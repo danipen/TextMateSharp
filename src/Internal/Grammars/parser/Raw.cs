@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using TextMateSharp.Internal.Types;
 using TextMateSharp.Internal.Utils;
@@ -34,12 +35,12 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public IRawRule GetProp(string name)
         {
-            return (IRawRule)this[name];
+            return TryGetObject<IRawRule>(name);
         }
 
         public IRawRule GetBase()
         {
-            return (IRawRule)this[DOLLAR_BASE];
+            return TryGetObject<IRawRule>(DOLLAR_BASE);
         }
 
         public void SetBase(IRawRule ruleBase)
@@ -49,7 +50,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public IRawRule GetSelf()
         {
-            return (IRawRule)this[DOLLAR_SELF];
+            return TryGetObject<IRawRule>(DOLLAR_SELF);
         }
 
         public void SetSelf(IRawRule self)
@@ -59,7 +60,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public int GetId()
         {
-            return (int)this[ID];
+            return TryGetObject<int>(ID);
         }
 
         public void SetId(int id)
@@ -69,7 +70,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetName()
         {
-            return (string)this[NAME];
+            return TryGetObject<string>(NAME);
         }
 
         public void SetName(string name)
@@ -79,7 +80,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetContentName()
         {
-            return (string)this[CONTENT_NAME];
+            return TryGetObject<string>(CONTENT_NAME);
         }
 
         public void SetContentName(string name)
@@ -89,7 +90,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetMatch()
         {
-            return (string)this[MATCH];
+            return TryGetObject<string>(MATCH);
         }
 
         public void SetMatch(string match)
@@ -100,12 +101,12 @@ namespace TextMateSharp.Internal.Grammars.Parser
         public IRawCaptures GetCaptures()
         {
             UpdateCaptures(CAPTURES);
-            return (IRawCaptures)this[CAPTURES];
+            return TryGetObject<IRawCaptures>(CAPTURES);
         }
 
         private void UpdateCaptures(string name)
         {
-            object captures = this[name];
+            object captures = TryGetObject<object>(name);
             if (captures is IList)
             {
                 Raw rawCaptures = new Raw();
@@ -126,7 +127,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetBegin()
         {
-            return (string)this[BEGIN];
+            return TryGetObject<string>(BEGIN);
         }
 
         public void SetBegin(string begin)
@@ -136,12 +137,12 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetWhile()
         {
-            return (string)this[WHILE];
+            return TryGetObject<string>(WHILE);
         }
 
         public string GetInclude()
         {
-            return (string)this[INCLUDE];
+            return TryGetObject<string>(INCLUDE);
         }
 
         public void SetInclude(string include)
@@ -152,7 +153,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
         public IRawCaptures GetBeginCaptures()
         {
             UpdateCaptures(BEGIN_CAPTURES);
-            return (IRawCaptures)this[BEGIN_CAPTURES];
+            return TryGetObject<IRawCaptures>(BEGIN_CAPTURES);
         }
 
         public void SetBeginCaptures(IRawCaptures beginCaptures)
@@ -162,7 +163,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetEnd()
         {
-            return (string)this[END];
+            return TryGetObject<string>(END);
         }
 
         public void SetEnd(string end)
@@ -173,7 +174,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
         public IRawCaptures GetEndCaptures()
         {
             UpdateCaptures(END_CAPTURES);
-            return (IRawCaptures)this[END_CAPTURES];
+            return TryGetObject<IRawCaptures>(END_CAPTURES);
         }
 
         public void SetEndCaptures(IRawCaptures endCaptures)
@@ -184,12 +185,17 @@ namespace TextMateSharp.Internal.Grammars.Parser
         public IRawCaptures GetWhileCaptures()
         {
             UpdateCaptures(WHILE_CAPTURES);
-            return (IRawCaptures)this[WHILE_CAPTURES];
+            return TryGetObject<IRawCaptures>(WHILE_CAPTURES);
         }
 
         public ICollection<IRawRule> GetPatterns()
         {
-            return (ICollection<IRawRule>)this[PATTERNS];
+            ICollection result = TryGetObject<ICollection>(PATTERNS);
+
+            if (result == null)
+                return null;
+
+            return result.Cast<IRawRule>().ToList();
         }
 
         public void SetPatterns(ICollection<IRawRule> patterns)
@@ -199,7 +205,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public Dictionary<string, IRawRule> GetInjections()
         {
-            return (Dictionary<string, IRawRule>)this[INJECTIONS];
+            return TryGetObject<Dictionary<string, IRawRule>>(INJECTIONS);
         }
 
         public string GetInjectionSelector()
@@ -209,7 +215,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public IRawRepository GetRepository()
         {
-            return (IRawRepository)this[REPOSITORY];
+            return TryGetObject<IRawRepository>(REPOSITORY);
         }
 
         public void SetRepository(IRawRepository repository)
@@ -219,7 +225,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public bool IsApplyEndPatternLast()
         {
-            object applyEndPatternLast = this[APPLY_END_PATTERN_LAST];
+            object applyEndPatternLast = TryGetObject<object>(APPLY_END_PATTERN_LAST);
             if (applyEndPatternLast == null)
             {
                 return false;
@@ -242,7 +248,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetScopeName()
         {
-            return (string)this[SCOPE_NAME];
+            return TryGetObject<string>(SCOPE_NAME);
         }
 
         public ICollection<string> GetFileTypes()
@@ -250,7 +256,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
             if (fileTypes == null)
             {
                 List<string> list = new List<string>();
-                ICollection unparsedFileTypes = (ICollection)this[FILE_TYPES];
+                ICollection unparsedFileTypes = TryGetObject<ICollection>(FILE_TYPES);
                 if (unparsedFileTypes != null)
                 {
                     foreach (object o in unparsedFileTypes)
@@ -271,7 +277,7 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public string GetFirstLineMatch()
         {
-            return (string)this[FIRST_LINE_MATCH];
+            return TryGetObject<string>(FIRST_LINE_MATCH);
         }
 
         public IRawRule GetCapture(string captureId)
@@ -287,6 +293,15 @@ namespace TextMateSharp.Internal.Grammars.Parser
         IEnumerator<string> IEnumerable<string>.GetEnumerator()
         {
             return Keys.GetEnumerator();
+        }
+
+        T TryGetObject<T>(string key)
+        {
+            object result;
+            if (!TryGetValue(key, out result))
+                return default(T);
+
+            return (T)result;
         }
     }
 }

@@ -8,37 +8,46 @@ namespace TextMateSharp.Internal.Themes
     {
         public string GetName()
         {
-            return (string)this["name"];
+            return TryGetObject<string>("name");
         }
 
         public ICollection<IRawThemeSetting> GetSettings()
         {
-            return (ICollection<IRawThemeSetting>)this["settings"];
+            return TryGetObject<ICollection<IRawThemeSetting>>("settings");
         }
 
         public object GetScope()
         {
-            return this["scope"];
+            return TryGetObject<object>("scope");
         }
 
         public IThemeSetting GetSetting()
         {
-            return (IThemeSetting)this["settings"];
+            return TryGetObject<IThemeSetting>("settings");
         }
 
         public object GetFontStyle()
         {
-            return this["fontStyle"];
+            return TryGetObject<object>("fontStyle");
         }
 
         public string GetBackground()
         {
-            return (string)this["background"];
+            return TryGetObject<string>("background");
         }
 
         public string GetForeground()
         {
-            return (string)this["foreground"];
+            return TryGetObject<string>("foreground");
+        }
+
+        T TryGetObject<T>(string key)
+        {
+            object result;
+            if (!TryGetValue(key, out result))
+                return default(T);
+
+            return (T)result;
         }
     }
 }

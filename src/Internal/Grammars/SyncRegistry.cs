@@ -98,11 +98,12 @@ namespace TextMateSharp.Internal.Grammars
             return this.grammars[scopeName];
         }
 
-        private static void CollectIncludedScopes(ICollection<String> result, IRawGrammar grammar)
+        private static void CollectIncludedScopes(ICollection<string> result, IRawGrammar grammar)
         {
-            if (grammar.GetPatterns() != null /* && Array.isArray(grammar.patterns) */)
+            ICollection<IRawRule> patterns = grammar.GetPatterns();
+            if (patterns != null /* && Array.isArray(grammar.patterns) */)
             {
-                ExtractIncludedScopesInPatterns(result, grammar.GetPatterns());
+                ExtractIncludedScopesInPatterns(result, patterns);
             }
 
             IRawRepository repository = grammar.GetRepository();
@@ -115,7 +116,7 @@ namespace TextMateSharp.Internal.Grammars
             result.Remove(grammar.GetScopeName());
         }
 
-        private static void ExtractIncludedScopesInPatterns(ICollection<String> result, ICollection<IRawRule> patterns)
+        private static void ExtractIncludedScopesInPatterns(ICollection<string> result, ICollection<IRawRule> patterns)
         {
             foreach (IRawRule pattern in patterns)
             {
@@ -125,7 +126,7 @@ namespace TextMateSharp.Internal.Grammars
                     ExtractIncludedScopesInPatterns(result, p);
                 }
 
-                String include = pattern.GetInclude();
+                string include = pattern.GetInclude();
                 if (include == null)
                 {
                     continue;
@@ -163,23 +164,30 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        private static void ExtractIncludedScopesInRepository(ICollection<string> result, IRawRepository repository)
+        private static void ExtractIncludedScopesInRepository(
+            ICollection<string> result,
+            IRawRepository repository)
         {
             if (!(repository is Raw))
             {
                 return;
             }
+
             Raw rawRepository = (Raw)repository;
             foreach (string key in rawRepository.Keys)
             {
                 IRawRule rule = (IRawRule)rawRepository[key];
-                if (rule.GetPatterns() != null)
+
+                ICollection<IRawRule> patterns = rule.GetPatterns();
+                IRawRepository repositoryRule = rule.GetRepository();
+
+                if (patterns != null)
                 {
-                    ExtractIncludedScopesInPatterns(result, rule.GetPatterns());
+                    ExtractIncludedScopesInPatterns(result, patterns);
                 }
-                if (rule.GetRepository() != null)
+                if (repositoryRule != null)
                 {
-                    ExtractIncludedScopesInRepository(result, rule.GetRepository());
+                    ExtractIncludedScopesInRepository(result, repositoryRule);
                 }
             }
         }
