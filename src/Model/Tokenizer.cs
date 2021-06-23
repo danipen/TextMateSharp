@@ -49,8 +49,8 @@ namespace TextMateSharp.Model
             for (int tokenIndex = 0, len = tmResultTokens.Length; tokenIndex < len; tokenIndex++)
             {
                 IToken token = tmResultTokens[tokenIndex];
-                int tokenStartIndex = token.GetStartIndex();
-                string tokenType = DecodeTextMateToken(this.decodeMap, token.GetScopes());
+                int tokenStartIndex = token.StartIndex;
+                string tokenType = DecodeTextMateToken(this.decodeMap, token.Scopes);
 
                 // do not push a new token if the type is exactly the same (also
                 // helps with ligatures)

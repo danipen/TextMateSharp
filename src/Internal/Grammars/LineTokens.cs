@@ -81,7 +81,7 @@ namespace TextMateSharp.Internal.Grammars
 
         public IToken[] GetResult(StackElement stack, int lineLength)
         {
-            if (this.tokens.Count != 0 && this.tokens[this.tokens.Count - 1].GetStartIndex() == lineLength - 1)
+            if (this.tokens.Count != 0 && this.tokens[this.tokens.Count - 1].StartIndex == lineLength - 1)
             {
                 // pop produced token for newline
                 this.tokens.RemoveAt(this.tokens.Count - 1);
@@ -91,7 +91,7 @@ namespace TextMateSharp.Internal.Grammars
             {
                 this.lastTokenEndIndex = -1;
                 this.Produce(stack, lineLength);
-                this.tokens[this.tokens.Count - 1].SetStartIndex(0);
+                this.tokens[this.tokens.Count - 1].StartIndex = 0;
             }
 
             return this.tokens.ToArray();

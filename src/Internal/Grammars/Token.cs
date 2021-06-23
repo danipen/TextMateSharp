@@ -7,48 +7,28 @@ namespace TextMateSharp.Internal.Grammars
 {
     class Token : IToken
     {
-        private int startIndex;
+        public int StartIndex { get; set; }
 
-        private int endIndex;
+        public int EndIndex { get; private set; }
 
-        private List<string> scopes;
+        public List<string> Scopes { get; private set; }
 
         public Token(int startIndex, int endIndex, List<string> scopes)
         {
-            this.startIndex = startIndex;
-            this.endIndex = endIndex;
-            this.scopes = scopes;
-        }
-
-        public int GetStartIndex()
-        {
-            return startIndex;
-        }
-
-        public void SetStartIndex(int startIndex)
-        {
-            this.startIndex = startIndex;
-        }
-
-        public int GetEndIndex()
-        {
-            return endIndex;
-        }
-
-        public List<string> GetScopes()
-        {
-            return scopes;
+            this.StartIndex = startIndex;
+            this.EndIndex = endIndex;
+            this.Scopes = scopes;
         }
 
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
             s.Append("{startIndex: ");
-            s.Append(startIndex);
+            s.Append(StartIndex);
             s.Append(", endIndex: ");
-            s.Append(endIndex);
+            s.Append(EndIndex);
             s.Append(", scopes: ");
-            s.Append(scopes);
+            s.Append(Scopes);
             s.Append("}");
             return s.ToString();
         }

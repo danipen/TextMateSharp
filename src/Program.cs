@@ -34,10 +34,10 @@ namespace TextMateSharp
                     foreach (IToken token in result.GetTokens())
                     {
                         Console.WriteLine(string.Format("Token from {0} to {1} ->{2}<- with scopes {3}",
-                            token.GetStartIndex(),
-                            token.GetEndIndex(),
-                            line.Substring(token.GetStartIndex(), token.GetEndIndex() - 1),
-                            string.Join(",", token.GetScopes())));
+                            token.StartIndex,
+                            token.EndIndex,
+                            line.Substring(token.StartIndex, token.EndIndex - 1),
+                            string.Join(",", token.Scopes)));
                     }
                 }
             }

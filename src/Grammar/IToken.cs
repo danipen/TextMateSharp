@@ -4,12 +4,10 @@ namespace TextMateSharp.Grammars
 {
     public interface IToken
     {
-        int GetStartIndex();
+        int StartIndex { get; set; }
 
-        void SetStartIndex(int startIndex);
+        int EndIndex { get; }
 
-        int GetEndIndex();
-
-        List<string> GetScopes();
+        List<string> Scopes { get;}
     }
 }
