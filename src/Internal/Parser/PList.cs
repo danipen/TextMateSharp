@@ -22,17 +22,17 @@ namespace TextMateSharp.Internal.Parser
             this.currObject = null;
         }
 
-        public void StartElement(string localName)
+        public void StartElement(string tagName)
         {
-            if ("dict".Equals(localName))
+            if ("dict".Equals(tagName))
             {
                 this.currObject = Create(currObject, false);
             }
-            else if ("array".Equals(localName))
+            else if ("array".Equals(tagName))
             {
                 this.currObject = Create(currObject, true);
             }
-            else if ("key".Equals(localName))
+            else if ("key".Equals(tagName))
             {
                 if (currObject != null)
                 {
@@ -51,12 +51,7 @@ namespace TextMateSharp.Internal.Parser
             return new PListGrammar(parent, valueAsArray);
         }
 
-        public void EndElement(string localName)
-        {
-            EndElement(localName);
-        }
-
-        private void endElement(string tagName)
+        public void EndElement(string tagName)
         {
             object value = null;
             string text = this.text.ToString();
