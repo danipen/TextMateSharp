@@ -7,7 +7,6 @@ namespace TextMateSharp.Internal.Grammars
 {
     class Token : IToken
     {
-
         private int startIndex;
 
         private int endIndex;
