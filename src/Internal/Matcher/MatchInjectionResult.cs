@@ -5,12 +5,12 @@ namespace TextMateSharp.Internal.Matcher
     internal class MatchInjectionsResult : IMatchInjectionsResult
     {
         private IOnigCaptureIndex[] captureIndexes;
-        private int matchedRuleId;
+        private int? matchedRuleId;
         private bool isPriorityMatch;
 
         internal MatchInjectionsResult(
             IOnigCaptureIndex[] captureIndexes,
-            int matchedRuleId,
+            int? matchedRuleId,
             bool isPriorityMatch)
         {
             this.captureIndexes = captureIndexes;
@@ -23,7 +23,7 @@ namespace TextMateSharp.Internal.Matcher
             return captureIndexes;
         }
 
-        public int GetMatchedRuleId()
+        public int? GetMatchedRuleId()
         {
             return matchedRuleId;
         }

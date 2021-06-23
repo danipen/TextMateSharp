@@ -4,9 +4,9 @@ namespace TextMateSharp.Internal.Rules
 {
     public class CaptureRule : Rule
     {
-        public int retokenizeCapturedWithRuleId;
+        public int? retokenizeCapturedWithRuleId;
 
-        public CaptureRule(int id, string name, string contentName, int retokenizeCapturedWithRuleId) : base(id, name, contentName)
+        public CaptureRule(int? id, string name, string contentName, int? retokenizeCapturedWithRuleId) : base(id, name, contentName)
         {
             this.retokenizeCapturedWithRuleId = retokenizeCapturedWithRuleId;
         }

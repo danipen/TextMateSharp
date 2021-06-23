@@ -17,7 +17,7 @@ namespace TextMateSharp.Internal.Utils
 
                 foreach (string key in rawToClone.Keys)
                 {
-                    raw[key] = Clone(raw[key]);
+                    raw[key] = Clone(rawToClone[key]);
                 }
                 return raw;
             }

@@ -6,6 +6,6 @@ namespace TextMateSharp.Internal.Matcher
     {
         IOnigCaptureIndex[] GetCaptureIndices();
 
-        int GetMatchedRuleId();
+        int? GetMatchedRuleId();
     }
 }

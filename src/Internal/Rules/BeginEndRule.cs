@@ -13,10 +13,10 @@ namespace TextMateSharp.Internal.Rules
         public List<CaptureRule> endCaptures;
         public bool applyEndPatternLast;
         public bool hasMissingPatterns;
-        public int[] patterns;
+        public int?[] patterns;
         private RegExpSourceList cachedCompiledPatterns;
 
-        public BeginEndRule(int id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
+        public BeginEndRule(int? id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
             string end, List<CaptureRule> endCaptures, bool applyEndPatternLast, ICompilePatternsResult patterns)
             : base(id, name, contentName)
         {

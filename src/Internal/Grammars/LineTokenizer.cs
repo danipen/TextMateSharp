@@ -97,7 +97,7 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             IOnigCaptureIndex[] captureIndices = r.GetCaptureIndices();
-            int matchedRuleId = r.GetMatchedRuleId();
+            int? matchedRuleId = r.GetMatchedRuleId();
 
             bool hasAdvanced = (captureIndices != null && captureIndices.Length > 0)
                     ? (captureIndices[0].GetEnd() > linePos)
@@ -309,7 +309,7 @@ namespace TextMateSharp.Internal.Grammars
             // The lower the better
             int bestMatchRating = int.MaxValue;
             IOnigCaptureIndex[] bestMatchCaptureIndices = null;
-            int bestMatchRuleId = -1;
+            int? bestMatchRuleId = null;
             int bestMatchResultPriority = 0;
 
             List<string> scopes = stack.contentNameScopesList.GenerateScopes();
@@ -354,7 +354,7 @@ namespace TextMateSharp.Internal.Grammars
 
             if (bestMatchCaptureIndices != null)
             {
-                int matchedRuleId = bestMatchRuleId;
+                int? matchedRuleId = bestMatchRuleId;
                 IOnigCaptureIndex[] matchCaptureIndices = bestMatchCaptureIndices;
                 bool isPriorityMatch = bestMatchResultPriority == -1;
 
@@ -422,7 +422,7 @@ namespace TextMateSharp.Internal.Grammars
                     lineTokens.Produce(stack, captureIndex.GetStart());
                 }
 
-                if (captureRule.retokenizeCapturedWithRuleId != -1)
+                if (captureRule.retokenizeCapturedWithRuleId != null)
                 {
                     // the capture requires additional matching
                     String scopeName = captureRule.GetName(lineText._string, captureIndices);
@@ -488,7 +488,7 @@ namespace TextMateSharp.Internal.Grammars
 
                 if (r != null)
                 {
-                    int matchedRuleId = ruleScanner.rules[r.GetIndex()];
+                    int? matchedRuleId = ruleScanner.rules[r.GetIndex()];
                     if (matchedRuleId != -2)
                     {
                         // we shouldn't end up here

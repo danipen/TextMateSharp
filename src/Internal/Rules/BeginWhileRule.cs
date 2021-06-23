@@ -12,11 +12,11 @@ namespace TextMateSharp.Internal.Rules
         private RegExpSource _while;
         public bool whileHasBackReferences;
         public bool hasMissingPatterns;
-        public int[] patterns;
+        public int?[] patterns;
         private RegExpSourceList cachedCompiledPatterns;
         private RegExpSourceList cachedCompiledWhilePatterns;
 
-        public BeginWhileRule(int id, string name, string contentName, string begin,
+        public BeginWhileRule(int? id, string name, string contentName, string begin,
                 List<CaptureRule> beginCaptures, string _while, List<CaptureRule> whileCaptures,
                 ICompilePatternsResult patterns) : base(id, name, contentName)
         {

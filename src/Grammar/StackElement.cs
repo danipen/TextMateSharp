@@ -13,14 +13,14 @@ namespace TextMateSharp.Grammars
         private int enterPosition;
         public StackElement parent;
         public int depth;
-        public int ruleId;
+        public int? ruleId;
         public string endRule;
         public ScopeListElement nameScopesList;
         public ScopeListElement contentNameScopesList;
 
         public StackElement(
             StackElement parent,
-            int ruleId,
+            int? ruleId,
             int enterPos,
             string endRule,
             ScopeListElement nameScopesList,
@@ -98,7 +98,7 @@ namespace TextMateSharp.Grammars
             return this;
         }
 
-        public StackElement Push(int ruleId, int enterPos, String endRule, ScopeListElement nameScopesList, ScopeListElement contentNameScopesList)
+        public StackElement Push(int? ruleId, int enterPos, String endRule, ScopeListElement nameScopesList, ScopeListElement contentNameScopesList)
         {
             return new StackElement(this, ruleId, enterPos, endRule, nameScopesList, contentNameScopesList);
         }

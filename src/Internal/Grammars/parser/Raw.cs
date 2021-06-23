@@ -58,9 +58,9 @@ namespace TextMateSharp.Internal.Grammars.Parser
             this[DOLLAR_SELF] = self;
         }
 
-        public int GetId()
+        public int? GetId()
         {
-            return TryGetObject<int>(ID);
+            return TryGetObject<int?>(ID);
         }
 
         public void SetId(int id)
@@ -299,7 +299,9 @@ namespace TextMateSharp.Internal.Grammars.Parser
         {
             object result;
             if (!TryGetValue(key, out result))
+            {
                 return default(T);
+            }
 
             return (T)result;
         }

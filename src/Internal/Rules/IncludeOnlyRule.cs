@@ -3,10 +3,10 @@ namespace TextMateSharp.Internal.Rules
     public class IncludeOnlyRule : Rule
     {
         public bool hasMissingPatterns;
-        public int[] patterns;
+        public int?[] patterns;
         private RegExpSourceList cachedCompiledPatterns;
 
-        public IncludeOnlyRule(int id, string name, string contentName, ICompilePatternsResult patterns) : base(id, name, contentName)
+        public IncludeOnlyRule(int? id, string name, string contentName, ICompilePatternsResult patterns) : base(id, name, contentName)
         {
             this.patterns = patterns.patterns;
             this.hasMissingPatterns = patterns.hasMissingPatterns;

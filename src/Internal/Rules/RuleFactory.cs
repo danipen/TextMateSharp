@@ -10,15 +10,15 @@ namespace TextMateSharp.Internal.Rules
     {
 
         public static CaptureRule CreateCaptureRule(IRuleFactoryHelper helper, string name, string contentName,
-                int retokenizeCapturedWithRuleId)
+                int? retokenizeCapturedWithRuleId)
         {
             return (CaptureRule)helper.RegisterRule(id => new CaptureRule(id, name, contentName, retokenizeCapturedWithRuleId));
         }
 
-        public static int GetCompiledRuleId(IRawRule desc, IRuleFactoryHelper helper,
+        public static int? GetCompiledRuleId(IRawRule desc, IRuleFactoryHelper helper,
                 IRawRepository repository)
         {
-            if (desc.GetId() == -1)
+            if (desc.GetId() == null)
             {
 
                 helper.RegisterRule(id =>
@@ -104,7 +104,7 @@ namespace TextMateSharp.Internal.Rules
                 foreach (string captureId in captures)
                 {
                     numericCaptureId = ParseInt(captureId);
-                    int retokenizeCapturedWithRuleId = -1;
+                    int? retokenizeCapturedWithRuleId = null;
                     IRawRule rule = captures.GetCapture(captureId);
                     if (rule.GetPatterns() != null)
                     {
@@ -130,10 +130,10 @@ namespace TextMateSharp.Internal.Rules
         private static ICompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
             IRawRepository repository)
         {
-            List<int> r = new List<int>();
+            List<int?> r = new List<int?>();
             int i;
             int len;
-            int patternId;
+            int? patternId;
             IRawGrammar externalGrammar;
             Rule rule;
             bool skipRule;
@@ -142,7 +142,7 @@ namespace TextMateSharp.Internal.Rules
             {
                 foreach (IRawRule pattern in patterns)
                 {
-                    patternId = -1;
+                    patternId = null;
 
                     if (pattern.GetInclude() != null)
                     {
@@ -221,7 +221,7 @@ namespace TextMateSharp.Internal.Rules
                         patternId = RuleFactory.GetCompiledRuleId(pattern, helper, repository);
                     }
 
-                    if (patternId != -1)
+                    if (patternId != null)
                     {
                         rule = helper.GetRule(patternId);
 

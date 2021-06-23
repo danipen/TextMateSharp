@@ -4,7 +4,7 @@ namespace TextMateSharp.Internal.Types
 {
     public interface IRawRule
     {
-        int GetId();
+        int? GetId();
 
         void SetId(int id);
 
