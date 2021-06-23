@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextMateSharp", "TextMateSharp\TextMateSharp.csproj", "{664F185F-961B-496E-9159-3CC8F05DBBE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{664F185F-961B-496E-9159-3CC8F05DBBE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{664F185F-961B-496E-9159-3CC8F05DBBE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{664F185F-961B-496E-9159-3CC8F05DBBE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{664F185F-961B-496E-9159-3CC8F05DBBE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D82FE2B4-7A75-444B-AB90-DC50F82D89A8}
+	EndGlobalSection
+EndGlobal

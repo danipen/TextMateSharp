@@ -1,0 +1,131 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Grammar\**" />
+    <Compile Remove="Internal\**" />
+    <Compile Remove="Registry\**" />
+    <Compile Remove="Themes\**" />
+    <EmbeddedResource Remove="Grammar\**" />
+    <EmbeddedResource Remove="Internal\**" />
+    <EmbeddedResource Remove="Registry\**" />
+    <EmbeddedResource Remove="Themes\**" />
+    <None Remove="Grammar\**" />
+    <None Remove="Internal\**" />
+    <None Remove="Registry\**" />
+    <None Remove="Themes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Model\DecodeMap.java" />
+    <None Remove="Model\IModelTokensChangedListener.java" />
+    <None Remove="Model\ITMModel.java" />
+    <None Remove="Model\ITokenizationSupport.java" />
+    <None Remove="Model\LineTokens.java" />
+    <None Remove="Model\ModelTokensChangedEvent.java" />
+    <None Remove="Model\ModelTokensChangedEventBuilder.java" />
+    <None Remove="Model\Range.java" />
+    <None Remove="Model\TMModel.java" />
+    <None Remove="Model\TMState.java" />
+    <None Remove="Model\TMTokenDecodeData.java" />
+    <None Remove="Model\Tokenizer.java" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Grammar\GrammarHelper.cs" />
+    <Compile Include="Grammar\IGrammar.cs" />
+    <Compile Include="Grammar\IGrammarRepository.cs" />
+    <Compile Include="Grammar\Injection.cs" />
+    <Compile Include="Grammar\IToken.cs" />
+    <Compile Include="Grammar\ITokenizeLineResult.cs" />
+    <Compile Include="Grammar\ITokenizeLineResult2.cs" />
+    <Compile Include="Grammar\StackElement.cs" />
+    <Compile Include="Internal\Grammars\SyncRegistry.cs" />
+    <Compile Include="Internal\Grammars\Grammar.cs" />
+    <Compile Include="Internal\Grammars\LineTokenizer.cs" />
+    <Compile Include="Internal\Grammars\LineTokens.cs" />
+    <Compile Include="Internal\Grammars\LocalStackElement.cs" />
+    <Compile Include="Internal\Grammars\MetadataConsts.cs" />
+    <Compile Include="Internal\Grammars\parser\PListGrammar.cs" />
+    <Compile Include="Internal\Grammars\parser\Raw.cs" />
+    <Compile Include="Internal\Grammars\reader\GrammarReader.cs" />
+    <Compile Include="Internal\Grammars\ScopeListElement.cs" />
+    <Compile Include="Internal\Grammars\ScopeMetadata.cs" />
+    <Compile Include="Internal\Grammars\ScopeMetadataProvider.cs" />
+    <Compile Include="Internal\Grammars\StackElementMetadata.cs" />
+    <Compile Include="Internal\Grammars\StandardTokenType.cs" />
+    <Compile Include="Internal\Grammars\Token.cs" />
+    <Compile Include="Internal\Grammars\TokenizeLineResult.cs" />
+    <Compile Include="Internal\Grammars\TokenizeLineResult2.cs" />
+    <Compile Include="Internal\Matcher\IMatchesName.cs" />
+    <Compile Include="Internal\Matcher\IMatchInjectionsResult.cs" />
+    <Compile Include="Internal\Matcher\IMatchResult.cs" />
+    <Compile Include="Internal\Matcher\Matcher.cs" />
+    <Compile Include="Internal\Matcher\MatcherWithPriority.cs" />
+    <Compile Include="Internal\Matcher\MatchInjectionResult.cs" />
+    <Compile Include="Internal\Matcher\MatchResult.cs" />
+    <Compile Include="Internal\Oniguruma\IOnigCaptureIndex.cs" />
+    <Compile Include="Internal\Oniguruma\IOnigNextMatchResult.cs" />
+    <Compile Include="Internal\Oniguruma\OnigNextMatchResult.cs" />
+    <Compile Include="Internal\Oniguruma\OnigRegExp.cs" />
+    <Compile Include="Internal\Oniguruma\OnigResult.cs" />
+    <Compile Include="Internal\Oniguruma\OnigScanner.cs" />
+    <Compile Include="Internal\Oniguruma\OnigSearcher.cs" />
+    <Compile Include="Internal\Oniguruma\OnigString.cs" />
+    <Compile Include="Internal\Oniguruma\Region.cs" />
+    <Compile Include="Internal\Parser\Json\JSONPListParser.cs" />
+    <Compile Include="Internal\Parser\PList.cs" />
+    <Compile Include="Internal\Parser\PListObject.cs" />
+    <Compile Include="Internal\Rules\BeginEndRule.cs" />
+    <Compile Include="Internal\Rules\BeginWhileRule.cs" />
+    <Compile Include="Internal\Rules\CaptureRule.cs" />
+    <Compile Include="Internal\Rules\ICompiledRule.cs" />
+    <Compile Include="Internal\Rules\ICompilePatternsResult.cs" />
+    <Compile Include="Internal\Rules\IGrammarRegistry.cs" />
+    <Compile Include="Internal\Rules\IncludeOnlyRule.cs" />
+    <Compile Include="Internal\Rules\IRegExpSourceAnchorCache.cs" />
+    <Compile Include="Internal\Rules\IRuleFactoryHelper.cs" />
+    <Compile Include="Internal\Rules\IRuleRegistry.cs" />
+    <Compile Include="Internal\Rules\MatchRule.cs" />
+    <Compile Include="Internal\Rules\RegExpSource.cs" />
+    <Compile Include="Internal\Rules\RegExpSourceList.cs" />
+    <Compile Include="Internal\Rules\Rule.cs" />
+    <Compile Include="Internal\Rules\RuleFactory.cs" />
+    <Compile Include="Internal\Themes\PListTheme.cs" />
+    <Compile Include="Internal\Themes\reader\ThemeReader.cs" />
+    <Compile Include="Internal\Themes\ThemeRaw.cs" />
+    <Compile Include="Internal\Types\IBaseRaw.cs" />
+    <Compile Include="Internal\Types\IRawCaptures.cs" />
+    <Compile Include="Internal\Types\IRawGrammar.cs" />
+    <Compile Include="Internal\Types\IRawRepository.cs" />
+    <Compile Include="Internal\Types\IRawRule.cs" />
+    <Compile Include="Internal\Utils\CloneUtils.cs" />
+    <Compile Include="Internal\Utils\CompareUtils.cs" />
+    <Compile Include="Internal\Utils\RegexSource.cs" />
+    <Compile Include="Registry\IRegistryOptions.cs" />
+    <Compile Include="Registry\Registry.cs" />
+    <Compile Include="Themes\ColorMap.cs" />
+    <Compile Include="Themes\FontStyle.cs" />
+    <Compile Include="Themes\IRawTheme.cs" />
+    <Compile Include="Themes\IRawThemeSetting.cs" />
+    <Compile Include="Themes\IThemeProvider.cs" />
+    <Compile Include="Themes\IThemeSetting.cs" />
+    <Compile Include="Themes\ParsedThemeRule.cs" />
+    <Compile Include="Themes\Theme.cs" />
+    <Compile Include="Themes\ThemeTrieElement.cs" />
+    <Compile Include="Themes\ThemeTrieElementRule.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Internal\Parser\Xml\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+</Project>
