@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using TextMateSharp.Themes;
 
@@ -13,7 +15,12 @@ namespace TextMateSharp.Internal.Themes
 
         public ICollection<IRawThemeSetting> GetSettings()
         {
-            return TryGetObject<ICollection<IRawThemeSetting>>("settings");
+            ICollection result = TryGetObject<ICollection>("settings");
+
+            if (result == null)
+                return null;
+
+            return result.Cast<IRawThemeSetting>().ToList();
         }
 
         public object GetScope()
