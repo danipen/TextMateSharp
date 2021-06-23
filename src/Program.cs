@@ -49,22 +49,23 @@ namespace TextMateSharp
 
         class LocalRegistryOptions : IRegistryOptions
         {
-            string IRegistryOptions.GetFilePath(string scopeName)
+            public string GetFilePath(string scopeName)
+            {
+                string result = Path.GetFullPath(@"../../../../test/testgrammars/csharp.tmLanguage.json");
+                return result;
+            }
+
+            public ICollection<string> GetInjections(string scopeName)
             {
                 return null;
             }
 
-            ICollection<string> IRegistryOptions.GetInjections(string scopeName)
+            public StreamReader GetInputStream(string scopeName)
             {
-                return null;
+                return new StreamReader(GetFilePath(scopeName));
             }
 
-            StreamReader IRegistryOptions.GetInputStream(string scopeName)
-            {
-                return null;
-            }
-
-            IRawTheme IRegistryOptions.GetTheme()
+            public IRawTheme GetTheme()
             {
                 return null;
             }
