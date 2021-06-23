@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -70,12 +71,14 @@
     <Compile Include="Internal\Matcher\MatchResult.cs" />
     <Compile Include="Internal\Oniguruma\IOnigCaptureIndex.cs" />
     <Compile Include="Internal\Oniguruma\IOnigNextMatchResult.cs" />
+    <Compile Include="Internal\Oniguruma\OnigInterop.cs" />
     <Compile Include="Internal\Oniguruma\OnigNextMatchResult.cs" />
     <Compile Include="Internal\Oniguruma\OnigRegExp.cs" />
     <Compile Include="Internal\Oniguruma\OnigResult.cs" />
     <Compile Include="Internal\Oniguruma\OnigScanner.cs" />
     <Compile Include="Internal\Oniguruma\OnigSearcher.cs" />
     <Compile Include="Internal\Oniguruma\OnigString.cs" />
+    <Compile Include="Internal\Oniguruma\ORegex.cs" />
     <Compile Include="Internal\Oniguruma\Region.cs" />
     <Compile Include="Internal\Parser\Json\JSONPListParser.cs" />
     <Compile Include="Internal\Parser\PList.cs" />
@@ -122,6 +125,18 @@
 
   <ItemGroup>
     <Folder Include="Internal\Parser\Xml\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="../lib/onigwrap.dll" Condition=" '$(OS)' == 'Windows_NT' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../lib/libonigwrap.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../lib/libonigwrap.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
