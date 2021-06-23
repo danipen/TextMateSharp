@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace TextMateSharp.Internal.Oniguruma
 {
     public class OnigRegExp
@@ -5,17 +7,23 @@ namespace TextMateSharp.Internal.Oniguruma
         private OnigString lastSearchString;
         private int lastSearchPosition;
         private OnigResult lastSearchResult;
-        //private Regex regex;
-
+        private ORegex regex;
+        private string patterDebug;
         public OnigRegExp(string source)
         {
             lastSearchString = null;
             lastSearchPosition = -1;
             lastSearchResult = null;
+
+            regex = new ORegex(source);
+            patterDebug = source;
             /*byte[] pattern = source.getBytes(StandardCharsets.UTF_8);
+             
 			this.regex = new Regex(pattern, 0, pattern.length, Option.CAPTURE_GROUP, UTF8Encoding.INSTANCE, Syntax.DEFAULT,
 					WarnCallback.DEFAULT);*/
         }
+
+        // TODO: dispose regex
 
         public OnigResult Search(OnigString str, int position)
         {
@@ -27,12 +35,27 @@ namespace TextMateSharp.Internal.Oniguruma
 
             lastSearchString = str;
             lastSearchPosition = position;
-            //lastSearchResult = Search(str.utf8_value, position, str.utf8_value.length);
+            lastSearchResult = Search(str._string, position);
             return lastSearchResult;
         }
 
-        private OnigResult Search(byte[] data, int position, int end)
+        private OnigResult Search(string data, int position)
         {
+            List<ORegexResult> results = regex.SafeSearch(data, position);
+
+            if (results == null || results.Count == 0)
+                return null;
+
+            Region region = new Region(results.Count);
+
+            for (int i = 0; i < results.Count; i++)
+            {
+                region.beg[i] = results[i].Position;
+                region.end[i] = results[i].Position + results[i].Length;
+            }
+
+            OnigResult result = new OnigResult(region, -1);
+
             /*Matcher matcher = regex.matcher(data);
 			int status = matcher.search(position, end, Option.DEFAULT);
 			if (status != Matcher.FAILED)
@@ -40,7 +63,7 @@ namespace TextMateSharp.Internal.Oniguruma
 				Region region = matcher.getEagerRegion();
 				return new OnigResult(region, -1);
 			}*/
-            return null;
+            return result;
         }
     }
 }

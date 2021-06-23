@@ -15,13 +15,6 @@ namespace TextMateSharp.Internal.Oniguruma
             this.end = new int[num];
         }
 
-        public Region(int begin, int end)
-        {
-            this.numRegs = 1;
-            this.beg = new int[] { begin };
-            this.end = new int[] { end };
-        }
-
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
