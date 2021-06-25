@@ -142,7 +142,7 @@ namespace TextMateSharp.Internal.Grammars
             if (scope.IndexOf(' ') >= 0)
             {
                 // there are multiple scopes to push
-                return Push(this, grammar, new List<string>(scope.Split(" ")));
+                return Push(this, grammar, new List<string>(scope.Split(new[] {" "}, StringSplitOptions.None)));
             }
             // there is a single scope to push
             return Push(this, grammar, new List<string>() { scope });

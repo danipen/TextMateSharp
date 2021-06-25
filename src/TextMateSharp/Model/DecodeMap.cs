@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -28,7 +29,8 @@ namespace TextMateSharp.Model
             {
                 return tokens;
             }
-            string[] tmpTokens = scope.Split("[.]");
+
+            string[] tmpTokens = scope.Split(new string[] {"[.]"}, StringSplitOptions.None);
 
             tokens = new int[tmpTokens.Length];
             for (int i = 0; i < tmpTokens.Length; i++)

@@ -63,7 +63,7 @@ namespace TextMateSharp.Themes
                 {
                     string scope = (string)settingScope;
 
-                    scopes = new List<string>(scope.Split(",", StringSplitOptions.RemoveEmptyEntries));
+                    scopes = new List<string>(scope.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries));
                 }
                 else if (settingScope is IList<object>)
                 {
@@ -80,7 +80,7 @@ namespace TextMateSharp.Themes
                 {
                     fontStyle = FontStyle.None;
 
-                    string[] segments = ((string)settingsFontStyle).Split(" ");
+                    string[] segments = ((string) settingsFontStyle).Split(new[] {" "}, StringSplitOptions.None);
                     foreach (string segment in segments)
                     {
                         if ("italic".Equals(segment))
@@ -115,7 +115,7 @@ namespace TextMateSharp.Themes
                 {
                     string _scope = scopes[j].Trim();
 
-                    List<string> segments = new(_scope.Split(" "));
+                    List<string> segments = new(_scope.Split(new[] {" "}, StringSplitOptions.None));
 
                     string scope = segments[segments.Count - 1];
                     List<string> parentScopes = null;
