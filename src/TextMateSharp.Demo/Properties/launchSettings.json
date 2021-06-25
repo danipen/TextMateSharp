@@ -2,7 +2,7 @@
   "profiles": {
     "TextMateSharp.Demo": {
       "commandName": "Project",
-      "commandLineArgs": "..\\..\\..\\testdata\\samplefiles\\sample.cs ..\\..\\..\\testdata\\grammars\\\\csharp.tmLanguage.json ..\\..\\..\\testdata\\themes\\dark_vs.json"
+      "commandLineArgs": "../../../testdata/samplefiles/sample.cs ../../../testdata/grammars/csharp.tmLanguage.json ../../../testdata/themes/dark_vs.json"
     }
   }
 }
