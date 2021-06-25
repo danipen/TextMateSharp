@@ -5,7 +5,7 @@ The implementation is based the Java port [eclipse/tm4e](https://github.com/ecli
 
 TextMateSharp uses [Oniguruma](https://github.com/kkos/oniguruma) regex engine bindings.
 
-Instructions about how to build Oniguruma bindings can be found in [`lib/README.md`](https://github.com/danipen/TextMateSharp/tree/master/lib)
+Instructions about how to build Oniguruma bindings can be found in [`onigwrap/README.md`](https://github.com/danipen/TextMateSharp/tree/master/onigwrap)
 
 ## Building
 Just execute `dotnet build` under the folder [TextMateSharp](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp)
