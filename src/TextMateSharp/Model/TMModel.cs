@@ -76,7 +76,16 @@ namespace TextMateSharp.Model
 
                     lock (_lock)
                     {
-                        toProcess = model.invalidLines.Dequeue();
+                        if (model.invalidLines.Count > 0)
+                        {
+                            toProcess = model.invalidLines.Dequeue();
+                        }
+                    }
+
+                    if (toProcess == -1)
+                    {
+                        Thread.Sleep(20);
+                        continue;
                     }
 
                     if (model.lines.Get(toProcess).IsInvalid)
@@ -103,7 +112,7 @@ namespace TextMateSharp.Model
             {
                 model.BuildEventWithCallback(eventBuilder =>
                 {
-                    int toLineIndex = toLineIndexOrNull.Value;
+                    int toLineIndex = toLineIndexOrNull ?? 0;
                     if (toLineIndexOrNull == null || toLineIndex >= model.lines.GetNumberOfLines())
                     {
                         toLineIndex = model.lines.GetNumberOfLines() - 1;
