@@ -162,9 +162,9 @@ Tokenizing line: }
 
 ## Demo
 
-There is a demo project in (TextMateSharp.Demo)[https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo] folder.
+There is a demo project in [TextMateSharp.Demo](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo) folder.
 
-Example grammars and files are located in the (testdata)[https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo/testdata] folder.
+Example grammars and files are located in the [testdata](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo/testdata) folder.
 
 Build and run:
 
