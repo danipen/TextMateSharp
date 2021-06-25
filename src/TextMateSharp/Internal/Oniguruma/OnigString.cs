@@ -99,19 +99,18 @@ namespace TextMateSharp.Internal.Oniguruma
         {
             if (this.utf8_value.Length != this._string.Length)
             {
+                char[] charArray = this._string.ToCharArray();
                 charsPosFromBytePos = new int[this.utf8_value.Length];
-                int bytesLen = 0; ;
+                int bytesLen = 0;
                 int charsLen = 0;
-                int length = this.utf8_value.Length;
-                for (int i = 0; i < length;)
+                for (int i = 0; i < this._string.Length; i++)
                 {
-                    int codeLen = GetByteCount(this.utf8_value, i, length);
+                    int codeLen = GetCharLength(charArray, i);
                     for (int i1 = 0; i1 < codeLen; i1++)
                     {
                         charsPosFromBytePos[bytesLen + i1] = charsLen;
                     }
                     bytesLen += codeLen;
-                    i += codeLen;
                     charsLen += 1;
                 }
                 if (bytesLen != this.utf8_value.Length)
@@ -122,9 +121,9 @@ namespace TextMateSharp.Internal.Oniguruma
             computedOffsets = true;
         }
 
-        private int GetByteCount(byte[] utf8_value, int ini, int lenght)
+        private int GetCharLength(char[] value, int index)
         {
-            return Encoding.UTF8.GetByteCount(Encoding.UTF8.GetString(utf8_value, ini, lenght));
+            return Encoding.UTF8.GetByteCount(value, index, 1);
         }
     }
 }
