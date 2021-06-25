@@ -116,11 +116,9 @@
     <Compile Include="Themes\FontStyle.cs" />
     <Compile Include="Themes\IRawTheme.cs" />
     <Compile Include="Themes\IRawThemeSetting.cs" />
-    <Compile Include="Themes\IStyle.cs" />
     <Compile Include="Themes\IThemeProvider.cs" />
     <Compile Include="Themes\IThemeSetting.cs" />
     <Compile Include="Themes\ParsedThemeRule.cs" />
-    <Compile Include="Themes\RGB.cs" />
     <Compile Include="Themes\Theme.cs" />
     <Compile Include="Themes\ThemeTrieElement.cs" />
     <Compile Include="Themes\ThemeTrieElementRule.cs" />

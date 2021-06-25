@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using TextMateSharp.Grammars;
+using TextMateSharp.Internal.Themes.Reader;
 using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
@@ -19,7 +20,7 @@ namespace TextMateSharp
                 Registry.Registry registry = new Registry.Registry(options);
 
                 List<string> textLines = new List<string>();
-                textLines.Add("using static System;");
+                textLines.Add("using static System; /* comment here */");
                 textLines.Add("namespace Example");
                 textLines.Add("{");
                 textLines.Add("}");
@@ -45,6 +46,20 @@ namespace TextMateSharp
                             endIndex,
                             line.SubstringAtIndexes(startIndex, endIndex),
                             string.Join(",", token.Scopes)));
+
+                        foreach (string scopeName in token.Scopes)
+                        {
+                            Theme theme = registry.GetTheme();
+                            List<ThemeTrieElementRule> themeRules = theme.Match(scopeName);
+
+                            foreach (ThemeTrieElementRule themeRule in themeRules)
+                            {
+                                Console.WriteLine("      - Matched theme rule: [bg: {0}, fg:{1}, fontStyle: {2}]",
+                                    theme.GetColor(themeRule.background),
+                                    theme.GetColor(themeRule.foreground),
+                                    themeRule.fontStyle);
+                            }
+                        }
                     }
                 }
             }
@@ -58,7 +73,7 @@ namespace TextMateSharp
         {
             public string GetFilePath(string scopeName)
             {
-                string result = Path.GetFullPath(@"../../../../test/testgrammars/csharp.tmLanguage.json");
+                string result = Path.GetFullPath(@"../../../../test/grammars/csharp.tmLanguage.json");
                 return result;
             }
 
@@ -74,7 +89,12 @@ namespace TextMateSharp
 
             public IRawTheme GetTheme()
             {
-                return null;
+                string themePath = Path.GetFullPath(@"../../../../test/themes/dark_vs.json");
+
+                using (StreamReader reader = new StreamReader(themePath))
+                {
+                    return ThemeReader.ReadThemeSync(reader);
+                }
             }
         }
     }

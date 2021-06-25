@@ -123,7 +123,12 @@ namespace TextMateSharp.Registry
             return this.syncRegistry.GrammarForScopeName(scopeName, initialLanguage, embeddedLanguages);
         }
 
-        public IRegistryOptions getLocator()
+        public Theme GetTheme()
+        {
+            return this.syncRegistry.GetTheme();
+        }
+
+        public IRegistryOptions GetLocator()
         {
             return locator;
         }

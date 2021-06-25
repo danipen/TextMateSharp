@@ -286,6 +286,5 @@ namespace TextMateSharp.Themes
             return Object.Equals(cache, other.cache) && Object.Equals(colorMap, other.colorMap) &&
                     Object.Equals(defaults, other.defaults) && Object.Equals(root, other.root);
         }
-
     }
 }

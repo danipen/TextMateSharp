@@ -24,6 +24,11 @@ namespace TextMateSharp.Internal.Grammars
             this.injectionGrammars = new Dictionary<string, ICollection<string>>();
         }
 
+        public Theme GetTheme()
+        {
+            return theme;
+        }
+
         public void SetTheme(Theme theme)
         {
             this.theme = theme;

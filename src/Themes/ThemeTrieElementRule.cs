@@ -43,15 +43,13 @@ namespace TextMateSharp.Themes
         {
             if (this.scopeDepth > scopeDepth)
             {
-                // TODO!!!
                 // console.log('how did this happen?');
             }
             else
             {
                 this.scopeDepth = scopeDepth;
             }
-            // console.log('TODO -> my depth: ' + this.scopeDepth + ', overwriting
-            // depth: ' + scopeDepth);
+            // console.log('TODO -> my depth: ' + this.scopeDepth + ', overwriting depth: ' + scopeDepth);
             if (fontStyle != FontStyle.NotSet)
             {
                 this.fontStyle = fontStyle;
