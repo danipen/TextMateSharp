@@ -13,7 +13,7 @@
       <TargetPath>onigwrap.dll</TargetPath>
     </ContentWithTargetPath>
     <!-- native oniguruma library for Linux -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\ibonigwrap.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+    <ContentWithTargetPath Include="Internal\Oniguruma\Native\libonigwrap.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>ibonigwrap.so</TargetPath>
     </ContentWithTargetPath>
