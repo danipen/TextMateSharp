@@ -50,10 +50,16 @@ namespace TextMateSharp
 
                 Registry.Registry registry = new Registry.Registry(options);
 
+                int ini = Environment.TickCount;
+                IGrammar grammar = registry.LoadGrammar("source.cs");
+                Console.WriteLine("Loaded {0} in {1}ms.",
+                    Path.GetFileName(grammarFile),
+                    Environment.TickCount - ini);
+
                 string[] textLines = File.ReadAllText(fileToParse).Split(Environment.NewLine);
 
-                IGrammar grammar = registry.LoadGrammar("source.cs");
-
+                int tokenizeIni = Environment.TickCount;
+                
                 foreach (string line in textLines)
                 {
                     Console.WriteLine(string.Format("Tokenizing line: {0}", line));
@@ -95,6 +101,10 @@ namespace TextMateSharp
                         }
                     }
                 }
+
+                Console.WriteLine("File {0} tokenized in {1}ms.",
+                    Path.GetFileName(fileToParse),
+                    Environment.TickCount - tokenizeIni);
             }
             catch (Exception ex)
             {
@@ -130,9 +140,15 @@ namespace TextMateSharp
 
             public IRawTheme GetTheme()
             {
+                int ini = Environment.TickCount;
+                
                 using (StreamReader reader = new StreamReader(_themeFile))
                 {
-                    return ThemeReader.ReadThemeSync(reader);
+                    IRawTheme result = ThemeReader.ReadThemeSync(reader);
+                    Console.WriteLine("Loaded {0} in {1}ms.",
+                        Path.GetFileName(_themeFile),
+                        Environment.TickCount - ini);
+                    return result;
                 }
             }
         }
