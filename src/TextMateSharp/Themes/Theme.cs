@@ -115,7 +115,7 @@ namespace TextMateSharp.Themes
                 {
                     string _scope = scopes[j].Trim();
 
-                    List<string> segments = new(_scope.Split(new[] {" "}, StringSplitOptions.None));
+                    List<string> segments = new List<string>(_scope.Split(new[] {" "}, StringSplitOptions.None));
 
                     string scope = segments[segments.Count - 1];
                     List<string> parentScopes = null;
