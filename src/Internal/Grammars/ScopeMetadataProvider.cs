@@ -80,7 +80,7 @@ namespace TextMateSharp.Internal.Grammars
             return value; //value.replace(/[\-\\\{\}\*\+\?\|\^\$\.\,\[\]\(\)\#\s]/g, '\\$&');
         }
 
-        public ScopeMetadata getMetadataForScope(string scopeName)
+        public ScopeMetadata GetMetadataForScope(string scopeName)
         {
             if (scopeName == null)
             {
