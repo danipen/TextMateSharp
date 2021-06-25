@@ -44,7 +44,7 @@ namespace TextMateSharp.Tests
                 utf8WithCharLen.ConvertUtf16OffsetToUtf8(55);
                 Assert.Fail("Expected error");
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 
@@ -64,7 +64,7 @@ namespace TextMateSharp.Tests
                 utf8WithCharLen.ConvertUtf8OffsetToUtf16(55);
                 Assert.Fail("Expected error");
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 
