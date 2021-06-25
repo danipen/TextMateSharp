@@ -7,6 +7,9 @@ TextMateSharp uses [Oniguruma](https://github.com/kkos/oniguruma) regex engine b
 
 Instructions about how to build Oniguruma bindings can be found in [`lib/README.md`](https://github.com/danipen/TextMateSharp/tree/master/lib)
 
+## Building
+Just execute `dotnet build` under the folder [TextMateSharp](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp)
+
 ## Using
 ```csharp
     class Program
@@ -155,4 +158,18 @@ Tokenizing line: {
 Tokenizing line: }
   - token from 0 to 1 -->}<-- with scopes source.cs
       - Matched theme rule: [bg: , fg:, fontStyle: -1]
+```
+
+## Demo
+
+There is a demo project in (TextMateSharp.Demo)[https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo] folder.
+
+Example grammars and files are located in the (testdata)[https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo/testdata] folder.
+
+Build and run:
+
+```
+cd src/TestMateSharp.Demo
+dotnet build
+dotnet run -- ./testdata/samplefiles/sample.cs ./testdata/grammars/csharp.tmLanguage.json ./testdata/themes/dark_vs.json
 ```
