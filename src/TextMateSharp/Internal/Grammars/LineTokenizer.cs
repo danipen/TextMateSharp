@@ -159,7 +159,7 @@ namespace TextMateSharp.Internal.Grammars
                     lineTokens.Produce(stack, captureIndices[0].GetEnd());
                     anchorPosition = captureIndices[0].GetEnd();
 
-                    string contentName = pushedRule.getContentName(lineText._string, captureIndices);
+                    string contentName = pushedRule.GetContentName(lineText._string, captureIndices);
                     ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
                     stack = stack.setContentNameScopesList(contentNameScopesList);
 
@@ -191,7 +191,7 @@ namespace TextMateSharp.Internal.Grammars
                     lineTokens.Produce(stack, captureIndices[0].GetEnd());
                     anchorPosition = captureIndices[0].GetEnd();
 
-                    string contentName = pushedRule.getContentName(lineText._string, captureIndices);
+                    string contentName = pushedRule.GetContentName(lineText._string, captureIndices);
                     ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
                     stack = stack.setContentNameScopesList(contentNameScopesList);
 
@@ -428,7 +428,7 @@ namespace TextMateSharp.Internal.Grammars
                     // the capture requires additional matching
                     string scopeName = captureRule.GetName(lineText._string, captureIndices);
                     ScopeListElement nameScopesList = stack.contentNameScopesList.Push(grammar, scopeName);
-                    string contentName = captureRule.getContentName(lineText._string, captureIndices);
+                    string contentName = captureRule.GetContentName(lineText._string, captureIndices);
                     ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
 
                     // the capture requires additional matching

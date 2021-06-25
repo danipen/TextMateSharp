@@ -268,7 +268,7 @@ namespace TextMateSharp.Themes
                     root.GetHashCode();
         }
 
-        public bool equals(object obj)
+        public override bool Equals(object obj)
         {
             if (this == obj)
             {

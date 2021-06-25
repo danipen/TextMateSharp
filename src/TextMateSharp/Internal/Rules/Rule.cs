@@ -33,7 +33,7 @@ namespace TextMateSharp.Internal.Rules
 			return RegexSource.ReplaceCaptures(this.name, lineText, captureIndices);
 		}
 
-		public string getContentName(string lineText, IOnigCaptureIndex[] captureIndices)
+		public string GetContentName(string lineText, IOnigCaptureIndex[] captureIndices)
 		{
 			if (!this.contentNameIsCapturing)
 			{

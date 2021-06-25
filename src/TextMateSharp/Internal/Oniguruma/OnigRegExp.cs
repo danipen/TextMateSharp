@@ -1,14 +1,15 @@
+using System;
 using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Oniguruma
 {
-    public class OnigRegExp
+    public class OnigRegExp : IDisposable
     {
         private OnigString lastSearchString;
         private int lastSearchPosition;
         private OnigResult lastSearchResult;
         private ORegex regex;
-        private string patterDebug;
+        private bool _disposed;
         public OnigRegExp(string source)
         {
             lastSearchString = null;
@@ -16,15 +17,29 @@ namespace TextMateSharp.Internal.Oniguruma
             lastSearchResult = null;
 
             regex = new ORegex(source, false, false);
-            patterDebug = source;
-            /*byte[] pattern = source.getBytes(StandardCharsets.UTF_8);
-             
-			this.regex = new Regex(pattern, 0, pattern.length, Option.CAPTURE_GROUP, UTF8Encoding.INSTANCE, Syntax.DEFAULT,
-					WarnCallback.DEFAULT);*/
         }
 
-        // TODO: dispose regex
+        ~OnigRegExp() => Dispose(false);
+        
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
 
+            if (regex != null)
+                regex.Dispose();
+            
+            _disposed = true;
+        }        
+        
         public OnigResult Search(OnigString str, int position)
         {
             if (lastSearchString == str && lastSearchPosition <= position &&
@@ -54,16 +69,7 @@ namespace TextMateSharp.Internal.Oniguruma
                 region.end[i] = results[i].Position + results[i].Length;
             }
 
-            OnigResult result = new OnigResult(region, -1);
-
-            /*Matcher matcher = regex.matcher(data);
-			int status = matcher.search(position, end, Option.DEFAULT);
-			if (status != Matcher.FAILED)
-			{
-				Region region = matcher.getEagerRegion();
-				return new OnigResult(region, -1);
-			}*/
-            return result;
+            return new OnigResult(region, -1);
         }
     }
 }
