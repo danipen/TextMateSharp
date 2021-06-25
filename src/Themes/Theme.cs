@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -25,19 +26,32 @@ namespace TextMateSharp.Themes
 
         public static List<ParsedThemeRule> ParseTheme(IRawTheme source)
         {
-            if (source == null || source.GetSettings() == null)
-            {
-                return new List<ParsedThemeRule>();
-            }
-            // if (!source.settings || !Array.isArray(source.settings)) {
-            // return [];
-            // }
-            ICollection<IRawThemeSetting> settings = source.GetSettings();
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
+
+            if (source == null)
+                return result;
+
+            // process theme rules in vscode-textmate format:
+            // see https://github.com/microsoft/vscode-textmate/tree/main/test-cases/themes
+            LookupThemeRules(source.GetSettings(), result);
+
+            // process theme rules in vscode format
+            // see https://github.com/microsoft/vscode/tree/main/extensions/theme-defaults/themes
+            LookupThemeRules(source.GetTokenColors(), result);
+
+            return result;
+        }
+
+        static void LookupThemeRules(
+            ICollection<IRawThemeSetting> settings,
+            List<ParsedThemeRule> parsedThemeRules)
+        {
+            if (settings == null)
+                return;
+
             int i = 0;
             foreach (IRawThemeSetting entry in settings)
             {
-
                 if (entry.GetSetting() == null)
                 {
                     continue;
@@ -51,9 +65,9 @@ namespace TextMateSharp.Themes
 
                     scopes = new List<string>(scope.Split(",", StringSplitOptions.RemoveEmptyEntries));
                 }
-                else if (settingScope is List<string>)
+                else if (settingScope is IList<object>)
                 {
-                    scopes = (List<string>)settingScope;
+                    scopes = new List<string>(((IList<object>)settingScope).Cast<string>());
                 }
                 else
                 {
@@ -112,12 +126,10 @@ namespace TextMateSharp.Themes
                     }
 
                     ParsedThemeRule t = new ParsedThemeRule(scope, parentScopes, i, fontStyle, foreground, background);
-                    result.Add(t);
+                    parsedThemeRules.Add(t);
                 }
                 i++;
             }
-
-            return result;
         }
 
         private static bool IsValidHexColor(string hex)

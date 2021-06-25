@@ -23,6 +23,16 @@ namespace TextMateSharp.Internal.Themes
             return result.Cast<IRawThemeSetting>().ToList();
         }
 
+        public ICollection<IRawThemeSetting> GetTokenColors()
+        {
+            ICollection result = TryGetObject<ICollection>("tokenColors");
+
+            if (result == null)
+                return null;
+
+            return result.Cast<IRawThemeSetting>().ToList();
+        }
+
         public object GetScope()
         {
             return TryGetObject<object>("scope");
