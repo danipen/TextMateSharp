@@ -1,9 +1,9 @@
 # TextMateSharp
-A port of [microsoft/vscode-textmate](https://github.com/microsoft/vscode-textmate) that brings TextMate grammars to dotnet ecosystem.
+An interpreter for grammar files as defined by TextMate. TextMate grammars use the oniguruma dialect (https://github.com/kkos/oniguruma). Supports loading grammar files only from JSON format. Cross - grammar injections are currently not supported.
 
-The implementation is based the Java port [eclipse/tm4e](https://github.com/eclipse/tm4e).
+TextMateSharp is a port of [microsoft/vscode-textmate](https://github.com/microsoft/vscode-textmate) that brings TextMate grammars to dotnet ecosystem. The implementation is based the Java port [eclipse/tm4e](https://github.com/eclipse/tm4e).
 
-TextMateSharp uses [Oniguruma](https://github.com/kkos/oniguruma) regex engine bindings.
+TextMateSharp uses a wrapper around [Oniguruma](https://github.com/kkos/oniguruma) regex engine. Read below to learn how to build Oniguruma bindings.
 
 ## Building
 Just execute `dotnet build` under the folder [TextMateSharp](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp)
