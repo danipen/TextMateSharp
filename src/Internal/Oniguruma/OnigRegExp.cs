@@ -15,7 +15,7 @@ namespace TextMateSharp.Internal.Oniguruma
             lastSearchPosition = -1;
             lastSearchResult = null;
 
-            regex = new ORegex(source);
+            regex = new ORegex(source, false, false);
             patterDebug = source;
             /*byte[] pattern = source.getBytes(StandardCharsets.UTF_8);
              

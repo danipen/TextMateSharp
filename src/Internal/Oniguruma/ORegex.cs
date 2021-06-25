@@ -72,7 +72,7 @@ namespace TextMateSharp.Internal.Oniguruma
                 for (var capture = 0; capture < captureCount; capture++)
                 {
                     var pos = OnigInterop.onigwrap_pos(region, capture);
-                    if (capture == 0 && pos == -1)
+                    if (capture == 0 && pos < 0)
                         break;
 
                     resultList.Add(new ORegexResult()
