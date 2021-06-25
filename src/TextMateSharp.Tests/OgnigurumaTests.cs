@@ -32,5 +32,24 @@ namespace TextMateSharp.Tests
                 Assert.AreEqual(2, result.LengthAt(0));
             }
         }
+
+        [Test]
+        public void TestOnigScanner()
+        {
+            OnigScanner scanner = new OnigScanner(new string[] { "c", "a(b)?" });
+            IOnigNextMatchResult result = scanner.FindNextMatchSync("abc", 0);
+
+            scanner = new OnigScanner(new string[] { "a([b-d])c" });
+            IOnigNextMatchResult onigResult = scanner.FindNextMatchSync("!abcdef", 0);
+
+            var captureIndices = onigResult.GetCaptureIndices();
+
+            Assert.AreEqual(2, captureIndices.Length);
+
+            Assert.AreEqual(1, captureIndices[0].GetStart());
+            Assert.AreEqual(3, captureIndices[0].GetLength());
+            Assert.AreEqual(2, captureIndices[1].GetStart());
+            Assert.AreEqual(1, captureIndices[1].GetLength());
+        }
     }
 }
