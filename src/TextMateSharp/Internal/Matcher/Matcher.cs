@@ -10,12 +10,7 @@ namespace TextMateSharp.Internal.Matcher
 
         public static ICollection<MatcherWithPriority<List<string>>> CreateMatchers(string expression)
         {
-            return CreateMatchers(expression, new NameMatcher());
-        }
-
-        private static ICollection<MatcherWithPriority<T>> CreateMatchers<T>(string selector, IMatchesName<T> matchesName)
-        {
-            return new Matcher<T>(selector, matchesName).results;
+            return new Matcher<List<string>>(expression, new NameMatcher()).results;
         }
 
         private List<MatcherWithPriority<T>> results;

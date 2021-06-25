@@ -131,8 +131,6 @@ namespace TextMateSharp.Internal.Rules
             IRawRepository repository)
         {
             List<int?> r = new List<int?>();
-            int i;
-            int len;
             int? patternId;
             IRawGrammar externalGrammar;
             Rule rule;
