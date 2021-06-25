@@ -370,3 +370,8 @@ src/TextMateSharp/.DS_Store
 src/TextMateSharp/Internal/.DS_Store
 src/TextMateSharp/Internal/Oniguruma/.DS_Store
 .DS_Store
+src/.vscode/tasks.json
+src/.vscode/launch.json
+.idea/.idea.TextMateSharp/.idea/vcs.xml
+.idea/.idea.TextMateSharp/.idea/indexLayout.xml
+.idea/.idea.TextMateSharp/.idea/encodings.xml
