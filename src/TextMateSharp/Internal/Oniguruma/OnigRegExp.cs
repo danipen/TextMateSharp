@@ -9,7 +9,7 @@ namespace TextMateSharp.Internal.Oniguruma
         private int lastSearchPosition;
         private OnigResult lastSearchResult;
         private ORegex regex;
-        private string patterDebug;
+        private bool _disposed;
         public OnigRegExp(string source)
         {
             lastSearchString = null;
@@ -17,19 +17,29 @@ namespace TextMateSharp.Internal.Oniguruma
             lastSearchResult = null;
 
             regex = new ORegex(source, false, false);
-            patterDebug = source;
         }
 
+        ~OnigRegExp() => Dispose(false);
+        
         public void Dispose()
         {
-            if (regex != null)
-            {
-                regex.Dispose();
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
 
-        // TODO: dispose regex
-
+            if (regex != null)
+                regex.Dispose();
+            
+            _disposed = true;
+        }        
+        
         public OnigResult Search(OnigString str, int position)
         {
             if (lastSearchString == str && lastSearchPosition <= position &&
@@ -59,16 +69,7 @@ namespace TextMateSharp.Internal.Oniguruma
                 region.end[i] = results[i].Position + results[i].Length;
             }
 
-            OnigResult result = new OnigResult(region, -1);
-
-            /*Matcher matcher = regex.matcher(data);
-			int status = matcher.search(position, end, Option.DEFAULT);
-			if (status != Matcher.FAILED)
-			{
-				Region region = matcher.getEagerRegion();
-				return new OnigResult(region, -1);
-			}*/
-            return result;
+            return new OnigResult(region, -1);
         }
     }
 }
