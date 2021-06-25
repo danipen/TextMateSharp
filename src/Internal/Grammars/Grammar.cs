@@ -101,7 +101,7 @@ namespace TextMateSharp.Internal.Grammars
             ICollection<MatcherWithPriority<List<string>>> matchers = Matcher<List<string>>.CreateMatchers(selector);
             int? ruleId = RuleFactory.GetCompiledRuleId(rule, ruleFactoryHelper, grammar.GetRepository());
 
-            foreach (MatcherWithPriority<List<String>> matcher in matchers)
+            foreach (MatcherWithPriority<List<string>> matcher in matchers)
             {
                 result.Add(new Injection(matcher.matcher, ruleId, grammar, matcher.priority));
             }

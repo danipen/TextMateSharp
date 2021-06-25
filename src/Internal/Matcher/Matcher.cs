@@ -155,7 +155,7 @@ namespace TextMateSharp.Internal.Matcher
             return null;
         }
 
-        private bool IsIdentifier(String token)
+        private bool IsIdentifier(string token)
         {
             return token != null && IDENTIFIER_REGEXP.Match(token).Success;
         }

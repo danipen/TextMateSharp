@@ -42,7 +42,7 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             // create the regex
-            /*Set<String> escapedScopes = this.embeddedLanguages.keySet().stream()
+            /*Set<string> escapedScopes = this.embeddedLanguages.keySet().stream()
                 .map(ScopeMetadataProvider::escapeRegExpCharacters)
                 .collect(Collectors.toSet());*/
 

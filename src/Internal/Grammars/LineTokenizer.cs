@@ -426,9 +426,9 @@ namespace TextMateSharp.Internal.Grammars
                 if (captureRule.retokenizeCapturedWithRuleId != null)
                 {
                     // the capture requires additional matching
-                    String scopeName = captureRule.GetName(lineText._string, captureIndices);
+                    string scopeName = captureRule.GetName(lineText._string, captureIndices);
                     ScopeListElement nameScopesList = stack.contentNameScopesList.Push(grammar, scopeName);
-                    String contentName = captureRule.getContentName(lineText._string, captureIndices);
+                    string contentName = captureRule.getContentName(lineText._string, captureIndices);
                     ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
 
                     // the capture requires additional matching
@@ -441,7 +441,7 @@ namespace TextMateSharp.Internal.Grammars
                 }
 
                 // push
-                String captureRuleScopeName = captureRule.GetName(lineText._string, captureIndices);
+                string captureRuleScopeName = captureRule.GetName(lineText._string, captureIndices);
                 if (captureRuleScopeName != null)
                 {
                     // push

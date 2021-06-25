@@ -20,7 +20,7 @@ namespace TextMateSharp.Themes
 
         public static Theme CreateFromRawTheme(IRawTheme source)
         {
-            return createFromParsedTheme(ParseTheme(source));
+            return CreateFromParsedTheme(ParseTheme(source));
         }
 
         public static List<ParsedThemeRule> ParseTheme(IRawTheme source)
@@ -84,16 +84,16 @@ namespace TextMateSharp.Themes
                     }
                 }
 
-                String foreground = null;
-                Object settingsForeground = entry.GetSetting().GetForeground();
-                if (settingsForeground is string && isValidHexColor((String)settingsForeground))
+                string foreground = null;
+                object settingsForeground = entry.GetSetting().GetForeground();
+                if (settingsForeground is string && IsValidHexColor((string)settingsForeground))
                 {
-                    foreground = (String)settingsForeground;
+                    foreground = (string)settingsForeground;
                 }
 
-                String background = null;
+                string background = null;
                 object settingsBackground = entry.GetSetting().GetBackground();
-                if (settingsBackground is String && isValidHexColor((string)settingsBackground))
+                if (settingsBackground is string && IsValidHexColor((string)settingsBackground))
                 {
                     background = (string)settingsBackground;
                 }
@@ -120,7 +120,7 @@ namespace TextMateSharp.Themes
             return result;
         }
 
-        private static bool isValidHexColor(string hex)
+        private static bool IsValidHexColor(string hex)
         {
             if (hex == null || hex.Length < 1)
             {
@@ -154,15 +154,15 @@ namespace TextMateSharp.Themes
             return false;
         }
 
-        public static Theme createFromParsedTheme(List<ParsedThemeRule> source)
+        public static Theme CreateFromParsedTheme(List<ParsedThemeRule> source)
         {
-            return resolveParsedThemeRules(source);
+            return ResolveParsedThemeRules(source);
         }
 
         /**
          * Resolve rules (i.e. inheritance).
          */
-        public static Theme resolveParsedThemeRules(List<ParsedThemeRule> parsedThemeRules)
+        public static Theme ResolveParsedThemeRules(List<ParsedThemeRule> parsedThemeRules)
         {
             // Sort rules lexicographically, and then by index if necessary
             parsedThemeRules.Sort((a, b) =>
@@ -182,8 +182,8 @@ namespace TextMateSharp.Themes
 
             // Determine defaults
             int defaultFontStyle = FontStyle.None;
-            String defaultForeground = "#000000";
-            String defaultBackground = "#ffffff";
+            string defaultForeground = "#000000";
+            string defaultBackground = "#ffffff";
             while (parsedThemeRules.Count >= 1 && "".Equals(parsedThemeRules[0].scope))
             {
                 ParsedThemeRule incomingDefaults = parsedThemeRules[0];
@@ -229,17 +229,17 @@ namespace TextMateSharp.Themes
             return this.colorMap.GetColorMap();
         }
 
-        public String getColor(int id)
+        public string GetColor(int id)
         {
             return this.colorMap.GetColor(id);
         }
 
-        public ThemeTrieElementRule getDefaults()
+        public ThemeTrieElementRule GetDefaults()
         {
             return this.defaults;
         }
 
-        public List<ThemeTrieElementRule> match(String scopeName)
+        public List<ThemeTrieElementRule> Match(string scopeName)
         {
             if (!this.cache.ContainsKey(scopeName))
             {

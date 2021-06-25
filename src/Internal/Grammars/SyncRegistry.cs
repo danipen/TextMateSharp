@@ -71,18 +71,18 @@ namespace TextMateSharp.Internal.Grammars
 
         public ThemeTrieElementRule GetDefaults()
         {
-            return this.theme.getDefaults();
+            return this.theme.GetDefaults();
         }
 
-        public List<ThemeTrieElementRule> ThemeMatch(String scopeName)
+        public List<ThemeTrieElementRule> ThemeMatch(string scopeName)
         {
-            return this.theme.match(scopeName);
+            return this.theme.Match(scopeName);
         }
 
         /**
 		 * Lookup a grammar.
 		 */
-        public IGrammar GrammarForScopeName(String scopeName, int initialLanguage,
+        public IGrammar GrammarForScopeName(string scopeName, int initialLanguage,
                 Dictionary<string, int> embeddedLanguages)
         {
             if (!this.grammars.ContainsKey(scopeName))
@@ -156,7 +156,7 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        private static void AddIncludedScope(string scopeName, ICollection<String> includedScopes)
+        private static void AddIncludedScope(string scopeName, ICollection<string> includedScopes)
         {
             if (!includedScopes.Contains(scopeName))
             {

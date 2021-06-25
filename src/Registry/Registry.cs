@@ -108,7 +108,7 @@ namespace TextMateSharp.Registry
             {
                 rawGrammar = GrammarReader.ReadGrammarSync(sr);
             }
-            ICollection<String> injections = this.locator.GetInjections(rawGrammar.GetScopeName());
+            ICollection<string> injections = this.locator.GetInjections(rawGrammar.GetScopeName());
             this.syncRegistry.AddGrammar(rawGrammar, injections);
             return this.GrammarForScopeName(rawGrammar.GetScopeName(), initialLanguage, embeddedLanguages);
         }
@@ -118,7 +118,7 @@ namespace TextMateSharp.Registry
             return GrammarForScopeName(scopeName, 0, null);
         }
 
-        public IGrammar GrammarForScopeName(String scopeName, int initialLanguage, Dictionary<string, int> embeddedLanguages)
+        public IGrammar GrammarForScopeName(string scopeName, int initialLanguage, Dictionary<string, int> embeddedLanguages)
         {
             return this.syncRegistry.GrammarForScopeName(scopeName, initialLanguage, embeddedLanguages);
         }

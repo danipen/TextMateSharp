@@ -4,15 +4,9 @@ namespace TextMateSharp.Model
 {
     public class ModelLine
     {
-        //String text;
         public bool IsInvalid;
         public TMState State;
         public List<TMToken> Tokens;
-
-        public ModelLine(/*String text*/)
-        {
-            //this.text = text;
-        }
 
         public void ResetTokenizationState()
         {

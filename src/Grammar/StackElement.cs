@@ -98,7 +98,7 @@ namespace TextMateSharp.Grammars
             return this;
         }
 
-        public StackElement Push(int? ruleId, int enterPos, String endRule, ScopeListElement nameScopesList, ScopeListElement contentNameScopesList)
+        public StackElement Push(int? ruleId, int enterPos, string endRule, ScopeListElement nameScopesList, ScopeListElement contentNameScopesList)
         {
             return new StackElement(this, ruleId, enterPos, endRule, nameScopesList, contentNameScopesList);
         }
@@ -139,7 +139,7 @@ namespace TextMateSharp.Grammars
             return this.parent.Push(this.ruleId, this.enterPosition, this.endRule, this.nameScopesList, contentNameScopesList);
         }
 
-        public StackElement SetEndRule(String endRule)
+        public StackElement SetEndRule(string endRule)
         {
             if (this.endRule != null && this.endRule.Equals(endRule))
             {

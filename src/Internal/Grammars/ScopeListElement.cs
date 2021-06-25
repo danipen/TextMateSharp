@@ -72,7 +72,7 @@ namespace TextMateSharp.Internal.Grammars
             int len = parentScopes.Count;
             int index = 0;
             string selector = parentScopes[index];
-            String selectorWithDot = selector + ".";
+            string selectorWithDot = selector + ".";
 
             while (target != null)
             {
@@ -122,7 +122,7 @@ namespace TextMateSharp.Internal.Grammars
                     background);
         }
 
-        private static ScopeListElement Push(ScopeListElement target, Grammar grammar, List<String> scopes)
+        private static ScopeListElement Push(ScopeListElement target, Grammar grammar, List<string> scopes)
         {
             foreach (string scope in scopes)
             {
@@ -160,7 +160,7 @@ namespace TextMateSharp.Internal.Grammars
             return result;
         }
 
-        public List<String> GenerateScopes()
+        public List<string> GenerateScopes()
         {
             return ScopeListElement.GenerateScopes(this);
         }

@@ -169,7 +169,7 @@ namespace TextMateSharp.Internal.Rules
                         }
                         else
                         {
-                            String externalGrammarName = null, externalGrammarInclude = null;
+                            string externalGrammarName = null, externalGrammarInclude = null;
                             int sharpIndex = pattern.GetInclude().IndexOf('#');
                             if (sharpIndex >= 0)
                             {
