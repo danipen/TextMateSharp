@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using TextMateSharp.Grammars;
+using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
 
@@ -18,7 +19,7 @@ namespace TextMateSharp
                 Registry.Registry registry = new Registry.Registry(options);
 
                 List<string> textLines = new List<string>();
-                textLines.Add("using System;");
+                textLines.Add("using static System;");
                 textLines.Add("namespace Example");
                 textLines.Add("{");
                 textLines.Add("}");
@@ -33,10 +34,16 @@ namespace TextMateSharp
 
                     foreach (IToken token in result.GetTokens())
                     {
-                        Console.WriteLine(string.Format("Token from {0} to {1} ->{2}<- with scopes {3}",
-                            token.StartIndex,
-                            token.EndIndex,
-                            line.Substring(token.StartIndex, token.EndIndex - 1),
+                        int startIndex = (token.StartIndex > line.Length) ? line.Length : token.StartIndex;
+                        int endIndex = (token.EndIndex > line.Length) ? line.Length : token.EndIndex;
+
+                        if (startIndex == endIndex)
+                            continue;
+
+                        Console.WriteLine(string.Format("  - token from {0} to {1} -->{2}<-- with scopes {3}",
+                            startIndex,
+                            endIndex,
+                            line.SubstringAtIndexes(startIndex, endIndex),
                             string.Join(",", token.Scopes)));
                     }
                 }

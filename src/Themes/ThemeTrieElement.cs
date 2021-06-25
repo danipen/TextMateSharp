@@ -90,7 +90,7 @@ namespace TextMateSharp.Themes
             }
             else
             {
-                head = scope.Substring(0, dotIndex);
+                head = scope.SubstringAtIndexes(0, dotIndex);
                 tail = scope.Substring(dotIndex + 1);
             }
 
@@ -124,7 +124,7 @@ namespace TextMateSharp.Themes
             }
             else
             {
-                head = scope.Substring(0, dotIndex);
+                head = scope.SubstringAtIndexes(0, dotIndex);
                 tail = scope.Substring(dotIndex + 1);
             }
 

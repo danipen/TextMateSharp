@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Grammars.Parser;
 using TextMateSharp.Internal.Types;
-
+using TextMateSharp.Internal.Utils;
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
@@ -147,7 +147,7 @@ namespace TextMateSharp.Internal.Grammars
                 int sharpIndex = include.IndexOf('#');
                 if (sharpIndex >= 0)
                 {
-                    AddIncludedScope(include.Substring(0, sharpIndex), result);
+                    AddIncludedScope(include.SubstringAtIndexes(0, sharpIndex), result);
                 }
                 else
                 {

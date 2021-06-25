@@ -5,6 +5,7 @@ using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Matcher;
 using TextMateSharp.Internal.Oniguruma;
 using TextMateSharp.Internal.Rules;
+using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Grammars
 {
@@ -434,7 +435,7 @@ namespace TextMateSharp.Internal.Grammars
                     StackElement stackClone = stack.Push(captureRule.retokenizeCapturedWithRuleId, captureIndex.GetStart(),
                             null, nameScopesList, contentNameScopesList);
                     TokenizeString(grammar,
-                            GrammarHelper.CreateOnigString(lineText._string.Substring(0, captureIndex.GetEnd())),
+                            GrammarHelper.CreateOnigString(lineText._string.SubstringAtIndexes(0, captureIndex.GetEnd())),
                             (isFirstLine && captureIndex.GetStart() == 0), captureIndex.GetStart(), stackClone, lineTokens);
                     continue;
                 }

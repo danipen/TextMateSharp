@@ -109,6 +109,7 @@
     <Compile Include="Internal\Utils\CloneUtils.cs" />
     <Compile Include="Internal\Utils\CompareUtils.cs" />
     <Compile Include="Internal\Utils\RegexSource.cs" />
+    <Compile Include="Internal\Utils\StringUtils.cs" />
     <Compile Include="Registry\IRegistryOptions.cs" />
     <Compile Include="Registry\Registry.cs" />
     <Compile Include="Themes\ColorMap.cs" />

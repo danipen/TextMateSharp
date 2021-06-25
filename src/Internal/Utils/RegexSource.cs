@@ -32,17 +32,17 @@ namespace TextMateSharp.Internal.Utils
             int doublePointIndex = match.IndexOf(':');
             if (doublePointIndex != -1)
             {
-                index = int.Parse(match.Substring(2, doublePointIndex));
-                command = match.Substring(doublePointIndex + 2, match.Length - 1);
+                index = int.Parse(match.SubstringAtIndexes(2, doublePointIndex));
+                command = match.SubstringAtIndexes(doublePointIndex + 2, match.Length - 1);
             }
             else
             {
-                index = int.Parse(match.Substring(1, match.Length));
+                index = int.Parse(match.SubstringAtIndexes(1, match.Length));
             }
             IOnigCaptureIndex capture = captureIndices.Length > index ? captureIndices[index] : null;
             if (capture != null)
             {
-                string result = captureSource.Substring(capture.GetStart(), capture.GetEnd());
+                string result = captureSource.SubstringAtIndexes(capture.GetStart(), capture.GetEnd());
                 // Remove leading dots that would make the selector invalid
                 while (result.Length > 0 && result[0] == '.')
                 {

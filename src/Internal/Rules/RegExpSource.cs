@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using TextMateSharp.Internal.Oniguruma;
+using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Rules
 {
@@ -87,7 +88,7 @@ namespace TextMateSharp.Internal.Rules
                             nextCh = regExpSource[pos + 1];
                             if (nextCh == 'z')
                             {
-                                output.Append(regExpSource.Substring(lastPushedPos, pos));
+                                output.Append(regExpSource.SubstringAtIndexes(lastPushedPos, pos));
                                 output.Append("$(?!\\n)(?<!\\n)");
                                 lastPushedPos = pos + 2;
                             }
@@ -108,7 +109,7 @@ namespace TextMateSharp.Internal.Rules
                 }
                 else
                 {
-                    output.Append(regExpSource.Substring(lastPushedPos, len));
+                    output.Append(regExpSource.SubstringAtIndexes(lastPushedPos, len));
                     this.source = output.ToString();
                 }
             }
@@ -127,7 +128,7 @@ namespace TextMateSharp.Internal.Rules
             {
                 foreach (IOnigCaptureIndex captureIndex in captureIndices)
                 {
-                    capturedValues.Add(lineText.Substring(
+                    capturedValues.Add(lineText.SubstringAtIndexes(
                         captureIndex.GetStart(),
                         captureIndex.GetEnd()));
                 }
@@ -135,7 +136,7 @@ namespace TextMateSharp.Internal.Rules
                 return BACK_REFERENCING_END.Replace(this.source, m =>
                 {
                     string value = m.Value;
-                    int index = int.Parse(m.Value.Substring(1, value.Length));
+                    int index = int.Parse(m.Value.SubstringAtIndexes(1, value.Length));
                     return EscapeRegExpCharacters(capturedValues.Count > index ? capturedValues[index] : "");
                 });
             }

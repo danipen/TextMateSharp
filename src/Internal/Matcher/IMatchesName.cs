@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using TextMateSharp.Internal.Utils;
+
 namespace TextMateSharp.Internal.Matcher
 {
     public interface IMatchesName<T>
@@ -39,7 +41,7 @@ namespace TextMateSharp.Internal.Matcher
                 return true;
             }
             int len = scopeName.Length;
-            return thisScopeName.Length > len && thisScopeName.Substring(0, len).Equals(scopeName)
+            return thisScopeName.Length > len && thisScopeName.SubstringAtIndexes(0, len).Equals(scopeName)
                     && thisScopeName[len] == '.';
         }
     }
