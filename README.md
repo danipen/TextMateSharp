@@ -7,6 +7,8 @@ Instructions about how to build Oniguruma bindings can be found in [`lib/README.
 
 ## Using
 ```csharp
+    class Program
+    {
         static void Main(string[] args)
         {
             try
@@ -15,7 +17,7 @@ Instructions about how to build Oniguruma bindings can be found in [`lib/README.
                 Registry.Registry registry = new Registry.Registry(options);
 
                 List<string> textLines = new List<string>();
-                textLines.Add("using static System;");
+                textLines.Add("using static System; /* comment here */");
                 textLines.Add("namespace Example");
                 textLines.Add("{");
                 textLines.Add("}");
@@ -44,6 +46,23 @@ Instructions about how to build Oniguruma bindings can be found in [`lib/README.
                             endIndex,
                             line.SubstringAtIndexes(startIndex, endIndex),
                             string.Join(",", token.Scopes)));
+
+                        foreach (string scopeName in token.Scopes)
+                        {
+                            Theme theme = registry.GetTheme();
+                            List<ThemeTrieElementRule> themeRules =
+                                theme.Match(scopeName);
+
+                            foreach (ThemeTrieElementRule themeRule in themeRules)
+                            {
+                                Console.WriteLine(
+                                    "      - Matched theme rule: " + 
+                                    "[bg: {0}, fg:{1}, fontStyle: {2}]",
+                                    theme.GetColor(themeRule.background),
+                                    theme.GetColor(themeRule.foreground),
+                                    themeRule.fontStyle);
+                            }
+                        }
                     }
                 }
             }
@@ -58,7 +77,7 @@ Instructions about how to build Oniguruma bindings can be found in [`lib/README.
             public string GetFilePath(string scopeName)
             {
                 string result = Path.GetFullPath(
-                    @"../../../../test/testgrammars/csharp.tmLanguage.json");
+                    @"../../../../test/grammars/csharp.tmLanguage.json");
                 return result;
             }
 
@@ -74,7 +93,13 @@ Instructions about how to build Oniguruma bindings can be found in [`lib/README.
 
             public IRawTheme GetTheme()
             {
-                return null;
+                string themePath = Path.GetFullPath(
+                    @"../../../../test/themes/dark_vs.json");
+
+                using (StreamReader reader = new StreamReader(themePath))
+                {
+                    return ThemeReader.ReadThemeSync(reader);
+                }
             }
         }
     }
@@ -82,19 +107,50 @@ Instructions about how to build Oniguruma bindings can be found in [`lib/README.
 
 OUTPUT:
 ```
-Tokenizing line: using static System;
-  -token from 0 to 5 ->using<- with scopes source.cs,keyword.other.using.cs
-  -token from 5 to 6 -> <- with scopes source.cs
-  -token from 6 to 12 ->static<- with scopes source.cs,keyword.other.static.cs
-  -token from 12 to 13 -> <- with scopes source.cs
-  -token from 13 to 19 ->System<- with scopes source.cs,storage.type.cs
-  -token from 19 to 20 ->;<- with scopes source.cs,punctuation.terminator.statement.cs
+Tokenizing line: using static System; /* comment here */
+  - token from 0 to 5 -->using<-- with scopes source.cs,keyword.other.using.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:#569CD6, fontStyle: -1]
+  - token from 5 to 6 --> <-- with scopes source.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+  - token from 6 to 12 -->static<-- with scopes source.cs,keyword.other.static.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:#569CD6, fontStyle: -1]
+  - token from 12 to 13 --> <-- with scopes source.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+  - token from 13 to 19 -->System<-- with scopes source.cs,storage.type.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:#569CD6, fontStyle: -1]
+  - token from 19 to 20 -->;<-- with scopes source.cs,punctuation.terminator.statement.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+  - token from 20 to 21 --> <-- with scopes source.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+  - token from 21 to 23 -->/*<-- with scopes source.cs,comment.block.cs,punctuation.definition.comment.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:#6A9955, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+  - token from 23 to 37 --> comment here <-- with scopes source.cs,comment.block.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:#6A9955, fontStyle: -1]
+  - token from 37 to 39 -->*/<-- with scopes source.cs,comment.block.cs,punctuation.definition.comment.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:#6A9955, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
 Tokenizing line: namespace Example
-  -token from 0 to 9 ->namespace<- with scopes source.cs,keyword.other.namespace.cs
-  -token from 9 to 10 -> <- with scopes source.cs
-  -token from 10 to 17 ->Example<- with scopes source.cs,entity.name.type.namespace.cs
+  - token from 0 to 9 -->namespace<-- with scopes source.cs,keyword.other.namespace.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:#569CD6, fontStyle: -1]
+  - token from 9 to 10 --> <-- with scopes source.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+  - token from 10 to 17 -->Example<-- with scopes source.cs,entity.name.type.namespace.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
 Tokenizing line: {
-  -token from 0 to 1 ->{<- with scopes source.cs,punctuation.curlybrace.open.cs
+  - token from 0 to 1 -->{<-- with scopes source.cs,punctuation.curlybrace.open.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
 Tokenizing line: }
-  -token from 0 to 1 ->}<- with scopes source.cs
+  - token from 0 to 1 -->}<-- with scopes source.cs
+      - Matched theme rule: [bg: , fg:, fontStyle: -1]
 ```

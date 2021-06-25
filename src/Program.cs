@@ -35,13 +35,16 @@ namespace TextMateSharp
 
                     foreach (IToken token in result.GetTokens())
                     {
-                        int startIndex = (token.StartIndex > line.Length) ? line.Length : token.StartIndex;
-                        int endIndex = (token.EndIndex > line.Length) ? line.Length : token.EndIndex;
+                        int startIndex = (token.StartIndex > line.Length) ?
+                            line.Length : token.StartIndex;
+                        int endIndex = (token.EndIndex > line.Length) ?
+                            line.Length : token.EndIndex;
 
                         if (startIndex == endIndex)
                             continue;
 
-                        Console.WriteLine(string.Format("  - token from {0} to {1} -->{2}<-- with scopes {3}",
+                        Console.WriteLine(string.Format(
+                            "  - token from {0} to {1} -->{2}<-- with scopes {3}",
                             startIndex,
                             endIndex,
                             line.SubstringAtIndexes(startIndex, endIndex),
@@ -50,11 +53,14 @@ namespace TextMateSharp
                         foreach (string scopeName in token.Scopes)
                         {
                             Theme theme = registry.GetTheme();
-                            List<ThemeTrieElementRule> themeRules = theme.Match(scopeName);
+                            List<ThemeTrieElementRule> themeRules =
+                                theme.Match(scopeName);
 
                             foreach (ThemeTrieElementRule themeRule in themeRules)
                             {
-                                Console.WriteLine("      - Matched theme rule: [bg: {0}, fg:{1}, fontStyle: {2}]",
+                                Console.WriteLine(
+                                    "      - Matched theme rule: " +
+                                    "[bg: {0}, fg:{1}, fontStyle: {2}]",
                                     theme.GetColor(themeRule.background),
                                     theme.GetColor(themeRule.foreground),
                                     themeRule.fontStyle);
@@ -73,7 +79,8 @@ namespace TextMateSharp
         {
             public string GetFilePath(string scopeName)
             {
-                string result = Path.GetFullPath(@"../../../../test/grammars/csharp.tmLanguage.json");
+                string result = Path.GetFullPath(
+                    @"../../../../test/grammars/csharp.tmLanguage.json");
                 return result;
             }
 
@@ -89,7 +96,8 @@ namespace TextMateSharp
 
             public IRawTheme GetTheme()
             {
-                string themePath = Path.GetFullPath(@"../../../../test/themes/dark_vs.json");
+                string themePath = Path.GetFullPath(
+                    @"../../../../test/themes/dark_vs.json");
 
                 using (StreamReader reader = new StreamReader(themePath))
                 {
