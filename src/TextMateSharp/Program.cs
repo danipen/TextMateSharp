@@ -8,7 +8,7 @@ using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
 
-namespace TextMateSharp
+namespace TextMateSharp.Demo
 {
     class Program
     {
