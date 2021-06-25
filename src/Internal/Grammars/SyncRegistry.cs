@@ -79,9 +79,6 @@ namespace TextMateSharp.Internal.Grammars
             return this.theme.Match(scopeName);
         }
 
-        /**
-		 * Lookup a grammar.
-		 */
         public IGrammar GrammarForScopeName(string scopeName, int initialLanguage,
                 Dictionary<string, int> embeddedLanguages)
         {

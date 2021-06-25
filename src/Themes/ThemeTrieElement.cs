@@ -34,17 +34,17 @@ namespace TextMateSharp.Themes
             this.children = children;
         }
 
-        private static List<ThemeTrieElementRule> sortBySpecificity(List<ThemeTrieElementRule> arr)
+        private static List<ThemeTrieElementRule> SortBySpecificity(List<ThemeTrieElementRule> arr)
         {
             if (arr.Count == 1)
             {
                 return arr;
             }
-            arr.Sort((a, b) => cmpBySpecificity(a, b));
+            arr.Sort((a, b) => CmpBySpecificity(a, b));
             return arr;
         }
 
-        private static int cmpBySpecificity(ThemeTrieElementRule a, ThemeTrieElementRule b)
+        private static int CmpBySpecificity(ThemeTrieElementRule a, ThemeTrieElementRule b)
         {
             if (a.scopeDepth == b.scopeDepth)
             {
@@ -77,7 +77,7 @@ namespace TextMateSharp.Themes
                 arr = new List<ThemeTrieElementRule>();
                 arr.Add(this.mainRule);
                 arr.AddRange(this.rulesWithParentScopes);
-                return ThemeTrieElement.sortBySpecificity(arr);
+                return ThemeTrieElement.SortBySpecificity(arr);
             }
 
             int dotIndex = scope.IndexOf('.');
@@ -102,7 +102,7 @@ namespace TextMateSharp.Themes
             arr = new List<ThemeTrieElementRule>();
             arr.Add(this.mainRule);
             arr.AddRange(this.rulesWithParentScopes);
-            return ThemeTrieElement.sortBySpecificity(arr);
+            return ThemeTrieElement.SortBySpecificity(arr);
         }
 
         public void Insert(int scopeDepth, string scope, List<string> parentScopes, int fontStyle, int foreground,

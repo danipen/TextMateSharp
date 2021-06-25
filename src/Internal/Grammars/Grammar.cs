@@ -43,7 +43,7 @@ namespace TextMateSharp.Internal.Grammars
 
         public ScopeMetadata GetMetadataForScope(string scope)
         {
-            return this.scopeMetadataProvider.getMetadataForScope(scope);
+            return this.scopeMetadataProvider.GetMetadataForScope(scope);
         }
 
         public List<Injection> GetInjections()
@@ -212,7 +212,7 @@ namespace TextMateSharp.Internal.Grammars
                         defaultTheme.background);
 
                 string rootScopeName = this.GetRule(this.rootId.Value).GetName(null, null);
-                ScopeMetadata rawRootMetadata = this.scopeMetadataProvider.getMetadataForScope(rootScopeName);
+                ScopeMetadata rawRootMetadata = this.scopeMetadataProvider.GetMetadataForScope(rootScopeName);
                 int rootMetadata = ScopeListElement.mergeMetadata(defaultMetadata, null, rawRootMetadata);
 
                 ScopeListElement scopeList = new ScopeListElement(null, rootScopeName, rootMetadata);
