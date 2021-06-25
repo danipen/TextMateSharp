@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Oniguruma
 {
-    public class OnigRegExp
+    public class OnigRegExp : IDisposable
     {
         private OnigString lastSearchString;
         private int lastSearchPosition;
@@ -17,10 +18,14 @@ namespace TextMateSharp.Internal.Oniguruma
 
             regex = new ORegex(source, false, false);
             patterDebug = source;
-            /*byte[] pattern = source.getBytes(StandardCharsets.UTF_8);
-             
-			this.regex = new Regex(pattern, 0, pattern.length, Option.CAPTURE_GROUP, UTF8Encoding.INSTANCE, Syntax.DEFAULT,
-					WarnCallback.DEFAULT);*/
+        }
+
+        public void Dispose()
+        {
+            if (regex != null)
+            {
+                regex.Dispose();
+            }
         }
 
         // TODO: dispose regex
