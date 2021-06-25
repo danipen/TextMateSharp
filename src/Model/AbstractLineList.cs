@@ -30,14 +30,6 @@ namespace TextMateSharp.Model
             this.list.RemoveAt(line);
         }
 
-        public void updateLine(int line)
-        {
-            lock (mLock)
-            {
-                // this.list.get(line).text = this.lineToTextResolver.apply(line);
-            }
-        }
-
         public ModelLine Get(int index)
         {
             lock (mLock)
