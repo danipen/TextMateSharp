@@ -16,14 +16,41 @@ namespace TextMateSharp
         {
             try
             {
-                IRegistryOptions options = new LocalRegistryOptions();
+                if (args.Length < 3)
+                {
+                    Console.WriteLine("Usage TextMateSharp.Demo <fileToParse.cs> <grammar> <themefile>");
+                    Console.WriteLine("EXAMPLE TextMateSharp.Demo .\\testdata\\samplefiles\\sample.cs .\\testdata\\grammars\\csharp.tmLanguage.json .\\testdata\\themes\\dark_vs.json");
+
+                    return;
+                }
+
+                string fileToParse = Path.GetFullPath(args[0]);
+                string grammarFile = Path.GetFullPath(args[1]);
+                string themeFile = Path.GetFullPath(args[2]);
+
+                if (!File.Exists(fileToParse))
+                {
+                    Console.WriteLine("No such file to parse: {0}", args[0]);
+                    return;
+                }
+
+                if (!File.Exists(grammarFile))
+                {
+                    Console.WriteLine("No such file to parse: {0}", args[1]);
+                    return;
+                }
+
+                if (!File.Exists(themeFile))
+                {
+                    Console.WriteLine("No such file to parse: {0}", args[2]);
+                    return;
+                }
+
+                IRegistryOptions options = new DemoRegistryOptions(grammarFile, themeFile);
+
                 Registry.Registry registry = new Registry.Registry(options);
 
-                List<string> textLines = new List<string>();
-                textLines.Add("using static System; /* comment here */");
-                textLines.Add("namespace Example");
-                textLines.Add("{");
-                textLines.Add("}");
+                string[] textLines = File.ReadAllText(fileToParse).Split(Environment.NewLine);
 
                 IGrammar grammar = registry.LoadGrammar("source.cs");
 
@@ -75,13 +102,20 @@ namespace TextMateSharp
             }
         }
 
-        class LocalRegistryOptions : IRegistryOptions
+        class DemoRegistryOptions : IRegistryOptions
         {
+            private string _grammarFile;
+            private string _themeFile;
+
+            internal DemoRegistryOptions(string grammarFile, string themeFile)
+            {
+                _grammarFile = grammarFile;
+                _themeFile = themeFile;
+            }
+
             public string GetFilePath(string scopeName)
             {
-                string result = Path.GetFullPath(
-                    @"../../../../test/grammars/csharp.tmLanguage.json");
-                return result;
+                return _grammarFile;
             }
 
             public ICollection<string> GetInjections(string scopeName)
@@ -96,10 +130,7 @@ namespace TextMateSharp
 
             public IRawTheme GetTheme()
             {
-                string themePath = Path.GetFullPath(
-                    @"../../../../test/themes/dark_vs.json");
-
-                using (StreamReader reader = new StreamReader(themePath))
+                using (StreamReader reader = new StreamReader(_themeFile))
                 {
                     return ThemeReader.ReadThemeSync(reader);
                 }
