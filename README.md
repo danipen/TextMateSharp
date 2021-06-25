@@ -1,5 +1,7 @@
 # TextMateSharp
-A port of [eclipse/tm4e](https://github.com/eclipse/tm4e) to bring TextMate grammars to dotnet ecosystem.
+A port of [microsoft/vscode-textmate](https://github.com/microsoft/vscode-textmate) that brings TextMate grammars to dotnet ecosystem.
+
+The implementation is based the Java port [eclipse/tm4e](https://github.com/eclipse/tm4e), 
 
 TextMateSharp uses [Oniguruma](https://github.com/kkos/oniguruma) regex engine bindings.
 
