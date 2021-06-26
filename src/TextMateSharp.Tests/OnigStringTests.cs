@@ -21,13 +21,6 @@ namespace TextMateSharp.Tests
         [Test]
         public void TestUtf8Utf16Conversions2()
         {
-
-            char c1 = 'm';
-            char c2 = 'õ';
-
-            int bytes = System.Text.Encoding.UTF8.GetByteCount(c1.ToString());
-            int bytes2 = System.Text.Encoding.UTF8.GetByteCount(c2.ToString());
-
             string str = "myááçóúôõaab";
             OnigString utf8WithCharLen = new OnigString(str);
 
