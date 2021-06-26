@@ -5,13 +5,25 @@ using NUnit.Framework;
 
 using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Types;
+using TextMateSharp.Tests.Resources;
 
 namespace TextMateSharp.Tests.Internal.Parser.Json
 {
     class GrammarReaderTests
     {
         [Test]
-        public void TestReadGrammar()
+        public void TestReadCharpGrammar()
+        {
+            using (Stream ms = ResourcesReader.OpenStream("csharp.tmLanguage.json"))
+            using (StreamReader reader = new StreamReader(ms))
+            {
+                IRawGrammar grammar = GrammarReader.ReadGrammarSync(reader);
+                Assert.AreEqual("source.cs", grammar.GetScopeName());
+            }
+        }
+
+        [Test]
+        public void TestReadSimpleGrammar()
         {
             using (Stream ms = GenerateStreamFromString(_json))
             using (StreamReader reader = new StreamReader(ms))
@@ -73,33 +85,33 @@ namespace TextMateSharp.Tests.Internal.Parser.Json
             return stream;
         }
 
-        const string _json =
-            "{" +
-            "    'name': 'C#'," +
-            "    'scopeName': 'source.cs'," +
-            "    'patterns': [" +
-            "        {" +
-            "            'include': '#preprocessor'" +
-            "        }," +
-            "        {" +
-            "            'include': '#comment'" +
-            "        }" +
-            "    ]," +
-            "    'repository': {" +
-            "          'extern-alias-directive': {" +
-            "              'begin': '[beginregex]+'," +
-            "              'beginCaptures': {" +
-            "                  '1': {" +
-            "                      'name': 'keyword.other.extern.cs'" +
-            "                  }," +
-            "                  '2': {" +
-            "                      'name': 'keyword.other.alias.cs'" +
-            "                  }" +
-            "                }," +
-            "                'end': '[endregexp]+'" +
-            "          }" +
-            "    }" +
-            "}";
+        static string _json =
+            @"{
+                'name': 'C#',
+                'scopeName': 'source.cs',
+                'patterns': [
+                    {
+                        'include': '#preprocessor'
+                    },
+                    {
+                        'include': '#comment'
+                    }
+                ],
+                'repository': {
+                      'extern-alias-directive': {
+                          'begin': '[beginregex]+',
+                          'beginCaptures': {
+                              '1': {
+                                  'name': 'keyword.other.extern.cs'
+                              },
+                              '2': {
+                                  'name': 'keyword.other.alias.cs'
+                              }
+                            },
+                            'end': '[endregexp]+'
+                      }
+                }
+            }".Replace("'", "\"");
 
         public int JSONPListParserIRawGrammar { get; private set; }
     }
