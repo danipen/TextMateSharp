@@ -1,11 +1,9 @@
-﻿
-using System;
-
+﻿using System;
 using NUnit.Framework;
 
 using TextMateSharp.Internal.Oniguruma;
 
-namespace TextMateSharp.Tests
+namespace TextMateSharp.Tests.Internal.Oniguruma
 {
     class OnigStringTests
     {
@@ -60,7 +58,6 @@ namespace TextMateSharp.Tests
             catch (Exception)
             {
             }
-
         }
     }
 }
