@@ -10,102 +10,102 @@ Just execute `dotnet build` under the folder [TextMateSharp](https://github.com/
 
 ## Using
 ```csharp
-    class Program
+class Program
+{
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        try
         {
-            try
+            IRegistryOptions options = new LocalRegistryOptions();
+            Registry.Registry registry = new Registry.Registry(options);
+
+            List<string> textLines = new List<string>();
+            textLines.Add("using static System; /* comment here */");
+            textLines.Add("namespace Example");
+            textLines.Add("{");
+            textLines.Add("}");
+
+            IGrammar grammar = registry.LoadGrammar("source.cs");
+
+            foreach (string line in textLines)
             {
-                IRegistryOptions options = new LocalRegistryOptions();
-                Registry.Registry registry = new Registry.Registry(options);
+                Console.WriteLine(string.Format("Tokenizing line: {0}", line));
 
-                List<string> textLines = new List<string>();
-                textLines.Add("using static System; /* comment here */");
-                textLines.Add("namespace Example");
-                textLines.Add("{");
-                textLines.Add("}");
+                ITokenizeLineResult result = grammar.TokenizeLine(line);
 
-                IGrammar grammar = registry.LoadGrammar("source.cs");
-
-                foreach (string line in textLines)
+                foreach (IToken token in result.GetTokens())
                 {
-                    Console.WriteLine(string.Format("Tokenizing line: {0}", line));
+                    int startIndex = (token.StartIndex > line.Length) ?
+                        line.Length : token.StartIndex;
+                    int endIndex = (token.EndIndex > line.Length) ?
+                        line.Length : token.EndIndex;
 
-                    ITokenizeLineResult result = grammar.TokenizeLine(line);
+                    if (startIndex == endIndex)
+                        continue;
 
-                    foreach (IToken token in result.GetTokens())
+                    Console.WriteLine(string.Format(
+                        "  - token from {0} to {1} -->{2}<-- with scopes {3}",
+                        startIndex,
+                        endIndex,
+                        line.SubstringAtIndexes(startIndex, endIndex),
+                        string.Join(",", token.Scopes)));
+
+                    foreach (string scopeName in token.Scopes)
                     {
-                        int startIndex = (token.StartIndex > line.Length) ?
-                            line.Length : token.StartIndex;
-                        int endIndex = (token.EndIndex > line.Length) ?
-                            line.Length : token.EndIndex;
+                        Theme theme = registry.GetTheme();
+                        List<ThemeTrieElementRule> themeRules =
+                            theme.Match(scopeName);
 
-                        if (startIndex == endIndex)
-                            continue;
-
-                        Console.WriteLine(string.Format(
-                            "  - token from {0} to {1} -->{2}<-- with scopes {3}",
-                            startIndex,
-                            endIndex,
-                            line.SubstringAtIndexes(startIndex, endIndex),
-                            string.Join(",", token.Scopes)));
-
-                        foreach (string scopeName in token.Scopes)
+                        foreach (ThemeTrieElementRule themeRule in themeRules)
                         {
-                            Theme theme = registry.GetTheme();
-                            List<ThemeTrieElementRule> themeRules =
-                                theme.Match(scopeName);
-
-                            foreach (ThemeTrieElementRule themeRule in themeRules)
-                            {
-                                Console.WriteLine(
-                                    "      - Matched theme rule: " + 
-                                    "[bg: {0}, fg:{1}, fontStyle: {2}]",
-                                    theme.GetColor(themeRule.background),
-                                    theme.GetColor(themeRule.foreground),
-                                    themeRule.fontStyle);
-                            }
+                            Console.WriteLine(
+                                "      - Matched theme rule: " + 
+                                "[bg: {0}, fg:{1}, fontStyle: {2}]",
+                                theme.GetColor(themeRule.background),
+                                theme.GetColor(themeRule.foreground),
+                                themeRule.fontStyle);
                         }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR: " + ex.Message);
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: " + ex.Message);
+        }
+    }
+
+    class LocalRegistryOptions : IRegistryOptions
+    {
+        public string GetFilePath(string scopeName)
+        {
+            string result = Path.GetFullPath(
+                @"../../../../test/grammars/csharp.tmLanguage.json");
+            return result;
         }
 
-        class LocalRegistryOptions : IRegistryOptions
+        public ICollection<string> GetInjections(string scopeName)
         {
-            public string GetFilePath(string scopeName)
-            {
-                string result = Path.GetFullPath(
-                    @"../../../../test/grammars/csharp.tmLanguage.json");
-                return result;
-            }
+            return null;
+        }
 
-            public ICollection<string> GetInjections(string scopeName)
-            {
-                return null;
-            }
+        public StreamReader GetInputStream(string scopeName)
+        {
+            return new StreamReader(GetFilePath(scopeName));
+        }
 
-            public StreamReader GetInputStream(string scopeName)
-            {
-                return new StreamReader(GetFilePath(scopeName));
-            }
+        public IRawTheme GetTheme()
+        {
+            string themePath = Path.GetFullPath(
+                @"../../../../test/themes/dark_vs.json");
 
-            public IRawTheme GetTheme()
+            using (StreamReader reader = new StreamReader(themePath))
             {
-                string themePath = Path.GetFullPath(
-                    @"../../../../test/themes/dark_vs.json");
-
-                using (StreamReader reader = new StreamReader(themePath))
-                {
-                    return ThemeReader.ReadThemeSync(reader);
-                }
+                return ThemeReader.ReadThemeSync(reader);
             }
         }
     }
+}
 ```
 
 OUTPUT:
