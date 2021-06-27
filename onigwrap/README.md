@@ -1,11 +1,11 @@
+# Onigwrap
+
 Provides interop between Oniguruma and dotnet managed code.
 
 Based on [fluentCODE/onigwrap](https://github.com/fluentCODE/onigwrap)
 
 * `onigwrap.c` - Is a C library that wraps Oniguruma, greatly simplifying the interface for which we need to provide interop. This also greatly limits the flexibility of Onig, but for our use of this library, we didn't need any of that flexibility.
-
-Building
-========
+## Building
 
 First, get a copy of Oniguruma.
 
