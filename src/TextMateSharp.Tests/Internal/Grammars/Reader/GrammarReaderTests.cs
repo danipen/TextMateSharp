@@ -14,7 +14,7 @@ namespace TextMateSharp.Tests.Internal.Parser.Json
         [Test]
         public void TestReadCharpGrammar()
         {
-            using (Stream ms = ResourcesReader.OpenStream("csharp.tmLanguage.json"))
+            using (Stream ms = ResourcReader.OpenStream("csharp.tmLanguage.json"))
             using (StreamReader reader = new StreamReader(ms))
             {
                 IRawGrammar grammar = GrammarReader.ReadGrammarSync(reader);

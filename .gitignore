@@ -376,3 +376,6 @@ src/.vscode/launch.json
 .idea/.idea.TextMateSharp/.idea/indexLayout.xml
 .idea/.idea.TextMateSharp/.idea/encodings.xml
 onigwrap/src/libonigwrap.so
+.idea/.idea.TextMateSharp.dir/.idea/encodings.xml
+.idea/.idea.TextMateSharp.dir/.idea/indexLayout.xml
+.idea/.idea.TextMateSharp.dir/.idea/vcs.xml
