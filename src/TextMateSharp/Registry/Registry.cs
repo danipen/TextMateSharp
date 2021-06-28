@@ -70,11 +70,12 @@ namespace TextMateSharp.Registry
                 try
                 {
                     IRawGrammar grammar = null;
-                    using (StreamReader reader = this.locator.GetInputStream(scopeName))
+                    using (Stream stream = this.locator.GetInputStream(scopeName))
+                    using (StreamReader reader = new StreamReader(stream))
                     {
                         grammar = GrammarReader.ReadGrammarSync(reader);
-
                     }
+
                     ICollection<string> injections = this.locator.GetInjections(scopeName);
 
                     ICollection<string> deps = this.syncRegistry.AddGrammar(grammar, injections);

@@ -28,7 +28,7 @@ namespace TextMateSharp.Internal.Grammars
             s.Append(", endIndex: ");
             s.Append(EndIndex);
             s.Append(", scopes: ");
-            s.Append(Scopes);
+            s.Append(string.Join(", ", Scopes));
             s.Append("}");
             return s.ToString();
         }

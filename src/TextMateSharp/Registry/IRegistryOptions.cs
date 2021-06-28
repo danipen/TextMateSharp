@@ -9,7 +9,7 @@ namespace TextMateSharp.Registry
     {
         string GetFilePath(string scopeName);
 
-        StreamReader GetInputStream(string scopeName);
+        Stream GetInputStream(string scopeName);
 
         ICollection<string> GetInjections(string scopeName);
 
@@ -28,7 +28,7 @@ namespace TextMateSharp.Registry
             return null;
         }
 
-        public StreamReader GetInputStream(string scopeName)
+        public Stream GetInputStream(string scopeName)
         {
             return null;
         }
