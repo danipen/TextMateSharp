@@ -329,11 +329,11 @@ namespace TextMateSharp.Model
             }
         }
 
-        public void ForceTokenization(int lineNumber)
+        public void ForceTokenization(int lineIndex)
         {
             this.BuildEventWithCallback(eventBuilder =>
 
-                this.fThread.UpdateTokensInRange(eventBuilder, lineNumber, lineNumber)
+                this.fThread.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex)
             );
         }
 
@@ -342,9 +342,9 @@ namespace TextMateSharp.Model
             return lines.Get(lineIndex).Tokens;
         }
 
-        public bool IsLineInvalid(int lineNumber)
+        public bool IsLineInvalid(int lineIndex)
         {
-            return lines.Get(lineNumber).IsInvalid;
+            return lines.Get(lineIndex).IsInvalid;
         }
 
         public void InvalidateLine(int lineIndex)

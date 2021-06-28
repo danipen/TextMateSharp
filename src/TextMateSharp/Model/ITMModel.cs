@@ -12,7 +12,7 @@ namespace TextMateSharp.Model
         void RemoveModelTokensChangedListener(IModelTokensChangedListener listener);
         void Dispose();
         List<TMToken> GetLineTokens(int line);
-        void ForceTokenization(int lineNumber);
+        void ForceTokenization(int lineIndex);
 
     }
 }
