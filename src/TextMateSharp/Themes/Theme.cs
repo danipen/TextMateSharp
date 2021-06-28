@@ -241,6 +241,11 @@ namespace TextMateSharp.Themes
             return this.colorMap.GetColorMap();
         }
 
+        public int GetColorId(string color)
+        {
+            return this.colorMap.GetId(color);
+        }
+
         public string GetColor(int id)
         {
             return this.colorMap.GetColor(id);
