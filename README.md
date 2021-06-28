@@ -27,11 +27,15 @@ class Program
 
             IGrammar grammar = registry.LoadGrammar("source.cs");
 
+            StackElement ruleStack = null;
+
             foreach (string line in textLines)
             {
                 Console.WriteLine(string.Format("Tokenizing line: {0}", line));
 
-                ITokenizeLineResult result = grammar.TokenizeLine(line);
+                ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack);
+
+                ruleStack = result.RuleStack;
 
                 foreach (IToken token in result.GetTokens())
                 {
