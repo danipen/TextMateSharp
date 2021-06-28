@@ -11,6 +11,8 @@ namespace TextMateSharp.Internal.Grammars
 
         public int EndIndex { get; private set; }
 
+        public int Length { get { return EndIndex - StartIndex; } }
+
         public List<string> Scopes { get; private set; }
 
         public Token(int startIndex, int endIndex, List<string> scopes)

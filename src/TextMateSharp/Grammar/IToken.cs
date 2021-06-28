@@ -8,6 +8,8 @@ namespace TextMateSharp.Grammars
 
         int EndIndex { get; }
 
+        int Length { get; }
+
         List<string> Scopes { get;}
     }
 }
