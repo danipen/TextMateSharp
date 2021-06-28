@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using TextMateSharp.Internal.Grammars.Parser;
 using TextMateSharp.Internal.Types;
+using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Utils
 {

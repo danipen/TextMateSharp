@@ -8,24 +8,43 @@ namespace TextMateSharp.Internal.Themes
 {
     public class ThemeRaw : Dictionary<string, object>, IRawTheme, IRawThemeSetting, IThemeSetting
     {
+        private static string NAME = "name";
+        private static string INCLUDE = "include";
+        private static string SETTINGS = "settings";
+        private static string TOKEN_COLORS = "tokenColors";
+        private static string SCOPE = "scope";
+        private static string FONT_STYLE = "fontStyle";
+        private static string BACKGROUND = "background";
+        private static string FOREGROUND = "foreground";
+
         public string GetName()
         {
-            return TryGetObject<string>("name");
+            return TryGetObject<string>(NAME);
+        }
+
+        public string GetInclude()
+        {
+            return TryGetObject<string>(INCLUDE);
         }
 
         public ICollection<IRawThemeSetting> GetSettings()
         {
-            ICollection result = TryGetObject<ICollection>("settings");
+            ICollection result = TryGetObject<ICollection>(SETTINGS);
 
             if (result == null)
                 return null;
 
             return result.Cast<IRawThemeSetting>().ToList();
+        }
+
+        public void SetSettings(ICollection<IRawThemeSetting> settings)
+        {
+            this[SETTINGS] = settings;
         }
 
         public ICollection<IRawThemeSetting> GetTokenColors()
         {
-            ICollection result = TryGetObject<ICollection>("tokenColors");
+            ICollection result = TryGetObject<ICollection>(TOKEN_COLORS);
 
             if (result == null)
                 return null;
@@ -33,29 +52,34 @@ namespace TextMateSharp.Internal.Themes
             return result.Cast<IRawThemeSetting>().ToList();
         }
 
+        public void SetTokenColors(ICollection<IRawThemeSetting> colors)
+        {
+            this[TOKEN_COLORS] = colors;
+        }
+
         public object GetScope()
         {
-            return TryGetObject<object>("scope");
+            return TryGetObject<object>(SCOPE);
         }
 
         public IThemeSetting GetSetting()
         {
-            return TryGetObject<IThemeSetting>("settings");
+            return TryGetObject<IThemeSetting>(SETTINGS);
         }
 
         public object GetFontStyle()
         {
-            return TryGetObject<object>("fontStyle");
+            return TryGetObject<object>(FONT_STYLE);
         }
 
         public string GetBackground()
         {
-            return TryGetObject<string>("background");
+            return TryGetObject<string>(BACKGROUND);
         }
 
         public string GetForeground()
         {
-            return TryGetObject<string>("foreground");
+            return TryGetObject<string>(FOREGROUND);
         }
 
         T TryGetObject<T>(string key)
