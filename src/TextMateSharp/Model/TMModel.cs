@@ -166,7 +166,6 @@ namespace TextMateSharp.Model
                         tokenizedChars += currentCharsToTokenize;
                     }
                 });
-
             }
 
             public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex, int endLineIndex)
@@ -250,7 +249,6 @@ namespace TextMateSharp.Model
                 }
                 return nextInvalidLineIndex;
             }
-
         }
 
         public IGrammar GetGrammar()

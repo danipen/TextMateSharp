@@ -4,7 +4,7 @@ namespace TextMateSharp.Model
 {
     public class ModelLine
     {
-        public bool IsInvalid;
+        public bool IsInvalid = true;
         public TMState State;
         public List<TMToken> Tokens;
 
