@@ -37,11 +37,6 @@ namespace TextMateSharp.Internal.Themes
             return result.Cast<IRawThemeSetting>().ToList();
         }
 
-        public void SetSettings(ICollection<IRawThemeSetting> settings)
-        {
-            this[SETTINGS] = settings;
-        }
-
         public ICollection<IRawThemeSetting> GetTokenColors()
         {
             ICollection result = TryGetObject<ICollection>(TOKEN_COLORS);
@@ -50,11 +45,6 @@ namespace TextMateSharp.Internal.Themes
                 return null;
 
             return result.Cast<IRawThemeSetting>().ToList();
-        }
-
-        public void SetTokenColors(ICollection<IRawThemeSetting> colors)
-        {
-            this[TOKEN_COLORS] = colors;
         }
 
         public object GetScope()

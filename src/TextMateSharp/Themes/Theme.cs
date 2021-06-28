@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using TextMateSharp.Internal.Utils;
+using TextMateSharp.Registry;
+using TextMateSharp.Internal.Themes.Reader;
+using System.IO;
 
 namespace TextMateSharp.Themes
 {
@@ -19,17 +22,24 @@ namespace TextMateSharp.Themes
         private ThemeTrieElementRule defaults;
         private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> cache;
 
-        public static Theme CreateFromRawTheme(IRawTheme source)
+        public static Theme CreateFromRawTheme(
+            IRawTheme source,
+            IRegistryOptions registryOptions)
         {
-            return CreateFromParsedTheme(ParseTheme(source));
+            List<ParsedThemeRule> parsedTheme = new List<ParsedThemeRule>();
+
+            if (source != null)
+            {
+                parsedTheme.AddRange(ParseTheme(source));
+                parsedTheme.AddRange(ParseInclude(source, registryOptions));
+            }
+
+            return CreateFromParsedTheme(parsedTheme);
         }
 
-        public static List<ParsedThemeRule> ParseTheme(IRawTheme source)
+        static List<ParsedThemeRule> ParseTheme(IRawTheme source)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
-
-            if (source == null)
-                return result;
 
             // process theme rules in vscode-textmate format:
             // see https://github.com/microsoft/vscode-textmate/tree/main/test-cases/themes
@@ -40,6 +50,34 @@ namespace TextMateSharp.Themes
             LookupThemeRules(source.GetTokenColors(), result);
 
             return result;
+        }
+
+        static IEnumerable<ParsedThemeRule> ParseInclude(
+            IRawTheme source,
+            IRegistryOptions registryOptions)
+        {
+            List<ParsedThemeRule> result = new List<ParsedThemeRule>();
+
+            string include = source.GetInclude();
+
+            if (string.IsNullOrEmpty(include))
+                return result;
+
+            Stream stream = registryOptions.GetInputStream(include);
+
+            if (stream == null)
+                return result;
+
+            using (stream)
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                IRawTheme themeInclude = ThemeReader.ReadThemeSync(reader);
+
+                if (themeInclude == null)
+                    return result;
+
+                return ParseTheme(themeInclude);
+            }
         }
 
         static void LookupThemeRules(
@@ -236,7 +274,7 @@ namespace TextMateSharp.Themes
             this.cache = new Dictionary<string, List<ThemeTrieElementRule>>();
         }
 
-        public IEnumerable<string> GetColorMap()
+        public ICollection<string> GetColorMap()
         {
             return this.colorMap.GetColorMap();
         }

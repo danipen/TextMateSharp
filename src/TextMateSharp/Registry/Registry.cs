@@ -25,15 +25,18 @@ namespace TextMateSharp.Registry
         public Registry(IRegistryOptions locator)
         {
             this.locator = locator;
-            this.syncRegistry = new SyncRegistry(TmTheme.CreateFromRawTheme(locator.GetTheme()));
+            this.syncRegistry = new SyncRegistry(
+                TmTheme.CreateFromRawTheme(
+                    locator.GetTheme(), locator));
         }
 
         public void SetTheme(IRawTheme theme)
         {
-            this.syncRegistry.SetTheme(TmTheme.CreateFromRawTheme(theme));
+            this.syncRegistry.SetTheme(
+                TmTheme.CreateFromRawTheme(theme, this.locator));
         }
 
-        public IEnumerable<string> GetColorMap()
+        public ICollection<string> GetColorMap()
         {
             return this.syncRegistry.GetColorMap();
         }

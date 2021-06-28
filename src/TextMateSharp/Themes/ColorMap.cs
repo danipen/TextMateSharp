@@ -45,7 +45,7 @@ namespace TextMateSharp.Themes
             return null;
         }
 
-        public IEnumerable<string> GetColorMap()
+        public ICollection<string> GetColorMap()
         {
             return this.color2id.Keys;
         }

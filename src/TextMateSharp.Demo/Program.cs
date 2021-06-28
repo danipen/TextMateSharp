@@ -148,7 +148,7 @@ namespace TextMateSharp
                 
                 using (StreamReader reader = new StreamReader(_themeFile))
                 {
-                    IRawTheme result = ThemeReader.ReadThemeSync(reader, this);
+                    IRawTheme result = ThemeReader.ReadThemeSync(reader);
                     Console.WriteLine("Loaded {0} in {1}ms.",
                         Path.GetFileName(_themeFile),
                         Environment.TickCount - ini);

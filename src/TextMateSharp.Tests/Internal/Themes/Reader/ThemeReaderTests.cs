@@ -15,22 +15,20 @@ namespace TextMateSharp.Tests.Internal.Themes.Reader
         [Test]
         public void TestReadTheme()
         {
-            IRegistryOptions registry = new TestRegistry("dark_vs.json");
+            Registry.Registry registry = new Registry.Registry(
+                new TestRegistry("dark_vs.json"));
 
-            IRawTheme theme = registry.GetTheme();
-
-            Assert.AreEqual(49, theme.GetTokenColors().Count);
+            Assert.AreEqual(15, registry.GetColorMap().Count);
         }
 
 
         [Test]
         public void TestIncludeTheme()
         {
-            IRegistryOptions registry = new TestRegistry("dark_plus.json");
+            Registry.Registry registry = new Registry.Registry(
+                new TestRegistry("dark_plus.json"));
 
-            IRawTheme theme = registry.GetTheme();
-
-            Assert.AreEqual(64, theme.GetTokenColors().Count);
+            Assert.AreEqual(20, registry.GetColorMap().Count);
         }
 
         class TestRegistry : IRegistryOptions
@@ -66,7 +64,7 @@ namespace TextMateSharp.Tests.Internal.Themes.Reader
                 using (Stream stream = ResourceReader.OpenStream(_theme))
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    return ThemeReader.ReadThemeSync(reader, this);
+                    return ThemeReader.ReadThemeSync(reader);
                 }
             }
         }

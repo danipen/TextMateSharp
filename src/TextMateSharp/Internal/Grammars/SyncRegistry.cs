@@ -38,7 +38,7 @@ namespace TextMateSharp.Internal.Grammars
 
         }
 
-        public IEnumerable<string> GetColorMap()
+        public ICollection<string> GetColorMap()
         {
             return this.theme.GetColorMap();
         }

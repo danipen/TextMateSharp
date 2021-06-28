@@ -8,7 +8,5 @@ namespace TextMateSharp.Themes
         string GetInclude();
         ICollection<IRawThemeSetting> GetSettings();
         ICollection<IRawThemeSetting> GetTokenColors();
-        void SetSettings(ICollection<IRawThemeSetting> settings);
-        void SetTokenColors(ICollection<IRawThemeSetting> colors);
     }
 }
