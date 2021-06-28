@@ -4,7 +4,6 @@ using System.IO;
 
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Themes.Reader;
-using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
 
