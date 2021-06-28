@@ -73,9 +73,6 @@ namespace TextMateSharp
                         int endIndex = (token.EndIndex > line.Length) ?
                             line.Length : token.EndIndex;
 
-                        if (startIndex == endIndex)
-                            continue;
-
                         Console.WriteLine(string.Format(
                             "  - token from {0} to {1} -->{2}<-- with scopes {3}",
                             startIndex,
