@@ -4,23 +4,13 @@ namespace TextMateSharp.Internal.Grammars
 {
     public class TokenizeLineResult : ITokenizeLineResult
     {
-        private IToken[] tokens;
-        private StackElement ruleStack;
+        public IToken[] Tokens { get; private set; }
+        public StackElement RuleStack { get; private set; }
 
         public TokenizeLineResult(IToken[] tokens, StackElement ruleStack)
         {
-            this.tokens = tokens;
-            this.ruleStack = ruleStack;
-        }
-
-        public IToken[] GetTokens()
-        {
-            return tokens;
-        }
-
-        public StackElement GetRuleStack()
-        {
-            return ruleStack;
+            this.Tokens = tokens;
+            this.RuleStack = ruleStack;
         }
     }
 }

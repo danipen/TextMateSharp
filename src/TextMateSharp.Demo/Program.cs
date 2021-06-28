@@ -59,14 +59,18 @@ namespace TextMateSharp
                 string[] textLines = File.ReadAllText(fileToParse).Split(Environment.NewLine);
 
                 int tokenizeIni = Environment.TickCount;
-                
+
+                StackElement ruleStack = null;
+
                 foreach (string line in textLines)
                 {
                     Console.WriteLine(string.Format("Tokenizing line: {0}", line));
 
-                    ITokenizeLineResult result = grammar.TokenizeLine(line);
+                    ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack);
 
-                    foreach (IToken token in result.GetTokens())
+                    ruleStack = result.RuleStack;
+
+                    foreach (IToken token in result.Tokens)
                     {
                         int startIndex = (token.StartIndex > line.Length) ?
                             line.Length : token.StartIndex;

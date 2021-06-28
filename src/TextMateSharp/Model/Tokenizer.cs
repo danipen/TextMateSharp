@@ -40,12 +40,12 @@ namespace TextMateSharp.Model
             // }
             TMState freshState = state != null ? state.Clone() : GetInitialState();
             ITokenizeLineResult textMateResult = grammar.TokenizeLine(line, freshState.GetRuleStack());
-            freshState.setRuleStack(textMateResult.GetRuleStack());
+            freshState.setRuleStack(textMateResult.RuleStack);
 
             // Create the result early and fill in the tokens later
             List<TMToken> tokens = new List<TMToken>();
             string lastTokenType = null;
-            IToken[] tmResultTokens = textMateResult.GetTokens();
+            IToken[] tmResultTokens = textMateResult.Tokens;
             for (int tokenIndex = 0, len = tmResultTokens.Length; tokenIndex < len; tokenIndex++)
             {
                 IToken token = tmResultTokens[tokenIndex];

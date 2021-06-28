@@ -25,7 +25,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             ITokenizeLineResult lineTokens = grammar.TokenizeLine(line);
 
-            IToken[] tokens = lineTokens.GetTokens();
+            IToken[] tokens = lineTokens.Tokens;
 
             Assert.AreEqual(4, tokens.Length);
 
@@ -40,6 +40,57 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
+        public void ParseMultilineTokensTest()
+        {
+            string[] lines = new string[]
+            {
+                "public int Compute()",
+                "{",
+                "    return 5 + 8;",
+                "}",
+            };
+
+            Registry.Registry registry = new Registry.Registry(
+                new TestRegistry());
+
+            IGrammar grammar = registry.LoadGrammar("source.cs");
+
+            List<IToken> tokens = new List<IToken>();
+
+            StackElement ruleStack = null;
+
+            foreach (string line in lines)
+            {
+                ITokenizeLineResult lineTokens = grammar.TokenizeLine(line, ruleStack);
+
+                ruleStack = lineTokens.RuleStack;
+
+                tokens.AddRange(lineTokens.Tokens);
+            }
+
+            Assert.AreEqual(18, tokens.Count);
+
+            AssertTokenValuesAreEqual(tokens[0],0, 6, "source.cs", "storage.modifier.cs");
+            AssertTokenValuesAreEqual(tokens[1], 6, 7, "source.cs");
+            AssertTokenValuesAreEqual(tokens[2], 7, 10, "source.cs", "keyword.type.cs");
+            AssertTokenValuesAreEqual(tokens[3], 10, 11, "source.cs");
+            AssertTokenValuesAreEqual(tokens[4], 11, 18, "source.cs", "entity.name.function.cs");
+            AssertTokenValuesAreEqual(tokens[5], 18, 19, "source.cs", "punctuation.parenthesis.open.cs");
+            AssertTokenValuesAreEqual(tokens[6], 19, 20, "source.cs", "punctuation.parenthesis.close.cs");
+            AssertTokenValuesAreEqual(tokens[7], 0, 1, "source.cs", "punctuation.curlybrace.open.cs");
+            AssertTokenValuesAreEqual(tokens[8], 0, 4, "source.cs");
+            AssertTokenValuesAreEqual(tokens[9], 4, 10, "source.cs", "keyword.control.flow.return.cs");
+            AssertTokenValuesAreEqual(tokens[10], 10, 11, "source.cs");
+            AssertTokenValuesAreEqual(tokens[11], 11, 12, "source.cs", "constant.numeric.decimal.cs");
+            AssertTokenValuesAreEqual(tokens[12], 12, 13, "source.cs");
+            AssertTokenValuesAreEqual(tokens[13], 13, 14, "source.cs", "keyword.operator.arithmetic.cs");
+            AssertTokenValuesAreEqual(tokens[14], 14, 15, "source.cs");
+            AssertTokenValuesAreEqual(tokens[15], 15, 16, "source.cs", "constant.numeric.decimal.cs");
+            AssertTokenValuesAreEqual(tokens[16], 16, 17, "source.cs", "punctuation.terminator.statement.cs");
+            AssertTokenValuesAreEqual(tokens[17], 0, 1, "source.cs", "punctuation.curlybrace.close.cs");
+        }
+
+        [Test]
         public void GrammarInjectionTest()
         {
             Registry.Registry registry = new Registry.Registry(
@@ -51,7 +102,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             ITokenizeLineResult lineTokens = grammar.TokenizeLine(line);
 
-            IToken[] tokens = lineTokens.GetTokens();
+            IToken[] tokens = lineTokens.Tokens;
 
             Assert.AreEqual(11, tokens.Length);
 
