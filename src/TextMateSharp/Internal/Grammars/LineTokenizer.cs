@@ -84,13 +84,10 @@ namespace TextMateSharp.Internal.Grammars
 
         private void ScanNext()
         {
-            System.Diagnostics.Debug.WriteLine("@@scanNext: |" + lineText._string.Replace("\n", "\\n").Substring(linePos) + '|');
-
             IMatchResult r = MatchRuleOrInjections(grammar, lineText, isFirstLine, linePos, stack, anchorPosition);
 
             if (r == null)
             {
-                System.Diagnostics.Debug.WriteLine(" no more matches.");
                 // No match
                 lineTokens.Produce(stack, lineLength);
                 stop = true;

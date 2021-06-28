@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using TextMateSharp.Grammars;
@@ -69,17 +70,10 @@ namespace TextMateSharp.Internal.Grammars
 
             List<string> scopes = scopesList.GenerateScopes();
 
-            foreach (string scope in scopes)
-            {
-                System.Diagnostics.Debug.WriteLine("  token: |" + this.lineText.SubstringAtIndexes(
-                    this.lastTokenEndIndex, endIndex)
-                    .Replace("\n", "\\n") + '|');
-                System.Diagnostics.Debug.WriteLine("      * " + scope);
-            }
-
             this.tokens.Add(new Token(this.lastTokenEndIndex, endIndex, scopes));
             this.lastTokenEndIndex = endIndex;
         }
+
 
         public IToken[] GetResult(StackElement stack, int lineLength)
         {
