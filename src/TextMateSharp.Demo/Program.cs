@@ -133,9 +133,13 @@ namespace TextMateSharp
                 return null;
             }
 
-            public StreamReader GetInputStream(string scopeName)
+            public Stream GetInputStream(string scopeName)
             {
-                return new StreamReader(GetFilePath(scopeName));
+                return new FileStream(
+                    GetFilePath(scopeName),
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.ReadWrite);
             }
 
             public IRawTheme GetTheme()

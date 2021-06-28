@@ -1,0 +1,69 @@
+{
+	"fileTypes": [],
+	"injectionSelector": "L:meta.objectliteral",
+	"name": "object-member-ng-styles",
+	"patterns": [
+		{
+			"include": "#object-member-ng-styles"
+		}
+	],
+	"repository": {
+	
+		"object-member-ng-styles": {
+			"begin": "styles\\s*:",
+			"end": "(?=,|\\})",
+			"name": "meta.object.member",
+			"patterns": [
+				{
+					"include": "#styles-ng"
+				}
+			]
+		},
+
+		"styles-ng": {
+			"begin": "\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "meta.brace.square"
+				}
+			},
+			"end": "\\]",
+			"endCaptures": {
+				"0": {
+					"name": "meta.brace.square"
+				}
+			},
+			"name": "meta.array.literal",
+			"patterns": [
+				{
+					"include": "#style-ng"
+				},
+				{
+					"include": "source.ts"
+				}
+			]
+		},
+
+		"style-ng": {
+			"begin": "`|\\(`",
+			"beginCaptures": {
+				"0": {
+					"name": "string.template"
+				}
+			},
+			"end": "`\\)|`",
+			"endCaptures": {
+				"0": {
+					"name": "string.template"
+				}
+			},
+			"name": "meta.template",
+			"patterns": [
+				{
+					"include": "source.css"
+				}
+			]
+		}
+	},
+	"scopeName": "styles.ng"
+}

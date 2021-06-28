@@ -1,0 +1,336 @@
+{
+	"fileTypes": [],
+	"injectionSelector": "L:meta.objectliteral",
+	"name": "object-member-ng-template",
+	"patterns": [
+		{
+			"include": "#object-member-ng-template"
+		}
+	],
+	"repository": {
+	
+		"object-member-ng-template": {
+			"begin": "template\\s*:",
+			"end": "(?=,|\\})",
+			"name": "meta.object.member",
+			"patterns": [
+				{
+					"include": "#template-ng"
+				},
+				{
+					"include": "source.ts"
+				}
+			]
+		},
+
+		"template-ng": {
+			"begin": "`|\\(`",
+			"beginCaptures": {
+				"0": {
+					"name": "string.template"
+				}
+			},
+			"end": "`\\)|`",
+			"endCaptures": {
+				"0": {
+					"name": "string.template"
+				}
+			},
+			"name": "meta.template",
+			"patterns": [
+				{
+					"include": "#comment-block"
+				},
+				{
+ 					"include": "#ng-style"
+  			},
+				{
+					"include": "#ng-children"
+				}
+			]
+		},
+
+		"ng-style": {
+			"begin": "(<)([Ss][Tt][Yy][Ll][Ee])(>)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.begin"
+				},
+				"2": {
+					"name": "entity.name.tag"
+				},
+				"3": {
+					"name": "punctuation.definition.tag.end"
+				}
+			},
+			"end": "(</)([Ss][Tt][Yy][Ll][Ee])(>)",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.begin"
+				},
+				"2": {
+					"name": "entity.name.tag"
+				},
+				"3": {
+					"name": "punctuation.definition.tag.end"
+				}
+			},
+			"name": "ng-style",
+			"patterns": [
+				{
+					"include": "source.css"
+				}
+			]
+		},
+
+		"ng-children": {
+			"patterns": [
+				{
+					"include": "#ng-tag-comment"
+				},
+				{
+					"include": "#ng-tag-open"
+				},
+				{
+					"include": "#ng-tag-close"
+				},
+				{
+					"include": "#ng-tag-invalid"
+				},
+				{
+					"include": "#ng-evaluated-code"
+				},
+				{
+					"include": "#ng-entities"
+				}
+			]
+		},
+
+		"ng-tag-comment": {
+			"begin": "<!--",
+			"end": "-->",
+			"name": "comment.block"
+		},
+
+		"ng-entities": {
+			"patterns": [
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.entity"
+						},
+						"3": {
+							"name": "punctuation.definition.entity"
+						}
+					},
+					"match": "(&)([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+)(;)",
+					"name": "constant.character.entity"
+				},
+				{
+					"match": "&",
+					"name": "invalid.illegal.bad-ampersand"
+				}
+			]
+		},
+
+		"ng-evaluated-code": {
+			"begin": "{{",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.brace.curly.start"
+				}
+			},
+			"end": "}}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.brace.curly.end"
+				}
+			},
+			"name": "meta.brace.curly",
+			"patterns": [
+				{
+					"include": "source.ts"
+				}
+			]
+		},
+
+		"ng-evaluated-code-attribute-double": {
+			"begin": "(?<=\\]=|\\)=)\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin"
+				}
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end"
+				}
+			},
+			"name": "meta.brace.curly",
+			"patterns": [
+				{
+					"include": "source.ts"
+				}
+			]
+		},
+
+		"ng-evaluated-code-attribute-single": {
+			"begin": "(?<=\\]=|\\)=)'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin"
+				}
+			},
+			"end": "'",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end"
+				}
+			},
+			"name": "meta.brace.curly",
+			"patterns": [
+				{
+					"include": "source.ts"
+				}
+			]
+		},
+
+		"ng-string-double-quoted": {
+			"begin": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin"
+				}
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end"
+				}
+			},
+			"name": "string.quoted.double",
+			"patterns": [
+				{
+					"include": "#ng-entities"
+				}
+			]
+		},
+
+		"ng-string-single-quoted": {
+			"begin": "'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin"
+				}
+			},
+			"end": "'",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end"
+				}
+			},
+			"name": "string.quoted.single",
+			"patterns": [
+				{
+					"include": "#ng-entities"
+				}
+			]
+		},
+
+		"ng-tag-attribute-assignment": {
+			"match": "=(?=\\s*(?:'|\"|{|/\\*|//|\\n))",
+			"name": "keyword.operator.assignment"
+		},
+
+		"ng-tag-attribute-name": {
+			"captures": {
+				"1": {
+					"name": "entity.other.attribute-name"
+				}
+			},
+			"match": "(?x)\\s*([_$a-zA-Z*#(\\[][-$.:\\w()\\[\\]]*)(?=\\s|=|/?>|/\\*|//)",
+			"name": "meta.tag.attribute-name"
+		},		
+
+		"ng-tag-attributes": {
+			"patterns": [
+				{
+					"include": "#ng-tag-attribute-name"
+				},
+				{
+					"include": "#ng-tag-attribute-assignment"
+				},
+				{
+					"include": "#ng-evaluated-code-attribute-single"
+				},
+				{
+					"include": "#ng-evaluated-code-attribute-double"
+				},
+				{
+					"include": "#ng-string-double-quoted"
+				},
+				{
+					"include": "#ng-string-single-quoted"
+				}
+			]
+		},
+
+		"ng-tag-attributes-illegal": {
+			"match": "\\S+",
+			"name": "invalid.illegal.attribute"
+		},
+
+		"ng-tag-close": {
+			"begin": "(</)([_$a-zA-Z][-$\\w.]*(?<!\\.|-))",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.begin"
+				},
+				"2": {
+					"name": "entity.name.tag"
+				}
+			},
+			"end": "(>)",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.end"
+				}
+			},
+			"name": "tag.close"
+		},
+
+		"ng-tag-invalid": {
+			"match": "<\\s*>",
+			"name": "invalid.illegal.tag.incomplete"
+		},
+
+		"ng-tag-open": {
+			"begin": "(?x)(<)([_$a-zA-Z][-$\\w.]*(?<!\\.|-))(?=\\s*(?!\\?)|/?>)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.begin"
+				},
+				"2": {
+					"name": "entity.name.tag"
+				}
+			},
+			"end": "(/?>)",
+			"endCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.end"
+				}
+			},
+			"name": "tag.open",
+			"patterns": [
+				{
+					"include": "#ng-tag-attributes"
+				},
+				{
+					"include": "#ng-tag-attributes-illegal"
+				}
+			]
+		}
+	},
+	"scopeName": "template.ng"
+}
