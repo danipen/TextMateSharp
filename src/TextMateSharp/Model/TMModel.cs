@@ -337,9 +337,9 @@ namespace TextMateSharp.Model
             );
         }
 
-        public List<TMToken> GetLineTokens(int lineNumber)
+        public List<TMToken> GetLineTokens(int lineIndex)
         {
-            return lines.Get(lineNumber).Tokens;
+            return lines.Get(lineIndex).Tokens;
         }
 
         public bool IsLineInvalid(int lineNumber)
