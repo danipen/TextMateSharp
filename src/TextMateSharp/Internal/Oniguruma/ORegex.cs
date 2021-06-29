@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace TextMateSharp.Internal.Oniguruma
 {
     public class ORegex : IDisposable
     {
+        private Regex UNICODE_WITHOUT_BRACES_PATTERN = new Regex("\\\\x[A-Fa-f0-9]{2,4}");
         private string text;
         private IntPtr regex;
         private IntPtr region;
@@ -37,10 +39,24 @@ namespace TextMateSharp.Internal.Oniguruma
             int ignoreCaseArg = ignoreCase ? 1 : 0;
             int multilineArg = multiline ? 1 : 0;
 
+            pattern = AddBracesToUnicodePatterns(pattern);
+
             regex = OnigInterop.onigwrap_create(pattern, pattern.Length * 2, ignoreCaseArg, multilineArg);
 
             if (!Valid)
                 regexString = pattern; // Save the pattern off on invalid patterns for throwing exceptions
+        }
+
+        string AddBracesToUnicodePatterns(string pattern)
+        {
+            return UNICODE_WITHOUT_BRACES_PATTERN.Replace(pattern, (m) =>
+            {
+                string prefix = "\\x";
+
+                return string.Concat(
+                    prefix,
+                    "{", m.Value.Substring(prefix.Length), "}");
+            });
         }
 
         public int IndexIn(string text, int offset = 0)
