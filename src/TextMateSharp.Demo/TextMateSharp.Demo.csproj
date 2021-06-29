@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="testdata\**" />
+    <EmbeddedResource Remove="testdata\**" />
+    <None Remove="testdata\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
   </ItemGroup>
 
