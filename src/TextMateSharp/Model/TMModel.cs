@@ -313,16 +313,11 @@ namespace TextMateSharp.Model
 
         public void InvalidateLine(int lineIndex)
         {
-            var line = this.lines.Get(lineIndex);
+            this.lines.Get(lineIndex).IsInvalid = true;
 
-            //if (!line.IsInvalid)
+            lock (_lock)
             {
-                line.IsInvalid = true;
-                Console.WriteLine($"Enqueue {lineIndex}");
-                lock (_lock)
-                {
-                    this.invalidLines.Enqueue(lineIndex);
-                }
+                this.invalidLines.Enqueue(lineIndex);
             }
         }
 
