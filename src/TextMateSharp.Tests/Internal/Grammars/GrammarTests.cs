@@ -5,6 +5,7 @@ using System.IO;
 using NUnit.Framework;
 
 using TextMateSharp.Grammars;
+using TextMateSharp.Internal.Themes.Reader;
 using TextMateSharp.Registry;
 using TextMateSharp.Tests.Resources;
 using TextMateSharp.Themes;
@@ -37,6 +38,41 @@ namespace TextMateSharp.Tests.Internal.Grammars
                 6, 12, "source.cs", "entity.name.type.namespace.cs");
             AssertTokenValuesAreEqual(tokens[3],
                 12, 13, "source.cs", "punctuation.terminator.statement.cs");
+        }
+
+        [Test]
+        public void ParseCssTokensTest()
+        {
+            string line =
+                "body { margin: 25px; }";
+
+            Registry.Registry registry = new Registry.Registry(
+                new TestRegistry());
+
+            IGrammar grammar = registry.LoadGrammar("source.css");
+
+            ITokenizeLineResult lineTokens = grammar.TokenizeLine(line);
+
+            IToken[] tokens = lineTokens.Tokens;
+
+            Assert.AreEqual(12, tokens.Length);
+        }
+
+        [Test]
+        public void TestMatchScopeName()
+        {
+            Registry.Registry registry = new Registry.Registry(
+                new TestRegistry());
+
+            IGrammar grammar = registry.LoadGrammar("source.css");
+
+            Theme theme = registry.GetTheme();
+            List<ThemeTrieElementRule> themeRules =
+                theme.Match("support.type.property-name.css");
+
+            string color = theme.GetColor(themeRules[0].foreground);
+
+            Assert.IsFalse(string.IsNullOrEmpty(color));
         }
 
         [Test]
@@ -205,6 +241,10 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             string IRegistryOptions.GetFilePath(string scopeName)
             {
+                if ("source.css".Equals(scopeName))
+                {
+                    return "css.tmLanguage.json";
+                }
                 if ("source.cs".Equals(scopeName))
                 {
                     return "csharp.tmLanguage.json";
@@ -234,7 +274,11 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             IRawTheme IRegistryOptions.GetTheme()
             {
-                return null;
+                using (Stream stream = ResourceReader.OpenStream("dark_vs.json"))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return ThemeReader.ReadThemeSync(reader);
+                }
             }
         }
     }

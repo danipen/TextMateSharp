@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Resources\csharp.tmLanguage.json" />
+    <None Remove="Resources\css.tmLanguage.json" />
     <None Remove="Resources\dark_plus.json" />
     <None Remove="Resources\dark_vs.json" />
     <None Remove="Resources\styles.ng.json" />
@@ -17,6 +18,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\csharp.tmLanguage.json" />
+    <EmbeddedResource Include="Resources\css.tmLanguage.json" />
     <EmbeddedResource Include="Resources\dark_plus.json" />
     <EmbeddedResource Include="Resources\dark_vs.json" />
     <EmbeddedResource Include="Resources\styles.ng.json" />
