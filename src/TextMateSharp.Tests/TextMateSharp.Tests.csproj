@@ -7,23 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\csharp.tmLanguage.json" />
-    <None Remove="Resources\css.tmLanguage.json" />
-    <None Remove="Resources\dark_plus.json" />
-    <None Remove="Resources\dark_vs.json" />
-    <None Remove="Resources\styles.ng.json" />
-    <None Remove="Resources\template.ng.json" />
-    <None Remove="Resources\TypeScript.tmLanguage.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\csharp.tmLanguage.json" />
-    <EmbeddedResource Include="Resources\css.tmLanguage.json" />
-    <EmbeddedResource Include="Resources\dark_plus.json" />
-    <EmbeddedResource Include="Resources\dark_vs.json" />
-    <EmbeddedResource Include="Resources\styles.ng.json" />
-    <EmbeddedResource Include="Resources\template.ng.json" />
-    <EmbeddedResource Include="Resources\TypeScript.tmLanguage.json" />
+    <EmbeddedResource Include="Resources\**\*.json" />
   </ItemGroup>
 
   <ItemGroup>

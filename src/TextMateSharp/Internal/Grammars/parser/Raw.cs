@@ -205,7 +205,12 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public Dictionary<string, IRawRule> GetInjections()
         {
-            return TryGetObject<Dictionary<string, IRawRule>>(INJECTIONS);
+            Raw result = TryGetObject<Raw>(INJECTIONS);
+
+            if (result == null)
+                return null;
+
+            return ConvertToDictionary<IRawRule>(result);
         }
 
         public string GetInjectionSelector()
@@ -293,6 +298,16 @@ namespace TextMateSharp.Internal.Grammars.Parser
         IEnumerator<string> IEnumerable<string>.GetEnumerator()
         {
             return Keys.GetEnumerator();
+        }
+
+        Dictionary<string, T> ConvertToDictionary<T>(Raw raw)
+        {
+            Dictionary<string, T> result = new Dictionary<string, T>();
+
+            foreach (string key in raw.Keys)
+                result.Add(key, (T)raw[key]);
+
+            return result;
         }
 
         T TryGetObject<T>(string key)

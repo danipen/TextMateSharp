@@ -76,6 +76,22 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
+        public void TestBatchGrammar()
+        {
+            string line =
+                "REM echo off";
+
+            Registry.Registry registry = new Registry.Registry(
+                new TestRegistry());
+
+            IGrammar grammar = registry.LoadGrammar("source.batchfile");
+
+            ITokenizeLineResult lineTokens = grammar.TokenizeLine(line);
+
+            Assert.AreEqual(2, lineTokens.Tokens.Length);
+        }
+
+        [Test]
         public void ParseMultilineTokensTest()
         {
             string[] lines = new string[]
@@ -241,6 +257,10 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             string IRegistryOptions.GetFilePath(string scopeName)
             {
+                if ("source.batchfile".Equals(scopeName))
+                {
+                    return "batchfile.tmLanguage.json";
+                }
                 if ("source.css".Equals(scopeName))
                 {
                     return "css.tmLanguage.json";
