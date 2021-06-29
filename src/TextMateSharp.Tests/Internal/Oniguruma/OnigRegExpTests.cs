@@ -35,5 +35,16 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
                 Assert.AreEqual(2, result.LengthAt(0));
             }
         }
+
+        [Test]
+        public void TestUnicodeCharsWithoutBraces()
+        {
+            string pattern = "[\\xa0-\\xF7]";
+
+            using (ORegex oRegex = new ORegex(pattern))
+            {
+                Assert.IsTrue(oRegex.Valid);
+            }
+        }
     }
 }
