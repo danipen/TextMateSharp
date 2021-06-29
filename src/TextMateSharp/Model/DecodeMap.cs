@@ -30,7 +30,7 @@ namespace TextMateSharp.Model
                 return tokens;
             }
 
-            string[] tmpTokens = scope.Split(new string[] {"[.]"}, StringSplitOptions.None);
+            string[] tmpTokens = scope.Split(new string[] { "[.]" }, StringSplitOptions.None);
 
             tokens = new int[tmpTokens.Length];
             for (int i = 0; i < tmpTokens.Length; i++)
@@ -66,7 +66,7 @@ namespace TextMateSharp.Model
                     }
                     else
                     {
-                        result.Append('.');
+                        result.Append(TMToken.SCOPE_SEPARATOR);
                         result.Append(this.tokenIdToToken[i]);
                     }
                 }
