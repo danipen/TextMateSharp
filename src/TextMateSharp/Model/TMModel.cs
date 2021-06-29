@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-
 using TextMateSharp.Grammars;
 
 namespace TextMateSharp.Model
@@ -104,7 +103,6 @@ namespace TextMateSharp.Model
                             }
                         }
                     }
-
                 } while (!IsStopped && model.fThread != null);
             }
 
@@ -118,62 +116,21 @@ namespace TextMateSharp.Model
                         toLineIndex = model.lines.GetNumberOfLines() - 1;
                     }
 
-                    long tokenizedChars = 0;
-                    long currentCharsToTokenize = 0;
-                    long MAX_ALLOWED_TIME = 20;
-                    long currentEstimatedTimeToTokenize = 0;
-                    long elapsedTime;
-                    long startTime = Environment.TickCount;
-                    // Tokenize at most 1000 lines. Estimate the tokenization speed per
-                    // character and stop when:
-                    // - MAX_ALLOWED_TIME is reached
-                    // - tokenizing the next line would go above MAX_ALLOWED_TIME
-
                     int lineIndex = startLine;
                     while (lineIndex <= toLineIndex && lineIndex < model.GetLines().GetNumberOfLines())
                     {
-                        elapsedTime = Environment.TickCount - startTime;
-                        if (elapsedTime > MAX_ALLOWED_TIME)
-                        {
-                            // Stop if MAX_ALLOWED_TIME is reached
-                            model.InvalidateLine(lineIndex);
-                            return;
-                        }
-
-                        // Compute how many characters will be tokenized for this line
-                        try
-                        {
-                            currentCharsToTokenize = model.lines.GetLineLength(lineIndex);
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
-                        }
-
-                        if (tokenizedChars > 0)
-                        {
-                            // If we have enough history, estimate how long tokenizing this line would take
-                            currentEstimatedTimeToTokenize = (long)((double)elapsedTime / tokenizedChars) * currentCharsToTokenize;
-                            if (elapsedTime + currentEstimatedTimeToTokenize > MAX_ALLOWED_TIME)
-                            {
-                                // Tokenizing this line will go above MAX_ALLOWED_TIME
-                                model.InvalidateLine(lineIndex);
-                                return;
-                            }
-                        }
-
                         lineIndex = this.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex) + 1;
-                        tokenizedChars += currentCharsToTokenize;
                     }
                 });
             }
 
-            public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex, int endLineIndex)
+            public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex,
+                int endLineIndex)
             {
                 int stopLineTokenizationAfter = 1000000000; // 1 billion, if a line is
-                                                            // so long, you have other
-                                                            // trouble :).
-                                                            // Validate all states up to and including endLineIndex
+                // so long, you have other
+                // trouble :).
+                // Validate all states up to and including endLineIndex
                 int nextInvalidLineIndex = startIndex;
                 int lineIndex = startIndex;
                 while (lineIndex <= endLineIndex && lineIndex < model.lines.GetNumberOfLines())
@@ -209,8 +166,10 @@ namespace TextMateSharp.Model
 
                     if (r == null)
                     {
-                        r = new LineTokens(new List<TMToken>() { new TMToken(0, "") }, text.Length, modeLine.GetState());
+                        r = new LineTokens(new List<TMToken>() { new TMToken(0, "") }, text.Length,
+                            modeLine.GetState());
                     }
+
                     modeLine.SetTokens(r.Tokens);
                     eventBuilder.registerChangedTokens(lineIndex + 1);
                     modeLine.IsInvalid = false;
@@ -231,8 +190,10 @@ namespace TextMateSharp.Model
                                 {
                                     break;
                                 }
+
                                 nextInvalidLineIndex++;
                             }
+
                             lineIndex = nextInvalidLineIndex;
                         }
                         else
@@ -247,6 +208,7 @@ namespace TextMateSharp.Model
                         lineIndex++;
                     }
                 }
+
                 return nextInvalidLineIndex;
             }
         }
@@ -272,10 +234,12 @@ namespace TextMateSharp.Model
             {
                 this.fThread = new TokenizerThread("TMModelThread", this);
             }
+
             if (this.fThread.IsStopped)
             {
                 this.fThread.Run();
             }
+
             if (!listeners.Contains(listener))
             {
                 listeners.Add(listener);
@@ -304,6 +268,7 @@ namespace TextMateSharp.Model
             {
                 return;
             }
+
             this.fThread.Stop();
             this.fThread = null;
         }
@@ -332,7 +297,6 @@ namespace TextMateSharp.Model
         public void ForceTokenization(int lineIndex)
         {
             this.BuildEventWithCallback(eventBuilder =>
-
                 this.fThread.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex)
             );
         }
@@ -349,10 +313,16 @@ namespace TextMateSharp.Model
 
         public void InvalidateLine(int lineIndex)
         {
-            this.lines.Get(lineIndex).IsInvalid = true;
-            lock (_lock)
+            var line = this.lines.Get(lineIndex);
+
+            //if (!line.IsInvalid)
             {
-                this.invalidLines.Enqueue(lineIndex);
+                line.IsInvalid = true;
+                Console.WriteLine($"Enqueue {lineIndex}");
+                lock (_lock)
+                {
+                    this.invalidLines.Enqueue(lineIndex);
+                }
             }
         }
 
