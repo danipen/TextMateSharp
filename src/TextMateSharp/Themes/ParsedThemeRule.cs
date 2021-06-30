@@ -4,9 +4,6 @@ namespace TextMateSharp.Themes
 {
     public class ParsedThemeRule
     {
-
-        // _parsedThemeRuleBrand: void;
-
         public string scope;
         public List<string> parentScopes;
         public int index;

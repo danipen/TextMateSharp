@@ -12,50 +12,94 @@ namespace TextMateSharp.Themes
 {
     public class Theme
     {
-        private static Regex rrggbb = new Regex("^#[0-9a-f]{6}", RegexOptions.IgnoreCase);
-        private static Regex rrggbbaa = new Regex("^#[0-9a-f]{8}", RegexOptions.IgnoreCase);
-        private static Regex rgb = new Regex("^#[0-9a-f]{3}", RegexOptions.IgnoreCase);
-        private static Regex rgba = new Regex("^#[0-9a-f]{4}", RegexOptions.IgnoreCase);
-
-        private ColorMap colorMap;
-        private ThemeTrieElement root;
-        private ThemeTrieElementRule defaults;
-        private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> cache;
+        private ParsedTheme _theme;
+        private ParsedTheme _include;
+        private ColorMap _colorMap;
 
         public static Theme CreateFromRawTheme(
             IRawTheme source,
             IRegistryOptions registryOptions)
         {
-            List<ParsedThemeRule> parsedTheme = new List<ParsedThemeRule>();
+            ColorMap colorMap = new ColorMap();
 
-            if (source != null)
-            {
-                parsedTheme.AddRange(ParseInclude(source, registryOptions, 0));
-                parsedTheme.AddRange(ParseTheme(source, parsedTheme.Count));
-            }
+            ParsedTheme theme = ParsedTheme.CreateFromParsedTheme(
+                ParsedTheme.ParseTheme(source, 0),
+                colorMap);
 
-            return CreateFromParsedTheme(parsedTheme);
+            ParsedTheme include = ParsedTheme.CreateFromParsedTheme(
+                ParsedTheme.ParseInclude(source, registryOptions, 0),
+                colorMap);
+
+            return new Theme(colorMap, theme, include);
         }
 
-        static List<ParsedThemeRule> ParseTheme(IRawTheme source, int startIndex)
+        Theme(ColorMap colorMap, ParsedTheme theme, ParsedTheme include)
+        {
+            _colorMap = colorMap;
+            _theme = theme;
+            _include = include;
+        }
+
+        public List<ThemeTrieElementRule> Match(string scopeName)
+        {
+            List<ThemeTrieElementRule> result = new List<ThemeTrieElementRule>();
+            result.AddRange(this._theme.Match(scopeName));
+            result.AddRange(this._include.Match(scopeName));
+            return result;
+        }
+
+        public ICollection<string> GetColorMap()
+        {
+            return this._colorMap.GetColorMap();
+        }
+
+        public int GetColorId(string color)
+        {
+            return this._colorMap.GetId(color);
+        }
+
+        public string GetColor(int id)
+        {
+            return this._colorMap.GetColor(id);
+        }
+
+        internal ThemeTrieElementRule GetDefaults()
+        {
+            return this._theme.GetDefaults();
+        }
+    }
+
+    class ParsedTheme
+    {
+        private static Regex rrggbb = new Regex("^#[0-9a-f]{6}", RegexOptions.IgnoreCase);
+        private static Regex rrggbbaa = new Regex("^#[0-9a-f]{8}", RegexOptions.IgnoreCase);
+        private static Regex rgb = new Regex("^#[0-9a-f]{3}", RegexOptions.IgnoreCase);
+        private static Regex rgba = new Regex("^#[0-9a-f]{4}", RegexOptions.IgnoreCase);
+
+        private ThemeTrieElement root;
+        private ThemeTrieElementRule defaults;
+
+        private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> cache;
+
+        internal static List<ParsedThemeRule> ParseTheme(IRawTheme source, int priority)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 
             // process theme rules in vscode-textmate format:
             // see https://github.com/microsoft/vscode-textmate/tree/main/test-cases/themes
-            LookupThemeRules(source.GetSettings(), result, startIndex);
+            LookupThemeRules(source.GetSettings(), result, priority);
 
             // process theme rules in vscode format
             // see https://github.com/microsoft/vscode/tree/main/extensions/theme-defaults/themes
-            LookupThemeRules(source.GetTokenColors(), result, startIndex);
+            LookupThemeRules(source.GetTokenColors(), result, priority);
 
             return result;
         }
 
-        static IEnumerable<ParsedThemeRule> ParseInclude(
+        internal static List<ParsedThemeRule> ParseInclude(
             IRawTheme source,
             IRegistryOptions registryOptions,
-            int startIndex)
+            int priority)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 
@@ -77,19 +121,19 @@ namespace TextMateSharp.Themes
                 if (themeInclude == null)
                     return result;
 
-                return ParseTheme(themeInclude, startIndex);
+                return ParseTheme(themeInclude, priority);
             }
         }
 
         static void LookupThemeRules(
             ICollection<IRawThemeSetting> settings,
             List<ParsedThemeRule> parsedThemeRules,
-            int startIndex)
+            int priority)
         {
             if (settings == null)
                 return;
 
-            int i = startIndex;
+            int i = 0;
             foreach (IRawThemeSetting entry in settings)
             {
                 if (entry.GetSetting() == null)
@@ -165,11 +209,6 @@ namespace TextMateSharp.Themes
                         parentScopes.Reverse();
                     }
 
-                    if (scope == "keyword.control")
-                    {
-
-                    }
-
                     ParsedThemeRule t = new ParsedThemeRule(scope, parentScopes, i, fontStyle, foreground, background);
                     parsedThemeRules.Add(t);
                 }
@@ -211,15 +250,19 @@ namespace TextMateSharp.Themes
             return false;
         }
 
-        public static Theme CreateFromParsedTheme(List<ParsedThemeRule> source)
+        public static ParsedTheme CreateFromParsedTheme(
+            List<ParsedThemeRule> source,
+            ColorMap colorMap)
         {
-            return ResolveParsedThemeRules(source);
+            return ResolveParsedThemeRules(source, colorMap);
         }
 
         /**
          * Resolve rules (i.e. inheritance).
          */
-        static Theme ResolveParsedThemeRules(List<ParsedThemeRule> parsedThemeRules)
+        static ParsedTheme ResolveParsedThemeRules(
+            List<ParsedThemeRule> parsedThemeRules,
+            ColorMap colorMap)
         {
             // Sort rules lexicographically, and then by index if necessary
             parsedThemeRules.Sort((a, b) =>
@@ -258,7 +301,6 @@ namespace TextMateSharp.Themes
                     defaultBackground = incomingDefaults.background;
                 }
             }
-            ColorMap colorMap = new ColorMap();
             ThemeTrieElementRule defaults = new ThemeTrieElementRule(0, null, defaultFontStyle,
                     colorMap.GetId(defaultForeground), colorMap.GetId(defaultBackground));
 
@@ -270,75 +312,28 @@ namespace TextMateSharp.Themes
                         colorMap.GetId(rule.background));
             }
 
-            return new Theme(colorMap, defaults, root);
+            return new ParsedTheme(defaults, root);
         }
 
-        public Theme(ColorMap colorMap, ThemeTrieElementRule defaults, ThemeTrieElement root)
+        ParsedTheme(ThemeTrieElementRule defaults, ThemeTrieElement root)
         {
-            this.colorMap = colorMap;
             this.root = root;
             this.defaults = defaults;
-            this.cache = new Dictionary<string, List<ThemeTrieElementRule>>();
+            cache = new Dictionary<string, List<ThemeTrieElementRule>>();
         }
 
-        public ICollection<string> GetColorMap()
-        {
-            return this.colorMap.GetColorMap();
-        }
-
-        public int GetColorId(string color)
-        {
-            return this.colorMap.GetId(color);
-        }
-
-        public string GetColor(int id)
-        {
-            return this.colorMap.GetColor(id);
-        }
-
-        public ThemeTrieElementRule GetDefaults()
-        {
-            return this.defaults;
-        }
-
-        public List<ThemeTrieElementRule> Match(string scopeName)
+        internal List<ThemeTrieElementRule> Match(string scopeName)
         {
             if (!this.cache.ContainsKey(scopeName))
             {
-                if (scopeName == "keyword.control.foreach.php")
-                {
-
-                }
                 this.cache[scopeName] = this.root.Match(scopeName);
             }
             return this.cache[scopeName];
         }
 
-        public override int GetHashCode()
+        internal ThemeTrieElementRule GetDefaults()
         {
-            return cache.GetHashCode() +
-                    colorMap.GetHashCode() +
-                    defaults.GetHashCode() +
-                    root.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (this == obj)
-            {
-                return true;
-            }
-            if (obj == null)
-            {
-                return false;
-            }
-            if (GetType() != obj.GetType())
-            {
-                return false;
-            }
-            Theme other = (Theme)obj;
-            return Object.Equals(cache, other.cache) && Object.Equals(colorMap, other.colorMap) &&
-                    Object.Equals(defaults, other.defaults) && Object.Equals(root, other.root);
+            return this.defaults;
         }
     }
 }
