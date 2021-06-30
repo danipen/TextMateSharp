@@ -30,31 +30,32 @@ namespace TextMateSharp.Themes
 
             if (source != null)
             {
-                parsedTheme.AddRange(ParseTheme(source));
-                parsedTheme.AddRange(ParseInclude(source, registryOptions));
+                parsedTheme.AddRange(ParseInclude(source, registryOptions, 0));
+                parsedTheme.AddRange(ParseTheme(source, parsedTheme.Count));
             }
 
             return CreateFromParsedTheme(parsedTheme);
         }
 
-        static List<ParsedThemeRule> ParseTheme(IRawTheme source)
+        static List<ParsedThemeRule> ParseTheme(IRawTheme source, int startIndex)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 
             // process theme rules in vscode-textmate format:
             // see https://github.com/microsoft/vscode-textmate/tree/main/test-cases/themes
-            LookupThemeRules(source.GetSettings(), result);
+            LookupThemeRules(source.GetSettings(), result, startIndex);
 
             // process theme rules in vscode format
             // see https://github.com/microsoft/vscode/tree/main/extensions/theme-defaults/themes
-            LookupThemeRules(source.GetTokenColors(), result);
+            LookupThemeRules(source.GetTokenColors(), result, startIndex);
 
             return result;
         }
 
         static IEnumerable<ParsedThemeRule> ParseInclude(
             IRawTheme source,
-            IRegistryOptions registryOptions)
+            IRegistryOptions registryOptions,
+            int startIndex)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 
@@ -76,18 +77,19 @@ namespace TextMateSharp.Themes
                 if (themeInclude == null)
                     return result;
 
-                return ParseTheme(themeInclude);
+                return ParseTheme(themeInclude, startIndex);
             }
         }
 
         static void LookupThemeRules(
             ICollection<IRawThemeSetting> settings,
-            List<ParsedThemeRule> parsedThemeRules)
+            List<ParsedThemeRule> parsedThemeRules,
+            int startIndex)
         {
             if (settings == null)
                 return;
 
-            int i = 0;
+            int i = startIndex;
             foreach (IRawThemeSetting entry in settings)
             {
                 if (entry.GetSetting() == null)
@@ -163,6 +165,11 @@ namespace TextMateSharp.Themes
                         parentScopes.Reverse();
                     }
 
+                    if (scope == "keyword.control")
+                    {
+
+                    }
+
                     ParsedThemeRule t = new ParsedThemeRule(scope, parentScopes, i, fontStyle, foreground, background);
                     parsedThemeRules.Add(t);
                 }
@@ -212,7 +219,7 @@ namespace TextMateSharp.Themes
         /**
          * Resolve rules (i.e. inheritance).
          */
-        public static Theme ResolveParsedThemeRules(List<ParsedThemeRule> parsedThemeRules)
+        static Theme ResolveParsedThemeRules(List<ParsedThemeRule> parsedThemeRules)
         {
             // Sort rules lexicographically, and then by index if necessary
             parsedThemeRules.Sort((a, b) =>
@@ -227,7 +234,7 @@ namespace TextMateSharp.Themes
                 {
                     return r;
                 }
-                return a.index - b.index;
+                return a.index.CompareTo(b.index);
             });
 
             // Determine defaults
@@ -298,6 +305,10 @@ namespace TextMateSharp.Themes
         {
             if (!this.cache.ContainsKey(scopeName))
             {
+                if (scopeName == "keyword.control.foreach.php")
+                {
+
+                }
                 this.cache[scopeName] = this.root.Match(scopeName);
             }
             return this.cache[scopeName];
