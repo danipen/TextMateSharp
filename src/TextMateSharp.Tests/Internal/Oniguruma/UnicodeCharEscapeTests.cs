@@ -28,6 +28,20 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
                 "\\A(?:\\x{EF}\\x{BB}\\x{BF}) ? (? i : (?=\\s* @charset\\b))",
                 UnicodeCharEscape.AddBracesToUnicodePatterns(
                 "\\A(?:\\xEF\\xBB\\xBF) ? (? i : (?=\\s* @charset\\b))"));
+
+            Assert.AreEqual(
+                "(?i)^\\s*(interface)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(extends)?\\s*",
+                UnicodeCharEscape.AddBracesToUnicodePatterns(
+                "(?i)^\\s*(interface)\\s+([a-z_\\x7f-\\x7fffffff][a-z0-9_\\x7f-\\x7fffffff]*)\\s*(extends)?\\s*"));
+        }
+
+        [Test]
+        public void AlreadyEscapedUnicodeCharsAreNotEscapedTest()
+        {
+            Assert.AreEqual(
+                "(?i)^\\s*(interface)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(extends)?\\s*",
+                UnicodeCharEscape.AddBracesToUnicodePatterns(
+                "(?i)^\\s*(interface)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(extends)?\\s*"));
         }
     }
 }

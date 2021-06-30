@@ -7,7 +7,7 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class UnicodeCharEscape
     {
-        private static Regex UNICODE_WITHOUT_BRACES_PATTERN = new Regex("\\\\x[A-Fa-f0-9]{2,4}");
+        private static Regex UNICODE_WITHOUT_BRACES_PATTERN = new Regex("\\\\x[A-Fa-f0-9]{2,8}");
 
         public static string AddBracesToUnicodePatterns(string pattern)
         {
