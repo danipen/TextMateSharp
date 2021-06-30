@@ -83,8 +83,31 @@ namespace TextMateSharp.Tests.Internal.Themes
 
             var rules = theme.Match(new string[]
             {
+                "meta.embedded.block.html",
+                "comment.line.double-slash.js"
+            });
+
+            Assert.AreEqual(
+                "#6A9955",
+                theme.GetColor(rules[0].foreground));
+        }
+
+        [Test]
+        public void EnsureColoredRulesAreReturnedFirstTest()
+        {
+            IRegistryOptions registryOptions = new TestRegistry();
+
+            Theme theme = Theme.CreateFromRawTheme(
+                registryOptions.GetTheme(),
+                registryOptions);
+
+            var rules = theme.Match(new string[]
+            {
+                "text.html.basic" ,
+                "meta.embedded.block.html",
+                "source.js",
                 "comment.line.double-slash.js",
-                "meta.embedded.block.html"
+                "punctuation.definition.comment.js"
             });
 
             Assert.AreEqual(

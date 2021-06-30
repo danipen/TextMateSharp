@@ -79,7 +79,7 @@ namespace TextMateSharp.Internal.Grammars
             return this.theme.GetDefaults();
         }
 
-        public List<ThemeTrieElementRule> ThemeMatch(IEnumerable<string> scopeNames)
+        public List<ThemeTrieElementRule> ThemeMatch(IList<string> scopeNames)
         {
             return this.theme.Match(scopeNames);
         }

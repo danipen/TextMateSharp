@@ -50,7 +50,7 @@ namespace TextMateSharp
                 Registry.Registry registry = new Registry.Registry(options);
 
                 int ini = Environment.TickCount;
-                IGrammar grammar = registry.LoadGrammar("source.php");
+                IGrammar grammar = registry.LoadGrammar("text.html.basic");
                 Console.WriteLine("Loaded {0} in {1}ms.",
                     Path.GetFileName(grammarFile),
                     Environment.TickCount - ini);
@@ -128,17 +128,23 @@ namespace TextMateSharp
 
             public string GetFilePath(string scopeName)
             {
-                if (scopeName == "text.html.cshtml")
-                    return _grammarFile;
-
                 if (scopeName == "./dark_vs.json")
                     return Path.Combine(Path.GetDirectoryName(_themeFile), "dark_vs.json");
+
+                if (scopeName == "text.html.cshtml")
+                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "cshtml.tmLanguage.json");
+
+                if (scopeName == "text.html")
+                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "html-derivative.tmLanguage.json");
 
                 if (scopeName == "text.html.basic")
                     return Path.Combine(Path.GetDirectoryName(_grammarFile), "html.tmLanguage.json");
 
                 if (scopeName == "source.php")
                     return Path.Combine(Path.GetDirectoryName(_grammarFile), "php.tmLanguage.json");
+
+                if (scopeName == "source.js")
+                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "JavaScript.tmLanguage.json");
 
                 return null;
             }

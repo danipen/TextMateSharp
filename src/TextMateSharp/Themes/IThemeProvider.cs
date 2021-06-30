@@ -5,7 +5,7 @@ namespace TextMateSharp.Themes
     public interface IThemeProvider
     {
 
-        List<ThemeTrieElementRule> ThemeMatch(IEnumerable<string> scopeNames);
+        List<ThemeTrieElementRule> ThemeMatch(IList<string> scopeNames);
 
         ThemeTrieElementRule GetDefaults();
     }

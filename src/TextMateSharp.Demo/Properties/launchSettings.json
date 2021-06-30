@@ -2,7 +2,7 @@
   "profiles": {
     "TextMateSharp.Demo": {
       "commandName": "Project",
-      "commandLineArgs": "../../../testdata/samplefiles/sample.php ../../../testdata/grammars/php.tmLanguage.json ../../../testdata/themes/dark_plus.json"
+      "commandLineArgs": "../../../testdata/samplefiles/sample.html ../../../testdata/grammars/html-derivative.tmLanguage.json ../../../testdata/themes/dark_plus.json"
     }
   }
 }
