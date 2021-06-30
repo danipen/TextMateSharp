@@ -116,6 +116,30 @@ namespace TextMateSharp.Tests.Internal.Themes
         }
 
         [Test]
+        public void JsonKeyColorTest()
+        {
+            IRegistryOptions registryOptions = new TestRegistry();
+
+            Theme theme = Theme.CreateFromRawTheme(
+                registryOptions.GetTheme(),
+                registryOptions);
+
+            var rules = theme.Match(new string[]
+            {
+                "source.json",
+                "meta.structure.dictionary.json",
+                "string.json",
+                "support.type.property-name.json"
+            });
+
+            string color = theme.GetColor(rules[0].foreground);
+
+            Assert.AreEqual(
+                "#9CDCFE",
+                color);
+        }
+
+        [Test]
         public void EnsureScriptTagIsColored()
         {
             IRegistryOptions registryOptions = new TestRegistry();
