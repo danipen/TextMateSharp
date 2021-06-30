@@ -66,7 +66,7 @@ namespace TextMateSharp.Model
                     }
                     else
                     {
-                        result.Append(TMToken.SCOPE_SEPARATOR);
+                        result.Append(".");
                         result.Append(this.tokenIdToToken[i]);
                     }
                 }

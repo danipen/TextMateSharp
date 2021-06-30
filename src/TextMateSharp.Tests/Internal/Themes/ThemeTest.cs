@@ -115,6 +115,28 @@ namespace TextMateSharp.Tests.Internal.Themes
                 theme.GetColor(rules[0].foreground));
         }
 
+        [Test]
+        public void EnsureScriptTagIsColored()
+        {
+            IRegistryOptions registryOptions = new TestRegistry();
+
+            Theme theme = Theme.CreateFromRawTheme(
+                registryOptions.GetTheme(),
+                registryOptions);
+
+            var rules = theme.Match(new string[]
+            {
+                "text.html.basic",
+                "meta.embedded.block.html",
+                "meta.tag.metadata.script.start.html",
+                "entity.name.tag.html"
+            });
+
+            Assert.AreEqual(
+                "#569CD6",
+                theme.GetColor(rules[0].foreground));
+        }
+
         class TestRegistry : IRegistryOptions
         {
             Stream IRegistryOptions.GetInputStream(string scopeName)

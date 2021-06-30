@@ -159,14 +159,14 @@ namespace TextMateSharp.Model
                     if (r != null && r.ActualStopOffset < text.Length)
                     {
                         // Treat the rest of the line (if above limit) as one default token
-                        r.Tokens.Add(new TMToken(r.ActualStopOffset, ""));
+                        r.Tokens.Add(new TMToken(r.ActualStopOffset, new List<string>()));
                         // Use as end state the starting state
                         r.EndState = modeLine.GetState();
                     }
 
                     if (r == null)
                     {
-                        r = new LineTokens(new List<TMToken>() { new TMToken(0, "") }, text.Length,
+                        r = new LineTokens(new List<TMToken>() { new TMToken(0, new List<string>()) }, text.Length,
                             modeLine.GetState());
                     }
 

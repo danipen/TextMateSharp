@@ -56,7 +56,7 @@ namespace TextMateSharp.Model
                 // helps with ligatures)
                 if (!tokenType.Equals(lastTokenType))
                 {
-                    tokens.Add(new TMToken(tokenStartIndex + offsetDelta, tokenType));
+                    tokens.Add(new TMToken(tokenStartIndex + offsetDelta, token.Scopes));
                     lastTokenType = tokenType;
                 }
             }
