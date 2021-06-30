@@ -20,5 +20,12 @@ namespace TextMateSharp.Internal.Oniguruma
                     "{", m.Value.Substring(prefix.Length), "}");
             });
         }
+
+        internal static string ConstraintUnicodePatternLenght(string pattern)
+        {
+            // php grammar has this kind of unicode chars, and
+            // oniguruma library doesn't like them
+            return pattern.Replace("\\x{7fffffff}", "\\x{7ffff}");
+        }
     }
 }

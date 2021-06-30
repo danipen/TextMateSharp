@@ -46,5 +46,16 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
                 Assert.IsTrue(oRegex.Valid);
             }
         }
+
+        [Test]
+        public void ConstraintUnicodePatternLenghtTest()
+        {
+            string pattern = "(?i)^\\s*(interface)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(extends)?\\s*";
+
+            using (ORegex oRegex = new ORegex(pattern))
+            {
+                Assert.IsTrue(oRegex.Valid);
+            }
+        }
     }
 }

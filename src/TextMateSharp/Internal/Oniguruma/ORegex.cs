@@ -39,6 +39,7 @@ namespace TextMateSharp.Internal.Oniguruma
             int multilineArg = multiline ? 1 : 0;
 
             pattern = UnicodeCharEscape.AddBracesToUnicodePatterns(pattern);
+            pattern = UnicodeCharEscape.ConstraintUnicodePatternLenght(pattern);
 
             regex = OnigInterop.onigwrap_create(pattern, pattern.Length * 2, ignoreCaseArg, multilineArg);
 
