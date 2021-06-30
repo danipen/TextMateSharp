@@ -40,11 +40,16 @@ namespace TextMateSharp.Themes
             _include = include;
         }
 
-        public List<ThemeTrieElementRule> Match(string scopeName)
+        public List<ThemeTrieElementRule> Match(IEnumerable<string> scopeNames)
         {
             List<ThemeTrieElementRule> result = new List<ThemeTrieElementRule>();
-            result.AddRange(this._theme.Match(scopeName));
-            result.AddRange(this._include.Match(scopeName));
+
+            foreach (string scope in scopeNames)
+                result.AddRange(this._theme.Match(scope));
+
+            foreach (string scope in scopeNames)
+                result.AddRange(this._include.Match(scope));
+
             return result;
         }
 

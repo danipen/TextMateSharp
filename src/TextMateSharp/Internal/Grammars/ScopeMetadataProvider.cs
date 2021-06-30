@@ -101,7 +101,7 @@ namespace TextMateSharp.Internal.Grammars
         {
             int languageId = this.ScopeToLanguage(scopeName);
             int standardTokenType = ScopeMetadataProvider.ToStandardTokenType(scopeName);
-            List<ThemeTrieElementRule> themeData = this.themeProvider.ThemeMatch(scopeName);
+            List<ThemeTrieElementRule> themeData = this.themeProvider.ThemeMatch(new string[] { scopeName });
 
             return new ScopeMetadata(scopeName, languageId, standardTokenType, themeData);
         }

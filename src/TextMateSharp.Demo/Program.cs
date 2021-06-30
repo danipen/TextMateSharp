@@ -85,16 +85,10 @@ namespace TextMateSharp
 
                         foreach (string scopeName in token.Scopes)
                         {
-                            if (scopeName == "keyword.control.foreach.php")
-                            {
-
-                            }
-
-
                             Theme theme = registry.GetTheme();
 
                             List<ThemeTrieElementRule> themeRules =
-                                theme.Match(scopeName);
+                                theme.Match(new string[] { scopeName });
 
                             foreach (ThemeTrieElementRule themeRule in themeRules)
                             {

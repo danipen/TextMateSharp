@@ -68,7 +68,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             Theme theme = registry.GetTheme();
             List<ThemeTrieElementRule> themeRules =
-                theme.Match("support.type.property-name.css");
+                theme.Match(new string[] { "support.type.property-name.css" });
 
             string color = theme.GetColor(themeRules[0].foreground);
 

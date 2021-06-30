@@ -79,9 +79,9 @@ namespace TextMateSharp.Internal.Grammars
             return this.theme.GetDefaults();
         }
 
-        public List<ThemeTrieElementRule> ThemeMatch(string scopeName)
+        public List<ThemeTrieElementRule> ThemeMatch(IEnumerable<string> scopeNames)
         {
-            return this.theme.Match(scopeName);
+            return this.theme.Match(scopeNames);
         }
 
         public IGrammar GrammarForScopeName(string scopeName, int initialLanguage,
