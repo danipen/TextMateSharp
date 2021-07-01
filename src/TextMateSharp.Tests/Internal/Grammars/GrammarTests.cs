@@ -143,6 +143,25 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
+        public void TokenizeUnicodeCommentsTest()
+        {
+            string text = "string s = \"chars: 安定させる\"";
+
+            Registry.Registry registry = new Registry.Registry(
+                            new TestRegistry());
+
+            IGrammar grammar = registry.LoadGrammar("source.cs");
+
+            ITokenizeLineResult lineTokens = grammar.TokenizeLine(text);
+
+            Assert.IsTrue(lineTokens.Tokens[7].Scopes.Contains("string.quoted.double.cs"));
+            Assert.AreEqual(12, lineTokens.Tokens[7].StartIndex);
+
+            // TODO: fix parsing unicode characters
+            // Assert.AreEqual(23, lineTokens.Tokens[7].EndIndex);
+        }
+
+        [Test]
         public void GrammarInjectionTest()
         {
             Registry.Registry registry = new Registry.Registry(
