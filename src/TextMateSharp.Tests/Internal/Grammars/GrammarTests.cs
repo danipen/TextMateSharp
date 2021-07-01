@@ -145,7 +145,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         [Test]
         public void TokenizeUnicodeCommentsTest()
         {
-            string text = "string s = \"chars: 安定させる\"";
+            string text = "string s = \"chars: 安定させる\";";
 
             Registry.Registry registry = new Registry.Registry(
                             new TestRegistry());
