@@ -1,3 +1,5 @@
+![dotnet-workflow](https://github.com/danipen/TextMateSharp/actions/workflows/dotnet.yml/badge.svg)
+
 # TextMateSharp
 An interpreter for grammar files as defined by TextMate. TextMate grammars use the oniguruma dialect (https://github.com/kkos/oniguruma). Supports loading grammar files only from JSON format. Cross - grammar injections are currently not supported.
 
