@@ -9,7 +9,7 @@ namespace TextMateSharp.Internal.Oniguruma
             this.searcher = new OnigSearcher(regexps);
         }
 
-        public IOnigNextMatchResult FindNextMatchSync(string source, int charOffset)
+        public IOnigNextMatchResult FindNextMatchSync(string source, in int charOffset)
         {
             OnigResult bestResult = searcher.Search(source, charOffset);
             if (bestResult != null)

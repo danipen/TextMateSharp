@@ -4,11 +4,11 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class Region
     {
-        public int numRegs;
+        public readonly int numRegs;
         public int[] beg;
         public int[] end;
 
-        public Region(int num)
+        public Region(in int num)
         {
             this.numRegs = num;
             this.beg = new int[num];

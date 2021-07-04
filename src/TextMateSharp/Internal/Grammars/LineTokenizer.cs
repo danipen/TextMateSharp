@@ -243,8 +243,8 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        private IMatchResult MatchRule(Grammar grammar, string lineText, bool isFirstLine, int linePos,
-                StackElement stack, int anchorPosition)
+        private IMatchResult MatchRule(Grammar grammar, string lineText, in bool isFirstLine, in int linePos,
+                StackElement stack, in int anchorPosition)
         {
             Rule rule = stack.GetRule(grammar);
             ICompiledRule ruleScanner = rule.Compile(grammar, stack.endRule, isFirstLine, linePos == anchorPosition);
@@ -260,7 +260,7 @@ namespace TextMateSharp.Internal.Grammars
         }
 
         private IMatchResult MatchRuleOrInjections(Grammar grammar, string lineText, bool isFirstLine,
-            int linePos, StackElement stack, int anchorPosition)
+            in int linePos, StackElement stack, in int anchorPosition)
         {
             // Look for normal grammar rule
             IMatchResult matchResult = MatchRule(grammar, lineText, isFirstLine, linePos, stack, anchorPosition);
@@ -302,7 +302,7 @@ namespace TextMateSharp.Internal.Grammars
         }
 
         private IMatchInjectionsResult MatchInjections(List<Injection> injections, Grammar grammar, string lineText,
-                bool isFirstLine, int linePos, StackElement stack, int anchorPosition)
+                bool isFirstLine, in int linePos, StackElement stack, in int anchorPosition)
         {
             // The lower the better
             int bestMatchRating = int.MaxValue;

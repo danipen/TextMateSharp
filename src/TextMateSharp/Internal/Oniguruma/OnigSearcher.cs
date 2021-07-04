@@ -17,7 +17,7 @@ namespace TextMateSharp.Internal.Oniguruma
             }
         }
 
-        public OnigResult Search(string source, int charOffset)
+        public OnigResult Search(string source, in int charOffset)
         {
             int byteOffset = charOffset;
 

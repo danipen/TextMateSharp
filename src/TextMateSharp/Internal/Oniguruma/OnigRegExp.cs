@@ -40,7 +40,7 @@ namespace TextMateSharp.Internal.Oniguruma
             _disposed = true;
         }        
         
-        public OnigResult Search(string str, int position)
+        public OnigResult Search(string str, in int position)
         {
             if (lastSearchString == str && lastSearchPosition <= position &&
                 (lastSearchResult == null || lastSearchResult.LocationAt(0) >= position))
@@ -54,7 +54,7 @@ namespace TextMateSharp.Internal.Oniguruma
             return lastSearchResult;
         }
 
-        private OnigResult GetOnigResult(string data, int position)
+        private OnigResult GetOnigResult(string data, in int position)
         {
             List<ORegexResult> results = regex.SafeSearch(data, position);
 
