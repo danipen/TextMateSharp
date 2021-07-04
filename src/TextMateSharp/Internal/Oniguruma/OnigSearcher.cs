@@ -17,9 +17,9 @@ namespace TextMateSharp.Internal.Oniguruma
             }
         }
 
-        public OnigResult Search(OnigString source, int charOffset)
+        public OnigResult Search(string source, int charOffset)
         {
-            int byteOffset = source.ConvertUtf16OffsetToUtf8(charOffset);
+            int byteOffset = charOffset;
 
             int bestLocation = 0;
             OnigResult bestResult = null;

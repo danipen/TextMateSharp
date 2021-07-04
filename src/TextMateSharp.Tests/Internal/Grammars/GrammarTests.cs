@@ -145,9 +145,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         [Test]
         public void TokenizeUnicodeCommentsTest()
         {
-            // TODO: fix parsing unicode characters
-            //string text = "string s = \"chars: 安定させる\";";
-            string text = "string s = \"chars: 12345\";";
+            string text = "string s = \"chars: 安定させる\";";
 
             Registry.Registry registry = new Registry.Registry(
                             new TestRegistry());
@@ -163,6 +161,21 @@ namespace TextMateSharp.Tests.Internal.Grammars
             Assert.IsTrue(lineTokens.Tokens[8].Scopes.Contains("punctuation.definition.string.end.cs"));
             Assert.AreEqual(24, lineTokens.Tokens[8].StartIndex);
             Assert.AreEqual(25, lineTokens.Tokens[8].EndIndex);
+        }
+
+        [Test]
+        public void TokenizeUnicodeCommentsTest2()
+        {
+            // TODO: fix parsing unicode characters
+            string text = "\"安安安\"";
+            //string text = "string s = \"chars: 12345\";";
+
+            Registry.Registry registry = new Registry.Registry(
+                            new TestRegistry());
+
+            IGrammar grammar = registry.LoadGrammar("source.cs");
+
+            ITokenizeLineResult lineTokens = grammar.TokenizeLine(text);
         }
 
         [Test]

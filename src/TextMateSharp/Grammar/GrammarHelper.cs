@@ -18,10 +18,5 @@ namespace TextMateSharp.Grammars
         {
             return new Grammar(grammar, initialLanguage, embeddedLanguages, repository, themeProvider);
         }
-
-        public static OnigString CreateOnigString(string str)
-        {
-            return new OnigString(str);
-        }
     }
 }

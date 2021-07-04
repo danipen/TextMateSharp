@@ -12,9 +12,8 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
             OnigSearcher searcher = new OnigSearcher(new string[] { regexp });
 
             string text = "other";
-            OnigString str = new OnigString(text);
 
-            Assert.IsNull(searcher.Search(str, 0));
+            Assert.IsNull(searcher.Search(text, 0));
         }
 
         [Test]
@@ -24,10 +23,9 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
             OnigSearcher searcher = new OnigSearcher(new string[] { regexp });
 
             string text = "鬼AAA";
-            OnigString str = new OnigString(text);
 
             // finds a double-byte match at location 0
-            OnigResult result = searcher.Search(str, 0);
+            OnigResult result = searcher.Search(text, 0);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count());
@@ -35,7 +33,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
             Assert.AreEqual(1, result.LengthAt(0));
 
             // start searching at index 1, it should find a match
-            result = searcher.Search(str, 1);
+            result = searcher.Search(text, 1);
 
             Assert.IsNull(result);
         }

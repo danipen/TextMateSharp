@@ -5,7 +5,7 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class OnigRegExp : IDisposable
     {
-        private OnigString lastSearchString;
+        private string lastSearchString;
         private int lastSearchPosition;
         private OnigResult lastSearchResult;
         private ORegex regex;
@@ -40,7 +40,7 @@ namespace TextMateSharp.Internal.Oniguruma
             _disposed = true;
         }        
         
-        public OnigResult Search(OnigString str, int position)
+        public OnigResult Search(string str, int position)
         {
             if (lastSearchString == str && lastSearchPosition <= position &&
                 (lastSearchResult == null || lastSearchResult.LocationAt(0) >= position))
@@ -50,11 +50,11 @@ namespace TextMateSharp.Internal.Oniguruma
 
             lastSearchString = str;
             lastSearchPosition = position;
-            lastSearchResult = Search(str._string, position);
+            lastSearchResult = GetOnigResult(str, position);
             return lastSearchResult;
         }
 
-        private OnigResult Search(string data, int position)
+        private OnigResult GetOnigResult(string data, int position)
         {
             List<ORegexResult> results = regex.SafeSearch(data, position);
 

@@ -230,10 +230,9 @@ namespace TextMateSharp.Internal.Grammars
                 // Only add \n if the passed lineText didn't have it.
                 lineText += '\n';
             }
-            OnigString onigLineText = GrammarHelper.CreateOnigString(lineText);
             int lineLength = lineText.Length;
             LineTokens lineTokens = new LineTokens(emitBinaryTokens, lineText);
-            StackElement nextState = LineTokenizer.TokenizeString(this, onigLineText, isFirstLine, 0, prevState,
+            StackElement nextState = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
                     lineTokens);
 
             if (emitBinaryTokens)

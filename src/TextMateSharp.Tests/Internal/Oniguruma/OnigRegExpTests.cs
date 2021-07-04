@@ -13,7 +13,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         {
             using (OnigRegExp regExp = new OnigRegExp("[A-C]+"))
             {
-                OnigString str = new OnigString("abcABC123");
+                string str = "abcABC123";
                 OnigResult result = regExp.Search(str, 0);
 
                 Assert.AreEqual(1, result.Count());
@@ -27,12 +27,44 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         {
             using (OnigRegExp regExp = new OnigRegExp("[á]+"))
             {
-                OnigString str = new OnigString("00áá00");
+                string str = "00áá00";
                 OnigResult result = regExp.Search(str, 0);
 
                 Assert.AreEqual(1, result.Count());
                 Assert.AreEqual(2, result.LocationAt(0));
                 Assert.AreEqual(2, result.LengthAt(0));
+            }
+        }
+
+        [Test]
+        public void TestUnicodeOnigRegExp2()
+        {
+            string text = "\"安\"";
+            string pattern = "\\\"[^\"]*\\\"";
+
+            using (OnigRegExp regExp = new OnigRegExp(pattern))
+            {
+                OnigResult result = regExp.Search(text, 0);
+
+                Assert.AreEqual(1, result.Count());
+                Assert.AreEqual(0, result.LocationAt(0));
+                Assert.AreEqual(3, result.LengthAt(0));
+            }
+        }
+
+        [Test]
+        public void TestUnicodeOnigRegExp4()
+        {
+            string text = "string s=\"安\""; ;
+            string pattern = "\\\"[^\"]*\\\"";
+
+            using (OnigRegExp regExp = new OnigRegExp(pattern))
+            {
+                OnigResult result = regExp.Search(text, 0);
+
+                Assert.AreEqual(1, result.Count());
+                Assert.AreEqual(9, result.LocationAt(0));
+                Assert.AreEqual(3, result.LengthAt(0));
             }
         }
 

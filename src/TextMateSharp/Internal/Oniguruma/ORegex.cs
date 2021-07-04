@@ -43,7 +43,7 @@ namespace TextMateSharp.Internal.Oniguruma
 
             regex = OnigInterop.onigwrap_create(pattern, pattern.Length * 2, ignoreCaseArg, multilineArg);
 
-            if (!Valid)
+            //if (!Valid)
                 regexString = pattern; // Save the pattern off on invalid patterns for throwing exceptions
         }
 
@@ -79,10 +79,12 @@ namespace TextMateSharp.Internal.Oniguruma
                     if (capture == 0 && pos < 0)
                         break;
 
+                    int len = pos == -1 ? 0 : OnigInterop.onigwrap_len(region, capture);
+
                     resultList.Add(new ORegexResult()
                     {
                         Position = pos,
-                        Length = pos == -1 ? 0 : OnigInterop.onigwrap_len(region, capture)
+                        Length = len
                     });
                 }
 

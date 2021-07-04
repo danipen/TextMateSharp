@@ -4,15 +4,14 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     class OnigNextMatchResult : IOnigNextMatchResult
     {
-
         private int index;
 
         private IOnigCaptureIndex[] captureIndices;
 
-        public OnigNextMatchResult(OnigResult result, OnigString source)
+        public OnigNextMatchResult(OnigResult result)
         {
             this.index = result.GetIndex();
-            this.captureIndices = CaptureIndicesForMatch(result, source);
+            this.captureIndices = CaptureIndicesForMatch(result);
         }
 
         public int GetIndex()
@@ -50,16 +49,18 @@ namespace TextMateSharp.Internal.Oniguruma
             return result.ToString();
         }
 
-        private static IOnigCaptureIndex[] CaptureIndicesForMatch(OnigResult result, OnigString source)
+        private static IOnigCaptureIndex[] CaptureIndicesForMatch(OnigResult result)
         {
             int resultCount = result.Count();
             IOnigCaptureIndex[] captures = new IOnigCaptureIndex[resultCount];
             for (int index = 0; index < resultCount; index++)
             {
-                int captureStart = source.ConvertUtf8OffsetToUtf16(result.LocationAt(index));
-                int captureEnd = source.ConvertUtf8OffsetToUtf16(result.LocationAt(index) + result.LengthAt(index));
+                int captureStart = result.LocationAt(index);
+                int captureEnd = result.LocationAt(index) + result.LengthAt(index);
+
                 captures[index] = new OnigCaptureIndex(index, captureStart, captureEnd);
             }
+
             return captures;
         }
 
