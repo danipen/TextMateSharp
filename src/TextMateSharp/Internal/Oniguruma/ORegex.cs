@@ -66,13 +66,13 @@ namespace TextMateSharp.Internal.Oniguruma
             if (disposed) throw new ObjectDisposedException("ORegex");
             if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", regexString));
 
-            var resultList = new List<ORegexResult>();
 
             lock (syncObject)
             {
                 Search(text, offset);
 
                 var captureCount = OnigInterop.onigwrap_num_regs(region);
+                var resultList = new List<ORegexResult>(captureCount);
                 for (var capture = 0; capture < captureCount; capture++)
                 {
                     var pos = OnigInterop.onigwrap_pos(region, capture);
@@ -91,9 +91,9 @@ namespace TextMateSharp.Internal.Oniguruma
                 this.text = null;
                 OnigInterop.onigwrap_region_free(region);
                 regionSet = false;
-            }
 
-            return resultList;
+                return resultList;
+            }
         }
 
         public void Search(string text, int offset = 0)
