@@ -16,13 +16,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Get Build Version
-      run: |
-        Import-Module .\build\GetBuildVersion.psm1
-        Write-Host $Env:GITHUB_REF
-        $version = GetBuildVersion -VersionString $Env:GITHUB_REF
-        echo "BUILD_VERSION=$version" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-      shell: pwsh
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.5
@@ -33,10 +30,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 5.0.x
 
     - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$BUILD_VERSION --no-restore
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{steps.extract_branch.outputs.branch}} --no-restore
 
     - name: Run tests
       run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
