@@ -34,6 +34,30 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
   </ItemGroup>
 
   <ItemGroup>
+    <!-- native oniguruma library for Windows in nuget package -->
+    <Content Include="Internal\Oniguruma\Native\onigwrap.dll">
+      <Link>onigwrap.dll</Link>
+      <PackagePath>runtimes/win/native/onigwrap.dll</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- native oniguruma library for Linux in nuget package -->
+    <Content Include="Internal\Oniguruma\Native\libonigwrap.so">
+      <Link>libonigwrap.so</Link>
+      <PackagePath>runtimes/linux/native/libonigwrap.so</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- native oniguruma library for macOS in nuget package -->
+    <Content Include="Internal\Oniguruma\Native\libonigwrap.dylib">
+      <Link>libonigwrap.dylib</Link>
+      <PackagePath>runtimes/osx/native/libonigwrap.dylib</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
