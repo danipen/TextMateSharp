@@ -36,7 +36,7 @@ jobs:
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{steps.extract_branch.outputs.branch}} --no-restore
 
     - name: Run tests
-      run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
+      run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
       
     - name: Publish
       if: startsWith(github.ref, 'refs/heads/release')
