@@ -18,7 +18,7 @@ jobs:
     
     - name: Extract branch name
       shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/tags/})"
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/tags/v})"
       id: extract_branch
 
     - name: Setup NuGet
