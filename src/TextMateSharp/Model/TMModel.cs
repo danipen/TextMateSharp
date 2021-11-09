@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using TextMateSharp.Grammars;
 
@@ -44,7 +45,6 @@ namespace TextMateSharp.Model
                 this.model = model;
                 this.IsStopped = true;
             }
-
 
             public void Run()
             {
@@ -116,10 +116,51 @@ namespace TextMateSharp.Model
                         toLineIndex = model.lines.GetNumberOfLines() - 1;
                     }
 
+                    long tokenizedChars = 0;
+                    long currentCharsToTokenize = 0;
+                    long MAX_ALLOWED_TIME = 20;
+                    long currentEstimatedTimeToTokenize = 0;
+                    long elapsedTime;
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                    // Tokenize at most 1000 lines. Estimate the tokenization speed per
+                    // character and stop when:
+                    // - MAX_ALLOWED_TIME is reached
+                    // - tokenizing the next line would go above MAX_ALLOWED_TIME
+
                     int lineIndex = startLine;
                     while (lineIndex <= toLineIndex && lineIndex < model.GetLines().GetNumberOfLines())
                     {
+                        elapsedTime = stopwatch.ElapsedMilliseconds;
+                        if (elapsedTime > MAX_ALLOWED_TIME)
+                        {
+                            // Stop if MAX_ALLOWED_TIME is reached
+                            model.InvalidateLine(lineIndex);
+                            return;
+                        }
+                        // Compute how many characters will be tokenized for this line
+                        try
+                        {
+                            currentCharsToTokenize = model.lines.GetLineLength(lineIndex);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        if (tokenizedChars > 0)
+                        {
+                            // If we have enough history, estimate how long tokenizing this line would take
+                            currentEstimatedTimeToTokenize = (long)((double)elapsedTime / tokenizedChars) * currentCharsToTokenize;
+                            if (elapsedTime + currentEstimatedTimeToTokenize > MAX_ALLOWED_TIME)
+                            {
+                                // Tokenizing this line will go above MAX_ALLOWED_TIME
+                                model.InvalidateLine(lineIndex);
+                                return;
+                            }
+                        }
+
                         lineIndex = this.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex) + 1;
+                        tokenizedChars += currentCharsToTokenize;
                     }
                 });
             }
