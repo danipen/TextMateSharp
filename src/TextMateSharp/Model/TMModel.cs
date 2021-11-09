@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+
 using TextMateSharp.Grammars;
 
 namespace TextMateSharp.Model
@@ -20,7 +21,8 @@ namespace TextMateSharp.Model
         private IModelLines lines;
         private Queue<int> invalidLines = new Queue<int>();
 
-        private static object _lock = new object();
+        private object _lock = new object();
+        private ManualResetEvent _resetEvent = new ManualResetEvent(false);
 
         public TMModel(IModelLines lines)
         {
@@ -29,6 +31,11 @@ namespace TextMateSharp.Model
             ((AbstractLineList)lines).SetModel(this);
             lines.ForEach((line) => line.ResetTokenizationState());
             InvalidateLine(0);
+        }
+
+        public bool IsStopped
+        {
+            get { return this.fThread == null || this.fThread.IsStopped; }
         }
 
         class TokenizerThread
@@ -52,7 +59,7 @@ namespace TextMateSharp.Model
 
                 Thread thread = new Thread(new ThreadStart(ThreadWorker));
                 thread.Name = name;
-                thread.Priority = ThreadPriority.BelowNormal;
+                thread.Priority = ThreadPriority.Lowest;
                 thread.IsBackground = true;
                 thread.Start();
             }
@@ -73,7 +80,7 @@ namespace TextMateSharp.Model
                 {
                     int toProcess = -1;
 
-                    lock (_lock)
+                    lock (this.model._lock)
                     {
                         if (model.invalidLines.Count > 0)
                         {
@@ -83,7 +90,8 @@ namespace TextMateSharp.Model
 
                     if (toProcess == -1)
                     {
-                        Thread.Sleep(20);
+                        this.model._resetEvent.Reset();
+                        this.model._resetEvent.WaitOne();
                         continue;
                     }
 
@@ -316,6 +324,9 @@ namespace TextMateSharp.Model
 
         private void BuildEventWithCallback(Action<ModelTokensChangedEventBuilder> callback)
         {
+            if (this.fThread == null || this.fThread.IsStopped)
+                return;
+
             ModelTokensChangedEventBuilder eventBuilder = new ModelTokensChangedEventBuilder(this);
 
             callback(eventBuilder);
@@ -342,8 +353,18 @@ namespace TextMateSharp.Model
             );
         }
 
+        public void ForceTokenization(int startLineIndex, int endLineIndex)
+        {
+            this.BuildEventWithCallback(eventBuilder =>
+                this.fThread.UpdateTokensInRange(eventBuilder, startLineIndex, endLineIndex)
+            );
+        }
+
         public List<TMToken> GetLineTokens(int lineIndex)
         {
+            if (lineIndex < 0 || lineIndex > lines.GetNumberOfLines() - 1)
+                return null;
+
             return lines.Get(lineIndex).Tokens;
         }
 
@@ -359,6 +380,7 @@ namespace TextMateSharp.Model
             lock (_lock)
             {
                 this.invalidLines.Enqueue(lineIndex);
+                _resetEvent.Set();
             }
         }
 

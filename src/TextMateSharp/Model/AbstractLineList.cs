@@ -55,6 +55,14 @@ namespace TextMateSharp.Model
             }
         }
 
+        protected void ForceTokenization(int startLineIndex, int endLineIndex)
+        {
+            if (model != null)
+            {
+                model.ForceTokenization(startLineIndex, endLineIndex);
+            }
+        }
+
         public int GetSize()
         {
             return GetNumberOfLines();
