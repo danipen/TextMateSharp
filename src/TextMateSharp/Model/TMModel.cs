@@ -274,6 +274,7 @@ namespace TextMateSharp.Model
                 this.grammar = grammar;
                 this.tokenizer = new Tokenizer(grammar);
                 lines.Get(0).SetState(tokenizer.GetInitialState());
+                InvalidateLine(0);
             }
         }
 
