@@ -29,8 +29,6 @@ namespace TextMateSharp.Model
             this.listeners = new List<IModelTokensChangedListener>();
             this.lines = lines;
             ((AbstractLineList)lines).SetModel(this);
-            lines.ForEach((line) => line.ResetTokenizationState());
-            InvalidateLine(0);
         }
 
         public bool IsStopped
@@ -273,6 +271,7 @@ namespace TextMateSharp.Model
             {
                 this.grammar = grammar;
                 this.tokenizer = new Tokenizer(grammar);
+                lines.ForEach((line) => line.ResetTokenizationState());
                 lines.Get(0).SetState(tokenizer.GetInitialState());
                 InvalidateLine(0);
             }
