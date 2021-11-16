@@ -1,4 +1,4 @@
-name: nuget
+name: Publish NuGet package
 
 on:
   create:
