@@ -38,6 +38,10 @@ namespace TextMateSharp.Model
             // state
             // );
             // }
+
+            if (grammar == null)
+                return null;
+
             TMState freshState = state != null ? state.Clone() : GetInitialState();
             ITokenizeLineResult textMateResult = grammar.TokenizeLine(line, freshState.GetRuleStack());
             freshState.setRuleStack(textMateResult.RuleStack);

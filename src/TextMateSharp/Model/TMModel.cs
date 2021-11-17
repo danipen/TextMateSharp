@@ -348,6 +348,9 @@ namespace TextMateSharp.Model
 
         public void ForceTokenization(int lineIndex)
         {
+            if (grammar == null)
+                return;
+
             this.BuildEventWithCallback(eventBuilder =>
                 this.fThread.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex)
             );
@@ -355,6 +358,9 @@ namespace TextMateSharp.Model
 
         public void ForceTokenization(int startLineIndex, int endLineIndex)
         {
+            if (grammar == null)
+                return;
+
             this.BuildEventWithCallback(eventBuilder =>
                 this.fThread.UpdateTokensInRange(eventBuilder, startLineIndex, endLineIndex)
             );
