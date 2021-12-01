@@ -319,6 +319,7 @@ namespace TextMateSharp.Model
             }
 
             this.fThread.Stop();
+            _resetEvent.Set();
             this.fThread = null;
         }
 
