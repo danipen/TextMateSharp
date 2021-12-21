@@ -25,24 +25,16 @@ namespace TextMateSharp.Model
             return Tokenize(line, state, 0, 0);
         }
 
-        public LineTokens Tokenize(string line, TMState state, int offsetDelta, int stopAtOffset)
+        public LineTokens Tokenize(string line, TMState state, int offsetDelta, int maxLen)
         {
-            // Do not attempt to tokenize if a line has over 20k
-            // or if the rule stack contains more than 100 rules (indicator of
-            // broken grammar that forgets to pop rules)
-            //if (line.length >= 20000 || depth(state.ruleStack) > 100) {
-            // return new RawLineTokens(
-            // [new Token(offsetDelta, '')],
-            // [new ModeTransition(offsetDelta, this._modeId)],
-            // offsetDelta,
-            // state
-            // );
-            // }
-
             if (grammar == null)
                 return null;
 
             TMState freshState = state != null ? state.Clone() : GetInitialState();
+
+            if (line.Length > 0 && line.Length > maxLen)
+                line = line.Substring(0, maxLen);
+
             ITokenizeLineResult textMateResult = grammar.TokenizeLine(line, freshState.GetRuleStack());
             freshState.setRuleStack(textMateResult.RuleStack);
 

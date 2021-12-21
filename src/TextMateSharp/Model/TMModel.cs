@@ -9,6 +9,7 @@ namespace TextMateSharp.Model
 {
     public class TMModel : ITMModel
     {
+        private const int MAX_LEN_TO_TOKENIZE;
         private IGrammar grammar;
 
         private List<IModelTokensChangedListener> listeners;
@@ -174,10 +175,6 @@ namespace TextMateSharp.Model
             public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex,
                 int endLineIndex)
             {
-                int stopLineTokenizationAfter = 1000000000; // 1 billion, if a line is
-                // so long, you have other
-                // trouble :).
-                // Validate all states up to and including endLineIndex
                 int nextInvalidLineIndex = startIndex;
                 int lineIndex = startIndex;
                 while (lineIndex <= endLineIndex && lineIndex < model.lines.GetNumberOfLines())
@@ -190,7 +187,7 @@ namespace TextMateSharp.Model
                     {
                         text = model.lines.GetLineText(lineIndex);
                         // Tokenize only the first X characters
-                        r = model.tokenizer.Tokenize(text, modeLine.GetState(), 0, stopLineTokenizationAfter);
+                        r = model.tokenizer.Tokenize(text, modeLine.GetState(), 0, MAX_LEN_TO_TOKENIZE);
                     }
                     catch (Exception e)
                     {

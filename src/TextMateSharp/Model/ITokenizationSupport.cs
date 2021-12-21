@@ -7,7 +7,7 @@ namespace TextMateSharp.Model
 
         LineTokens Tokenize(string line, TMState state);
 
-        LineTokens Tokenize(string line, TMState state, int offsetDelta, int stopAtOffset);
+        LineTokens Tokenize(string line, TMState state, int offsetDelta, int maxLen);
 
     }
 }
