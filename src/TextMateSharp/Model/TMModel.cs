@@ -9,7 +9,7 @@ namespace TextMateSharp.Model
 {
     public class TMModel : ITMModel
     {
-        private const int MAX_LEN_TO_TOKENIZE;
+        private const int MAX_LEN_TO_TOKENIZE = 10000;
         private IGrammar grammar;
 
         private List<IModelTokensChangedListener> listeners;
