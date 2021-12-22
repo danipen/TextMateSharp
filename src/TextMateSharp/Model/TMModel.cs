@@ -115,6 +115,9 @@ namespace TextMateSharp.Model
 
             private void RevalidateTokensNow(int startLine, int? toLineIndexOrNull)
             {
+                if (model.tokenizer == null)
+                    return;
+
                 model.BuildEventWithCallback(eventBuilder =>
                 {
                     int toLineIndex = toLineIndexOrNull ?? 0;
