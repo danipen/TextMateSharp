@@ -60,30 +60,9 @@ namespace TextMateSharp.Registry
                     continue;
                 }
 
-                string filePath = this.locator.GetFilePath(scopeName);
-                if (filePath == null)
-                {
-                    if (scopeName.Equals(initialScopeName))
-                    {
-                        throw new TMException("Unknown location for grammar <" + initialScopeName + ">");
-                    }
-                    continue;
-                }
-
                 try
                 {
-                    IRawGrammar grammar = null;
-
-                    Stream stream = this.locator.GetInputStream(scopeName);
-
-                    if (stream != null)
-                    {
-                        using (stream)
-                        using (StreamReader reader = new StreamReader(stream))
-                        {
-                            grammar = GrammarReader.ReadGrammarSync(reader);
-                        }
-                    }
+                    IRawGrammar grammar = this.locator.GrammarResolver.GetGrammar(scopeName);
 
                     if (grammar == null)
                         continue;

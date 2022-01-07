@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 
 using TextMateSharp.Grammars;
+using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
+using TextMateSharp.Internal.Types;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
 
@@ -119,14 +121,49 @@ namespace TextMateSharp
         {
             private string _grammarFile;
             private string _themeFile;
-
+            private IThemeResolver _themeResolver;
+            private IGrammarResolver _grammarResolver;
             internal DemoRegistryOptions(string grammarFile, string themeFile)
             {
                 _grammarFile = grammarFile;
                 _themeFile = themeFile;
+                _themeResolver = new DemoThemeResolver(GetFilePath);
+                _grammarResolver = new DemoGrammarResolver(GetFilePath);
             }
+            class DemoThemeResolver : IThemeResolver
+            {
+                private readonly Func<string, string> _getFilePathMethod;
 
-            public string GetFilePath(string scopeName)
+                public DemoThemeResolver(Func<string, string> getFilePathMethod)
+                {
+                    this._getFilePathMethod = getFilePathMethod;
+                }
+                public IRawTheme GetTheme(string scopeName)
+                {
+                    using var stream = new FileStream(_getFilePathMethod(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var reader = new StreamReader(stream);
+                    return ThemeReader.ReadThemeSync(reader);
+                }
+            }
+            class DemoGrammarResolver : IGrammarResolver
+            {
+                private readonly Func<string, string> _getFilePathMethod;
+
+                public DemoGrammarResolver(Func<string, string> getFilePathMethod)
+                {
+                    this._getFilePathMethod = getFilePathMethod;
+                }
+                public IRawGrammar GetGrammar(string scopeName)
+                {
+                    using var stream = new FileStream(_getFilePathMethod(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var reader = new StreamReader(stream);
+                    return GrammarReader.ReadGrammarSync(reader);
+                }
+            }
+            public IThemeResolver ThemeResolver { get => _themeResolver; set => _themeResolver = value; }
+            public IGrammarResolver GrammarResolver { get => _grammarResolver; set => _grammarResolver = value; }
+
+            private string GetFilePath(string scopeName)
             {
                 if (scopeName == "./dark_vs.json")
                     return Path.Combine(Path.GetDirectoryName(_themeFile), "dark_vs.json");
