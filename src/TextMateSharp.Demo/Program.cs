@@ -121,47 +121,25 @@ namespace TextMateSharp
         {
             private string _grammarFile;
             private string _themeFile;
-            private IThemeResolver _themeResolver;
-            private IGrammarResolver _grammarResolver;
             internal DemoRegistryOptions(string grammarFile, string themeFile)
             {
                 _grammarFile = grammarFile;
                 _themeFile = themeFile;
-                _themeResolver = new DemoThemeResolver(GetFilePath);
-                _grammarResolver = new DemoGrammarResolver(GetFilePath);
             }
-            class DemoThemeResolver : IThemeResolver
-            {
-                private readonly Func<string, string> _getFilePathMethod;
 
-                public DemoThemeResolver(Func<string, string> getFilePathMethod)
-                {
-                    this._getFilePathMethod = getFilePathMethod;
-                }
-                public IRawTheme GetTheme(string scopeName)
-                {
-                    using var stream = new FileStream(_getFilePathMethod(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using var reader = new StreamReader(stream);
-                    return ThemeReader.ReadThemeSync(reader);
-                }
-            }
-            class DemoGrammarResolver : IGrammarResolver
+            public IRawTheme GetTheme(string scopeName)
             {
-                private readonly Func<string, string> _getFilePathMethod;
-
-                public DemoGrammarResolver(Func<string, string> getFilePathMethod)
-                {
-                    this._getFilePathMethod = getFilePathMethod;
-                }
-                public IRawGrammar GetGrammar(string scopeName)
-                {
-                    using var stream = new FileStream(_getFilePathMethod(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using var reader = new StreamReader(stream);
-                    return GrammarReader.ReadGrammarSync(reader);
-                }
+                using var stream = new FileStream(GetFilePath(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(stream);
+                return ThemeReader.ReadThemeSync(reader);
             }
-            public IThemeResolver ThemeResolver { get => _themeResolver; set => _themeResolver = value; }
-            public IGrammarResolver GrammarResolver { get => _grammarResolver; set => _grammarResolver = value; }
+
+            public IRawGrammar GetGrammar(string scopeName)
+            {
+                using var stream = new FileStream(GetFilePath(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(stream);
+                return GrammarReader.ReadGrammarSync(reader);
+            }
 
             private string GetFilePath(string scopeName)
             {
@@ -191,19 +169,10 @@ namespace TextMateSharp
                 return null;
             }
 
-            public Stream GetInputStream(string scopeName)
-            {
-                return new FileStream(
-                    GetFilePath(scopeName),
-                    FileMode.Open,
-                    FileAccess.Read,
-                    FileShare.ReadWrite);
-            }
-
-            public IRawTheme GetCurrentTheme()
+            public IRawTheme GetDefaultTheme()
             {
                 int ini = Environment.TickCount;
-                
+
                 using (StreamReader reader = new StreamReader(_themeFile))
                 {
                     IRawTheme result = ThemeReader.ReadThemeSync(reader);

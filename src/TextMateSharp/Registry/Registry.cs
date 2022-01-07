@@ -27,7 +27,7 @@ namespace TextMateSharp.Registry
             this.locator = locator;
             this.syncRegistry = new SyncRegistry(
                 TmTheme.CreateFromRawTheme(
-                    locator.GetCurrentTheme(), locator));
+                    locator.GetDefaultTheme(), locator));
         }
 
         public void SetTheme(IRawTheme theme)
@@ -62,7 +62,7 @@ namespace TextMateSharp.Registry
 
                 try
                 {
-                    IRawGrammar grammar = this.locator.GrammarResolver.GetGrammar(scopeName);
+                    IRawGrammar grammar = this.locator.GetGrammar(scopeName);
 
                     if (grammar == null)
                         continue;

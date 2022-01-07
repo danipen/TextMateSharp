@@ -110,7 +110,7 @@ namespace TextMateSharp.Themes
             if (string.IsNullOrEmpty(include))
                 return result;
 
-            IRawTheme themeInclude = registryOptions.ThemeResolver.GetTheme(include);
+            IRawTheme themeInclude = registryOptions.GetTheme(include);
 
             if (themeInclude == null)
                 return result;

@@ -280,48 +280,18 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
         class TestRegistry : IRegistryOptions
         {
-            private IThemeResolver _themeResolver;
-            private IGrammarResolver _grammarResolver;
-            public TestRegistry()
+            public IRawTheme GetTheme(string scopeName)
             {
-                _themeResolver = new DemoThemeResolver(GetFilePath);
-                _grammarResolver = new DemoGrammarResolver(GetFilePath);
+                using var stream = ResourceReader.OpenStream(GetFilePath(scopeName));
+                using var reader = new StreamReader(stream);
+                return ThemeReader.ReadThemeSync(reader);
             }
-            public IThemeResolver ThemeResolver { get => _themeResolver; set => _themeResolver = value; }
-            public IGrammarResolver GrammarResolver { get => _grammarResolver; set => _grammarResolver = value; }
-            class DemoThemeResolver : IThemeResolver
-            {
-                private readonly Func<string, string> _getFilePathMethod;
 
-                public DemoThemeResolver(Func<string, string> getFilePathMethod)
-                {
-                    this._getFilePathMethod = getFilePathMethod;
-                }
-                public IRawTheme GetTheme(string scopeName)
-                {
-                    using var stream = ResourceReader.OpenStream(_getFilePathMethod(scopeName));
-                    using var reader = new StreamReader(stream);
-                    return ThemeReader.ReadThemeSync(reader);
-                }
-            }
-            class DemoGrammarResolver : IGrammarResolver
+            public IRawGrammar GetGrammar(string scopeName)
             {
-                private readonly Func<string, string> _getFilePathMethod;
-
-                public DemoGrammarResolver(Func<string, string> getFilePathMethod)
-                {
-                    this._getFilePathMethod = getFilePathMethod;
-                }
-                public IRawGrammar GetGrammar(string scopeName)
-                {
-                    using var stream = ResourceReader.OpenStream(_getFilePathMethod(scopeName));
-                    using var reader = new StreamReader(stream);
-                    return GrammarReader.ReadGrammarSync(reader);
-                }
-            }
-            Stream GetInputStream(string scopeName)
-            {
-                return ResourceReader.OpenStream(GetFilePath(scopeName));
+                using var stream = ResourceReader.OpenStream(GetFilePath(scopeName));
+                using var reader = new StreamReader(stream);
+                return GrammarReader.ReadGrammarSync(reader);
             }
 
             ICollection<string> IRegistryOptions.GetInjections(string scopeName)
@@ -366,7 +336,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
                 return null;
             }
 
-            IRawTheme IRegistryOptions.GetCurrentTheme()
+            IRawTheme IRegistryOptions.GetDefaultTheme()
             {
                 using (Stream stream = ResourceReader.OpenStream("dark_vs.json"))
                 using (StreamReader reader = new StreamReader(stream))

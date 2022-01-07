@@ -1,8 +1,6 @@
-﻿using System;
+﻿using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-
-using NUnit.Framework;
 using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
 using TextMateSharp.Internal.Types;
@@ -36,52 +34,30 @@ namespace TextMateSharp.Tests.Internal.Themes.Reader
         class TestRegistry : IRegistryOptions
         {
             private string _theme;
-            private IThemeResolver _themeResolver;
-            private IGrammarResolver _grammarResolver;
-            public IThemeResolver ThemeResolver { get => _themeResolver; set => _themeResolver = value; }
-            public IGrammarResolver GrammarResolver { get => _grammarResolver; set => _grammarResolver = value; }
 
             internal TestRegistry(string theme)
             {
                 _theme = theme;
-                _themeResolver = new DemoThemeResolver(GetFilePath);
-                _grammarResolver = new DemoGrammarResolver(GetFilePath);
             }
-            class DemoThemeResolver : IThemeResolver
+            public IRawTheme GetTheme(string scopeName)
             {
-                private readonly Func<string, string> _getFilePathMethod;
+                if (scopeName.StartsWith("./"))
+                    scopeName = scopeName.Replace("./", string.Empty);
 
-                public DemoThemeResolver(Func<string, string> getFilePathMethod)
-                {
-                    this._getFilePathMethod = getFilePathMethod;
-                }
-                public IRawTheme GetTheme(string scopeName)
-                {
-                    if (scopeName.StartsWith("./"))
-                        scopeName = scopeName.Replace("./", string.Empty);
-
-                    using var stream = ResourceReader.OpenStream(_getFilePathMethod(scopeName));
-                    using var reader = new StreamReader(stream);
-                    return ThemeReader.ReadThemeSync(reader);
-                }
+                using var stream = ResourceReader.OpenStream(GetFilePath(scopeName));
+                using var reader = new StreamReader(stream);
+                return ThemeReader.ReadThemeSync(reader);
             }
-            class DemoGrammarResolver : IGrammarResolver
+
+
+            public IRawGrammar GetGrammar(string scopeName)
             {
-                private readonly Func<string, string> _getFilePathMethod;
+                if (scopeName.StartsWith("./"))
+                    scopeName = scopeName.Replace("./", string.Empty);
 
-                public DemoGrammarResolver(Func<string, string> getFilePathMethod)
-                {
-                    this._getFilePathMethod = getFilePathMethod;
-                }
-                public IRawGrammar GetGrammar(string scopeName)
-                {
-                    if (scopeName.StartsWith("./"))
-                        scopeName = scopeName.Replace("./", string.Empty);
-
-                    using var stream = ResourceReader.OpenStream(_getFilePathMethod(scopeName));
-                    using var reader = new StreamReader(stream);
-                    return GrammarReader.ReadGrammarSync(reader);
-                }
+                using var stream = ResourceReader.OpenStream(GetFilePath(scopeName));
+                using var reader = new StreamReader(stream);
+                return GrammarReader.ReadGrammarSync(reader);
             }
 
             ICollection<string> IRegistryOptions.GetInjections(string scopeName)
@@ -94,7 +70,7 @@ namespace TextMateSharp.Tests.Internal.Themes.Reader
                 return scopeName;
             }
 
-            IRawTheme IRegistryOptions.GetCurrentTheme()
+            IRawTheme IRegistryOptions.GetDefaultTheme()
             {
                 using (Stream stream = ResourceReader.OpenStream(_theme))
                 using (StreamReader reader = new StreamReader(stream))
