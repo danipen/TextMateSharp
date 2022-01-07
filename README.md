@@ -84,21 +84,19 @@ class Program
 
     class LocalRegistryOptions : IRegistryOptions
     {
-        public string GetFilePath(string scopeName)
-        {
-            string result = Path.GetFullPath(
-                @"../../../../test/grammars/csharp.tmLanguage.json");
-            return result;
-        }
-
         public ICollection<string> GetInjections(string scopeName)
         {
             return null;
         }
 
-        public StreamReader GetInputStream(string scopeName)
+        public IRawGrammar GetGrammar(string scopeName)
         {
-            return new StreamReader(GetFilePath(scopeName));
+            return null;
+        }
+
+        public IRawTheme GetTheme(string scopeName)
+        {
+            return null;
         }
 
         public IRawTheme GetTheme()
