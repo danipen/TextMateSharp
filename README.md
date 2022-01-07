@@ -99,7 +99,7 @@ class Program
             return null;
         }
 
-        public IRawTheme GetTheme()
+        public IRawTheme GetDefaultTheme()
         {
             string themePath = Path.GetFullPath(
                 @"../../../../test/themes/dark_vs.json");
