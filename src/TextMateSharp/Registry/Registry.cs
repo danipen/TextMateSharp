@@ -27,7 +27,7 @@ namespace TextMateSharp.Registry
             this.locator = locator;
             this.syncRegistry = new SyncRegistry(
                 TmTheme.CreateFromRawTheme(
-                    locator.GetTheme(), locator));
+                    locator.GetCurrentTheme(), locator));
         }
 
         public void SetTheme(IRawTheme theme)

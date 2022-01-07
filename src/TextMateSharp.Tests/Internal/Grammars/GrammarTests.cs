@@ -1,11 +1,11 @@
-﻿using System;
+﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
-
-using NUnit.Framework;
-
 using TextMateSharp.Grammars;
+using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
+using TextMateSharp.Internal.Types;
 using TextMateSharp.Registry;
 using TextMateSharp.Tests.Resources;
 using TextMateSharp.Themes;
@@ -122,7 +122,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             Assert.AreEqual(18, tokens.Count);
 
-            AssertTokenValuesAreEqual(tokens[0],0, 6, "source.cs", "storage.modifier.cs");
+            AssertTokenValuesAreEqual(tokens[0], 0, 6, "source.cs", "storage.modifier.cs");
             AssertTokenValuesAreEqual(tokens[1], 6, 7, "source.cs");
             AssertTokenValuesAreEqual(tokens[2], 7, 10, "source.cs", "keyword.type.cs");
             AssertTokenValuesAreEqual(tokens[3], 10, 11, "source.cs");
@@ -280,10 +280,48 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
         class TestRegistry : IRegistryOptions
         {
-            Stream IRegistryOptions.GetInputStream(string scopeName)
+            private IThemeResolver _themeResolver;
+            private IGrammarResolver _grammarResolver;
+            public TestRegistry()
             {
-                return ResourceReader.OpenStream(
-                    ((IRegistryOptions)this).GetFilePath(scopeName));
+                _themeResolver = new DemoThemeResolver(GetFilePath);
+                _grammarResolver = new DemoGrammarResolver(GetFilePath);
+            }
+            public IThemeResolver ThemeResolver { get => _themeResolver; set => _themeResolver = value; }
+            public IGrammarResolver GrammarResolver { get => _grammarResolver; set => _grammarResolver = value; }
+            class DemoThemeResolver : IThemeResolver
+            {
+                private readonly Func<string, string> _getFilePathMethod;
+
+                public DemoThemeResolver(Func<string, string> getFilePathMethod)
+                {
+                    this._getFilePathMethod = getFilePathMethod;
+                }
+                public IRawTheme GetTheme(string scopeName)
+                {
+                    using var stream = ResourceReader.OpenStream(_getFilePathMethod(scopeName));
+                    using var reader = new StreamReader(stream);
+                    return ThemeReader.ReadThemeSync(reader);
+                }
+            }
+            class DemoGrammarResolver : IGrammarResolver
+            {
+                private readonly Func<string, string> _getFilePathMethod;
+
+                public DemoGrammarResolver(Func<string, string> getFilePathMethod)
+                {
+                    this._getFilePathMethod = getFilePathMethod;
+                }
+                public IRawGrammar GetGrammar(string scopeName)
+                {
+                    using var stream = ResourceReader.OpenStream(_getFilePathMethod(scopeName));
+                    using var reader = new StreamReader(stream);
+                    return GrammarReader.ReadGrammarSync(reader);
+                }
+            }
+            Stream GetInputStream(string scopeName)
+            {
+                return ResourceReader.OpenStream(GetFilePath(scopeName));
             }
 
             ICollection<string> IRegistryOptions.GetInjections(string scopeName)
@@ -291,7 +329,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
                 return new List<string>() { "template.ng", "styles.ng" };
             }
 
-            string IRegistryOptions.GetFilePath(string scopeName)
+            private string GetFilePath(string scopeName)
             {
                 if ("source.batchfile".Equals(scopeName))
                 {
@@ -328,7 +366,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
                 return null;
             }
 
-            IRawTheme IRegistryOptions.GetTheme()
+            IRawTheme IRegistryOptions.GetCurrentTheme()
             {
                 using (Stream stream = ResourceReader.OpenStream("dark_vs.json"))
                 using (StreamReader reader = new StreamReader(stream))

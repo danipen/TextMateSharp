@@ -10,7 +10,7 @@ namespace TextMateSharp.Registry
         public IThemeResolver ThemeResolver { get; set; }
         public IGrammarResolver GrammarResolver { get; set; }
         ICollection<string> GetInjections(string scopeName);
-        IRawTheme GetTheme();
+        IRawTheme GetCurrentTheme();
     }
 
     public interface IThemeResolver
@@ -42,7 +42,7 @@ namespace TextMateSharp.Registry
             return null;
         }
 
-        public IRawTheme GetTheme()
+        public IRawTheme GetCurrentTheme()
         {
             return null;
         }

@@ -200,7 +200,7 @@ namespace TextMateSharp
                     FileShare.ReadWrite);
             }
 
-            public IRawTheme GetTheme()
+            public IRawTheme GetCurrentTheme()
             {
                 int ini = Environment.TickCount;
                 
