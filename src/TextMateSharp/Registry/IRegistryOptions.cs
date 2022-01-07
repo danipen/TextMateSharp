@@ -1,39 +1,44 @@
 using System.Collections.Generic;
-using System.IO;
-
+using TextMateSharp.Internal.Types;
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Registry
 {
     public interface IRegistryOptions
     {
-        string GetFilePath(string scopeName);
-
-        Stream GetInputStream(string scopeName);
-
+        IRawTheme GetTheme(string scopeName);
+        IRawGrammar GetGrammar(string scopeName);
         ICollection<string> GetInjections(string scopeName);
-
-        IRawTheme GetTheme();
+        IRawTheme GetDefaultTheme();
     }
 
+    public interface IThemeResolver
+    {
+        IRawTheme GetTheme(string scopeName);
+    }
+    public interface IGrammarResolver
+    {
+        IRawGrammar GetGrammar(string scopeName);
+
+    }
     public class DefaultLocator : IRegistryOptions
     {
-        public string GetFilePath(string scopeName)
-        {
-            return null;
-        }
-
         public ICollection<string> GetInjections(string scopeName)
         {
             return null;
         }
 
-        public Stream GetInputStream(string scopeName)
+        public IRawTheme GetDefaultTheme()
         {
             return null;
         }
 
-        public IRawTheme GetTheme()
+        public IRawTheme GetTheme(string scopeName)
+        {
+            return null;
+        }
+
+        public IRawGrammar GetGrammar(string scopeName)
         {
             return null;
         }

@@ -1,12 +1,9 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
-
 using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
-using TextMateSharp.Internal.Themes.Reader;
-using System.IO;
 
 namespace TextMateSharp.Themes
 {
@@ -44,7 +41,7 @@ namespace TextMateSharp.Themes
         {
             List<ThemeTrieElementRule> result = new List<ThemeTrieElementRule>();
 
-            for(int i=scopeNames.Count -1; i>=0; i--)
+            for (int i = scopeNames.Count - 1; i >= 0; i--)
                 result.AddRange(this._theme.Match(scopeNames[i]));
 
             for (int i = scopeNames.Count - 1; i >= 0; i--)
@@ -113,21 +110,13 @@ namespace TextMateSharp.Themes
             if (string.IsNullOrEmpty(include))
                 return result;
 
-            Stream stream = registryOptions.GetInputStream(include);
+            IRawTheme themeInclude = registryOptions.GetTheme(include);
 
-            if (stream == null)
+            if (themeInclude == null)
                 return result;
 
-            using (stream)
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                IRawTheme themeInclude = ThemeReader.ReadThemeSync(reader);
+            return ParseTheme(themeInclude, priority);
 
-                if (themeInclude == null)
-                    return result;
-
-                return ParseTheme(themeInclude, priority);
-            }
         }
 
         static void LookupThemeRules(
@@ -152,7 +141,7 @@ namespace TextMateSharp.Themes
                 {
                     string scope = (string)settingScope;
 
-                    scopes = new List<string>(scope.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries));
+                    scopes = new List<string>(scope.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries));
                 }
                 else if (settingScope is IList<object>)
                 {
@@ -169,7 +158,7 @@ namespace TextMateSharp.Themes
                 {
                     fontStyle = FontStyle.None;
 
-                    string[] segments = ((string) settingsFontStyle).Split(new[] {" "}, StringSplitOptions.None);
+                    string[] segments = ((string)settingsFontStyle).Split(new[] { " " }, StringSplitOptions.None);
                     foreach (string segment in segments)
                     {
                         if ("italic".Equals(segment))
@@ -204,7 +193,7 @@ namespace TextMateSharp.Themes
                 {
                     string _scope = scopes[j].Trim();
 
-                    List<string> segments = new List<string>(_scope.Split(new[] {" "}, StringSplitOptions.None));
+                    List<string> segments = new List<string>(_scope.Split(new[] { " " }, StringSplitOptions.None));
 
                     string scope = segments[segments.Count - 1];
                     List<string> parentScopes = null;

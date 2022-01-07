@@ -1,13 +1,9 @@
-﻿using System;
+﻿using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using NUnit.Framework;
-
+using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
+using TextMateSharp.Internal.Types;
 using TextMateSharp.Registry;
 using TextMateSharp.Tests.Resources;
 using TextMateSharp.Themes;
@@ -22,7 +18,7 @@ namespace TextMateSharp.Tests.Internal.Themes
             IRegistryOptions registryOptions = new TestRegistry();
 
             Theme theme = Theme.CreateFromRawTheme(
-                registryOptions.GetTheme(),
+                registryOptions.GetDefaultTheme(),
                 registryOptions);
 
             var rules = theme.Match(new string[] { "keyword.control" });
@@ -38,7 +34,7 @@ namespace TextMateSharp.Tests.Internal.Themes
             IRegistryOptions registryOptions = new TestRegistry();
 
             Theme theme = Theme.CreateFromRawTheme(
-                registryOptions.GetTheme(),
+                registryOptions.GetDefaultTheme(),
                 registryOptions);
 
             var rules = theme.Match(new string[]
@@ -51,14 +47,14 @@ namespace TextMateSharp.Tests.Internal.Themes
                 "#C586C0",
                 theme.GetColor(rules[0].foreground));
         }
-        
+
         [Test]
         public void PHPVariableTest()
         {
             IRegistryOptions registryOptions = new TestRegistry();
 
             Theme theme = Theme.CreateFromRawTheme(
-                registryOptions.GetTheme(),
+                registryOptions.GetDefaultTheme(),
                 registryOptions);
 
             var rules = theme.Match(new string[]
@@ -78,7 +74,7 @@ namespace TextMateSharp.Tests.Internal.Themes
             IRegistryOptions registryOptions = new TestRegistry();
 
             Theme theme = Theme.CreateFromRawTheme(
-                registryOptions.GetTheme(),
+                registryOptions.GetDefaultTheme(),
                 registryOptions);
 
             var rules = theme.Match(new string[]
@@ -98,7 +94,7 @@ namespace TextMateSharp.Tests.Internal.Themes
             IRegistryOptions registryOptions = new TestRegistry();
 
             Theme theme = Theme.CreateFromRawTheme(
-                registryOptions.GetTheme(),
+                registryOptions.GetDefaultTheme(),
                 registryOptions);
 
             var rules = theme.Match(new string[]
@@ -121,7 +117,7 @@ namespace TextMateSharp.Tests.Internal.Themes
             IRegistryOptions registryOptions = new TestRegistry();
 
             Theme theme = Theme.CreateFromRawTheme(
-                registryOptions.GetTheme(),
+                registryOptions.GetDefaultTheme(),
                 registryOptions);
 
             var rules = theme.Match(new string[]
@@ -145,7 +141,7 @@ namespace TextMateSharp.Tests.Internal.Themes
             IRegistryOptions registryOptions = new TestRegistry();
 
             Theme theme = Theme.CreateFromRawTheme(
-                registryOptions.GetTheme(),
+                registryOptions.GetDefaultTheme(),
                 registryOptions);
 
             var rules = theme.Match(new string[]
@@ -163,12 +159,24 @@ namespace TextMateSharp.Tests.Internal.Themes
 
         class TestRegistry : IRegistryOptions
         {
-            Stream IRegistryOptions.GetInputStream(string scopeName)
+            public IRawTheme GetTheme(string scopeName)
             {
                 if (scopeName == "./dark_vs.json")
                     scopeName = "dark_vs.json";
 
-                return ResourceReader.OpenStream(scopeName);
+                using var stream = ResourceReader.OpenStream(scopeName);
+                using var reader = new StreamReader(stream);
+                return ThemeReader.ReadThemeSync(reader);
+            }
+
+            public IRawGrammar GetGrammar(string scopeName)
+            {
+                if (scopeName == "./dark_vs.json")
+                    scopeName = "dark_vs.json";
+
+                using var stream = ResourceReader.OpenStream(scopeName);
+                using var reader = new StreamReader(stream);
+                return GrammarReader.ReadGrammarSync(reader);
             }
 
             ICollection<string> IRegistryOptions.GetInjections(string scopeName)
@@ -176,12 +184,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 return null;
             }
 
-            string IRegistryOptions.GetFilePath(string scopeName)
-            {
-                return string.Empty;
-            }
-
-            IRawTheme IRegistryOptions.GetTheme()
+            IRawTheme IRegistryOptions.GetDefaultTheme()
             {
                 using (Stream stream = ResourceReader.OpenStream("dark_plus.json"))
                 using (StreamReader reader = new StreamReader(stream))

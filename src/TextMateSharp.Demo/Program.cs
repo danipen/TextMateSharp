@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 
 using TextMateSharp.Grammars;
+using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
+using TextMateSharp.Internal.Types;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
 
@@ -119,14 +121,27 @@ namespace TextMateSharp
         {
             private string _grammarFile;
             private string _themeFile;
-
             internal DemoRegistryOptions(string grammarFile, string themeFile)
             {
                 _grammarFile = grammarFile;
                 _themeFile = themeFile;
             }
 
-            public string GetFilePath(string scopeName)
+            public IRawTheme GetTheme(string scopeName)
+            {
+                using var stream = new FileStream(GetFilePath(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(stream);
+                return ThemeReader.ReadThemeSync(reader);
+            }
+
+            public IRawGrammar GetGrammar(string scopeName)
+            {
+                using var stream = new FileStream(GetFilePath(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(stream);
+                return GrammarReader.ReadGrammarSync(reader);
+            }
+
+            private string GetFilePath(string scopeName)
             {
                 if (scopeName == "./dark_vs.json")
                     return Path.Combine(Path.GetDirectoryName(_themeFile), "dark_vs.json");
@@ -154,19 +169,10 @@ namespace TextMateSharp
                 return null;
             }
 
-            public Stream GetInputStream(string scopeName)
-            {
-                return new FileStream(
-                    GetFilePath(scopeName),
-                    FileMode.Open,
-                    FileAccess.Read,
-                    FileShare.ReadWrite);
-            }
-
-            public IRawTheme GetTheme()
+            public IRawTheme GetDefaultTheme()
             {
                 int ini = Environment.TickCount;
-                
+
                 using (StreamReader reader = new StreamReader(_themeFile))
                 {
                     IRawTheme result = ThemeReader.ReadThemeSync(reader);
