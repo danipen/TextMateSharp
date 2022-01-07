@@ -129,23 +129,34 @@ namespace TextMateSharp
 
             public IRawTheme GetTheme(string scopeName)
             {
-                using var stream = new FileStream(GetFilePath(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(stream);
-                return ThemeReader.ReadThemeSync(reader);
+                return ReadTheme(GetThemeFilePath(scopeName));
             }
 
             public IRawGrammar GetGrammar(string scopeName)
             {
-                using var stream = new FileStream(GetFilePath(scopeName), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(stream);
-                return GrammarReader.ReadGrammarSync(reader);
+                return ReadGrammar(GetGrammarFilePath(scopeName));
             }
 
-            private string GetFilePath(string scopeName)
+            public ICollection<string> GetInjections(string scopeName)
+            {
+                return null;
+            }
+
+            public IRawTheme GetDefaultTheme()
+            {
+                return ReadTheme(_themeFile);
+            }
+
+            string GetThemeFilePath(string scopeName)
             {
                 if (scopeName == "./dark_vs.json")
                     return Path.Combine(Path.GetDirectoryName(_themeFile), "dark_vs.json");
 
+                return null;
+            }
+
+            string GetGrammarFilePath(string scopeName)
+            {
                 if (scopeName == "text.html.cshtml")
                     return Path.Combine(Path.GetDirectoryName(_grammarFile), "cshtml.tmLanguage.json");
 
@@ -164,20 +175,39 @@ namespace TextMateSharp
                 return null;
             }
 
-            public ICollection<string> GetInjections(string scopeName)
+            static IRawTheme ReadTheme(string path)
             {
-                return null;
-            }
+                if (path == null)
+                    return null;
 
-            public IRawTheme GetDefaultTheme()
-            {
                 int ini = Environment.TickCount;
 
-                using (StreamReader reader = new StreamReader(_themeFile))
+                using var stream = new FileStream(
+                    path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(stream);
                 {
                     IRawTheme result = ThemeReader.ReadThemeSync(reader);
-                    Console.WriteLine("Loaded {0} in {1}ms.",
-                        Path.GetFileName(_themeFile),
+                    Console.WriteLine("Loaded theme {0} in {1}ms.",
+                        path,
+                        Environment.TickCount - ini);
+                    return result;
+                }
+            }
+
+            static IRawGrammar ReadGrammar(string path)
+            {
+                if (path == null)
+                    return null;
+
+                int ini = Environment.TickCount;
+
+                using var stream = new FileStream(
+                    path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var reader = new StreamReader(stream);
+                {
+                    IRawGrammar result = GrammarReader.ReadGrammarSync(reader);
+                    Console.WriteLine("Loaded grammar {0} in {1}ms.",
+                        path,
                         Environment.TickCount - ini);
                     return result;
                 }
