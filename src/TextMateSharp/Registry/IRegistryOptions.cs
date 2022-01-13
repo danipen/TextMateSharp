@@ -12,15 +12,6 @@ namespace TextMateSharp.Registry
         IRawTheme GetDefaultTheme();
     }
 
-    public interface IThemeResolver
-    {
-        IRawTheme GetTheme(string scopeName);
-    }
-    public interface IGrammarResolver
-    {
-        IRawGrammar GetGrammar(string scopeName);
-
-    }
     public class DefaultLocator : IRegistryOptions
     {
         public ICollection<string> GetInjections(string scopeName)
