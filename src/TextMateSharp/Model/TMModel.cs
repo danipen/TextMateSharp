@@ -189,12 +189,15 @@ namespace TextMateSharp.Model
                     try
                     {
                         text = model.lines.GetLineText(lineIndex);
+                        if (text == null)
+                            continue;
                         // Tokenize only the first X characters
                         r = model.tokenizer.Tokenize(text, modeLine.GetState(), 0, MAX_LEN_TO_TOKENIZE);
                     }
                     catch (Exception e)
                     {
                         System.Diagnostics.Debug.WriteLine(e.Message);
+                        continue;
                     }
 
                     if (r != null && r.Tokens != null && r.Tokens.Count != 0)

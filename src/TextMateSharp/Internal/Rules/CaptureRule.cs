@@ -13,12 +13,12 @@ namespace TextMateSharp.Internal.Rules
 
         public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
-            throw new InvalidOperationException("Not supported");
+            
         }
 
         public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
-            throw new InvalidOperationException("Not supported");
+            return null;
         }
 
     }

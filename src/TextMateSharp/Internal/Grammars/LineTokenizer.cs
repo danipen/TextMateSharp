@@ -252,6 +252,10 @@ namespace TextMateSharp.Internal.Grammars
                 return null;
 
             ICompiledRule ruleScanner = rule.Compile(grammar, stack.endRule, isFirstLine, linePos == anchorPosition);
+
+            if (ruleScanner == null)
+                return null;
+
             IOnigNextMatchResult r = ruleScanner.scanner.FindNextMatchSync(lineText, linePos);
 
             if (r != null)
