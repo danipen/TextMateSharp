@@ -1,8 +1,10 @@
 ![dotnet-workflow](https://github.com/danipen/TextMateSharp/actions/workflows/dotnet.yml/badge.svg)
+![GitHub license](https://img.shields.io/github/license/danipen/TextMateSharp)
+[![Current stable version](https://img.shields.io/nuget/v/TextMateSharp.svg)](https://www.nuget.org/packages/TextMateSharp)
+[![Downloads](https://img.shields.io/nuget/dt/TextMateSharp)](https://www.nuget.org/packages/TextMateSharp)
 ![Size](https://img.shields.io/github/repo-size/danipen/textmatesharp.svg) 
 ![GitHub language count](https://img.shields.io/github/languages/count/danipen/TextMateSharp)
 ![GitHub top language](https://img.shields.io/github/languages/top/danipen/TextMateSharp)
-![GitHub license](https://img.shields.io/github/license/danipen/TextMateSharp)
 
 # TextMateSharp
 An interpreter for grammar files as defined by TextMate. TextMate grammars use the oniguruma dialect (https://github.com/kkos/oniguruma). Supports loading grammar files only from JSON format. Cross - grammar injections are currently not supported.
