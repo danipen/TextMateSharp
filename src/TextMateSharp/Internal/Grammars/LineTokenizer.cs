@@ -247,6 +247,10 @@ namespace TextMateSharp.Internal.Grammars
                 StackElement stack, in int anchorPosition)
         {
             Rule rule = stack.GetRule(grammar);
+
+            if (rule == null)
+                return null;
+
             ICompiledRule ruleScanner = rule.Compile(grammar, stack.endRule, isFirstLine, linePos == anchorPosition);
             IOnigNextMatchResult r = ruleScanner.scanner.FindNextMatchSync(lineText, linePos);
 
