@@ -45,7 +45,7 @@ namespace TextMateSharp.Grammars
             {
                 return false;
             }
-            return a.depth == b.depth && a.ruleId == b.ruleId && !Equals(a.endRule, b.endRule) && StructuralEquals(a.parent, b.parent);
+            return a.depth == b.depth && a.ruleId == b.ruleId && Equals(a.endRule, b.endRule) && StructuralEquals(a.parent, b.parent);
         }
 
         public override bool Equals(Object other)
