@@ -394,6 +394,19 @@ namespace TextMateSharp.Model
             }
         }
 
+        public void InvalidateLineRange(int iniLineIndex, int endLineIndex)
+        {
+            lock (_lock)
+            {
+                for (int i = iniLineIndex; i <= endLineIndex; i++)
+                {
+                    this.lines.Get(i).IsInvalid = true;
+                    this.invalidLines.Enqueue(i);
+                }
+                _resetEvent.Set();
+            }
+        }
+
         public IModelLines GetLines()
         {
             return this.lines;

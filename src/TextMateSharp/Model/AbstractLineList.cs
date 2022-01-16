@@ -55,6 +55,14 @@ namespace TextMateSharp.Model
             }
         }
 
+        protected void InvalidateLineRange(int iniLineIndex, int endLineIndex)
+        {
+            if (model != null)
+            {
+                model.InvalidateLineRange(iniLineIndex, endLineIndex);
+            }
+        }
+
         protected void ForceTokenization(int startLineIndex, int endLineIndex)
         {
             if (model != null)
