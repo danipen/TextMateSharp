@@ -128,7 +128,7 @@ namespace TextMateSharp.Model
 
                     long tokenizedChars = 0;
                     long currentCharsToTokenize = 0;
-                    long MAX_ALLOWED_TIME = 20;
+                    long MAX_ALLOWED_TIME = 5;
                     long currentEstimatedTimeToTokenize = 0;
                     long elapsedTime;
                     Stopwatch stopwatch = new Stopwatch();
