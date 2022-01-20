@@ -346,7 +346,14 @@ namespace TextMateSharp.Model
         {
             foreach (IModelTokensChangedListener listener in listeners)
             {
-                listener.ModelTokensChanged(e);
+                try
+                {
+                    listener.ModelTokensChanged(e);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                }
             }
         }
 
