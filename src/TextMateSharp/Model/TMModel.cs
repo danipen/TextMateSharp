@@ -272,25 +272,21 @@ namespace TextMateSharp.Model
         {
             if (!Object.Equals(grammar, this.grammar))
             {
+                Stop();
+
                 this.grammar = grammar;
                 this.tokenizer = new Tokenizer(grammar);
                 lines.ForEach((line) => line.ResetTokenizationState());
                 lines.Get(0).SetState(tokenizer.GetInitialState());
+
+                Start();
                 InvalidateLine(0);
             }
         }
 
         public void AddModelTokensChangedListener(IModelTokensChangedListener listener)
         {
-            if (this.fThread == null || this.fThread.IsStopped)
-            {
-                this.fThread = new TokenizerThread("TMModelThread", this);
-            }
-
-            if (this.fThread.IsStopped)
-            {
-                this.fThread.Run();
-            }
+            Start();
 
             if (!listeners.Contains(listener))
             {
@@ -324,6 +320,19 @@ namespace TextMateSharp.Model
             this.fThread.Stop();
             _resetEvent.Set();
             this.fThread = null;
+        }
+
+        private void Start()
+        {
+            if (this.fThread == null || this.fThread.IsStopped)
+            {
+                this.fThread = new TokenizerThread("TMModelThread", this);
+            }
+
+            if (this.fThread.IsStopped)
+            {
+                this.fThread.Run();
+            }
         }
 
         private void BuildEventWithCallback(Action<ModelTokensChangedEventBuilder> callback)
