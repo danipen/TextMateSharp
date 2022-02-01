@@ -22,18 +22,27 @@ namespace TextMateSharp.Model
 
         public void AddLine(int line)
         {
-            this.list.Insert(line, new ModelLine());
+            lock (mLock)
+            {
+                this.list.Insert(line, new ModelLine());
+            }
         }
 
         public void RemoveLine(int line)
         {
-            this.list.RemoveAt(line);
+            lock (mLock)
+            {
+                this.list.RemoveAt(line);
+            }
         }
 
         public ModelLine Get(int index)
         {
             lock (mLock)
             {
+                if (index < 0 || index >= this.list.Count)
+                    return null;
+
                 return this.list[index];
             }
         }

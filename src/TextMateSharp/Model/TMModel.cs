@@ -94,7 +94,9 @@ namespace TextMateSharp.Model
                         continue;
                     }
 
-                    if (model.lines.Get(toProcess).IsInvalid)
+                    var modelLine = model.lines.Get(toProcess);
+
+                    if (modelLine != null && modelLine.IsInvalid)
                     {
                         try
                         {
