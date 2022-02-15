@@ -3,6 +3,5 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NewtonsoftJsonVersion>13.0.1</NewtonsoftJsonVersion>
-	<Version>0.10.12.1</Version>
   </PropertyGroup>
 </Project>
