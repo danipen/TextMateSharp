@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>True</IsPackable>
+    <Description>A set of grammars and Themes that can be used by TextMateSharp</Description>
+    <PackageProjectUrl>https://github.com/danipen/TextMateSharp</PackageProjectUrl>
+    <Authors>Daniel Peñalba</Authors>
+    <Company />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Themes\*.json" />
+    <EmbeddedResource Include="Resources\Grammars\**\*.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\build\Directory.Build.props" />
+</Project>

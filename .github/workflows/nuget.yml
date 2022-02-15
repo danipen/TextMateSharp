@@ -9,7 +9,7 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: './src/TextMateSharp/TextMateSharp.csproj'
+      SOLUTION: 'TextMateSharp.sln'
 
     runs-on: ubuntu-latest
 

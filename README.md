@@ -169,14 +169,14 @@ Tokenizing line: }
 
 There is a demo project in [TextMateSharp.Demo](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo) folder.
 
-Example grammars and files are located in the [testdata](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo/testdata) folder.
+![image](https://user-images.githubusercontent.com/501613/154065980-44b416ab-3b01-45f7-a8b3-7185413e769c.png)
 
 Build and run:
 
 ```
 cd src/TestMateSharp.Demo
 dotnet build
-dotnet run -- ./testdata/samplefiles/sample.cs ./testdata/grammars/csharp.tmLanguage.json ./testdata/themes/dark_vs.json
+dotnet run -- ./testdata/samplefiles/sample.cs
 ```
 
 ## Building Oniguruma wrapper

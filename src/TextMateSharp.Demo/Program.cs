@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Spectre.Console;
+
+using System;
+using System.Globalization;
 using System.IO;
 
 using TextMateSharp.Grammars;
-using TextMateSharp.Internal.Grammars.Reader;
-using TextMateSharp.Internal.Themes.Reader;
-using TextMateSharp.Internal.Types;
-using TextMateSharp.Registry;
 using TextMateSharp.Themes;
 
 namespace TextMateSharp
@@ -17,17 +15,15 @@ namespace TextMateSharp
         {
             try
             {
-                if (args.Length < 3)
+                if (args.Length < 1)
                 {
-                    Console.WriteLine("Usage TextMateSharp.Demo <fileToParse.cs> <grammar> <themefile>");
-                    Console.WriteLine("EXAMPLE TextMateSharp.Demo .\\testdata\\samplefiles\\sample.cs .\\testdata\\grammars\\csharp.tmLanguage.json .\\testdata\\themes\\dark_vs.json");
+                    Console.WriteLine("Usage TextMateSharp.Demo <fileToParse.cs>");
+                    Console.WriteLine("EXAMPLE TextMateSharp.Demo .\\testdata\\samplefiles\\sample.cs");
 
                     return;
                 }
 
                 string fileToParse = Path.GetFullPath(args[0]);
-                string grammarFile = Path.GetFullPath(args[1]);
-                string themeFile = Path.GetFullPath(args[2]);
 
                 if (!File.Exists(fileToParse))
                 {
@@ -35,75 +31,66 @@ namespace TextMateSharp
                     return;
                 }
 
-                if (!File.Exists(grammarFile))
-                {
-                    Console.WriteLine("No such file to parse: {0}", args[1]);
-                    return;
-                }
-
-                if (!File.Exists(themeFile))
-                {
-                    Console.WriteLine("No such file to parse: {0}", args[2]);
-                    return;
-                }
-
-                IRegistryOptions options = new DemoRegistryOptions(grammarFile, themeFile);
+                RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
 
                 Registry.Registry registry = new Registry.Registry(options);
 
-                int ini = Environment.TickCount;
-                IGrammar grammar = registry.LoadGrammar("text.html.basic");
-                Console.WriteLine("Loaded {0} in {1}ms.",
-                    Path.GetFileName(grammarFile),
-                    Environment.TickCount - ini);
+                Theme theme = registry.GetTheme();
 
-                string[] textLines = File.ReadAllText(fileToParse).Split(Environment.NewLine);
+                int ini = Environment.TickCount;
+                IGrammar grammar = registry.LoadGrammar(options.GetScopeByExtension(Path.GetExtension(fileToParse)));
+
+                if (grammar == null)
+                {
+                    Console.WriteLine(File.ReadAllText(fileToParse));
+                    return;
+                }
+
+                Console.WriteLine("Grammar loaded in {0}ms.",
+                    Environment.TickCount - ini);
 
                 int tokenizeIni = Environment.TickCount;
 
                 StackElement ruleStack = null;
 
-                foreach (string line in textLines)
+                using (StreamReader sr = new StreamReader(fileToParse))
                 {
-                    Console.WriteLine(string.Format("Tokenizing line: {0}", line));
+                    string? line = sr.ReadLine();
 
-                    ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack);
-
-                    ruleStack = result.RuleStack;
-
-                    foreach (IToken token in result.Tokens)
+                    while (line != null)
                     {
-                        int startIndex = (token.StartIndex > line.Length) ?
-                            line.Length : token.StartIndex;
-                        int endIndex = (token.EndIndex > line.Length) ?
-                            line.Length : token.EndIndex;
+                        ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack);
 
-                        Console.WriteLine(string.Format(
-                            "  - token from {0} to {1} -->{2}<-- with scopes {3}",
-                            startIndex,
-                            endIndex,
-                            line.Substring(startIndex, endIndex - startIndex),
-                            string.Join(",", token.Scopes)));
+                        ruleStack = result.RuleStack;
 
-                        foreach (string scopeName in token.Scopes)
+                        foreach (IToken token in result.Tokens)
                         {
-                            Theme theme = registry.GetTheme();
+                            int startIndex = (token.StartIndex > line.Length) ?
+                                line.Length : token.StartIndex;
+                            int endIndex = (token.EndIndex > line.Length) ?
+                                line.Length : token.EndIndex;
 
-                            List<ThemeTrieElementRule> themeRules =
-                                theme.Match(new string[] { scopeName });
+                            int foreground = -1;
+                            int background = -1;
+                            int fontStyle = -1;
 
-                            foreach (ThemeTrieElementRule themeRule in themeRules)
+                            foreach (var themeRule in theme.Match(token.Scopes))
                             {
-                                Console.WriteLine(
-                                    "      - Matched theme rule: " +
-                                    "[bg: {0}, fg:{1}, fontStyle: {2}, scopeDeph: {3}, parentScopes: {4}]",
-                                    theme.GetColor(themeRule.background),
-                                    theme.GetColor(themeRule.foreground),
-                                    themeRule.fontStyle,
-                                    themeRule.scopeDepth,
-                                    string.Join(", ", themeRule.parentScopes == null ? new string[] { } : themeRule.parentScopes));
+                                if (foreground == -1 && themeRule.foreground > 0)
+                                    foreground = themeRule.foreground;
+
+                                if (background == -1 && themeRule.background > 0)
+                                    background = themeRule.background;
+
+                                if (fontStyle == -1 && themeRule.fontStyle > 0)
+                                    fontStyle = themeRule.fontStyle;
                             }
+
+                            WriteToken(line.SubstringAtIndexes(startIndex, endIndex), foreground, background, fontStyle, theme);
                         }
+
+                        Console.WriteLine();
+                        line = sr.ReadLine();
                     }
                 }
 
@@ -116,102 +103,72 @@ namespace TextMateSharp
                 Console.WriteLine("ERROR: " + ex.Message);
             }
         }
-
-        class DemoRegistryOptions : IRegistryOptions
+        static void WriteToken(string text, int foreground, int background, int fontStyle, Theme theme)
         {
-            private string _grammarFile;
-            private string _themeFile;
-            internal DemoRegistryOptions(string grammarFile, string themeFile)
+            if (foreground == -1)
             {
-                _grammarFile = grammarFile;
-                _themeFile = themeFile;
+                Console.Write(text);
+                return;
             }
 
-            public IRawTheme GetTheme(string scopeName)
-            {
-                return ReadTheme(GetThemeFilePath(scopeName));
-            }
+            Decoration decoration = GetDecoration(fontStyle);
 
-            public IRawGrammar GetGrammar(string scopeName)
-            {
-                return ReadGrammar(GetGrammarFilePath(scopeName));
-            }
+            Color backgroundColor = GetColor(background, theme);
+            Color foregroundColor = GetColor(foreground, theme);
 
-            public ICollection<string> GetInjections(string scopeName)
-            {
-                return null;
-            }
+            Style style = new Style(foregroundColor, backgroundColor, decoration);
+            Markup markup = new Markup(text, style);
 
-            public IRawTheme GetDefaultTheme()
-            {
-                return ReadTheme(_themeFile);
-            }
+            AnsiConsole.Write(markup);
+        }
 
-            string GetThemeFilePath(string scopeName)
-            {
-                if (scopeName == "./dark_vs.json")
-                    return Path.Combine(Path.GetDirectoryName(_themeFile), "dark_vs.json");
+        static Color GetColor(int colorId, Theme theme)
+        {
+            if (colorId == -1)
+                return Color.Default;
 
-                return null;
-            }
+            return HexToColor(theme.GetColor(colorId));
+        }
 
-            string GetGrammarFilePath(string scopeName)
-            {
-                if (scopeName == "text.html.cshtml")
-                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "cshtml.tmLanguage.json");
+        static Decoration GetDecoration(int fontStyle)
+        {
+            Decoration result = Decoration.None;
 
-                if (scopeName == "text.html")
-                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "html-derivative.tmLanguage.json");
+            if (fontStyle == FontStyle.NotSet)
+                return result;
 
-                if (scopeName == "text.html.basic")
-                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "html.tmLanguage.json");
+            if ((fontStyle & FontStyle.Italic) != 0)
+                result |= Decoration.Italic;
 
-                if (scopeName == "source.php")
-                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "php.tmLanguage.json");
+            if ((fontStyle & FontStyle.Underline) != 0)
+                result |= Decoration.Underline;
 
-                if (scopeName == "source.js")
-                    return Path.Combine(Path.GetDirectoryName(_grammarFile), "JavaScript.tmLanguage.json");
+            if ((fontStyle & FontStyle.Bold) != 0)
+                result |= Decoration.Bold;
 
-                return null;
-            }
+            return result;
+        }
+        public static Color HexToColor(string hexString)
+        {
+            //replace # occurences
+            if (hexString.IndexOf('#') != -1)
+                hexString = hexString.Replace("#", "");
 
-            static IRawTheme ReadTheme(string path)
-            {
-                if (path == null)
-                    return null;
+            byte r, g, b = 0;
 
-                int ini = Environment.TickCount;
+            r = byte.Parse(hexString.Substring(0, 2), NumberStyles.AllowHexSpecifier);
+            g = byte.Parse(hexString.Substring(2, 2), NumberStyles.AllowHexSpecifier);
+            b = byte.Parse(hexString.Substring(4, 2), NumberStyles.AllowHexSpecifier);
 
-                using var stream = new FileStream(
-                    path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(stream);
-                {
-                    IRawTheme result = ThemeReader.ReadThemeSync(reader);
-                    Console.WriteLine("Loaded theme {0} in {1}ms.",
-                        path,
-                        Environment.TickCount - ini);
-                    return result;
-                }
-            }
+            return new Color(r, g, b);
+        }
+    }
 
-            static IRawGrammar ReadGrammar(string path)
-            {
-                if (path == null)
-                    return null;
-
-                int ini = Environment.TickCount;
-
-                using var stream = new FileStream(
-                    path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(stream);
-                {
-                    IRawGrammar result = GrammarReader.ReadGrammarSync(reader);
-                    Console.WriteLine("Loaded grammar {0} in {1}ms.",
-                        path,
-                        Environment.TickCount - ini);
-                    return result;
-                }
-            }
+    internal static class StringExtensions
+    {
+        internal static string SubstringAtIndexes(this string str, int startIndex, int endIndex)
+        {
+            return str.Substring(startIndex, endIndex - startIndex);
         }
     }
 }
