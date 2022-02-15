@@ -59,7 +59,8 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
   </ItemGroup>
   <Import Project="..\..\build\SourceLink.props" />
+  <Import Project="..\..\build\Directory.Build.props" />
 </Project>

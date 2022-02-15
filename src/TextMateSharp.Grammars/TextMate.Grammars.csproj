@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Themes\*.json" />
+    <EmbeddedResource Include="Resources\Grammars\**\*.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\build\Directory.Build.props" />
+</Project>
