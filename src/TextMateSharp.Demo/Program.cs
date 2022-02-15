@@ -1,11 +1,11 @@
-﻿using Spectre.Console;
-
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 
 using TextMateSharp.Grammars;
 using TextMateSharp.Themes;
+
+using Spectre.Console;
 
 namespace TextMateSharp
 {
@@ -148,7 +148,8 @@ namespace TextMateSharp
 
             return result;
         }
-        public static Color HexToColor(string hexString)
+
+        static Color HexToColor(string hexString)
         {
             //replace # occurences
             if (hexString.IndexOf('#') != -1)
