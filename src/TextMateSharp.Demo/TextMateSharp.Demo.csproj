@@ -13,6 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+      <PackageReference Include="Spectre.Console" Version="0.43.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TextMateSharp.Grammars\TextMateSharp.Grammars.csproj" />
     <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
   </ItemGroup>
 
