@@ -11,6 +11,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMateSharp.Tests", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMate.Grammars", "src\TextMateSharp.Grammars\TextMate.Grammars.csproj", "{DDB3D93D-BFAA-4CE6-B98D-74497DDE0D62}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{FB55729C-1952-4D20-BFE7-C3202B160A0B}"
+	ProjectSection(SolutionItems) = preProject
+		build\Directory.Build.props = build\Directory.Build.props
+		build\SourceLink.props = build\SourceLink.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{C4A8E28E-70B0-4184-B62B-7286CB2F5756}"
+	ProjectSection(SolutionItems) = preProject
+		build\Directory.Build.props = build\Directory.Build.props
+		build\SourceLink.props = build\SourceLink.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{46BA508A-D22E-4F76-AD27-68AC62725952}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\nuget.yml = .github\workflows\nuget.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +54,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C4A8E28E-70B0-4184-B62B-7286CB2F5756} = {FB55729C-1952-4D20-BFE7-C3202B160A0B}
+		{46BA508A-D22E-4F76-AD27-68AC62725952} = {FB55729C-1952-4D20-BFE7-C3202B160A0B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D82FE2B4-7A75-444B-AB90-DC50F82D89A8}
