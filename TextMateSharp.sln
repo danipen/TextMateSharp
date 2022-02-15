@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMateSharp.Demo", "src\T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMateSharp.Tests", "src\TextMateSharp.Tests\TextMateSharp.Tests.csproj", "{B49D3C2E-6C4E-45B3-A645-592994B7B94D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMate.Grammars", "src\TextMateSharp.Grammars\TextMate.Grammars.csproj", "{DDB3D93D-BFAA-4CE6-B98D-74497DDE0D62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMateSharp.Grammars", "src\TextMateSharp.Grammars\TextMateSharp.Grammars.csproj", "{DDB3D93D-BFAA-4CE6-B98D-74497DDE0D62}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{FB55729C-1952-4D20-BFE7-C3202B160A0B}"
 	ProjectSection(SolutionItems) = preProject
