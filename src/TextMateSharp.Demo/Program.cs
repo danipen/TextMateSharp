@@ -117,7 +117,7 @@ namespace TextMateSharp
             Color foregroundColor = GetColor(foreground, theme);
 
             Style style = new Style(foregroundColor, backgroundColor, decoration);
-            Markup markup = new Markup(text, style);
+            Markup markup = new Markup(text.Replace("[", "[[").Replace("]", "]]"), style);
 
             AnsiConsole.Write(markup);
         }

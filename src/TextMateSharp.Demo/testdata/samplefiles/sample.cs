@@ -7,7 +7,7 @@ namespace Example
     {
         public static void DoSomething(string parameter)
         {
-            // example comment
+            // example [comment]
             /* and block comments
                multiline */
    

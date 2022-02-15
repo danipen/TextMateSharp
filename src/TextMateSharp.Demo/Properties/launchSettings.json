@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "TextMateSharp.Demo": {
+    "TextMateSharp.Demo - normalfile": {
       "commandName": "Project",
       "commandLineArgs": "../../../testdata/samplefiles/sample.cs"
+    },
+    "TexMateSharp.Demo - bigfile": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../testdata/samplefiles/bigfile.cs"
     }
   }
 }
