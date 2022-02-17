@@ -20,7 +20,7 @@ namespace TextMateSharp.Internal.Oniguruma
             }
         }
 
-        public ORegex(string pattern, bool ignoreCase = true, bool multiline = false)
+        public unsafe ORegex(string pattern, bool ignoreCase = true, bool multiline = false)
         {
             int ignoreCaseArg = ignoreCase ? 1 : 0;
             int multilineArg = multiline ? 1 : 0;
@@ -28,7 +28,14 @@ namespace TextMateSharp.Internal.Oniguruma
             pattern = UnicodeCharEscape.AddBracesToUnicodePatterns(pattern);
             pattern = UnicodeCharEscape.ConstraintUnicodePatternLenght(pattern);
 
-            _regex = OnigInterop.onigwrap_create(pattern, Encoding.Unicode.GetByteCount(pattern), ignoreCaseArg, multilineArg);
+            fixed (char* patternPtr = pattern)
+            {
+                _regex = OnigInterop.onigwrap_create(
+                    patternPtr,
+                    Encoding.Unicode.GetByteCount(patternPtr, pattern.Length),
+                    ignoreCaseArg,
+                    multilineArg);
+            }
 
             if (!Valid)
                 _regexString = pattern; // Save the pattern off on invalid patterns for throwing exceptions
@@ -74,7 +81,7 @@ namespace TextMateSharp.Internal.Oniguruma
             }
         }
 
-        void Search(string text, int offset = 0)
+        unsafe void Search(string text, int offset = 0)
         {
             if (_disposed) throw new ObjectDisposedException("ORegex");
             if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", _regexString));
@@ -82,7 +89,14 @@ namespace TextMateSharp.Internal.Oniguruma
             if (_region != IntPtr.Zero)
                 OnigInterop.onigwrap_region_free(_region);
 
-            _region = OnigInterop.onigwrap_search(_regex, text, offset * 2, Encoding.Unicode.GetByteCount(text));
+            fixed (char* textPtr = text)
+            {
+                _region = OnigInterop.onigwrap_search(
+                    _regex,
+                    textPtr,
+                    Encoding.Unicode.GetByteCount(textPtr, offset),
+                    Encoding.Unicode.GetByteCount(textPtr, text.Length));
+            }
         }
 
         public void Dispose()
