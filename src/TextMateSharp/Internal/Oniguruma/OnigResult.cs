@@ -2,28 +2,28 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class OnigResult
     {
-        private int indexInScanner;
-        private Region region;
+        private int _indexInScanner;
+        private Region _region;
 
         public OnigResult(Region region, int indexInScanner)
         {
-            this.region = region;
-            this.indexInScanner = indexInScanner;
+            this._region = region;
+            this._indexInScanner = indexInScanner;
         }
 
         public int GetIndex()
         {
-            return indexInScanner;
+            return _indexInScanner;
         }
 
         public void SetIndex(int index)
         {
-            this.indexInScanner = index;
+            this._indexInScanner = index;
         }
 
         public int LocationAt(int index)
         {
-            int bytes = region.beg[index];
+            int bytes = _region.Start[index];
             if (bytes > 0)
             {
                 return bytes;
@@ -36,12 +36,12 @@ namespace TextMateSharp.Internal.Oniguruma
 
         public int Count()
         {
-            return region.numRegs;
+            return _region.NumRegs;
         }
 
         public int LengthAt(int index)
         {
-            int bytes = region.end[index] - region.beg[index];
+            int bytes = _region.End[index] - _region.Start[index];
             if (bytes > 0)
             {
                 return bytes;

@@ -4,34 +4,19 @@ namespace TextMateSharp.Model
 {
     public class ModelLine
     {
-        public bool IsInvalid = true;
-        public TMState State;
-        public List<TMToken> Tokens;
+        public bool IsInvalid { get; set; }
+        public TMState State { get; set; }
+        public List<TMToken> Tokens { get; set; }
+
+        public ModelLine()
+        {
+            IsInvalid = true;
+        }
 
         public void ResetTokenizationState()
         {
-            this.State = null;
-            this.Tokens = null;
-        }
-
-        public TMState GetState()
-        {
-            return State;
-        }
-
-        public void SetState(TMState state)
-        {
-            this.State = state;
-        }
-
-        public void SetTokens(List<TMToken> tokens)
-        {
-            this.Tokens = tokens;
-        }
-
-        public List<TMToken> GetTokens()
-        {
-            return Tokens;
+            State = null;
+            Tokens = null;
         }
     }
 }

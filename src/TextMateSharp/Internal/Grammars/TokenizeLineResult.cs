@@ -9,8 +9,8 @@ namespace TextMateSharp.Internal.Grammars
 
         public TokenizeLineResult(IToken[] tokens, StackElement ruleStack)
         {
-            this.Tokens = tokens;
-            this.RuleStack = ruleStack;
+            Tokens = tokens;
+            RuleStack = ruleStack;
         }
     }
 }

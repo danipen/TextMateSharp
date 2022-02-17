@@ -43,6 +43,8 @@ namespace TextMateSharp.Registry
 
         public IGrammar LoadGrammar(string initialScopeName)
         {
+            if (string.IsNullOrEmpty(initialScopeName))
+                return null;
 
             List<string> remainingScopeNames = new List<string>();
             remainingScopeNames.Add(initialScopeName);

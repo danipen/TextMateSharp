@@ -13,60 +13,59 @@ namespace TextMateSharp.Internal.Grammars
 {
     public class Grammar : IGrammar, IRuleFactoryHelper
     {
-
-        private int? rootId;
-        private int lastRuleId;
-        private Dictionary<int?, Rule> ruleId2desc;
-        private Dictionary<string, IRawGrammar> includedGrammars;
-        private IGrammarRepository grammarRepository;
-        private IRawGrammar grammar;
-        private List<Injection> injections;
-        private ScopeMetadataProvider scopeMetadataProvider;
+        private int? _rootId;
+        private int _lastRuleId;
+        private Dictionary<int?, Rule> _ruleId2desc;
+        private Dictionary<string, IRawGrammar> _includedGrammars;
+        private IGrammarRepository _grammarRepository;
+        private IRawGrammar _grammar;
+        private List<Injection> _injections;
+        private ScopeMetadataProvider _scopeMetadataProvider;
 
         public Grammar(IRawGrammar grammar, int initialLanguage, Dictionary<string, int> embeddedLanguages,
                 IGrammarRepository grammarRepository, IThemeProvider themeProvider)
         {
-            this.scopeMetadataProvider = new ScopeMetadataProvider(initialLanguage, themeProvider, embeddedLanguages);
-            this.rootId = null;
-            this.lastRuleId = 0;
-            this.includedGrammars = new Dictionary<string, IRawGrammar>();
-            this.grammarRepository = grammarRepository;
-            this.grammar = InitGrammar(grammar, null);
-            this.ruleId2desc = new Dictionary<int?, Rule>();
-            this.injections = null;
+            _scopeMetadataProvider = new ScopeMetadataProvider(initialLanguage, themeProvider, embeddedLanguages);
+            _rootId = null;
+            _lastRuleId = 0;
+            _includedGrammars = new Dictionary<string, IRawGrammar>();
+            _grammarRepository = grammarRepository;
+            _grammar = InitGrammar(grammar, null);
+            _ruleId2desc = new Dictionary<int?, Rule>();
+            _injections = null;
         }
 
         public void OnDidChangeTheme()
         {
-            this.scopeMetadataProvider.OnDidChangeTheme();
+            this._scopeMetadataProvider.OnDidChangeTheme();
         }
 
         public ScopeMetadata GetMetadataForScope(string scope)
         {
-            return this.scopeMetadataProvider.GetMetadataForScope(scope);
+            return this._scopeMetadataProvider.GetMetadataForScope(scope);
         }
 
         public List<Injection> GetInjections()
         {
-            if (this.injections == null)
+            if (this._injections == null)
             {
-                this.injections = new List<Injection>();
+                this._injections = new List<Injection>();
                 // add injections from the current grammar
-                Dictionary<string, IRawRule> rawInjections = this.grammar.GetInjections();
+                Dictionary<string, IRawRule> rawInjections = this._grammar.GetInjections();
                 if (rawInjections != null)
                 {
                     foreach (string expression in rawInjections.Keys)
                     {
                         IRawRule rule = rawInjections[expression];
-                        CollectInjections(this.injections, expression, rule, this, this.grammar);
+                        CollectInjections(this._injections, expression, rule, this, this._grammar);
                     }
                 }
 
                 // add injection grammars contributed for the current scope
-                if (this.grammarRepository != null)
+                if (this._grammarRepository != null)
                 {
-                    ICollection<string> injectionScopeNames = this.grammarRepository
-                            .Injections(this.grammar.GetScopeName());
+                    ICollection<string> injectionScopeNames = this._grammarRepository
+                            .Injections(this._grammar.GetScopeName());
                     if (injectionScopeNames != null)
                     {
                         foreach (string injectionScopeName in injectionScopeNames)
@@ -77,7 +76,7 @@ namespace TextMateSharp.Internal.Grammars
                                 string selector = injectionGrammar.GetInjectionSelector();
                                 if (selector != null)
                                 {
-                                    CollectInjections(this.injections, selector, (IRawRule)injectionGrammar, this,
+                                    CollectInjections(this._injections, selector, (IRawRule)injectionGrammar, this,
                                             injectionGrammar);
                                 }
                             }
@@ -86,13 +85,13 @@ namespace TextMateSharp.Internal.Grammars
                 }
 
                 // sort by priority
-                injections.Sort((i1, i2) =>
+                _injections.Sort((i1, i2) =>
                 {
-                    return i1.priority - i2.priority;
+                    return i1.Priority - i2.Priority;
                 });
             }
 
-            return this.injections;
+            return this._injections;
         }
 
         private void CollectInjections(List<Injection> result, string selector, IRawRule rule,
@@ -103,22 +102,22 @@ namespace TextMateSharp.Internal.Grammars
 
             foreach (MatcherWithPriority<List<string>> matcher in matchers)
             {
-                result.Add(new Injection(matcher.matcher, ruleId, grammar, matcher.priority));
+                result.Add(new Injection(matcher.Matcher, ruleId, grammar, matcher.Priority));
             }
         }
 
         public Rule RegisterRule(Func<int, Rule> factory)
         {
-            int id = (++this.lastRuleId);
+            int id = (++this._lastRuleId);
             Rule result = factory(id);
-            this.ruleId2desc[id] = result;
+            this._ruleId2desc[id] = result;
             return result;
         }
 
         public Rule GetRule(int? patternId)
         {
             Rule result;
-            this.ruleId2desc.TryGetValue(patternId, out result);
+            this._ruleId2desc.TryGetValue(patternId, out result);
             return result;
         }
 
@@ -129,18 +128,18 @@ namespace TextMateSharp.Internal.Grammars
 
         public IRawGrammar GetExternalGrammar(string scopeName, IRawRepository repository)
         {
-            if (this.includedGrammars.ContainsKey(scopeName))
+            if (this._includedGrammars.ContainsKey(scopeName))
             {
-                return this.includedGrammars[scopeName];
+                return this._includedGrammars[scopeName];
             }
-            else if (this.grammarRepository != null)
+            else if (this._grammarRepository != null)
             {
-                IRawGrammar rawIncludedGrammar = this.grammarRepository.Lookup(scopeName);
+                IRawGrammar rawIncludedGrammar = this._grammarRepository.Lookup(scopeName);
                 if (rawIncludedGrammar != null)
                 {
-                    this.includedGrammars[scopeName] =
+                    this._includedGrammars[scopeName] =
                             InitGrammar(rawIncludedGrammar, repository != null ? repository.GetBase() : null);
-                    return this.includedGrammars[scopeName];
+                    return this._includedGrammars[scopeName];
                 }
             }
             return null;
@@ -195,29 +194,29 @@ namespace TextMateSharp.Internal.Grammars
 
         private object Tokenize(string lineText, StackElement prevState, bool emitBinaryTokens)
         {
-            if (this.rootId == null)
+            if (this._rootId == null)
             {
-                this.rootId = RuleFactory.GetCompiledRuleId(this.grammar.GetRepository().GetSelf(), this,
-                        this.grammar.GetRepository());
+                this._rootId = RuleFactory.GetCompiledRuleId(this._grammar.GetRepository().GetSelf(), this,
+                        this._grammar.GetRepository());
             }
 
             bool isFirstLine;
             if (prevState == null || prevState.Equals(StackElement.NULL))
             {
                 isFirstLine = true;
-                ScopeMetadata rawDefaultMetadata = this.scopeMetadataProvider.GetDefaultMetadata();
-                ThemeTrieElementRule defaultTheme = rawDefaultMetadata.themeData[0];
-                int defaultMetadata = StackElementMetadata.Set(0, rawDefaultMetadata.languageId,
-                        rawDefaultMetadata.tokenType, defaultTheme.fontStyle, defaultTheme.foreground,
+                ScopeMetadata rawDefaultMetadata = this._scopeMetadataProvider.GetDefaultMetadata();
+                ThemeTrieElementRule defaultTheme = rawDefaultMetadata.ThemeData[0];
+                int defaultMetadata = StackElementMetadata.Set(0, rawDefaultMetadata.LanguageId,
+                        rawDefaultMetadata.TokenType, defaultTheme.fontStyle, defaultTheme.foreground,
                         defaultTheme.background);
 
-                string rootScopeName = this.GetRule(this.rootId.Value).GetName(null, null);
-                ScopeMetadata rawRootMetadata = this.scopeMetadataProvider.GetMetadataForScope(rootScopeName);
+                string rootScopeName = this.GetRule(this._rootId.Value).GetName(null, null);
+                ScopeMetadata rawRootMetadata = this._scopeMetadataProvider.GetMetadataForScope(rootScopeName);
                 int rootMetadata = ScopeListElement.mergeMetadata(defaultMetadata, null, rawRootMetadata);
 
                 ScopeListElement scopeList = new ScopeListElement(null, rootScopeName, rootMetadata);
 
-                prevState = new StackElement(null, this.rootId.Value, -1, null, scopeList, scopeList);
+                prevState = new StackElement(null, this._rootId.Value, -1, null, scopeList, scopeList);
             }
             else
             {
@@ -244,17 +243,17 @@ namespace TextMateSharp.Internal.Grammars
 
         public string GetName()
         {
-            return grammar.GetName();
+            return _grammar.GetName();
         }
 
         public string GetScopeName()
         {
-            return grammar.GetScopeName();
+            return _grammar.GetScopeName();
         }
 
         public ICollection<string> GetFileTypes()
         {
-            return grammar.GetFileTypes();
+            return _grammar.GetFileTypes();
         }
     }
 }

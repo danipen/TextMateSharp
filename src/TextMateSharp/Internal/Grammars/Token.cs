@@ -17,9 +17,9 @@ namespace TextMateSharp.Internal.Grammars
 
         public Token(int startIndex, int endIndex, List<string> scopes)
         {
-            this.StartIndex = startIndex;
-            this.EndIndex = endIndex;
-            this.Scopes = scopes;
+            StartIndex = startIndex;
+            EndIndex = endIndex;
+            Scopes = scopes;
         }
 
         public override string ToString()

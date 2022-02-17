@@ -4,23 +4,13 @@ namespace TextMateSharp.Internal.Matcher
 {
     class MatchResult : IMatchResult
     {
-        private IOnigCaptureIndex[] captureIndexes;
-        private int? matchedRuleId;
+        public IOnigCaptureIndex[] CaptureIndexes { get; private set; }
+        public int? MatchedRuleId { get; private set; }
 
         internal MatchResult(IOnigCaptureIndex[] captureIndexes, int? matchedRuleId)
         {
-            this.captureIndexes = captureIndexes;
-            this.matchedRuleId = matchedRuleId;
-        }
-
-        public IOnigCaptureIndex[] GetCaptureIndices()
-        {
-            return captureIndexes;
-        }
-
-        public int? GetMatchedRuleId()
-        {
-            return matchedRuleId;
+            CaptureIndexes = captureIndexes;
+            MatchedRuleId = matchedRuleId;
         }
     }
 }

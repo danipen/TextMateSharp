@@ -7,23 +7,24 @@ namespace TextMateSharp.Grammars
 {
     public class Injection
     {
+        public int Priority { get; private set; } // -1 | 0 | 1; // 0 is the default. -1 for 'L' and 1 for 'R'
+        public int? RuleId { get; private set; }
+        public IRawGrammar Grammar { get; private set; }
 
-        private Predicate<List<string>> matcher;
-        public int priority; // -1 | 0 | 1; // 0 is the default. -1 for 'L' and 1 for 'R'
-        public int? ruleId;
-        public IRawGrammar grammar;
+        private Predicate<List<string>> _matcher;
 
         public Injection(Predicate<List<string>> matcher, int? ruleId, IRawGrammar grammar, int priority)
         {
-            this.matcher = matcher;
-            this.ruleId = ruleId;
-            this.grammar = grammar;
-            this.priority = priority;
+            RuleId = ruleId;
+            Grammar = grammar;
+            Priority = priority;
+
+            this._matcher = matcher;
         }
 
         public bool Match(List<string> states)
         {
-            return matcher.Invoke(states);
+            return _matcher.Invoke(states);
         }
     }
 }

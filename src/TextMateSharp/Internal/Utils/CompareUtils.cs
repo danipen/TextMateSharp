@@ -4,7 +4,7 @@ namespace TextMateSharp.Internal.Utils
 {
     public class CompareUtils
     {
-        public static int Strcmp(string a, string b)
+        public static int StrCmp(string a, string b)
         {
             if (a == null && b == null)
             {
@@ -57,7 +57,7 @@ namespace TextMateSharp.Internal.Utils
             {
                 for (int i = 0; i < len1; i++)
                 {
-                    int res = Strcmp(a[i], b[i]);
+                    int res = StrCmp(a[i], b[i]);
                     if (res != 0)
                     {
                         return res;

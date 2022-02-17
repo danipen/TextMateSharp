@@ -2,18 +2,16 @@ using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Oniguruma
 {
-
     public class OnigSearcher
     {
-
-        private List<OnigRegExp> regExps;
+        private List<OnigRegExp> _regExps;
 
         public OnigSearcher(string[] regexps)
         {
-            regExps = new List<OnigRegExp>(regexps.Length);
+            _regExps = new List<OnigRegExp>(regexps.Length);
             foreach (string regexp in regexps)
             {
-                regExps.Add(new OnigRegExp(regexp));
+                _regExps.Add(new OnigRegExp(regexp));
             }
         }
 
@@ -25,7 +23,7 @@ namespace TextMateSharp.Internal.Oniguruma
             OnigResult bestResult = null;
             int index = 0;
 
-            foreach (OnigRegExp regExp in regExps)
+            foreach (OnigRegExp regExp in _regExps)
             {
                 OnigResult result = regExp.Search(source, byteOffset);
                 if (result != null && result.Count() > 0)

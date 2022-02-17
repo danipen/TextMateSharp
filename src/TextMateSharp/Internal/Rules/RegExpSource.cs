@@ -15,11 +15,11 @@ namespace TextMateSharp.Internal.Rules
         private static Regex BACK_REFERENCING_END = new Regex("\\\\(\\d+)");
         private static Regex REGEXP_CHARACTERS = new Regex("[\\-\\\\\\{\\}\\*\\+\\?\\|\\^\\$\\.\\,\\[\\]\\(\\)\\#\\s]");
 
-        private int? ruleId;
+        private int? _ruleId;
         private bool _hasAnchor;
         private bool _hasBackReferences;
-        private IRegExpSourceAnchorCache anchorCache;
-        private string source;
+        private IRegExpSourceAnchorCache _anchorCache;
+        private string _source;
 
         public RegExpSource(string regExpSource, int? ruleId) :
             this(regExpSource, ruleId, true)
@@ -34,35 +34,35 @@ namespace TextMateSharp.Internal.Rules
             }
             else
             {
-                this.source = regExpSource;
+                this._source = regExpSource;
                 this._hasAnchor = false;
             }
 
             if (this._hasAnchor)
             {
-                this.anchorCache = this.BuildAnchorCache();
+                this._anchorCache = this.BuildAnchorCache();
             }
 
-            this.ruleId = ruleId;
-            this._hasBackReferences = HAS_BACK_REFERENCES.Match(this.source).Success;
+            this._ruleId = ruleId;
+            this._hasBackReferences = HAS_BACK_REFERENCES.Match(this._source).Success;
         }
 
         public RegExpSource Clone()
         {
-            return new RegExpSource(this.source, this.ruleId, true);
+            return new RegExpSource(this._source, this._ruleId, true);
         }
 
-        public void setSource(string newSource)
+        public void SetSource(string newSource)
         {
-            if (this.source.Equals(newSource))
+            if (this._source.Equals(newSource))
             {
                 return;
             }
-            this.source = newSource;
+            this._source = newSource;
 
             if (this._hasAnchor)
             {
-                this.anchorCache = this.BuildAnchorCache();
+                this._anchorCache = this.BuildAnchorCache();
             }
         }
 
@@ -105,18 +105,18 @@ namespace TextMateSharp.Internal.Rules
                 if (lastPushedPos == 0)
                 {
                     // No \z hit
-                    this.source = regExpSource;
+                    this._source = regExpSource;
                 }
                 else
                 {
                     output.Append(regExpSource.SubstringAtIndexes(lastPushedPos, len));
-                    this.source = output.ToString();
+                    this._source = output.ToString();
                 }
             }
             else
             {
                 this._hasAnchor = false;
-                this.source = regExpSource;
+                this._source = regExpSource;
             }
         }
 
@@ -129,11 +129,11 @@ namespace TextMateSharp.Internal.Rules
                 foreach (IOnigCaptureIndex captureIndex in captureIndices)
                 {
                     capturedValues.Add(lineText.SubstringAtIndexes(
-                        captureIndex.GetStart(),
-                        captureIndex.GetEnd()));
+                        captureIndex.Start,
+                        captureIndex.End));
                 }
 
-                return BACK_REFERENCING_END.Replace(this.source, m =>
+                return BACK_REFERENCING_END.Replace(this._source, m =>
                 {
                     string value = m.Value;
                     int index = int.Parse(m.Value.SubstringAtIndexes(1, value.Length));
@@ -167,9 +167,9 @@ namespace TextMateSharp.Internal.Rules
             char ch;
             char nextCh;
 
-            for (pos = 0, len = this.source.Length; pos < len; pos++)
+            for (pos = 0, len = this._source.Length; pos < len; pos++)
             {
-                ch = this.source[pos];
+                ch = this._source[pos];
                 A0_G0_result.Append(ch);
                 A0_G1_result.Append(ch);
                 A1_G0_result.Append(ch);
@@ -179,7 +179,7 @@ namespace TextMateSharp.Internal.Rules
                 {
                     if (pos + 1 < len)
                     {
-                        nextCh = this.source[pos + 1];
+                        nextCh = this._source[pos + 1];
                         if (nextCh == 'A')
                         {
                             A0_G0_result.Append('\uFFFF');
@@ -217,29 +217,29 @@ namespace TextMateSharp.Internal.Rules
         {
             if (!this._hasAnchor)
             {
-                return this.source;
+                return this._source;
             }
 
             if (allowA)
             {
                 if (allowG)
                 {
-                    return this.anchorCache.A1_G1;
+                    return this._anchorCache.A1_G1;
                 }
                 else
                 {
-                    return this.anchorCache.A1_G0;
+                    return this._anchorCache.A1_G0;
                 }
             }
             else
             {
                 if (allowG)
                 {
-                    return this.anchorCache.A0_G1;
+                    return this._anchorCache.A0_G1;
                 }
                 else
                 {
-                    return this.anchorCache.A0_G0;
+                    return this._anchorCache.A0_G0;
                 }
             }
         }
@@ -251,12 +251,12 @@ namespace TextMateSharp.Internal.Rules
 
         public string GetSource()
         {
-            return this.source;
+            return this._source;
         }
 
         public int? GetRuleId()
         {
-            return this.ruleId;
+            return this._ruleId;
         }
 
         public bool HasBackReferences()

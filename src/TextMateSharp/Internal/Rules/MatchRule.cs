@@ -4,31 +4,31 @@ namespace TextMateSharp.Internal.Rules
 {
     public class MatchRule : Rule
     {
+        public List<CaptureRule> Captures { get; private set; }
 
-        private RegExpSource match;
-        public List<CaptureRule> captures;
-        private RegExpSourceList cachedCompiledPatterns;
+        private RegExpSource _match;
+        private RegExpSourceList _cachedCompiledPatterns;
 
         public MatchRule(int? id, string name, string match, List<CaptureRule> captures) : base(id, name, null)
         {
-            this.match = new RegExpSource(match, this.id);
-            this.captures = captures;
-            this.cachedCompiledPatterns = null;
+            this._match = new RegExpSource(match, this.Id);
+            this.Captures = captures;
+            this._cachedCompiledPatterns = null;
         }
 
         public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
-            sourceList.Push(this.match);
+            sourceList.Push(this._match);
         }
 
         public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
-            if (this.cachedCompiledPatterns == null)
+            if (this._cachedCompiledPatterns == null)
             {
-                this.cachedCompiledPatterns = new RegExpSourceList();
-                this.CollectPatternsRecursive(grammar, this.cachedCompiledPatterns, true);
+                this._cachedCompiledPatterns = new RegExpSourceList();
+                this.CollectPatternsRecursive(grammar, this._cachedCompiledPatterns, true);
             }
-            return this.cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
         }
     }
 }

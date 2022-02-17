@@ -7,16 +7,15 @@ namespace TextMateSharp.Internal.Grammars
 {
     public class ScopeListElement
     {
-
-        public ScopeListElement parent;
-        public string scope;
-        public int metadata;
+        public ScopeListElement Parent { get; private set; }
+        public string Scope { get; private set; }
+        public int Metadata { get; private set; }
 
         public ScopeListElement(ScopeListElement parent, string scope, int metadata)
         {
-            this.parent = parent;
-            this.scope = scope;
-            this.metadata = metadata;
+            Parent = parent;
+            Scope = scope;
+            Metadata = metadata;
         }
 
         private static bool Equals(ScopeListElement a, ScopeListElement b)
@@ -29,7 +28,7 @@ namespace TextMateSharp.Internal.Grammars
             {
                 return false;
             }
-            return Object.Equals(a.scope, b.scope) && a.metadata == b.metadata && Equals(a.parent, b.parent);
+            return Object.Equals(a.Scope, b.Scope) && a.Metadata == b.Metadata && Equals(a.Parent, b.Parent);
         }
 
         public override bool Equals(object other)
@@ -51,9 +50,9 @@ namespace TextMateSharp.Internal.Grammars
 
         public override int GetHashCode()
         {
-            return scope.GetHashCode() +
-                    metadata.GetHashCode() +
-                parent.GetHashCode();
+            return Scope.GetHashCode() +
+                    Metadata.GetHashCode() +
+                Parent.GetHashCode();
         }
 
 
@@ -76,7 +75,7 @@ namespace TextMateSharp.Internal.Grammars
 
             while (target != null)
             {
-                if (MatchesScope(target.scope, selector, selectorWithDot))
+                if (MatchesScope(target.Scope, selector, selectorWithDot))
                 {
                     index++;
                     if (index == len)
@@ -86,7 +85,7 @@ namespace TextMateSharp.Internal.Grammars
                     selector = parentScopes[index];
                     selectorWithDot = selector + '.';
                 }
-                target = target.parent;
+                target = target.Parent;
             }
 
             return false;
@@ -103,10 +102,10 @@ namespace TextMateSharp.Internal.Grammars
             int foreground = 0;
             int background = 0;
 
-            if (source.themeData != null)
+            if (source.ThemeData != null)
             {
                 // Find the first themeData that matches
-                foreach (ThemeTrieElementRule themeData in source.themeData)
+                foreach (ThemeTrieElementRule themeData in source.ThemeData)
                 {
                     if (Matches(scopesList, themeData.parentScopes))
                     {
@@ -118,7 +117,7 @@ namespace TextMateSharp.Internal.Grammars
                 }
             }
 
-            return StackElementMetadata.Set(metadata, source.languageId, source.tokenType, fontStyle, foreground,
+            return StackElementMetadata.Set(metadata, source.LanguageId, source.TokenType, fontStyle, foreground,
                     background);
         }
 
@@ -127,7 +126,7 @@ namespace TextMateSharp.Internal.Grammars
             foreach (string scope in scopes)
             {
                 ScopeMetadata rawMetadata = grammar.GetMetadataForScope(scope);
-                int metadata = ScopeListElement.mergeMetadata(target.metadata, target, rawMetadata);
+                int metadata = ScopeListElement.mergeMetadata(target.Metadata, target, rawMetadata);
                 target = new ScopeListElement(target, scope, metadata);
             }
             return target;
@@ -153,8 +152,8 @@ namespace TextMateSharp.Internal.Grammars
             List<string> result = new List<string>();
             while (scopesList != null)
             {
-                result.Add(scopesList.scope);
-                scopesList = scopesList.parent;
+                result.Add(scopesList.Scope);
+                scopesList = scopesList.Parent;
             }
             result.Reverse();
             return result;

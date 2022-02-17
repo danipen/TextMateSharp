@@ -4,11 +4,11 @@ namespace TextMateSharp.Internal.Rules
 {
     public class CaptureRule : Rule
     {
-        public int? retokenizeCapturedWithRuleId;
+        public int? RetokenizeCapturedWithRuleId { get; private set; }
 
         public CaptureRule(int? id, string name, string contentName, int? retokenizeCapturedWithRuleId) : base(id, name, contentName)
         {
-            this.retokenizeCapturedWithRuleId = retokenizeCapturedWithRuleId;
+            RetokenizeCapturedWithRuleId = retokenizeCapturedWithRuleId;
         }
 
         public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)

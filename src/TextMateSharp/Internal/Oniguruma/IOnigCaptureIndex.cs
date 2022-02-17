@@ -2,12 +2,12 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public interface IOnigCaptureIndex
     {
-        int GetIndex();
+        int Index { get; }
 
-        int GetStart();
+        int Start { get; }
 
-        int GetEnd();
+        int End { get; }
 
-        int GetLength();
+        int Length { get; }
     }
 }
