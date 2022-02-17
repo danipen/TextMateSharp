@@ -65,6 +65,28 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
                 ExtractCaptureText(text, captureIndices, 3));
         }
 
+        [Test]
+        public void TestOnigScannerWithUnicodeBiggerThan2Bytes()
+        {
+            string pattern = "a([b-d])\U0001D11E";
+            string text = "ab\U0001D11E";
+
+            OnigScanner scanner = new OnigScanner(new string[] { pattern });
+            IOnigNextMatchResult onigResult = scanner.FindNextMatchSync(text, 0);
+
+            var captureIndices = onigResult.GetCaptureIndices();
+
+            Assert.AreEqual(2, captureIndices.Length);
+
+            Assert.AreEqual(
+                "ab\U0001D11E",
+                ExtractCaptureText(text, captureIndices, 0));
+
+            Assert.AreEqual(
+                "b",
+                ExtractCaptureText(text, captureIndices, 1));
+        }
+
 
         static string ExtractCaptureText(
             string text,

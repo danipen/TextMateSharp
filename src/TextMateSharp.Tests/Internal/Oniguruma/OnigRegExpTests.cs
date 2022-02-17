@@ -89,5 +89,16 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
                 Assert.IsTrue(oRegex.Valid);
             }
         }
+
+        [Test]
+        public void UnicodeBiggerThan2Bytes()
+        {
+            string pattern = "\U0001D11E";
+
+            using (ORegex oRegex = new ORegex(pattern))
+            {
+                Assert.IsTrue(oRegex.Valid);
+            }
+        }
     }
 }
