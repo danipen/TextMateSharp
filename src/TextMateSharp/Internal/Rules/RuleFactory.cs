@@ -8,7 +8,6 @@ namespace TextMateSharp.Internal.Rules
 {
     public class RuleFactory
     {
-
         public static CaptureRule CreateCaptureRule(IRuleFactoryHelper helper, string name, string contentName,
                 int? retokenizeCapturedWithRuleId)
         {
@@ -228,7 +227,7 @@ namespace TextMateSharp.Internal.Rules
                         if (rule is IncludeOnlyRule)
                         {
                             IncludeOnlyRule ior = (IncludeOnlyRule)rule;
-                            if (ior.hasMissingPatterns && ior.patterns.Length == 0)
+                            if (ior.HasMissingPatterns && ior.Patterns.Length == 0)
                             {
                                 skipRule = true;
                             }
@@ -236,7 +235,7 @@ namespace TextMateSharp.Internal.Rules
                         else if (rule is BeginEndRule)
                         {
                             BeginEndRule br = (BeginEndRule)rule;
-                            if (br.hasMissingPatterns && br.patterns.Length == 0)
+                            if (br.HasMissingPatterns && br.Patterns.Length == 0)
                             {
                                 skipRule = true;
                             }
@@ -244,7 +243,7 @@ namespace TextMateSharp.Internal.Rules
                         else if (rule is BeginWhileRule)
                         {
                             BeginWhileRule br = (BeginWhileRule)rule;
-                            if (br.hasMissingPatterns && br.patterns.Length == 0)
+                            if (br.HasMissingPatterns && br.Patterns.Length == 0)
                             {
                                 skipRule = true;
                             }

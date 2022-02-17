@@ -4,8 +4,8 @@ namespace TextMateSharp.Model
 {
     public class ModelTokensChangedEvent
     {
-        public List<Range> ranges;
-        public ITMModel model;
+        public List<Range> Ranges { get; private set; }
+        public ITMModel Model { get; private set; }
 
         public ModelTokensChangedEvent(Range range, ITMModel model) :
             this(new List<Range>() { range }, model)
@@ -14,8 +14,8 @@ namespace TextMateSharp.Model
 
         public ModelTokensChangedEvent(List<Range> ranges, ITMModel model)
         {
-            this.ranges = ranges;
-            this.model = model;
+            Ranges = ranges;
+            Model = model;
         }
     }
 }

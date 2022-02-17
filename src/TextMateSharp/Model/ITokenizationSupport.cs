@@ -2,7 +2,6 @@ namespace TextMateSharp.Model
 {
     public interface ITokenizationSupport
     {
-
         TMState GetInitialState();
 
         LineTokens Tokenize(string line, TMState state);

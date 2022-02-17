@@ -261,7 +261,7 @@ namespace TextMateSharp.Themes
             // Sort rules lexicographically, and then by index if necessary
             parsedThemeRules.Sort((a, b) =>
             {
-                int r = CompareUtils.Strcmp(a.scope, b.scope);
+                int r = CompareUtils.StrCmp(a.scope, b.scope);
                 if (r != 0)
                 {
                     return r;

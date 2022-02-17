@@ -10,13 +10,14 @@ namespace TextMateSharp.Grammars
     {
         public static StackElement NULL = new StackElement(null, 0, 0, null, null, null);
 
-        private int enterPosition;
-        public StackElement parent;
-        public int depth;
-        public int? ruleId;
-        public string endRule;
-        public ScopeListElement nameScopesList;
-        public ScopeListElement contentNameScopesList;
+        public StackElement Parent { get; private set; }
+        public int Depth { get; private set; }
+        public int? RuleId { get; private set; }
+        public string EndRule { get; private set; }
+        public ScopeListElement NameScopesList { get; private set; }
+        public ScopeListElement ContentNameScopesList { get; private set; }
+
+        private int _enterPosition;
 
         public StackElement(
             StackElement parent,
@@ -26,13 +27,14 @@ namespace TextMateSharp.Grammars
             ScopeListElement nameScopesList,
             ScopeListElement contentNameScopesList)
         {
-            this.parent = parent;
-            this.depth = (this.parent != null ? this.parent.depth + 1 : 1);
-            this.ruleId = ruleId;
-            this.enterPosition = enterPos;
-            this.endRule = endRule;
-            this.nameScopesList = nameScopesList;
-            this.contentNameScopesList = contentNameScopesList;
+            Parent = parent;
+            Depth = (this.Parent != null ? this.Parent.Depth + 1 : 1);
+            RuleId = ruleId;
+            EndRule = endRule;
+            NameScopesList = nameScopesList;
+            ContentNameScopesList = contentNameScopesList;
+
+            _enterPosition = enterPos;
         }
 
         private static bool StructuralEquals(StackElement a, StackElement b)
@@ -45,7 +47,7 @@ namespace TextMateSharp.Grammars
             {
                 return false;
             }
-            return a.depth == b.depth && a.ruleId == b.ruleId && Equals(a.endRule, b.endRule) && StructuralEquals(a.parent, b.parent);
+            return a.Depth == b.Depth && a.RuleId == b.RuleId && Equals(a.EndRule, b.EndRule) && StructuralEquals(a.Parent, b.Parent);
         }
 
         public override bool Equals(Object other)
@@ -62,16 +64,16 @@ namespace TextMateSharp.Grammars
                 return false;
             }
             StackElement stackElement = (StackElement)other;
-            return StructuralEquals(this, stackElement) && this.contentNameScopesList.Equals(stackElement.contentNameScopesList);
+            return StructuralEquals(this, stackElement) && this.ContentNameScopesList.Equals(stackElement.ContentNameScopesList);
         }
 
         public override int GetHashCode()
         {
-            return depth.GetHashCode() + 
-                ruleId.GetHashCode() +
-                endRule.GetHashCode() + 
-                parent.GetHashCode() +
-                contentNameScopesList.GetHashCode();
+            return Depth.GetHashCode() + 
+                RuleId.GetHashCode() +
+                EndRule.GetHashCode() + 
+                Parent.GetHashCode() +
+                ContentNameScopesList.GetHashCode();
         }
 
         public void Reset()
@@ -79,21 +81,21 @@ namespace TextMateSharp.Grammars
             StackElement el = this;
             while (el != null)
             {
-                el.enterPosition = -1;
-                el = el.parent;
+                el._enterPosition = -1;
+                el = el.Parent;
             }
         }
 
         public StackElement Pop()
         {
-            return this.parent;
+            return this.Parent;
         }
 
         public StackElement SafePop()
         {
-            if (this.parent != null)
+            if (this.Parent != null)
             {
-                return this.parent;
+                return this.Parent;
             }
             return this;
         }
@@ -105,22 +107,22 @@ namespace TextMateSharp.Grammars
 
         public int GetEnterPos()
         {
-            return this.enterPosition;
+            return this._enterPosition;
         }
 
         public Rule GetRule(IRuleRegistry grammar)
         {
-            return grammar.GetRule(this.ruleId);
+            return grammar.GetRule(this.RuleId);
         }
 
         private void AppendString(List<string> res)
         {
-            if (this.parent != null)
+            if (this.Parent != null)
             {
-                this.parent.AppendString(res);
+                this.Parent.AppendString(res);
             }
 
-            res.Add('(' + this.ruleId.ToString() + ')'); //, TODO-${this.nameScopesList}, TODO-${this.contentNameScopesList})`;
+            res.Add('(' + this.RuleId.ToString() + ')'); //, TODO-${this.nameScopesList}, TODO-${this.contentNameScopesList})`;
         }
 
         public override string ToString()
@@ -132,25 +134,25 @@ namespace TextMateSharp.Grammars
 
         public StackElement setContentNameScopesList(ScopeListElement contentNameScopesList)
         {
-            if (this.contentNameScopesList.Equals(contentNameScopesList))
+            if (this.ContentNameScopesList.Equals(contentNameScopesList))
             {
                 return this;
             }
-            return this.parent.Push(this.ruleId, this.enterPosition, this.endRule, this.nameScopesList, contentNameScopesList);
+            return this.Parent.Push(this.RuleId, this._enterPosition, this.EndRule, this.NameScopesList, contentNameScopesList);
         }
 
         public StackElement SetEndRule(string endRule)
         {
-            if (this.endRule != null && this.endRule.Equals(endRule))
+            if (this.EndRule != null && this.EndRule.Equals(endRule))
             {
                 return this;
             }
-            return new StackElement(this.parent, this.ruleId, this.enterPosition, endRule, this.nameScopesList, this.contentNameScopesList);
+            return new StackElement(this.Parent, this.RuleId, this._enterPosition, endRule, this.NameScopesList, this.ContentNameScopesList);
         }
 
         public bool HasSameRuleAs(StackElement other)
         {
-            return this.ruleId == other.ruleId;
+            return this.RuleId == other.RuleId;
         }
     }
 }

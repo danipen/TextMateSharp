@@ -4,13 +4,13 @@ namespace TextMateSharp.Internal.Rules
 {
     public class ICompiledRule
     {
-        public OnigScanner scanner;
-        public int?[] rules;
+        public OnigScanner Scanner { get; private set; }
+        public int?[] Rules { get; private set; }
 
         public ICompiledRule(OnigScanner scanner, int?[] rules)
         {
-            this.scanner = scanner;
-            this.rules = rules;
+            Scanner = scanner;
+            Rules = rules;
         }
     }
 }

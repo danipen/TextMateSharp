@@ -2,20 +2,22 @@ namespace TextMateSharp.Internal.Rules
 {
     public class IncludeOnlyRule : Rule
     {
-        public bool hasMissingPatterns;
-        public int?[] patterns;
-        private RegExpSourceList cachedCompiledPatterns;
+        public bool HasMissingPatterns { get; private set; }
+        public int?[] Patterns { get; private set; }
+
+        private RegExpSourceList _cachedCompiledPatterns;
 
         public IncludeOnlyRule(int? id, string name, string contentName, ICompilePatternsResult patterns) : base(id, name, contentName)
         {
-            this.patterns = patterns.patterns;
-            this.hasMissingPatterns = patterns.hasMissingPatterns;
-            this.cachedCompiledPatterns = null;
+            Patterns = patterns.Patterns;
+            HasMissingPatterns = patterns.HasMissingPatterns;
+
+            _cachedCompiledPatterns = null;
         }
 
         public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
-            foreach (int pattern in this.patterns)
+            foreach (int pattern in this.Patterns)
             {
                 Rule rule = grammar.GetRule(pattern);
                 rule.CollectPatternsRecursive(grammar, sourceList, false);
@@ -24,12 +26,12 @@ namespace TextMateSharp.Internal.Rules
 
         public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
-            if (this.cachedCompiledPatterns == null)
+            if (this._cachedCompiledPatterns == null)
             {
-                this.cachedCompiledPatterns = new RegExpSourceList();
-                this.CollectPatternsRecursive(grammar, this.cachedCompiledPatterns, true);
+                this._cachedCompiledPatterns = new RegExpSourceList();
+                this.CollectPatternsRecursive(grammar, this._cachedCompiledPatterns, true);
             }
-            return this.cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
         }
     }
 }

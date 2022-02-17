@@ -11,47 +11,47 @@ namespace TextMateSharp.Internal.Grammars
 {
     public class SyncRegistry : IGrammarRepository, IThemeProvider
     {
-        private Dictionary<string, IGrammar> grammars;
-        private Dictionary<string, IRawGrammar> rawGrammars;
-        private Dictionary<string, ICollection<string>> injectionGrammars;
-        private Theme theme;
+        private Dictionary<string, IGrammar> _grammars;
+        private Dictionary<string, IRawGrammar> _rawGrammars;
+        private Dictionary<string, ICollection<string>> _injectionGrammars;
+        private Theme _theme;
 
         public SyncRegistry(Theme theme)
         {
-            this.theme = theme;
-            this.grammars = new Dictionary<string, IGrammar>();
-            this.rawGrammars = new Dictionary<string, IRawGrammar>();
-            this.injectionGrammars = new Dictionary<string, ICollection<string>>();
+            _theme = theme;
+            _grammars = new Dictionary<string, IGrammar>();
+            _rawGrammars = new Dictionary<string, IRawGrammar>();
+            _injectionGrammars = new Dictionary<string, ICollection<string>>();
         }
 
         public Theme GetTheme()
         {
-            return theme;
+            return _theme;
         }
 
         public void SetTheme(Theme theme)
         {
-            this.theme = theme;
+            this._theme = theme;
 
-            foreach (IGrammar grammar in grammars.Values)
+            foreach (IGrammar grammar in _grammars.Values)
                 ((Grammar)grammar).OnDidChangeTheme();
 
         }
 
         public ICollection<string> GetColorMap()
         {
-            return this.theme.GetColorMap();
+            return this._theme.GetColorMap();
         }
 
         public ICollection<string> AddGrammar(IRawGrammar grammar, ICollection<string> injectionScopeNames)
         {
-            this.rawGrammars.Add(grammar.GetScopeName(), grammar);
+            this._rawGrammars.Add(grammar.GetScopeName(), grammar);
             ICollection<string> includedScopes = new List<string>();
             CollectIncludedScopes(includedScopes, grammar);
 
             if (injectionScopeNames != null)
             {
-                this.injectionGrammars.Add(grammar.GetScopeName(), injectionScopeNames);
+                this._injectionGrammars.Add(grammar.GetScopeName(), injectionScopeNames);
                 foreach (string scopeName in injectionScopeNames)
                 {
                     AddIncludedScope(scopeName, includedScopes);
@@ -63,41 +63,41 @@ namespace TextMateSharp.Internal.Grammars
         public IRawGrammar Lookup(string scopeName)
         {
             IRawGrammar result;
-            this.rawGrammars.TryGetValue(scopeName, out result);
+            this._rawGrammars.TryGetValue(scopeName, out result);
             return result;
         }
 
         public ICollection<string> Injections(string targetScope)
         {
             ICollection<string> result;
-            this.injectionGrammars.TryGetValue(targetScope, out result);
+            this._injectionGrammars.TryGetValue(targetScope, out result);
             return result;
         }
 
         public ThemeTrieElementRule GetDefaults()
         {
-            return this.theme.GetDefaults();
+            return this._theme.GetDefaults();
         }
 
         public List<ThemeTrieElementRule> ThemeMatch(IList<string> scopeNames)
         {
-            return this.theme.Match(scopeNames);
+            return this._theme.Match(scopeNames);
         }
 
         public IGrammar GrammarForScopeName(string scopeName, int initialLanguage,
                 Dictionary<string, int> embeddedLanguages)
         {
-            if (!this.grammars.ContainsKey(scopeName))
+            if (!this._grammars.ContainsKey(scopeName))
             {
                 IRawGrammar rawGrammar = Lookup(scopeName);
                 if (rawGrammar == null)
                 {
                     return null;
                 }
-                this.grammars.Add(scopeName,
+                this._grammars.Add(scopeName,
                         GrammarHelper.CreateGrammar(rawGrammar, initialLanguage, embeddedLanguages, this, this));
             }
-            return this.grammars[scopeName];
+            return this._grammars[scopeName];
         }
 
         private static void CollectIncludedScopes(ICollection<string> result, IRawGrammar grammar)

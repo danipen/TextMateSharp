@@ -8,89 +8,87 @@ namespace TextMateSharp.Internal.Grammars
 {
     internal class LineTokens
     {
-
-        private string lineText;
+        private string _lineText;
 
         // used only if `_emitBinaryTokens` is false.
-        private List<IToken> tokens;
+        private List<IToken> _tokens;
 
-
-        private bool emitBinaryTokens;
+        private bool _emitBinaryTokens;
 
         // used only if `_emitBinaryTokens` is true.
         private List<int> binaryTokens;
 
-        private int lastTokenEndIndex;
+        private int _lastTokenEndIndex;
 
         internal LineTokens(bool emitBinaryTokens, string lineText)
         {
-            this.emitBinaryTokens = emitBinaryTokens;
-            this.lineText = lineText;
-            if (this.emitBinaryTokens)
+            this._emitBinaryTokens = emitBinaryTokens;
+            this._lineText = lineText;
+            if (this._emitBinaryTokens)
             {
-                this.tokens = null;
+                this._tokens = null;
                 this.binaryTokens = new List<int>();
             }
             else
             {
-                this.tokens = new List<IToken>();
+                this._tokens = new List<IToken>();
                 this.binaryTokens = null;
             }
-            this.lastTokenEndIndex = 0;
+            this._lastTokenEndIndex = 0;
         }
 
         public void Produce(StackElement stack, int endIndex)
         {
-            this.ProduceFromScopes(stack.contentNameScopesList, endIndex);
+            this.ProduceFromScopes(stack.ContentNameScopesList, endIndex);
         }
 
         public void ProduceFromScopes(ScopeListElement scopesList, int endIndex)
         {
-            if (this.lastTokenEndIndex >= endIndex)
+            if (this._lastTokenEndIndex >= endIndex)
             {
                 return;
             }
 
-            if (this.emitBinaryTokens)
+            if (this._emitBinaryTokens)
             {
-                int metadata = scopesList.metadata;
+                int metadata = scopesList.Metadata;
                 if (this.binaryTokens.Count != 0 && this.binaryTokens[this.binaryTokens.Count - 1] == metadata)
                 {
                     // no need to push a token with the same metadata
-                    this.lastTokenEndIndex = endIndex;
+                    this._lastTokenEndIndex = endIndex;
                     return;
                 }
 
-                this.binaryTokens.Add(this.lastTokenEndIndex);
+                this.binaryTokens.Add(this._lastTokenEndIndex);
                 this.binaryTokens.Add(metadata);
 
-                this.lastTokenEndIndex = endIndex;
+                this._lastTokenEndIndex = endIndex;
                 return;
             }
 
             List<string> scopes = scopesList.GenerateScopes();
 
-            this.tokens.Add(new Token(this.lastTokenEndIndex, endIndex, scopes));
-            this.lastTokenEndIndex = endIndex;
+            this._tokens.Add(new Token(this._lastTokenEndIndex, endIndex, scopes));
+            this._lastTokenEndIndex = endIndex;
         }
 
 
         public IToken[] GetResult(StackElement stack, int lineLength)
         {
-            if (this.tokens.Count != 0 && this.tokens[this.tokens.Count - 1].StartIndex == lineLength - 1)
+            if (this._tokens.Count != 0 && this._tokens[this._tokens.Count - 1].StartIndex == lineLength - 1)
             {
                 // pop produced token for newline
-                this.tokens.RemoveAt(this.tokens.Count - 1);
+                this._tokens.RemoveAt(this._tokens.Count - 1);
             }
 
-            if (this.tokens.Count == 0)
+            if (this._tokens.Count == 0)
             {
-                this.lastTokenEndIndex = -1;
+                this._lastTokenEndIndex = -1;
                 this.Produce(stack, lineLength);
-                this.tokens[this.tokens.Count - 1].StartIndex = 0;
+                this._tokens[this._tokens.Count - 1].StartIndex = 0;
             }
 
-            return this.tokens.ToArray();
+            return this._tokens.ToArray();
         }
 
         public int[] GetBinaryResult(StackElement stack, int lineLength)
@@ -104,7 +102,7 @@ namespace TextMateSharp.Internal.Grammars
 
             if (this.binaryTokens.Count == 0)
             {
-                this.lastTokenEndIndex = -1;
+                this._lastTokenEndIndex = -1;
                 this.Produce(stack, lineLength);
                 this.binaryTokens[this.binaryTokens.Count - 2] = 0;
             }

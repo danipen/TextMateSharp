@@ -6,41 +6,44 @@ namespace TextMateSharp.Internal.Rules
 {
     public class BeginEndRule : Rule
     {
-        private RegExpSource begin;
-        public List<CaptureRule> beginCaptures;
-        private RegExpSource end;
-        public bool endHasBackReferences;
-        public List<CaptureRule> endCaptures;
-        public bool applyEndPatternLast;
-        public bool hasMissingPatterns;
-        public int?[] patterns;
-        private RegExpSourceList cachedCompiledPatterns;
+        public List<CaptureRule> BeginCaptures { get; private set; }
+        public bool EndHasBackReferences { get; private set; }
+        public List<CaptureRule> EndCaptures { get; private set; }
+        public bool ApplyEndPatternLast { get; private set; }
+        public bool HasMissingPatterns { get; private set; }
+        public int?[] Patterns { get; private set; }
+
+        private RegExpSource _begin;
+        private RegExpSource _end;
+        private RegExpSourceList _cachedCompiledPatterns;
 
         public BeginEndRule(int? id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
             string end, List<CaptureRule> endCaptures, bool applyEndPatternLast, ICompilePatternsResult patterns)
             : base(id, name, contentName)
         {
-            this.begin = new RegExpSource(begin, this.id);
-            this.beginCaptures = beginCaptures;
-            this.end = new RegExpSource(end, -1);
-            this.endHasBackReferences = this.end.HasBackReferences();
-            this.endCaptures = endCaptures;
-            this.applyEndPatternLast = applyEndPatternLast;
-            this.patterns = patterns.patterns;
-            this.hasMissingPatterns = patterns.hasMissingPatterns;
-            this.cachedCompiledPatterns = null;
+            _begin = new RegExpSource(begin, this.Id);
+            _end = new RegExpSource(end, -1);
+
+            BeginCaptures = beginCaptures;
+            EndHasBackReferences = _end.HasBackReferences();
+            EndCaptures = endCaptures;
+            ApplyEndPatternLast = applyEndPatternLast;
+            Patterns = patterns.Patterns;
+            HasMissingPatterns = patterns.HasMissingPatterns;
+
+            _cachedCompiledPatterns = null;
         }
 
         public string GetEndWithResolvedBackReferences(string lineText, IOnigCaptureIndex[] captureIndices)
         {
-            return this.end.ResolveBackReferences(lineText, captureIndices);
+            return this._end.ResolveBackReferences(lineText, captureIndices);
         }
 
         public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
             if (isFirst)
             {
-                foreach (int pattern in this.patterns)
+                foreach (int pattern in this.Patterns)
                 {
                     Rule rule = grammar.GetRule(pattern);
                     rule.CollectPatternsRecursive(grammar, sourceList, false);
@@ -48,16 +51,16 @@ namespace TextMateSharp.Internal.Rules
             }
             else
             {
-                sourceList.Push(this.begin);
+                sourceList.Push(this._begin);
             }
         }
 
         public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             RegExpSourceList precompiled = this.Precompile(grammar);
-            if (this.end.HasBackReferences())
+            if (this._end.HasBackReferences())
             {
-                if (this.applyEndPatternLast)
+                if (this.ApplyEndPatternLast)
                 {
                     precompiled.SetSource(precompiled.Length() - 1, endRegexSource);
                 }
@@ -66,27 +69,27 @@ namespace TextMateSharp.Internal.Rules
                     precompiled.SetSource(0, endRegexSource);
                 }
             }
-            return this.cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
         }
 
         private RegExpSourceList Precompile(IRuleRegistry grammar)
         {
-            if (this.cachedCompiledPatterns == null)
+            if (this._cachedCompiledPatterns == null)
             {
-                this.cachedCompiledPatterns = new RegExpSourceList();
+                this._cachedCompiledPatterns = new RegExpSourceList();
 
-                this.CollectPatternsRecursive(grammar, this.cachedCompiledPatterns, true);
+                this.CollectPatternsRecursive(grammar, this._cachedCompiledPatterns, true);
 
-                if (this.applyEndPatternLast)
+                if (this.ApplyEndPatternLast)
                 {
-                    this.cachedCompiledPatterns.Push(this.end.HasBackReferences() ? this.end.Clone() : this.end);
+                    this._cachedCompiledPatterns.Push(this._end.HasBackReferences() ? this._end.Clone() : this._end);
                 }
                 else
                 {
-                    this.cachedCompiledPatterns.UnShift(this.end.HasBackReferences() ? this.end.Clone() : this.end);
+                    this._cachedCompiledPatterns.UnShift(this._end.HasBackReferences() ? this._end.Clone() : this._end);
                 }
             }
-            return this.cachedCompiledPatterns;
+            return this._cachedCompiledPatterns;
         }
     }
 }

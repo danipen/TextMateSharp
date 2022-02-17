@@ -6,25 +6,27 @@ namespace TextMateSharp.Model
 {
     class DecodeMap
     {
-        int lastAssignedId;
-        Dictionary<string /* scope */, int[] /* ids */ > scopeToTokenIds;
-        Dictionary<string /* token */, int?/* id */ > tokenToTokenId;
-        Dictionary<int/* id */, string /* id */ > tokenIdToToken;
-        public TMTokenDecodeData prevToken;
+        public TMTokenDecodeData PrevToken { get; set; }
+
+        private int lastAssignedId;
+        private Dictionary<string /* scope */, int[] /* ids */ > _scopeToTokenIds;
+        private Dictionary<string /* token */, int?/* id */ > _tokenToTokenId;
+        private Dictionary<int/* id */, string /* id */ > _tokenIdToToken;
 
         public DecodeMap()
         {
+            this.PrevToken = new TMTokenDecodeData(new string[0], new Dictionary<int, Dictionary<int, bool>>());
+
             this.lastAssignedId = 0;
-            this.scopeToTokenIds = new Dictionary<string, int[]>();
-            this.tokenToTokenId = new Dictionary<string, int?>();
-            this.tokenIdToToken = new Dictionary<int, string>();
-            this.prevToken = new TMTokenDecodeData(new string[0], new Dictionary<int, Dictionary<int, bool>>());
+            this._scopeToTokenIds = new Dictionary<string, int[]>();
+            this._tokenToTokenId = new Dictionary<string, int?>();
+            this._tokenIdToToken = new Dictionary<int, string>();
         }
 
         public int[] getTokenIds(string scope)
         {
             int[] tokens;
-            this.scopeToTokenIds.TryGetValue(scope, out tokens);
+            this._scopeToTokenIds.TryGetValue(scope, out tokens);
             if (tokens != null)
             {
                 return tokens;
@@ -37,17 +39,17 @@ namespace TextMateSharp.Model
             {
                 string token = tmpTokens[i];
                 int? tokenId;
-                this.tokenToTokenId.TryGetValue(token, out tokenId);
+                this._tokenToTokenId.TryGetValue(token, out tokenId);
                 if (tokenId == null)
                 {
                     tokenId = (++this.lastAssignedId);
-                    this.tokenToTokenId[token] = tokenId.Value;
-                    this.tokenIdToToken[tokenId.Value] = token;
+                    this._tokenToTokenId[token] = tokenId.Value;
+                    this._tokenIdToToken[tokenId.Value] = token;
                 }
                 tokens[i] = tokenId.Value;
             }
 
-            this.scopeToTokenIds[scope] = tokens;
+            this._scopeToTokenIds[scope] = tokens;
             return tokens;
         }
 
@@ -62,12 +64,12 @@ namespace TextMateSharp.Model
                     if (isFirst)
                     {
                         isFirst = false;
-                        result.Append(this.tokenIdToToken[i]);
+                        result.Append(this._tokenIdToToken[i]);
                     }
                     else
                     {
                         result.Append(".");
-                        result.Append(this.tokenIdToToken[i]);
+                        result.Append(this._tokenIdToToken[i]);
                     }
                 }
             }

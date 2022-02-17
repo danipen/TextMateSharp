@@ -6,13 +6,13 @@ namespace TextMateSharp.Model
 {
     public class Tokenizer : ITokenizationSupport
     {
-        private IGrammar grammar;
-        private DecodeMap decodeMap;
+        private IGrammar _grammar;
+        private DecodeMap _decodeMap;
 
         public Tokenizer(IGrammar grammar)
         {
-            this.grammar = grammar;
-            this.decodeMap = new DecodeMap();
+            this._grammar = grammar;
+            this._decodeMap = new DecodeMap();
         }
 
         public TMState GetInitialState()
@@ -27,7 +27,7 @@ namespace TextMateSharp.Model
 
         public LineTokens Tokenize(string line, TMState state, int offsetDelta, int maxLen)
         {
-            if (grammar == null)
+            if (_grammar == null)
                 return null;
 
             TMState freshState = state != null ? state.Clone() : GetInitialState();
@@ -35,7 +35,7 @@ namespace TextMateSharp.Model
             if (line.Length > 0 && line.Length > maxLen)
                 line = line.Substring(0, maxLen);
 
-            ITokenizeLineResult textMateResult = grammar.TokenizeLine(line, freshState.GetRuleStack());
+            ITokenizeLineResult textMateResult = _grammar.TokenizeLine(line, freshState.GetRuleStack());
             freshState.setRuleStack(textMateResult.RuleStack);
 
             // Create the result early and fill in the tokens later
@@ -46,7 +46,7 @@ namespace TextMateSharp.Model
             {
                 IToken token = tmResultTokens[tokenIndex];
                 int tokenStartIndex = token.StartIndex;
-                string tokenType = DecodeTextMateToken(this.decodeMap, token.Scopes);
+                string tokenType = DecodeTextMateToken(this._decodeMap, token.Scopes);
 
                 // do not push a new token if the type is exactly the same (also
                 // helps with ligatures)
@@ -62,9 +62,9 @@ namespace TextMateSharp.Model
 
         private string DecodeTextMateToken(DecodeMap decodeMap, List<string> scopes)
         {
-            string[] prevTokenScopes = decodeMap.prevToken.scopes;
+            string[] prevTokenScopes = decodeMap.PrevToken.Scopes;
             int prevTokenScopesLength = prevTokenScopes.Length;
-            Dictionary<int, Dictionary<int, bool>> prevTokenScopeTokensMaps = decodeMap.prevToken.scopeTokensMaps;
+            Dictionary<int, Dictionary<int, bool>> prevTokenScopeTokensMaps = decodeMap.PrevToken.ScopeTokensMaps;
 
             Dictionary<int, Dictionary<int, bool>> scopeTokensMaps = new Dictionary<int, Dictionary<int, bool>>();
             Dictionary<int, bool> prevScopeTokensMaps = new Dictionary<int, bool>();
@@ -93,7 +93,7 @@ namespace TextMateSharp.Model
                 scopeTokensMaps[level] = prevScopeTokensMaps;
             }
 
-            decodeMap.prevToken = new TMTokenDecodeData(scopes.ToArray(), scopeTokensMaps);
+            decodeMap.PrevToken = new TMTokenDecodeData(scopes.ToArray(), scopeTokensMaps);
             return decodeMap.GetToken(prevScopeTokensMaps);
         }
     }

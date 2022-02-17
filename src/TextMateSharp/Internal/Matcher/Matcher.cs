@@ -8,29 +8,29 @@ namespace TextMateSharp.Internal.Matcher
     {
         private static Regex IDENTIFIER_REGEXP = new Regex("[\\w\\.:]+");
 
+        private List<MatcherWithPriority<T>> _results;
+        private Tokenizer _tokenizer;
+        private IMatchesName<T> _matchesName;
+        private string _token;
+
         public static ICollection<MatcherWithPriority<List<string>>> CreateMatchers(string expression)
         {
-            return new Matcher<List<string>>(expression, new NameMatcher()).results;
+            return new Matcher<List<string>>(expression, new NameMatcher())._results;
         }
-
-        private List<MatcherWithPriority<T>> results;
-        private Tokenizer tokenizer;
-        private IMatchesName<T> matchesName;
-        private String token;
 
         public Matcher(string expression, IMatchesName<T> matchesName)
         {
-            this.results = new List<MatcherWithPriority<T>>();
-            this.tokenizer = new Tokenizer(expression);
-            this.matchesName = matchesName;
+            this._results = new List<MatcherWithPriority<T>>();
+            this._tokenizer = new Tokenizer(expression);
+            this._matchesName = matchesName;
 
-            this.token = tokenizer.Next();
-            while (token != null)
+            this._token = _tokenizer.Next();
+            while (_token != null)
             {
                 int priority = 0;
-                if (token.Length == 2 && token[1] == ':')
+                if (_token.Length == 2 && _token[1] == ':')
                 {
-                    switch (token[0])
+                    switch (_token[0])
                     {
                         case 'R':
                             priority = 1;
@@ -39,18 +39,18 @@ namespace TextMateSharp.Internal.Matcher
                             priority = -1;
                             break;
                     }
-                    token = tokenizer.Next();
+                    _token = _tokenizer.Next();
                 }
                 Predicate<T> matcher = ParseConjunction();
                 if (matcher != null)
                 {
-                    results.Add(new MatcherWithPriority<T>(matcher, priority));
+                    _results.Add(new MatcherWithPriority<T>(matcher, priority));
                 }
-                if (!",".Equals(token))
+                if (!",".Equals(_token))
                 {
                     break;
                 }
-                token = tokenizer.Next();
+                _token = _tokenizer.Next();
             }
         }
 
@@ -61,12 +61,12 @@ namespace TextMateSharp.Internal.Matcher
             while (matcher != null)
             {
                 matchers.Add(matcher);
-                if (token.Equals("|") || token.Equals(","))
+                if (_token.Equals("|") || _token.Equals(","))
                 {
                     do
                     {
-                        token = tokenizer.Next();
-                    } while (token.Equals("|") || token.Equals(",")); // ignore subsequent
+                        _token = _tokenizer.Next();
+                    } while (_token.Equals("|") || _token.Equals(",")); // ignore subsequent
                                                                       // commas
                 }
                 else
@@ -114,9 +114,9 @@ namespace TextMateSharp.Internal.Matcher
 
         private Predicate<T> ParseOperand()
         {
-            if ("-".Equals(token))
+            if ("-".Equals(_token))
             {
-                token = tokenizer.Next();
+                _token = _tokenizer.Next();
                 Predicate<T> expressionToNegate = ParseOperand();
                 return matcherInput =>
                 {
@@ -127,25 +127,25 @@ namespace TextMateSharp.Internal.Matcher
                     return !expressionToNegate.Invoke(matcherInput);
                 };
             }
-            if ("(".Equals(token))
+            if ("(".Equals(_token))
             {
-                token = tokenizer.Next();
+                _token = _tokenizer.Next();
                 Predicate<T> expressionInParents = parseInnerExpression();
-                if (")".Equals(token))
+                if (")".Equals(_token))
                 {
-                    token = tokenizer.Next();
+                    _token = _tokenizer.Next();
                 }
                 return expressionInParents;
             }
-            if (IsIdentifier(token))
+            if (IsIdentifier(_token))
             {
                 ICollection<string> identifiers = new List<string>();
                 do
                 {
-                    identifiers.Add(token);
-                    token = tokenizer.Next();
-                } while (IsIdentifier(token));
-                return matcherInput => this.matchesName.Match(identifiers, matcherInput);
+                    identifiers.Add(_token);
+                    _token = _tokenizer.Next();
+                } while (IsIdentifier(_token));
+                return matcherInput => this._matchesName.Match(identifiers, matcherInput);
             }
             return null;
         }
