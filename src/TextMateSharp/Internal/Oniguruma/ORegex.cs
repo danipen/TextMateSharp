@@ -28,9 +28,13 @@ namespace TextMateSharp.Internal.Oniguruma
             pattern = UnicodeCharEscape.AddBracesToUnicodePatterns(pattern);
             pattern = UnicodeCharEscape.ConstraintUnicodePatternLenght(pattern);
 
-            fixed (char* patternP = pattern)
+            fixed (char* patternPtr = pattern)
             {
-                _regex = OnigInterop.onigwrap_create(pattern, Encoding.Unicode.GetByteCount(patternP, pattern.Length), ignoreCaseArg, multilineArg);
+                _regex = OnigInterop.onigwrap_create(
+                    patternPtr,
+                    Encoding.Unicode.GetByteCount(patternPtr, pattern.Length),
+                    ignoreCaseArg,
+                    multilineArg);
             }
 
             if (!Valid)
@@ -85,13 +89,13 @@ namespace TextMateSharp.Internal.Oniguruma
             if (_region != IntPtr.Zero)
                 OnigInterop.onigwrap_region_free(_region);
 
-            fixed (char* textP = text)
+            fixed (char* textPtr = text)
             {
                 _region = OnigInterop.onigwrap_search(
                     _regex,
-                    text,
-                    Encoding.Unicode.GetByteCount(textP, offset),
-                    Encoding.Unicode.GetByteCount(textP, text.Length));
+                    textPtr,
+                    Encoding.Unicode.GetByteCount(textPtr, offset),
+                    Encoding.Unicode.GetByteCount(textPtr, text.Length));
             }
         }
 

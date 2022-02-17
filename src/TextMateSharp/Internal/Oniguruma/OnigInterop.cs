@@ -6,7 +6,7 @@ namespace TextMateSharp.Internal.Oniguruma
     internal unsafe class OnigInterop
     {
         [DllImport("onigwrap", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr onigwrap_create(string pattern, int len, int ignoreCase, int multiline);
+        internal static extern IntPtr onigwrap_create(char* pattern, int len, int ignoreCase, int multiline);
 
         [DllImport("onigwrap", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void onigwrap_region_free(IntPtr region);
@@ -15,10 +15,10 @@ namespace TextMateSharp.Internal.Oniguruma
         internal static extern void onigwrap_free(IntPtr regex);
 
         [DllImport("onigwrap", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int onigwrap_index_in(IntPtr regex, string text, int offset, int length);
+        internal static extern int onigwrap_index_in(IntPtr regex, char* text, int offset, int length);
 
         [DllImport("onigwrap", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr onigwrap_search(IntPtr regex, string text, int offset, int length);
+        internal static extern IntPtr onigwrap_search(IntPtr regex, char* text, int offset, int length);
 
         [DllImport("onigwrap", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int onigwrap_num_regs(IntPtr region);
