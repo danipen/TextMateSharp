@@ -54,12 +54,12 @@ namespace TextMateSharp.Tests.Model
             ModelLinesMock modelLines = new ModelLinesMock(reader.ReadToEnd().Split("\n"));
 
             TMModel tmModel = new TMModel(modelLines);
-            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
-            Registry.Registry registry = new Registry.Registry(options);
 
             tmModel.SetGrammar(null);
 
-            Mock<IModelTokensChangedListener> changesListenerMock = new Mock<IModelTokensChangedListener>();
+            Mock<IModelTokensChangedListener> changesListenerMock = new Mock<IModelTokensChangedListener>(
+                MockBehavior.Strict);
+
             tmModel.AddModelTokensChangedListener(changesListenerMock.Object);
 
             Task.Delay(250).Wait();
