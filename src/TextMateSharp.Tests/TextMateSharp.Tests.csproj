@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -10,13 +10,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Resources\sample.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\sample.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TextMateSharp.Grammars\TextMateSharp.Grammars.csproj" />
     <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+      <PackageReference Include="Moq" Version="4.16.1" />
+  </ItemGroup>
 </Project>
