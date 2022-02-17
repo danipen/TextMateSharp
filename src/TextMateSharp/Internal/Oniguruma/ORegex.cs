@@ -1,35 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace TextMateSharp.Internal.Oniguruma
 {
     public class ORegex : IDisposable
     {
-        private string text;
-        private IntPtr regex;
-        private IntPtr region;
-        private bool regionSet = false;
-        private bool disposed = false;
-        private object syncObject = new object();
-        private string regexString;
-
-        /// <summary>
-        /// Indicates whether or not a search has been run
-        /// </summary>
-        public bool Ran
-        {
-            get
-            {
-                return regionSet;
-            }
-        }
+        private IntPtr _regex;
+        private IntPtr _region;
+        private bool _disposed = false;
+        private object _syncObject = new object();
+        private string _regexString;
 
         public bool Valid
         {
             get
             {
-                return regex != IntPtr.Zero;
+                return _regex != IntPtr.Zero;
             }
         }
 
@@ -41,18 +28,10 @@ namespace TextMateSharp.Internal.Oniguruma
             pattern = UnicodeCharEscape.AddBracesToUnicodePatterns(pattern);
             pattern = UnicodeCharEscape.ConstraintUnicodePatternLenght(pattern);
 
-            regex = OnigInterop.onigwrap_create(pattern, pattern.Length * 2, ignoreCaseArg, multilineArg);
+            _regex = OnigInterop.onigwrap_create(pattern, Encoding.Unicode.GetByteCount(pattern), ignoreCaseArg, multilineArg);
 
-            //if (!Valid)
-                regexString = pattern; // Save the pattern off on invalid patterns for throwing exceptions
-        }
-
-        public int IndexIn(string text, int offset = 0)
-        {
-            if (disposed) throw new ObjectDisposedException("ORegex");
-            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", regexString));
-
-            return OnigInterop.onigwrap_index_in(regex, text, offset * 2, text.Length * 2);
+            if (!Valid)
+                _regexString = pattern; // Save the pattern off on invalid patterns for throwing exceptions
         }
 
         /// <summary>
@@ -63,23 +42,23 @@ namespace TextMateSharp.Internal.Oniguruma
         /// <returns></returns>
         public List<ORegexResult> SafeSearch(string text, int offset = 0)
         {
-            if (disposed) throw new ObjectDisposedException("ORegex");
-            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", regexString));
+            if (_disposed) throw new ObjectDisposedException("ORegex");
+            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", _regexString));
 
 
-            lock (syncObject)
+            lock (_syncObject)
             {
                 Search(text, offset);
 
-                var captureCount = OnigInterop.onigwrap_num_regs(region);
+                var captureCount = OnigInterop.onigwrap_num_regs(_region);
                 var resultList = new List<ORegexResult>(captureCount);
                 for (var capture = 0; capture < captureCount; capture++)
                 {
-                    var pos = OnigInterop.onigwrap_pos(region, capture);
+                    var pos = OnigInterop.onigwrap_pos(_region, capture);
                     if (capture == 0 && pos < 0)
                         break;
 
-                    int len = pos == -1 ? 0 : OnigInterop.onigwrap_len(region, capture);
+                    int len = pos == -1 ? 0 : OnigInterop.onigwrap_len(_region, capture);
 
                     resultList.Add(new ORegexResult()
                     {
@@ -88,58 +67,22 @@ namespace TextMateSharp.Internal.Oniguruma
                     });
                 }
 
-                this.text = null;
-                OnigInterop.onigwrap_region_free(region);
-                regionSet = false;
+                OnigInterop.onigwrap_region_free(_region);
+                _region = IntPtr.Zero;
 
                 return resultList;
             }
         }
 
-        public void Search(string text, int offset = 0)
+        void Search(string text, int offset = 0)
         {
-            if (disposed) throw new ObjectDisposedException("ORegex");
-            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", regexString));
+            if (_disposed) throw new ObjectDisposedException("ORegex");
+            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", _regexString));
 
-            this.text = text;
-            if (regionSet)
-                OnigInterop.onigwrap_region_free(region);
+            if (_region != IntPtr.Zero)
+                OnigInterop.onigwrap_region_free(_region);
 
-            region = OnigInterop.onigwrap_search(regex, text, offset * 2, text.Length * 2);
-            regionSet = true;
-        }
-
-        public int MatchPosition(int nth)
-        {
-            if (disposed) throw new ObjectDisposedException("ORegex");
-            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", regexString));
-            if (!regionSet) throw new InvalidOperationException("ORegex.MatchPosition requires that ORegex.Search be run first.");
-
-            return OnigInterop.onigwrap_pos(region, nth);
-        }
-
-        public int MatchLength(int nth)
-        {
-            if (disposed) throw new ObjectDisposedException("ORegex");
-            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", regexString));
-            if (!regionSet) throw new InvalidOperationException("ORegex.MatchLength requires that ORegex.Search be run first.");
-
-            return OnigInterop.onigwrap_len(region, nth);
-        }
-
-        public string Capture(int nth)
-        {
-            if (disposed) throw new ObjectDisposedException("ORegex");
-            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", regexString));
-            if (!regionSet) throw new InvalidOperationException("ORegex.Capture requires that ORegex.Search be run first.");
-
-            var pos = OnigInterop.onigwrap_pos(region, nth);
-            if (pos < 0)
-                return null;
-
-            var len = OnigInterop.onigwrap_len(region, nth);
-
-            return text.Substring(pos, len);
+            _region = OnigInterop.onigwrap_search(_regex, text, offset * 2, Encoding.Unicode.GetByteCount(text));
         }
 
         public void Dispose()
@@ -150,15 +93,15 @@ namespace TextMateSharp.Internal.Oniguruma
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
-                disposed = true;
+                _disposed = true;
 
-                if (regex != IntPtr.Zero)
-                    OnigInterop.onigwrap_free(regex);
+                if (_region != IntPtr.Zero)
+                    OnigInterop.onigwrap_region_free(_region);
 
-                if (regionSet)
-                    OnigInterop.onigwrap_region_free(region);
+                if (_regex != IntPtr.Zero)
+                    OnigInterop.onigwrap_free(_regex);
             }
         }
 

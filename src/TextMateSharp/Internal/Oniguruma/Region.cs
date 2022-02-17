@@ -4,22 +4,22 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class Region
     {
-        public readonly int numRegs;
-        public int[] beg;
-        public int[] end;
+        public int NumRegs { get; private set; }
+        public int[] Start { get; private set; }
+        public int[] End { get; private set; }
 
         public Region(in int num)
         {
-            this.numRegs = num;
-            this.beg = new int[num];
-            this.end = new int[num];
+            NumRegs = num;
+            Start = new int[num];
+            End = new int[num];
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Region: \n");
-            for (int i = 0; i < beg.Length; i++) sb.Append(" " + i + ": (" + beg[i] + "-" + end[i] + ")");
+            for (int i = 0; i < Start.Length; i++) sb.Append(" " + i + ": (" + Start[i] + "-" + End[i] + ")");
             return sb.ToString();
         }
     }

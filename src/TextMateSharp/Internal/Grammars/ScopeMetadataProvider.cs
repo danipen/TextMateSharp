@@ -15,29 +15,29 @@ namespace TextMateSharp.Internal.Grammars
         private const string STRING_TOKEN_TYPE = "string";
         private const string REGEX_TOKEN_TYPE = "regex";
 
-        private int initialLanguage;
-        private IThemeProvider themeProvider;
-        private Dictionary<string, ScopeMetadata> cache;
-        private ScopeMetadata defaultMetaData;
-        private Dictionary<string, int> embeddedLanguages;
-        private Regex embeddedLanguagesRegex;
+        private int _initialLanguage;
+        private IThemeProvider _themeProvider;
+        private Dictionary<string, ScopeMetadata> _cache;
+        private ScopeMetadata _defaultMetaData;
+        private Dictionary<string, int> _embeddedLanguages;
+        private Regex _embeddedLanguagesRegex;
 
         public ScopeMetadataProvider(int initialLanguage, IThemeProvider themeProvider,
             Dictionary<string, int> embeddedLanguages)
         {
-            this.initialLanguage = initialLanguage;
-            this.themeProvider = themeProvider;
-            this.cache = new Dictionary<string, ScopeMetadata>();
+            this._initialLanguage = initialLanguage;
+            this._themeProvider = themeProvider;
+            this._cache = new Dictionary<string, ScopeMetadata>();
             this.OnDidChangeTheme();
 
             // embeddedLanguages handling
-            this.embeddedLanguages = new Dictionary<string, int>();
+            this._embeddedLanguages = new Dictionary<string, int>();
             if (embeddedLanguages != null)
             {
                 foreach (string scope in embeddedLanguages.Keys)
                 {
                     int languageId = embeddedLanguages[scope];
-                    this.embeddedLanguages[scope] = languageId;
+                    this._embeddedLanguages[scope] = languageId;
                 }
             }
 
@@ -48,7 +48,7 @@ namespace TextMateSharp.Internal.Grammars
 
             //if (escapedScopes.isEmpty()) {
                 // no scopes registered
-            this.embeddedLanguagesRegex = null;
+            this._embeddedLanguagesRegex = null;
             //} else {
                 // TODO!!!
                 //this.embeddedLanguagesRegex = null;
@@ -61,17 +61,17 @@ namespace TextMateSharp.Internal.Grammars
 
         public void OnDidChangeTheme()
         {
-            this.cache.Clear();
-            this.defaultMetaData = new ScopeMetadata(
+            this._cache.Clear();
+            this._defaultMetaData = new ScopeMetadata(
                 "",
-                this.initialLanguage,
+                this._initialLanguage,
                 StandardTokenType.Other,
-                new List<ThemeTrieElementRule>() { this.themeProvider.GetDefaults() });
+                new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
         }
 
         public ScopeMetadata GetDefaultMetadata()
         {
-            return this.defaultMetaData;
+            return this._defaultMetaData;
         }
 
         private static string EscapeRegExpCharacters(string value)
@@ -87,13 +87,13 @@ namespace TextMateSharp.Internal.Grammars
                 return ScopeMetadataProvider._NULL_SCOPE_METADATA;
             }
             ScopeMetadata value;
-            this.cache.TryGetValue(scopeName, out value);
+            this._cache.TryGetValue(scopeName, out value);
             if (value != null)
             {
                 return value;
             }
             value = this.DoGetMetadataForScope(scopeName);
-            this.cache[scopeName] = value;
+            this._cache[scopeName] = value;
             return value;
         }
 
@@ -101,7 +101,7 @@ namespace TextMateSharp.Internal.Grammars
         {
             int languageId = this.ScopeToLanguage(scopeName);
             int standardTokenType = ScopeMetadataProvider.ToStandardTokenType(scopeName);
-            List<ThemeTrieElementRule> themeData = this.themeProvider.ThemeMatch(new string[] { scopeName });
+            List<ThemeTrieElementRule> themeData = this._themeProvider.ThemeMatch(new string[] { scopeName });
 
             return new ScopeMetadata(scopeName, languageId, standardTokenType, themeData);
         }
@@ -112,7 +112,7 @@ namespace TextMateSharp.Internal.Grammars
             {
                 return 0;
             }
-            if (this.embeddedLanguagesRegex == null)
+            if (this._embeddedLanguagesRegex == null)
             {
                 // no scopes registered
                 return 0;

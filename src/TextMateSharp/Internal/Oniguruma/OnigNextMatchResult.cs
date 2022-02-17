@@ -4,24 +4,24 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     class OnigNextMatchResult : IOnigNextMatchResult
     {
-        private int index;
+        private int _index;
 
-        private IOnigCaptureIndex[] captureIndices;
+        private IOnigCaptureIndex[] _captureIndices;
 
         public OnigNextMatchResult(OnigResult result)
         {
-            this.index = result.GetIndex();
-            this.captureIndices = CaptureIndicesForMatch(result);
+            this._index = result.GetIndex();
+            this._captureIndices = CaptureIndicesForMatch(result);
         }
 
         public int GetIndex()
         {
-            return index;
+            return _index;
         }
 
         public IOnigCaptureIndex[] GetCaptureIndices()
         {
-            return captureIndices;
+            return _captureIndices;
         }
 
         public override string ToString()
@@ -66,49 +66,29 @@ namespace TextMateSharp.Internal.Oniguruma
 
         class OnigCaptureIndex : IOnigCaptureIndex
         {
-
-            private int index;
-            private int start;
-            private int end;
+            public int Index { get; private set; }
+            public int Start { get; private set; }
+            public int End { get; private set; }
+            public int Length { get { return End - Start; } }
 
             public OnigCaptureIndex(int index, int start, int end)
             {
-                this.index = index;
-                this.start = start >= 0 ? start : 0;
-                this.end = end >= 0 ? end : 0;
+                Index = index;
+                Start = start >= 0 ? start : 0;
+                End = end >= 0 ? end : 0;
             }
 
-            public int GetIndex()
-            {
-                return index;
-            }
-
-            public int GetStart()
-            {
-                return start;
-            }
-
-            public int GetEnd()
-            {
-                return end;
-            }
-
-            public int GetLength()
-            {
-                return end - start;
-            }
-
-            public string toString()
+            public override string ToString()
             {
                 StringBuilder result = new StringBuilder();
                 result.Append("{\"index\": ");
-                result.Append(GetIndex());
+                result.Append(Index);
                 result.Append(", \"start\": ");
-                result.Append(GetStart());
+                result.Append(Start);
                 result.Append(", \"end\": ");
-                result.Append(GetEnd());
+                result.Append(End);
                 result.Append(", \"length\": ");
-                result.Append(GetLength());
+                result.Append(Length);
                 result.Append("}");
                 return result.ToString();
             }

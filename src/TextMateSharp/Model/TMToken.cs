@@ -4,13 +4,13 @@ namespace TextMateSharp.Model
 {
     public class TMToken
     {
-        public int StartIndex;
+        public int StartIndex { get; private set; }
         public List<string> Scopes { get; private set; }
 
         public TMToken(int startIndex, List<string> scopes)
         {
-            this.StartIndex = startIndex;
-            this.Scopes = scopes;
+            StartIndex = startIndex;
+            Scopes = scopes;
         }
     }
 }

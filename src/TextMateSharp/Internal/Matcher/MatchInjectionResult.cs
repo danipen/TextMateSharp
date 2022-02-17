@@ -4,33 +4,18 @@ namespace TextMateSharp.Internal.Matcher
 {
     internal class MatchInjectionsResult : IMatchInjectionsResult
     {
-        private IOnigCaptureIndex[] captureIndexes;
-        private int? matchedRuleId;
-        private bool isPriorityMatch;
+        public IOnigCaptureIndex[] CaptureIndexes { get; private set; }
+        public int? MatchedRuleId { get; private set; }
+        public bool IsPriorityMatch { get; private set; }
 
         internal MatchInjectionsResult(
             IOnigCaptureIndex[] captureIndexes,
             int? matchedRuleId,
             bool isPriorityMatch)
         {
-            this.captureIndexes = captureIndexes;
-            this.matchedRuleId = matchedRuleId;
-            this.isPriorityMatch = isPriorityMatch;
-        }
-
-        public IOnigCaptureIndex[] GetCaptureIndices()
-        {
-            return captureIndexes;
-        }
-
-        public int? GetMatchedRuleId()
-        {
-            return matchedRuleId;
-        }
-
-        public bool IsPriorityMatch()
-        {
-            return isPriorityMatch;
+            CaptureIndexes = captureIndexes;
+            MatchedRuleId = matchedRuleId;
+            IsPriorityMatch = isPriorityMatch;
         }
     }
 }

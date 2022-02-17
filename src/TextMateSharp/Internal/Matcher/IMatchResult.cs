@@ -4,8 +4,8 @@ namespace TextMateSharp.Internal.Matcher
 {
     public interface IMatchResult
     {
-        IOnigCaptureIndex[] GetCaptureIndices();
+        IOnigCaptureIndex[] CaptureIndexes { get; }
 
-        int? GetMatchedRuleId();
+        int? MatchedRuleId { get; }
     }
 }

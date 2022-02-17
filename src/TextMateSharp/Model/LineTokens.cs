@@ -4,30 +4,15 @@ namespace TextMateSharp.Model
 {
     public class LineTokens
     {
-        public List<TMToken> Tokens;
-        public int ActualStopOffset;
-        public TMState EndState;
+        public List<TMToken> Tokens { get; private set; }
+        public int ActualStopOffset { get; set; }
+        public TMState EndState { get; set; }
 
         public LineTokens(List<TMToken> tokens, int actualStopOffset, TMState endState)
         {
-            this.Tokens = tokens;
-            this.ActualStopOffset = actualStopOffset;
-            this.EndState = endState;
-        }
-
-        public TMState GetEndState()
-        {
-            return EndState;
-        }
-
-        public void SetEndState(TMState endState)
-        {
-            this.EndState = endState;
-        }
-
-        public List<TMToken> GetTokens()
-        {
-            return Tokens;
+            Tokens = tokens;
+            ActualStopOffset = actualStopOffset;
+            EndState = endState;
         }
     }
 }

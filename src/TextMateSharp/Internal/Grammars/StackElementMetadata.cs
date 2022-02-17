@@ -4,7 +4,6 @@ namespace TextMateSharp.Internal.Grammars
 {
     public static class StackElementMetadata
     {
-
         public static string ToBinaryStr(int metadata)
         {
             /*

@@ -4,31 +4,31 @@ namespace TextMateSharp.Model
 {
     public class TMState
     {
-        private TMState parentEmbedderState;
-        private StackElement ruleStack;
+        private TMState _parentEmbedderState;
+        private StackElement _ruleStack;
 
         public TMState(TMState parentEmbedderState, StackElement ruleStatck)
         {
-            this.parentEmbedderState = parentEmbedderState;
-            this.ruleStack = ruleStatck;
+            this._parentEmbedderState = parentEmbedderState;
+            this._ruleStack = ruleStatck;
         }
 
         public void setRuleStack(StackElement ruleStack)
         {
-            this.ruleStack = ruleStack;
+            this._ruleStack = ruleStack;
         }
 
         public StackElement GetRuleStack()
         {
-            return ruleStack;
+            return _ruleStack;
         }
 
         public TMState Clone()
         {
-            TMState parentEmbedderStateClone = this.parentEmbedderState != null ? 
-                this.parentEmbedderState.Clone() : null;
+            TMState parentEmbedderStateClone = this._parentEmbedderState != null ? 
+                this._parentEmbedderState.Clone() : null;
 
-            return new TMState(parentEmbedderStateClone, this.ruleStack);
+            return new TMState(parentEmbedderStateClone, this._ruleStack);
         }
 
         public override bool Equals(object other)
@@ -40,13 +40,13 @@ namespace TextMateSharp.Model
 
             TMState otherState = (TMState)other;
 
-            return Equals(parentEmbedderState, otherState.parentEmbedderState) &&
-                   Equals(ruleStack, otherState.ruleStack);
+            return Equals(_parentEmbedderState, otherState._parentEmbedderState) &&
+                   Equals(_ruleStack, otherState._ruleStack);
         }
 
         public override int GetHashCode()
         {
-            return this.parentEmbedderState.GetHashCode() + this.ruleStack.GetHashCode();
+            return this._parentEmbedderState.GetHashCode() + this._ruleStack.GetHashCode();
         }
 
     }

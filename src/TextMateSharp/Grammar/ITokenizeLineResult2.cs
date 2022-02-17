@@ -2,7 +2,7 @@ namespace TextMateSharp.Grammars
 {
     public interface ITokenizeLineResult2
     {
-        int[] GetTokens();
-        StackElement GetRuleStack();
+        int[] Tokens { get; }
+        StackElement RuleStack { get; }
     }
 }

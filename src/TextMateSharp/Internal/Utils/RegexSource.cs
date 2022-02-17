@@ -42,7 +42,7 @@ namespace TextMateSharp.Internal.Utils
             IOnigCaptureIndex capture = captureIndices.Length > index ? captureIndices[index] : null;
             if (capture != null)
             {
-                string result = captureSource.SubstringAtIndexes(capture.GetStart(), capture.GetEnd());
+                string result = captureSource.SubstringAtIndexes(capture.Start, capture.End);
                 // Remove leading dots that would make the selector invalid
                 while (result.Length > 0 && result[0] == '.')
                 {

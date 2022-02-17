@@ -7,17 +7,17 @@ namespace TextMateSharp.Internal.Grammars
     public class ScopeMetadata
     {
 
-        public string scopeName;
-        public int languageId;
-        public int tokenType;
-        public List<ThemeTrieElementRule> themeData;
+        public string ScopeName { get; private set; }
+        public int LanguageId { get; private set; }
+        public int TokenType { get; private set; }
+        public List<ThemeTrieElementRule> ThemeData { get; private set; }
 
         public ScopeMetadata(string scopeName, int languageId, int tokenType, List<ThemeTrieElementRule> themeData)
         {
-            this.scopeName = scopeName;
-            this.languageId = languageId;
-            this.tokenType = tokenType;
-            this.themeData = themeData;
+            ScopeName = scopeName;
+            LanguageId = languageId;
+            TokenType = tokenType;
+            ThemeData = themeData;
         }
     }
 }

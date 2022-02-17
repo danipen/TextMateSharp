@@ -5,18 +5,19 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class OnigRegExp : IDisposable
     {
-        private string lastSearchString;
-        private int lastSearchPosition;
-        private OnigResult lastSearchResult;
-        private ORegex regex;
+        private string _lastSearchString;
+        private int _lastSearchPosition;
+        private OnigResult _lastSearchResult;
+        private ORegex _regex;
         private bool _disposed;
+
         public OnigRegExp(string source)
         {
-            lastSearchString = null;
-            lastSearchPosition = -1;
-            lastSearchResult = null;
+            _lastSearchString = null;
+            _lastSearchPosition = -1;
+            _lastSearchResult = null;
 
-            regex = new ORegex(source, false, false);
+            _regex = new ORegex(source, false, false);
         }
 
         ~OnigRegExp() => Dispose(false);
@@ -34,29 +35,29 @@ namespace TextMateSharp.Internal.Oniguruma
                 return;
             }
 
-            if (regex != null)
-                regex.Dispose();
+            if (_regex != null)
+                _regex.Dispose();
             
             _disposed = true;
-        }        
+        }
         
         public OnigResult Search(string str, in int position)
         {
-            if (lastSearchString == str && lastSearchPosition <= position &&
-                (lastSearchResult == null || lastSearchResult.LocationAt(0) >= position))
+            if (_lastSearchString == str && _lastSearchPosition <= position &&
+                (_lastSearchResult == null || _lastSearchResult.LocationAt(0) >= position))
             {
-                return lastSearchResult;
+                return _lastSearchResult;
             }
 
-            lastSearchString = str;
-            lastSearchPosition = position;
-            lastSearchResult = GetOnigResult(str, position);
-            return lastSearchResult;
+            _lastSearchString = str;
+            _lastSearchPosition = position;
+            _lastSearchResult = GetOnigResult(str, position);
+            return _lastSearchResult;
         }
 
         private OnigResult GetOnigResult(string data, in int position)
         {
-            List<ORegexResult> results = regex.SafeSearch(data, position);
+            List<ORegexResult> results = _regex.SafeSearch(data, position);
 
             if (results == null || results.Count == 0)
                 return null;
@@ -65,8 +66,8 @@ namespace TextMateSharp.Internal.Oniguruma
 
             for (int i = 0; i < results.Count; i++)
             {
-                region.beg[i] = results[i].Position;
-                region.end[i] = results[i].Position + results[i].Length;
+                region.Start[i] = results[i].Position;
+                region.End[i] = results[i].Position + results[i].Length;
             }
 
             return new OnigResult(region, -1);

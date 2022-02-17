@@ -3,47 +3,47 @@ using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Rules
 {
-	public abstract class Rule
-	{
+    public abstract class Rule
+    {
+        public int? Id { get; private set; }
 
-		public int? id;
+        private bool _nameIsCapturing;
+        private string _name;
 
-		private bool nameIsCapturing;
-		private string name;
+        private bool _contentNameIsCapturing;
+        private string _contentName;
 
-		private bool contentNameIsCapturing;
-		private string contentName;
+        public Rule(int? id, string name, string contentName)
+        {
+            Id = id;
 
-		public Rule(int? id, string name, string contentName)
-		{
-			this.id = id;
-			this.name = name;
-			this.nameIsCapturing = RegexSource.HasCaptures(this.name);
-			this.contentName = contentName;
-			this.contentNameIsCapturing = RegexSource.HasCaptures(this.contentName);
-		}
+            _name = name;
+            _nameIsCapturing = RegexSource.HasCaptures(this._name);
+            _contentName = contentName;
+            _contentNameIsCapturing = RegexSource.HasCaptures(this._contentName);
+        }
 
-		public string GetName(string lineText, IOnigCaptureIndex[] captureIndices)
-		{
-			if (!this.nameIsCapturing)
-			{
-				return this.name;
-			}
+        public string GetName(string lineText, IOnigCaptureIndex[] captureIndices)
+        {
+            if (!this._nameIsCapturing)
+            {
+                return this._name;
+            }
 
-			return RegexSource.ReplaceCaptures(this.name, lineText, captureIndices);
-		}
+            return RegexSource.ReplaceCaptures(this._name, lineText, captureIndices);
+        }
 
-		public string GetContentName(string lineText, IOnigCaptureIndex[] captureIndices)
-		{
-			if (!this.contentNameIsCapturing)
-			{
-				return this.contentName;
-			}
-			return RegexSource.ReplaceCaptures(this.contentName, lineText, captureIndices);
-		}
+        public string GetContentName(string lineText, IOnigCaptureIndex[] captureIndices)
+        {
+            if (!this._contentNameIsCapturing)
+            {
+                return this._contentName;
+            }
+            return RegexSource.ReplaceCaptures(this._contentName, lineText, captureIndices);
+        }
 
-		public abstract void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst);
+        public abstract void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst);
 
-		public abstract ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG);
-	}
+        public abstract ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG);
+    }
 }

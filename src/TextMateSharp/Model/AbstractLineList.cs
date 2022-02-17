@@ -5,11 +5,9 @@ namespace TextMateSharp.Model
 {
     public abstract class AbstractLineList : IModelLines
     {
-        //private static final Logger LOGGER = Logger.getLogger(AbstractLineList.class.getName());
+        private IList<ModelLine> _list = new List<ModelLine>();
 
-        private IList<ModelLine> list = new List<ModelLine>();
-
-        private TMModel model;
+        private TMModel _model;
 
         public AbstractLineList()
         {
@@ -17,14 +15,14 @@ namespace TextMateSharp.Model
 
         public void SetModel(TMModel model)
         {
-            this.model = model;
+            this._model = model;
         }
 
         public void AddLine(int line)
         {
             lock (mLock)
             {
-                this.list.Insert(line, new ModelLine());
+                this._list.Insert(line, new ModelLine());
             }
         }
 
@@ -32,7 +30,7 @@ namespace TextMateSharp.Model
         {
             lock (mLock)
             {
-                this.list.RemoveAt(line);
+                this._list.RemoveAt(line);
             }
         }
 
@@ -40,10 +38,10 @@ namespace TextMateSharp.Model
         {
             lock (mLock)
             {
-                if (index < 0 || index >= this.list.Count)
+                if (index < 0 || index >= this._list.Count)
                     return null;
 
-                return this.list[index];
+                return this._list[index];
             }
         }
 
@@ -51,32 +49,32 @@ namespace TextMateSharp.Model
         {
             lock (mLock)
             {
-                foreach (ModelLine modelLine in list)
+                foreach (ModelLine modelLine in _list)
                     action(modelLine);
             }
         }
 
         protected void InvalidateLine(int lineIndex)
         {
-            if (model != null)
+            if (_model != null)
             {
-                model.InvalidateLine(lineIndex);
+                _model.InvalidateLine(lineIndex);
             }
         }
 
         protected void InvalidateLineRange(int iniLineIndex, int endLineIndex)
         {
-            if (model != null)
+            if (_model != null)
             {
-                model.InvalidateLineRange(iniLineIndex, endLineIndex);
+                _model.InvalidateLineRange(iniLineIndex, endLineIndex);
             }
         }
 
         protected void ForceTokenization(int startLineIndex, int endLineIndex)
         {
-            if (model != null)
+            if (_model != null)
             {
-                model.ForceTokenization(startLineIndex, endLineIndex);
+                _model.ForceTokenization(startLineIndex, endLineIndex);
             }
         }
 

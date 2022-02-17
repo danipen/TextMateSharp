@@ -57,7 +57,8 @@ namespace TextMateSharp.Internal.Rules
                 this._anchorCache.A0_G1 = null;
                 this._anchorCache.A1_G0 = null;
                 this._anchorCache.A1_G1 = null;
-                r.setSource(newSource);
+
+                r.SetSource(newSource);
             }
         }
 
@@ -80,22 +81,22 @@ namespace TextMateSharp.Internal.Rules
             {
                 if (this._anchorCache.A0_G0 == null)
                 {
-                    this._anchorCache.A0_G0 = (allowA == false && allowG == false) ? this._resolveAnchors(allowA, allowG)
+                    this._anchorCache.A0_G0 = (allowA == false && allowG == false) ? this.ResolveAnchors(allowA, allowG)
                             : null;
                 }
                 if (this._anchorCache.A0_G1 == null)
                 {
-                    this._anchorCache.A0_G1 = (allowA == false && allowG == true) ? this._resolveAnchors(allowA, allowG)
+                    this._anchorCache.A0_G1 = (allowA == false && allowG == true) ? this.ResolveAnchors(allowA, allowG)
                             : null;
                 }
                 if (this._anchorCache.A1_G0 == null)
                 {
-                    this._anchorCache.A1_G0 = (allowA == true && allowG == false) ? this._resolveAnchors(allowA, allowG)
+                    this._anchorCache.A1_G0 = (allowA == true && allowG == false) ? this.ResolveAnchors(allowA, allowG)
                             : null;
                 }
                 if (this._anchorCache.A1_G1 == null)
                 {
-                    this._anchorCache.A1_G1 = (allowA == true && allowG == true) ? this._resolveAnchors(allowA, allowG)
+                    this._anchorCache.A1_G1 = (allowA == true && allowG == true) ? this.ResolveAnchors(allowA, allowG)
                             : null;
                 }
                 if (allowA)
@@ -124,7 +125,7 @@ namespace TextMateSharp.Internal.Rules
 
         }
 
-        private ICompiledRule _resolveAnchors(bool allowA, bool allowG)
+        private ICompiledRule ResolveAnchors(bool allowA, bool allowG)
         {
             List<string> regexps = new List<string>();
             foreach (RegExpSource regExpSource in _items)

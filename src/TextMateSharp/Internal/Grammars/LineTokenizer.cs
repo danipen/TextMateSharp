@@ -14,165 +14,165 @@ namespace TextMateSharp.Internal.Grammars
         class WhileStack
         {
 
-            public StackElement stack;
-            public BeginWhileRule rule;
+            public StackElement Stack { get; private set; }
+            public BeginWhileRule Rule { get; private set; }
 
             public WhileStack(StackElement stack, BeginWhileRule rule)
             {
-                this.stack = stack;
-                this.rule = rule;
+                Stack = stack;
+                Rule = rule;
             }
         }
 
         class WhileCheckResult
         {
 
-            public StackElement stack;
-            public int linePos;
-            public int anchorPosition;
-            public bool isFirstLine;
+            public StackElement Stack { get; private set; }
+            public int LinePos { get; private set; }
+            public int AnchorPosition { get; private set; }
+            public bool IsFirstLine { get; private set; }
 
             public WhileCheckResult(StackElement stack, int linePos, int anchorPosition, bool isFirstLine)
             {
-                this.stack = stack;
-                this.linePos = linePos;
-                this.anchorPosition = anchorPosition;
-                this.isFirstLine = isFirstLine;
+                Stack = stack;
+                LinePos = linePos;
+                AnchorPosition = anchorPosition;
+                IsFirstLine = isFirstLine;
             }
         }
 
-        private Grammar grammar;
-        private string lineText;
-        private bool isFirstLine;
-        private int linePos;
-        private StackElement stack;
-        private LineTokens lineTokens;
-        private int anchorPosition = -1;
-        private bool stop;
-        private int lineLength;
+        private Grammar _grammar;
+        private string _lineText;
+        private bool _isFirstLine;
+        private int _linePos;
+        private StackElement _stack;
+        private LineTokens _lineTokens;
+        private int _anchorPosition = -1;
+        private bool _stop;
+        private int _lineLength;
 
         public LineTokenizer(Grammar grammar, string lineText, bool isFirstLine, int linePos, StackElement stack,
                 LineTokens lineTokens)
         {
-            this.grammar = grammar;
-            this.lineText = lineText;
-            this.lineLength = lineText.Length;
-            this.isFirstLine = isFirstLine;
-            this.linePos = linePos;
-            this.stack = stack;
-            this.lineTokens = lineTokens;
+            this._grammar = grammar;
+            this._lineText = lineText;
+            this._lineLength = lineText.Length;
+            this._isFirstLine = isFirstLine;
+            this._linePos = linePos;
+            this._stack = stack;
+            this._lineTokens = lineTokens;
         }
 
         public StackElement Scan()
         {
-            stop = false;
+            _stop = false;
 
-            WhileCheckResult whileCheckResult = CheckWhileConditions(grammar, lineText, isFirstLine, linePos, stack,
-                    lineTokens);
-            stack = whileCheckResult.stack;
-            linePos = whileCheckResult.linePos;
-            isFirstLine = whileCheckResult.isFirstLine;
-            anchorPosition = whileCheckResult.anchorPosition;
+            WhileCheckResult whileCheckResult = CheckWhileConditions(_grammar, _lineText, _isFirstLine, _linePos, _stack,
+                    _lineTokens);
+            _stack = whileCheckResult.Stack;
+            _linePos = whileCheckResult.LinePos;
+            _isFirstLine = whileCheckResult.IsFirstLine;
+            _anchorPosition = whileCheckResult.AnchorPosition;
 
-            while (!stop)
+            while (!_stop)
             {
                 ScanNext(); // potentially modifies linePos && anchorPosition
             }
 
-            return stack;
+            return _stack;
         }
 
         private void ScanNext()
         {
-            IMatchResult r = MatchRuleOrInjections(grammar, lineText, isFirstLine, linePos, stack, anchorPosition);
+            IMatchResult r = MatchRuleOrInjections(_grammar, _lineText, _isFirstLine, _linePos, _stack, _anchorPosition);
 
             if (r == null)
             {
                 // No match
-                lineTokens.Produce(stack, lineLength);
-                stop = true;
+                _lineTokens.Produce(_stack, _lineLength);
+                _stop = true;
                 return;
             }
 
-            IOnigCaptureIndex[] captureIndices = r.GetCaptureIndices();
-            int? matchedRuleId = r.GetMatchedRuleId();
+            IOnigCaptureIndex[] captureIndices = r.CaptureIndexes;
+            int? matchedRuleId = r.MatchedRuleId;
 
             bool hasAdvanced = (captureIndices != null && captureIndices.Length > 0)
-                    ? (captureIndices[0].GetEnd() > linePos)
+                    ? (captureIndices[0].End > _linePos)
                     : false;
 
             if (matchedRuleId == -1)
             {
                 // We matched the `end` for this rule => pop it
-                BeginEndRule poppedRule = (BeginEndRule)stack.GetRule(grammar);
+                BeginEndRule poppedRule = (BeginEndRule)_stack.GetRule(_grammar);
 
                 /*
 				 * if (logger.isEnabled()) { logger.log("  popping " + poppedRule.debugName +
 				 * " - " + poppedRule.debugEndRegExp); }
 				 */
 
-                lineTokens.Produce(stack, captureIndices[0].GetStart());
-                stack = stack.setContentNameScopesList(stack.nameScopesList);
-                HandleCaptures(grammar, lineText, isFirstLine, stack, lineTokens, poppedRule.endCaptures, captureIndices);
-                lineTokens.Produce(stack, captureIndices[0].GetEnd());
+                _lineTokens.Produce(_stack, captureIndices[0].Start);
+                _stack = _stack.setContentNameScopesList(_stack.NameScopesList);
+                HandleCaptures(_grammar, _lineText, _isFirstLine, _stack, _lineTokens, poppedRule.EndCaptures, captureIndices);
+                _lineTokens.Produce(_stack, captureIndices[0].End);
 
                 // pop
-                StackElement popped = stack;
-                stack = stack.Pop();
+                StackElement popped = _stack;
+                _stack = _stack.Pop();
 
-                if (!hasAdvanced && popped.GetEnterPos() == linePos)
+                if (!hasAdvanced && popped.GetEnterPos() == _linePos)
                 {
                     // Grammar pushed & popped a rule without advancing
                     System.Diagnostics.Debug.WriteLine("[1] - Grammar is in an endless loop - Grammar pushed & popped a rule without advancing");
                     // See https://github.com/Microsoft/vscode-textmate/issues/12
                     // Let's assume this was a mistake by the grammar author and the
                     // intent was to continue in this state
-                    stack = popped;
+                    _stack = popped;
 
-                    lineTokens.Produce(stack, lineLength);
-                    stop = true;
+                    _lineTokens.Produce(_stack, _lineLength);
+                    _stop = true;
                     return;
                 }
             }
             else if (captureIndices != null && captureIndices.Length > 0)
             {
                 // We matched a rule!
-                Rule rule = grammar.GetRule(matchedRuleId);
+                Rule rule = _grammar.GetRule(matchedRuleId);
 
-                lineTokens.Produce(stack, captureIndices[0].GetStart());
+                _lineTokens.Produce(_stack, captureIndices[0].Start);
 
-                StackElement beforePush = stack;
+                StackElement beforePush = _stack;
                 // push it on the stack rule
-                string scopeName = rule.GetName(lineText, captureIndices);
-                ScopeListElement nameScopesList = stack.contentNameScopesList.Push(grammar, scopeName);
-                stack = stack.Push(matchedRuleId, linePos, null, nameScopesList, nameScopesList);
+                string scopeName = rule.GetName(_lineText, captureIndices);
+                ScopeListElement nameScopesList = _stack.ContentNameScopesList.Push(_grammar, scopeName);
+                _stack = _stack.Push(matchedRuleId, _linePos, null, nameScopesList, nameScopesList);
 
                 if (rule is BeginEndRule)
                 {
                     BeginEndRule pushedRule = (BeginEndRule)rule;
 
-                    HandleCaptures(grammar, lineText, isFirstLine, stack, lineTokens, pushedRule.beginCaptures,
+                    HandleCaptures(_grammar, _lineText, _isFirstLine, _stack, _lineTokens, pushedRule.BeginCaptures,
                             captureIndices);
-                    lineTokens.Produce(stack, captureIndices[0].GetEnd());
-                    anchorPosition = captureIndices[0].GetEnd();
+                    _lineTokens.Produce(_stack, captureIndices[0].End);
+                    _anchorPosition = captureIndices[0].End;
 
-                    string contentName = pushedRule.GetContentName(lineText, captureIndices);
-                    ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
-                    stack = stack.setContentNameScopesList(contentNameScopesList);
+                    string contentName = pushedRule.GetContentName(_lineText, captureIndices);
+                    ScopeListElement contentNameScopesList = nameScopesList.Push(_grammar, contentName);
+                    _stack = _stack.setContentNameScopesList(contentNameScopesList);
 
-                    if (pushedRule.endHasBackReferences)
+                    if (pushedRule.EndHasBackReferences)
                     {
-                        stack = stack.SetEndRule(
-                            pushedRule.GetEndWithResolvedBackReferences(lineText, captureIndices));
+                        _stack = _stack.SetEndRule(
+                            pushedRule.GetEndWithResolvedBackReferences(_lineText, captureIndices));
                     }
 
-                    if (!hasAdvanced && beforePush.HasSameRuleAs(stack))
+                    if (!hasAdvanced && beforePush.HasSameRuleAs(_stack))
                     {
                         // Grammar pushed the same rule without advancing
                         System.Diagnostics.Debug.WriteLine("[2] - Grammar is in an endless loop - Grammar pushed the same rule without advancing");
-                        stack = stack.Pop();
-                        lineTokens.Produce(stack, lineLength);
-                        stop = true;
+                        _stack = _stack.Pop();
+                        _lineTokens.Produce(_stack, _lineLength);
+                        _stop = true;
                         return;
                     }
                 }
@@ -183,28 +183,28 @@ namespace TextMateSharp.Internal.Grammars
                     // console.log(' pushing ' + pushedRule.debugName);
                     // }
 
-                    HandleCaptures(grammar, lineText, isFirstLine, stack, lineTokens, pushedRule.beginCaptures,
+                    HandleCaptures(_grammar, _lineText, _isFirstLine, _stack, _lineTokens, pushedRule.BeginCaptures,
                             captureIndices);
-                    lineTokens.Produce(stack, captureIndices[0].GetEnd());
-                    anchorPosition = captureIndices[0].GetEnd();
+                    _lineTokens.Produce(_stack, captureIndices[0].End);
+                    _anchorPosition = captureIndices[0].End;
 
-                    string contentName = pushedRule.GetContentName(lineText, captureIndices);
-                    ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
-                    stack = stack.setContentNameScopesList(contentNameScopesList);
+                    string contentName = pushedRule.GetContentName(_lineText, captureIndices);
+                    ScopeListElement contentNameScopesList = nameScopesList.Push(_grammar, contentName);
+                    _stack = _stack.setContentNameScopesList(contentNameScopesList);
 
-                    if (pushedRule.whileHasBackReferences)
+                    if (pushedRule.WhileHasBackReferences)
                     {
-                        stack = stack.SetEndRule(
-                                pushedRule.getWhileWithResolvedBackReferences(lineText, captureIndices));
+                        _stack = _stack.SetEndRule(
+                                pushedRule.getWhileWithResolvedBackReferences(_lineText, captureIndices));
                     }
 
-                    if (!hasAdvanced && beforePush.HasSameRuleAs(stack))
+                    if (!hasAdvanced && beforePush.HasSameRuleAs(_stack))
                     {
                         // Grammar pushed the same rule without advancing
                         System.Diagnostics.Debug.WriteLine("[3] - Grammar is in an endless loop - Grammar pushed the same rule without advancing");
-                        stack = stack.Pop();
-                        lineTokens.Produce(stack, lineLength);
-                        stop = true;
+                        _stack = _stack.Pop();
+                        _lineTokens.Produce(_stack, _lineLength);
+                        _stop = true;
                         return;
                     }
                 }
@@ -216,30 +216,30 @@ namespace TextMateSharp.Internal.Grammars
                     // matchingRule.debugMatchRegExp);
                     // }
 
-                    HandleCaptures(grammar, lineText, isFirstLine, stack, lineTokens, matchingRule.captures,
+                    HandleCaptures(_grammar, _lineText, _isFirstLine, _stack, _lineTokens, matchingRule.Captures,
                             captureIndices);
-                    lineTokens.Produce(stack, captureIndices[0].GetEnd());
+                    _lineTokens.Produce(_stack, captureIndices[0].End);
 
                     // pop rule immediately since it is a MatchRule
-                    stack = stack.Pop();
+                    _stack = _stack.Pop();
 
                     if (!hasAdvanced)
                     {
                         // Grammar is not advancing, nor is it pushing/popping
                         System.Diagnostics.Debug.WriteLine("[4] - Grammar is in an endless loop - Grammar is not advancing, nor is it pushing/popping");
-                        stack = stack.SafePop();
-                        lineTokens.Produce(stack, lineLength);
-                        stop = true;
+                        _stack = _stack.SafePop();
+                        _lineTokens.Produce(_stack, _lineLength);
+                        _stop = true;
                         return;
                     }
                 }
             }
 
-            if (captureIndices != null && captureIndices.Length > 0 && captureIndices[0].GetEnd() > linePos)
+            if (captureIndices != null && captureIndices.Length > 0 && captureIndices[0].End > _linePos)
             {
                 // Advance stream
-                linePos = captureIndices[0].GetEnd();
-                isFirstLine = false;
+                _linePos = captureIndices[0].End;
+                _isFirstLine = false;
             }
         }
 
@@ -251,18 +251,18 @@ namespace TextMateSharp.Internal.Grammars
             if (rule == null)
                 return null;
 
-            ICompiledRule ruleScanner = rule.Compile(grammar, stack.endRule, isFirstLine, linePos == anchorPosition);
+            ICompiledRule ruleScanner = rule.Compile(grammar, stack.EndRule, isFirstLine, linePos == anchorPosition);
 
             if (ruleScanner == null)
                 return null;
 
-            IOnigNextMatchResult r = ruleScanner.scanner.FindNextMatchSync(lineText, linePos);
+            IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
 
             if (r != null)
             {
                 return new MatchResult(
                     r.GetCaptureIndices(),
-                    ruleScanner.rules[r.GetIndex()]);
+                    ruleScanner.Rules[r.GetIndex()]);
             }
             return null;
         }
@@ -296,11 +296,11 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             // Decide if `matchResult` or `injectionResult` should win
-            int matchResultScore = matchResult.GetCaptureIndices()[0].GetStart();
-            int injectionResultScore = injectionResult.GetCaptureIndices()[0].GetStart();
+            int matchResultScore = matchResult.CaptureIndexes[0].Start;
+            int injectionResultScore = injectionResult.CaptureIndexes[0].Start;
 
             if (injectionResultScore < matchResultScore
-                    || (injectionResult.IsPriorityMatch() && injectionResultScore == matchResultScore))
+                    || (injectionResult.IsPriorityMatch && injectionResultScore == matchResultScore))
             {
                 // injection won!
                 return injectionResult;
@@ -318,7 +318,7 @@ namespace TextMateSharp.Internal.Grammars
             int? bestMatchRuleId = null;
             int bestMatchResultPriority = 0;
 
-            List<string> scopes = stack.contentNameScopesList.GenerateScopes();
+            List<string> scopes = stack.ContentNameScopesList.GenerateScopes();
 
             foreach (Injection injection in injections)
             {
@@ -328,16 +328,16 @@ namespace TextMateSharp.Internal.Grammars
                     continue;
                 }
 
-                ICompiledRule ruleScanner = grammar.GetRule(injection.ruleId).Compile(grammar, null, isFirstLine,
+                ICompiledRule ruleScanner = grammar.GetRule(injection.RuleId).Compile(grammar, null, isFirstLine,
                         linePos == anchorPosition);
-                IOnigNextMatchResult matchResult = ruleScanner.scanner.FindNextMatchSync(lineText, linePos);
+                IOnigNextMatchResult matchResult = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
 
                 if (matchResult == null)
                 {
                     continue;
                 }
 
-                int matchRating = matchResult.GetCaptureIndices()[0].GetStart();
+                int matchRating = matchResult.GetCaptureIndices()[0].Start;
 
                 if (matchRating > bestMatchRating)
                 {
@@ -348,8 +348,8 @@ namespace TextMateSharp.Internal.Grammars
 
                 bestMatchRating = matchRating;
                 bestMatchCaptureIndices = matchResult.GetCaptureIndices();
-                bestMatchRuleId = ruleScanner.rules[matchResult.GetIndex()];
-                bestMatchResultPriority = injection.priority;
+                bestMatchRuleId = ruleScanner.Rules[matchResult.GetIndex()];
+                bestMatchResultPriority = injection.Priority;
 
                 if (bestMatchRating == linePos)
                 {
@@ -383,7 +383,7 @@ namespace TextMateSharp.Internal.Grammars
 
             int len = Math.Min(captures.Count, captureIndices.Length);
             List<LocalStackElement> localStack = new List<LocalStackElement>();
-            int maxEnd = captureIndices[0].GetEnd();
+            int maxEnd = captureIndices[0].End;
             IOnigCaptureIndex captureIndex;
 
             for (int i = 0; i < len; i++)
@@ -397,51 +397,51 @@ namespace TextMateSharp.Internal.Grammars
 
                 captureIndex = captureIndices[i];
 
-                if (captureIndex.GetLength() == 0)
+                if (captureIndex.Length == 0)
                 {
                     // Nothing really captured
                     continue;
                 }
 
-                if (captureIndex.GetStart() > maxEnd)
+                if (captureIndex.Start > maxEnd)
                 {
                     // Capture going beyond consumed string
                     break;
                 }
 
                 // pop captures while needed
-                while (localStack.Count > 0 && localStack[localStack.Count - 1].GetEndPos() <= captureIndex.GetStart())
+                while (localStack.Count > 0 && localStack[localStack.Count - 1].EndPos <= captureIndex.Start)
                 {
                     // pop!
-                    lineTokens.ProduceFromScopes(localStack[localStack.Count - 1].GetScopes(),
-                            localStack[localStack.Count - 1].GetEndPos());
+                    lineTokens.ProduceFromScopes(localStack[localStack.Count - 1].Scopes,
+                            localStack[localStack.Count - 1].EndPos);
                     localStack.RemoveAt(localStack.Count - 1);
                 }
 
                 if (localStack.Count > 0)
                 {
-                    lineTokens.ProduceFromScopes(localStack[localStack.Count - 1].GetScopes(),
-                            captureIndex.GetStart());
+                    lineTokens.ProduceFromScopes(localStack[localStack.Count - 1].Scopes,
+                            captureIndex.Start);
                 }
                 else
                 {
-                    lineTokens.Produce(stack, captureIndex.GetStart());
+                    lineTokens.Produce(stack, captureIndex.Start);
                 }
 
-                if (captureRule.retokenizeCapturedWithRuleId != null)
+                if (captureRule.RetokenizeCapturedWithRuleId != null)
                 {
                     // the capture requires additional matching
                     string scopeName = captureRule.GetName(lineText, captureIndices);
-                    ScopeListElement nameScopesList = stack.contentNameScopesList.Push(grammar, scopeName);
+                    ScopeListElement nameScopesList = stack.ContentNameScopesList.Push(grammar, scopeName);
                     string contentName = captureRule.GetContentName(lineText, captureIndices);
                     ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
 
                     // the capture requires additional matching
-                    StackElement stackClone = stack.Push(captureRule.retokenizeCapturedWithRuleId, captureIndex.GetStart(),
+                    StackElement stackClone = stack.Push(captureRule.RetokenizeCapturedWithRuleId, captureIndex.Start,
                             null, nameScopesList, contentNameScopesList);
                     TokenizeString(grammar,
-                            lineText.SubstringAtIndexes(0, captureIndex.GetEnd()),
-                            (isFirstLine && captureIndex.GetStart() == 0), captureIndex.GetStart(), stackClone, lineTokens);
+                            lineText.SubstringAtIndexes(0, captureIndex.End),
+                            (isFirstLine && captureIndex.Start == 0), captureIndex.Start, stackClone, lineTokens);
                     continue;
                 }
 
@@ -450,18 +450,18 @@ namespace TextMateSharp.Internal.Grammars
                 if (captureRuleScopeName != null)
                 {
                     // push
-                    ScopeListElement baseElement = localStack.Count == 0 ? stack.contentNameScopesList :
-                        localStack[localStack.Count - 1].GetScopes();
+                    ScopeListElement baseElement = localStack.Count == 0 ? stack.ContentNameScopesList :
+                        localStack[localStack.Count - 1].Scopes;
                     ScopeListElement captureRuleScopesList = baseElement.Push(grammar, captureRuleScopeName);
-                    localStack.Add(new LocalStackElement(captureRuleScopesList, captureIndex.GetEnd()));
+                    localStack.Add(new LocalStackElement(captureRuleScopesList, captureIndex.End));
                 }
             }
 
             while (localStack.Count > 0)
             {
                 // pop!
-                lineTokens.ProduceFromScopes(localStack[localStack.Count - 1].GetScopes(),
-                        localStack[localStack.Count - 1].GetEndPos());
+                lineTokens.ProduceFromScopes(localStack[localStack.Count - 1].Scopes,
+                        localStack[localStack.Count - 1].EndPos);
                 localStack.RemoveAt(localStack.Count - 1);
             }
         }
@@ -487,37 +487,37 @@ namespace TextMateSharp.Internal.Grammars
             for (int i = whileRules.Count - 1; i >= 0; i--)
             {
                 WhileStack whileRule = whileRules[i];
-                ICompiledRule ruleScanner = whileRule.rule.CompileWhile(grammar, whileRule.stack.endRule, isFirstLine,
+                ICompiledRule ruleScanner = whileRule.Rule.CompileWhile(grammar, whileRule.Stack.EndRule, isFirstLine,
                         currentanchorPosition == linePos);
-                IOnigNextMatchResult r = ruleScanner.scanner.FindNextMatchSync(lineText, linePos);
+                IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
 
 
                 if (r != null)
                 {
-                    int? matchedRuleId = ruleScanner.rules[r.GetIndex()];
+                    int? matchedRuleId = ruleScanner.Rules[r.GetIndex()];
                     if (matchedRuleId != -2)
                     {
                         // we shouldn't end up here
-                        stack = whileRule.stack.Pop();
+                        stack = whileRule.Stack.Pop();
                         break;
                     }
                     if (r.GetCaptureIndices() != null && r.GetCaptureIndices().Length > 0)
                     {
-                        lineTokens.Produce(whileRule.stack, r.GetCaptureIndices()[0].GetStart());
-                        HandleCaptures(grammar, lineText, isFirstLine, whileRule.stack, lineTokens,
-                                whileRule.rule.whileCaptures, r.GetCaptureIndices());
-                        lineTokens.Produce(whileRule.stack, r.GetCaptureIndices()[0].GetEnd());
-                        currentanchorPosition = r.GetCaptureIndices()[0].GetEnd();
-                        if (r.GetCaptureIndices()[0].GetEnd() > linePos)
+                        lineTokens.Produce(whileRule.Stack, r.GetCaptureIndices()[0].Start);
+                        HandleCaptures(grammar, lineText, isFirstLine, whileRule.Stack, lineTokens,
+                                whileRule.Rule.WhileCaptures, r.GetCaptureIndices());
+                        lineTokens.Produce(whileRule.Stack, r.GetCaptureIndices()[0].End);
+                        currentanchorPosition = r.GetCaptureIndices()[0].End;
+                        if (r.GetCaptureIndices()[0].End > linePos)
                         {
-                            linePos = r.GetCaptureIndices()[0].GetEnd();
+                            linePos = r.GetCaptureIndices()[0].End;
                             isFirstLine = false;
                         }
                     }
                 }
                 else
                 {
-                    stack = whileRule.stack.Pop();
+                    stack = whileRule.Stack.Pop();
                     break;
                 }
             }

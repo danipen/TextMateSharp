@@ -16,10 +16,10 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
 
             Assert.AreEqual(2, captureIndices.Length);
 
-            Assert.AreEqual(0, captureIndices[0].GetStart());
-            Assert.AreEqual(2, captureIndices[0].GetLength());
-            Assert.AreEqual(1, captureIndices[1].GetStart());
-            Assert.AreEqual(1, captureIndices[1].GetLength());
+            Assert.AreEqual(0, captureIndices[0].Start);
+            Assert.AreEqual(2, captureIndices[0].Length);
+            Assert.AreEqual(1, captureIndices[1].Start);
+            Assert.AreEqual(1, captureIndices[1].Length);
         }
 
         [Test]
@@ -32,10 +32,10 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
 
             Assert.AreEqual(2, captureIndices.Length);
 
-            Assert.AreEqual(1, captureIndices[0].GetStart());
-            Assert.AreEqual(3, captureIndices[0].GetLength());
-            Assert.AreEqual(2, captureIndices[1].GetStart());
-            Assert.AreEqual(1, captureIndices[1].GetLength());
+            Assert.AreEqual(1, captureIndices[0].Start);
+            Assert.AreEqual(3, captureIndices[0].Length);
+            Assert.AreEqual(2, captureIndices[1].Start);
+            Assert.AreEqual(1, captureIndices[1].Length);
         }
 
         [Test]
@@ -72,8 +72,8 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
             int index)
         {
             return text.Substring(
-                captures[index].GetStart(),
-                captures[index].GetLength());
+                captures[index].Start,
+                captures[index].Length);
         }
     }
 }
