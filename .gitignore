@@ -377,3 +377,7 @@ onigwrap/src/libonigwrap.so
 .idea/.idea.TextMateSharp.dir/.idea/encodings.xml
 .idea/.idea.TextMateSharp.dir/.idea/indexLayout.xml
 .idea/.idea.TextMateSharp.dir/.idea/vcs.xml
+onigwrap/src/onigwrap.lib
+onigwrap/src/onigwrap.exp
+onigwrap/src/onigwrap.dll
+onigwrap/src/onig_s.lib
