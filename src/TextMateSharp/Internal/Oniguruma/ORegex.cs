@@ -6,6 +6,8 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class ORegex : IDisposable
     {
+        private static object _createRegexSync = new object();
+
         private IntPtr _regex;
         private IntPtr _region;
         private bool _disposed = false;
@@ -28,13 +30,16 @@ namespace TextMateSharp.Internal.Oniguruma
             pattern = UnicodeCharEscape.AddBracesToUnicodePatterns(pattern);
             pattern = UnicodeCharEscape.ConstraintUnicodePatternLenght(pattern);
 
-            fixed (char* patternPtr = pattern)
+            lock (_createRegexSync)
             {
-                _regex = OnigInterop.onigwrap_create(
-                    patternPtr,
-                    Encoding.Unicode.GetByteCount(patternPtr, pattern.Length),
-                    ignoreCaseArg,
-                    multilineArg);
+                fixed (char* patternPtr = pattern)
+                {
+                    _regex = OnigInterop.onigwrap_create(
+                        patternPtr,
+                        Encoding.Unicode.GetByteCount(patternPtr, pattern.Length),
+                        ignoreCaseArg,
+                        multilineArg);
+                }
             }
 
             if (!Valid)
