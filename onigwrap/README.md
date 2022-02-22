@@ -50,6 +50,10 @@ Linux
 
 Build and configure oniguruma [following the instructions](https://github.com/kkos/oniguruma#case-2-manual-compilation-on-linux-unix-and-cygwin-platform) on the Oniguruma repository.
 
+We need to prepare onig for static linking though, so add `-fPIC` to the `CFLAGS`. If your Mono version is 32bit, make sure to add `-m32` to the `CFLAGS` too. (You may need to install a package like `gcc-multilib` to make the build work with `-m32`.)
+
+`./configure "CFLAGS=-fPIC"`
+
 Copy .libs/libonig.a to the onigwrap folder.
 
 Build onigwrap:
