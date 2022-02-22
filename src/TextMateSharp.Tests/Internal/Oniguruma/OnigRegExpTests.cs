@@ -100,5 +100,26 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
                 Assert.IsTrue(oRegex.Valid);
             }
         }
+
+        [Test]
+        public void SearchTwiceTests()
+        {
+            using (OnigRegExp regExp = new OnigRegExp("[A-C]+"))
+            {
+                string str1 = "abcABC123";
+                string str2 = "abc123ABC";
+
+                OnigResult result1 = regExp.Search(str1, 0);
+                OnigResult result2 = regExp.Search(str2, 0);
+
+                Assert.AreEqual(1, result1.Count());
+                Assert.AreEqual(3, result1.LocationAt(0));
+                Assert.AreEqual(3, result1.LengthAt(0));
+
+                Assert.AreEqual(1, result2.Count());
+                Assert.AreEqual(6, result2.LocationAt(0));
+                Assert.AreEqual(3, result2.LengthAt(0));
+            }
+        }
     }
 }
