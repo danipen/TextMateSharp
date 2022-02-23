@@ -13,6 +13,8 @@ TextMateSharp is a port of [microsoft/vscode-textmate](https://github.com/micros
 
 TextMateSharp uses a wrapper around [Oniguruma](https://github.com/kkos/oniguruma) regex engine. Read below to learn how to build Oniguruma bindings.
 
+TextMateSharp is used by [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit).
+
 ## Building
 Just execute `dotnet build` under the folder [TextMateSharp](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp)
 
