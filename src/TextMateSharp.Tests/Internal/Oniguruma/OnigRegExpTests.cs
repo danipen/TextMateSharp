@@ -1,6 +1,4 @@
-﻿using System;
-
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 using TextMateSharp.Internal.Oniguruma;
 
@@ -55,7 +53,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         [Test]
         public void TestUnicodeOnigRegExp4()
         {
-            string text = "string s=\"安\""; ;
+            string text = "string s=\"安\"";
             string pattern = "\\\"[^\"]*\\\"";
 
             using (OnigRegExp regExp = new OnigRegExp(pattern))

@@ -21,7 +21,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 registryOptions.GetDefaultTheme(),
                 registryOptions);
 
-            var rules = theme.Match(new string[] { "keyword.control" });
+            var rules = theme.Match(new[] { "keyword.control" });
 
             Assert.AreEqual(
                 "#C586C0",
@@ -37,7 +37,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 registryOptions.GetDefaultTheme(),
                 registryOptions);
 
-            var rules = theme.Match(new string[]
+            var rules = theme.Match(new[]
             {
                 "keyword.control.directive.include.c",
                 "meta.preprocessor.include.c"
@@ -49,7 +49,7 @@ namespace TextMateSharp.Tests.Internal.Themes
         }
 
         [Test]
-        public void PHPVariableTest()
+        public void PhpVariableTest()
         {
             IRegistryOptions registryOptions = new TestRegistry();
 
@@ -57,7 +57,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 registryOptions.GetDefaultTheme(),
                 registryOptions);
 
-            var rules = theme.Match(new string[]
+            var rules = theme.Match(new[]
             {
                 "string.quoted.double.php",
                 "variable.other.php"
@@ -77,7 +77,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 registryOptions.GetDefaultTheme(),
                 registryOptions);
 
-            var rules = theme.Match(new string[]
+            var rules = theme.Match(new[]
             {
                 "meta.embedded.block.html",
                 "comment.line.double-slash.js"
@@ -97,7 +97,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 registryOptions.GetDefaultTheme(),
                 registryOptions);
 
-            var rules = theme.Match(new string[]
+            var rules = theme.Match(new[]
             {
                 "text.html.basic" ,
                 "meta.embedded.block.html",
@@ -120,7 +120,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 registryOptions.GetDefaultTheme(),
                 registryOptions);
 
-            var rules = theme.Match(new string[]
+            var rules = theme.Match(new[]
             {
                 "source.json",
                 "meta.structure.dictionary.json",
@@ -144,7 +144,7 @@ namespace TextMateSharp.Tests.Internal.Themes
                 registryOptions.GetDefaultTheme(),
                 registryOptions);
 
-            var rules = theme.Match(new string[]
+            var rules = theme.Match(new[]
             {
                 "text.html.basic",
                 "meta.embedded.block.html",

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
+
 using System.Collections.Generic;
 using System.IO;
 using TextMateSharp.Grammars;
@@ -64,11 +64,9 @@ namespace TextMateSharp.Tests.Internal.Grammars
             Registry.Registry registry = new Registry.Registry(
                 new TestRegistry());
 
-            IGrammar grammar = registry.LoadGrammar("source.css");
-
             Theme theme = registry.GetTheme();
             List<ThemeTrieElementRule> themeRules =
-                theme.Match(new string[] { "support.type.property-name.css" });
+                theme.Match(new[] { "support.type.property-name.css" });
 
             string color = theme.GetColor(themeRules[0].foreground);
 
@@ -94,7 +92,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         [Test]
         public void ParseMultilineTokensTest()
         {
-            string[] lines = new string[]
+            string[] lines = new[]
             {
                 "public int Compute()",
                 "{",
@@ -166,9 +164,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         [Test]
         public void TokenizeUnicodeCommentsTest2()
         {
-            // TODO: fix parsing unicode characters
-            string text = "\"安安安\"";
-            //string text = "string s = \"chars: 12345\";";
+            string text = "//安安安";
 
             Registry.Registry registry = new Registry.Registry(
                             new TestRegistry());
@@ -176,6 +172,20 @@ namespace TextMateSharp.Tests.Internal.Grammars
             IGrammar grammar = registry.LoadGrammar("source.cs");
 
             ITokenizeLineResult lineTokens = grammar.TokenizeLine(text);
+            
+            IToken[] tokens = lineTokens.Tokens;
+            
+            Assert.AreEqual(2, tokens.Length);
+            
+            AssertTokenValuesAreEqual(tokens[0],
+                0, 2,
+                "source.cs",
+                "comment.line.double-slash.cs",
+                "punctuation.definition.comment.cs");
+            
+            AssertTokenValuesAreEqual(tokens[1], 
+                2, 5,
+                "source.cs", "comment.line.double-slash.cs");
         }
 
         [Test]

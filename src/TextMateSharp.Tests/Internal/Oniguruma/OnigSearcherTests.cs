@@ -9,7 +9,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         public void TestOnigSearcherNoResult()
         {
             string regexp = "whatever";
-            OnigSearcher searcher = new OnigSearcher(new string[] { regexp });
+            OnigSearcher searcher = new OnigSearcher(new[] { regexp });
 
             string text = "other";
 
@@ -20,7 +20,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         public void TestOnigSearcher()
         {
             string regexp = "[鬼]";
-            OnigSearcher searcher = new OnigSearcher(new string[] { regexp });
+            OnigSearcher searcher = new OnigSearcher(new[] { regexp });
 
             string text = "鬼AAA";
 

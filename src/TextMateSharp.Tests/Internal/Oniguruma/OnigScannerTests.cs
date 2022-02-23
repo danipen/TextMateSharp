@@ -9,7 +9,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         [Test]
         public void TestOnigScanner()
         {
-            OnigScanner scanner = new OnigScanner(new string[] { "c", "a(b)?" });
+            OnigScanner scanner = new OnigScanner(new[] { "c", "a(b)?" });
             IOnigNextMatchResult onigResult = scanner.FindNextMatchSync("abc", 0);
 
             var captureIndices = onigResult.GetCaptureIndices();
@@ -25,7 +25,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         [Test]
         public void TestOnigScanner2()
         {
-            OnigScanner scanner = new OnigScanner(new string[] { "a([b-d])c" });
+            OnigScanner scanner = new OnigScanner(new[] { "a([b-d])c" });
             IOnigNextMatchResult onigResult = scanner.FindNextMatchSync("!abcdef", 0);
 
             var captureIndices = onigResult.GetCaptureIndices();
@@ -44,7 +44,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
             string pattern = "\\b(?:(define)|(undef))\\b\\s*\\b([_[:alpha:]][_[:alnum:]]*)\\b";
             string text = "#define VC7";
 
-            OnigScanner scanner = new OnigScanner(new string[] { pattern });
+            OnigScanner scanner = new OnigScanner(new[] { pattern });
             IOnigNextMatchResult onigResult = scanner.FindNextMatchSync(text, 0);
 
             var captureIndices = onigResult.GetCaptureIndices();
@@ -71,7 +71,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
             string pattern = "a([b-d])\U0001D11E";
             string text = "ab\U0001D11E";
 
-            OnigScanner scanner = new OnigScanner(new string[] { pattern });
+            OnigScanner scanner = new OnigScanner(new[] { pattern });
             IOnigNextMatchResult onigResult = scanner.FindNextMatchSync(text, 0);
 
             var captureIndices = onigResult.GetCaptureIndices();

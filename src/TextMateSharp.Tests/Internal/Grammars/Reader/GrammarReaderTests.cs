@@ -7,7 +7,7 @@ using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Types;
 using TextMateSharp.Tests.Resources;
 
-namespace TextMateSharp.Tests.Internal.Parser.Json
+namespace TextMateSharp.Tests.Internal.Grammars.Reader
 {
     class GrammarReaderTests
     {
@@ -112,7 +112,5 @@ namespace TextMateSharp.Tests.Internal.Parser.Json
                       }
                 }
             }".Replace("'", "\"");
-
-        public int JSONPListParserIRawGrammar { get; private set; }
     }
 }
