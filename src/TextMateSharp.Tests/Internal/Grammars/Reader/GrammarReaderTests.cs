@@ -12,7 +12,7 @@ namespace TextMateSharp.Tests.Internal.Grammars.Reader
     class GrammarReaderTests
     {
         [Test]
-        public void TestReadCharpGrammar()
+        public void Read_Csharp_Grammar_Should_Not_Throw_Any_Exception()
         {
             using (Stream ms = ResourceReader.OpenStream("csharp.tmLanguage.json"))
             using (StreamReader reader = new StreamReader(ms))
@@ -23,7 +23,7 @@ namespace TextMateSharp.Tests.Internal.Grammars.Reader
         }
 
         [Test]
-        public void TestReadSimpleGrammar()
+        public void Read_Csharp_Grammar_Should_Be_Well_Formed()
         {
             using (Stream ms = GenerateStreamFromString(_json))
             using (StreamReader reader = new StreamReader(ms))

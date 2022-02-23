@@ -7,7 +7,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
     class OnigurumaTests
     {
         [Test]
-        public void TestOnigScanner()
+        public void Onig_Scanner_Should_Capture_Indices()
         {
             OnigScanner scanner = new OnigScanner(new[] { "c", "a(b)?" });
             IOnigNextMatchResult onigResult = scanner.FindNextMatchSync("abc", 0);
@@ -23,7 +23,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestOnigScanner2()
+        public void Onig_Scanner_Should_Capture_Indices2()
         {
             OnigScanner scanner = new OnigScanner(new[] { "a([b-d])c" });
             IOnigNextMatchResult onigResult = scanner.FindNextMatchSync("!abcdef", 0);
@@ -39,7 +39,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestOnigScannerText()
+        public void Onig_Scanner_Grammar_Regex_Should_Capture_Indices()
         {
             string pattern = "\\b(?:(define)|(undef))\\b\\s*\\b([_[:alpha:]][_[:alnum:]]*)\\b";
             string text = "#define VC7";
@@ -66,7 +66,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestOnigScannerWithUnicodeBiggerThan2Bytes()
+        public void Onig_Scanner_With_Unicode_Bigger_Than_2_Bytes_Should_Capture_Indices()
         {
             string pattern = "a([b-d])\U0001D11E";
             string text = "ab\U0001D11E";

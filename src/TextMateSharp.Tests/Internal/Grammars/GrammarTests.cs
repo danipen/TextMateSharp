@@ -15,7 +15,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
     class GrammarTests
     {
         [Test]
-        public void ParseSimpleTokensTest()
+        public void Parse_Using_Statement_Should_Generate_Tokens()
         {
             string line = "using System;";
 
@@ -41,7 +41,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void ParseCssTokensTest()
+        public void Parse_Css_Statement_Should_Generate_Tokens()
         {
             string line =
                 "body { margin: 25px; }";
@@ -59,14 +59,14 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TestMatchScopeName()
+        public void Match_Scope_Should_Generate_Empty_Color()
         {
             Registry.Registry registry = new Registry.Registry(
                 new TestRegistry());
 
             Theme theme = registry.GetTheme();
             List<ThemeTrieElementRule> themeRules =
-                theme.Match(new[] { "support.type.property-name.css" });
+                theme.Match(new string[] { "support.type.property-name.css" });
 
             string color = theme.GetColor(themeRules[0].foreground);
 
@@ -74,7 +74,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TestBatchGrammar()
+        public void Parse_Batch_Statement_Should_Generate_Tokens()
         {
             string line =
                 "REM echo off";
@@ -90,9 +90,9 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void ParseMultilineTokensTest()
+        public void Parse_Multiline_Text_Should_Generate_Tokens()
         {
-            string[] lines = new[]
+            string[] lines = new string[]
             {
                 "public int Compute()",
                 "{",
@@ -141,7 +141,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TokenizeUnicodeCommentsTest()
+        public void Parse_Unicode_String_Should_Generate_Tokens()
         {
             string text = "string s = \"chars: 安定させる\";";
 
@@ -162,7 +162,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TokenizeUnicodeCommentsTest2()
+        public void Parse_Unicode_Comments_Should_Generate_Tokens()
         {
             string text = "//安安安";
 
@@ -189,7 +189,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void GrammarInjectionTest()
+        public void Injected_Grammars_Should_Generate_Tokens()
         {
             Registry.Registry registry = new Registry.Registry(
                 new TestRegistry());

@@ -7,7 +7,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
     class OnigRegExpTests
     {
         [Test]
-        public void TestOnigRegExp()
+        public void Basic_Regex_Should_Have_Valid_Location_And_Length()
         {
             using (OnigRegExp regExp = new OnigRegExp("[A-C]+"))
             {
@@ -21,7 +21,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestUnicodeOnigRegExp()
+        public void UTF8_Regex_Should_Have_Valid_Location_And_Length()
         {
             using (OnigRegExp regExp = new OnigRegExp("[á]+"))
             {
@@ -35,7 +35,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestUnicodeOnigRegExp2()
+        public void Unicode_Regex_Should_Have_Valid_Location_And_Length()
         {
             string text = "\"安\"";
             string pattern = "\\\"[^\"]*\\\"";
@@ -51,7 +51,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestUnicodeOnigRegExp4()
+        public void Basic_Regex_Should_Have_Valid_Location_And_Length2()
         {
             string text = "string s=\"安\"";
             string pattern = "\\\"[^\"]*\\\"";
@@ -67,7 +67,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestUnicodeCharsWithoutBraces()
+        public void Unicode_Regex_Without_Braces_Should_Be_Valid()
         {
             string pattern = "[\\xa0-\\xF7]";
 
@@ -78,7 +78,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void ConstraintUnicodePatternLenghtTest()
+        public void Unicode_Regex_With_Constraint_Pattern_Should_Be_Valid()
         {
             string pattern = "(?i)^\\s*(interface)\\s+([a-z_\\x{7f}-\\x{7fffffff}][a-z0-9_\\x{7f}-\\x{7fffffff}]*)\\s*(extends)?\\s*";
 
@@ -89,7 +89,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void UnicodeBiggerThan2Bytes()
+        public void Unicode_Regex_With_Unicode_Chars_Bigger_Than_2_Bytes_Should_Be_Valid()
         {
             string pattern = "\U0001D11E";
 
@@ -100,7 +100,7 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void SearchTwiceTests()
+        public void Search_Twice_In_Regex_Should_Regenerate_Location_And_Length()
         {
             using (OnigRegExp regExp = new OnigRegExp("[A-C]+"))
             {
