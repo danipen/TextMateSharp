@@ -189,6 +189,7 @@ namespace TextMateSharp.Model
                     catch (Exception e)
                     {
                         System.Diagnostics.Debug.WriteLine(e.Message);
+                        lineIndex++;
                         continue;
                     }
 
