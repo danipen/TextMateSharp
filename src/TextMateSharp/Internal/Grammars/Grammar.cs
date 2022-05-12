@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Grammars.Parser;
 using TextMateSharp.Internal.Matcher;
-using TextMateSharp.Internal.Oniguruma;
 using TextMateSharp.Internal.Rules;
 using TextMateSharp.Internal.Types;
 using TextMateSharp.Themes;
@@ -15,6 +14,7 @@ namespace TextMateSharp.Internal.Grammars
     {
         private int? _rootId;
         private int _lastRuleId;
+        private volatile bool _isCompiling;
         private Dictionary<int?, Rule> _ruleId2desc;
         private Dictionary<string, IRawGrammar> _includedGrammars;
         private IGrammarRepository _grammarRepository;
@@ -44,6 +44,8 @@ namespace TextMateSharp.Internal.Grammars
         {
             return this._scopeMetadataProvider.GetMetadataForScope(scope);
         }
+
+        public bool IsCompiling => _isCompiling;
 
         public List<Injection> GetInjections()
         {
@@ -196,8 +198,7 @@ namespace TextMateSharp.Internal.Grammars
         {
             if (this._rootId == null)
             {
-                this._rootId = RuleFactory.GetCompiledRuleId(this._grammar.GetRepository().GetSelf(), this,
-                        this._grammar.GetRepository());
+                GenerateRootId();
             }
 
             bool isFirstLine;
@@ -210,7 +211,9 @@ namespace TextMateSharp.Internal.Grammars
                         rawDefaultMetadata.TokenType, defaultTheme.fontStyle, defaultTheme.foreground,
                         defaultTheme.background);
 
-                string rootScopeName = this.GetRule(this._rootId.Value).GetName(null, null);
+                string rootScopeName = this.GetRule(this._rootId.Value)?.GetName(null, null);
+                if (rootScopeName == null)
+                    return null;
                 ScopeMetadata rawRootMetadata = this._scopeMetadataProvider.GetMetadataForScope(rootScopeName);
                 int rootMetadata = ScopeListElement.mergeMetadata(defaultMetadata, null, rawRootMetadata);
 
@@ -239,6 +242,20 @@ namespace TextMateSharp.Internal.Grammars
                 return new TokenizeLineResult2(lineTokens.GetBinaryResult(nextState, lineLength), nextState);
             }
             return new TokenizeLineResult(lineTokens.GetResult(nextState, lineLength), nextState);
+        }
+
+        private void GenerateRootId()
+        {
+            _isCompiling = true;
+            try
+            {
+                this._rootId = RuleFactory.GetCompiledRuleId(this._grammar.GetRepository().GetSelf(), this,
+                        this._grammar.GetRepository());
+            }
+            finally
+            {
+                _isCompiling = false;
+            }
         }
 
         public string GetName()

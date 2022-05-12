@@ -69,6 +69,13 @@ namespace TextMateSharp.Model
                 {
                     int toProcess = -1;
 
+                    if (model._grammar.IsCompiling)
+                    {
+                        this.model._resetEvent.Reset();
+                        this.model._resetEvent.WaitOne();
+                        continue;
+                    }
+
                     lock (this.model._lock)
                     {
                         if (model._invalidLines.Count > 0)
@@ -174,6 +181,12 @@ namespace TextMateSharp.Model
                 int lineIndex = startIndex;
                 while (lineIndex <= endLineIndex && lineIndex < model._lines.GetNumberOfLines())
                 {
+                    if (model._grammar.IsCompiling)
+                    {
+                        lineIndex++;
+                        continue;
+                    }
+
                     int endStateIndex = lineIndex + 1;
                     LineTokens r = null;
                     string text = null;
