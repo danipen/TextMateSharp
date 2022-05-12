@@ -318,11 +318,14 @@ namespace TextMateSharp.Themes
 
         internal List<ThemeTrieElementRule> Match(string scopeName)
         {
-            if (!this.cache.ContainsKey(scopeName))
+            lock (this.cache)
             {
-                this.cache[scopeName] = this.root.Match(scopeName);
+                if (!this.cache.ContainsKey(scopeName))
+                {
+                    this.cache[scopeName] = this.root.Match(scopeName);
+                }
+                return this.cache[scopeName];
             }
-            return this.cache[scopeName];
         }
 
         internal ThemeTrieElementRule GetDefaults()
