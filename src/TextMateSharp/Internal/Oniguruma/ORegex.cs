@@ -51,7 +51,7 @@ namespace TextMateSharp.Internal.Oniguruma
         /// <param name="text">The text to search</param>
         /// <param name="offset">An offset from which to start</param>
         /// <returns></returns>
-        public unsafe List<ORegexResult> SafeSearch(string text, int offset = 0)
+        public unsafe OnigResult SafeSearch(string text, int offset = 0)
         {
             if (_disposed) throw new ObjectDisposedException("ORegex");
             if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", _regexString));
@@ -72,23 +72,25 @@ namespace TextMateSharp.Internal.Oniguruma
                 }
 
                 var captureCount = OnigInterop.onigwrap_num_regs(_region);
-                var resultList = new List<ORegexResult>(captureCount);
+
+                Region region = null;
+
                 for (var capture = 0; capture < captureCount; capture++)
                 {
                     var pos = OnigInterop.onigwrap_pos(_region, capture);
                     if (capture == 0 && pos < 0)
-                        break;
+                        return null;
 
                     int len = pos == -1 ? 0 : OnigInterop.onigwrap_len(_region, capture);
 
-                    resultList.Add(new ORegexResult()
-                    {
-                        Position = pos,
-                        Length = len
-                    });
+                    if (region == null)
+                        region = new Region(captureCount);
+
+                    region.Start[capture] = pos;
+                    region.End[capture] = pos + len;
                 }
 
-                return resultList;
+                return new OnigResult(region, -1);
             }
         }
 
@@ -119,11 +121,5 @@ namespace TextMateSharp.Internal.Oniguruma
         {
             Dispose(false);
         }
-    }
-
-    public struct ORegexResult
-    {
-        public int Position;
-        public int Length;
     }
 }
