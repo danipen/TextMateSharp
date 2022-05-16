@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 using TextMateSharp.Grammars;
 
@@ -38,6 +39,7 @@ namespace TextMateSharp.Model
             private string name;
             private TMModel model;
             private TMState lastState;
+            private Task task;
 
             public TokenizerThread(string name, TMModel model)
             {
@@ -50,15 +52,18 @@ namespace TextMateSharp.Model
             {
                 IsStopped = false;
 
-                ThreadPool.QueueUserWorkItem(ThreadWorker);
+                task = Task.Run(ThreadWorker);
             }
 
             public void Stop()
             {
                 IsStopped = true;
+                this.model._resetEvent.Set();
+                task.Wait(TimeSpan.FromSeconds(1));
+                task.Dispose();
             }
 
-            void ThreadWorker(object state)
+            void ThreadWorker()
             {
                 if (IsStopped)
                 {
@@ -329,7 +334,6 @@ namespace TextMateSharp.Model
             }
 
             this._thread.Stop();
-            _resetEvent.Set();
             this._thread = null;
         }
 
