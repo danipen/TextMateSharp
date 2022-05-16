@@ -59,8 +59,8 @@ namespace TextMateSharp.Model
             {
                 IsStopped = true;
                 this.model._resetEvent.Set();
-                task.Wait(TimeSpan.FromSeconds(1));
-                task.Dispose();
+                task?.Wait(TimeSpan.FromSeconds(1));
+                task?.Dispose();
             }
 
             void ThreadWorker()
