@@ -181,7 +181,7 @@ namespace TextMateSharp.Model
                 int lineIndex = startIndex;
                 while (lineIndex <= endLineIndex && lineIndex < model._lines.GetNumberOfLines())
                 {
-                    if (model._grammar.IsCompiling)
+                    if (model._grammar != null && model._grammar.IsCompiling)
                     {
                         lineIndex++;
                         continue;
