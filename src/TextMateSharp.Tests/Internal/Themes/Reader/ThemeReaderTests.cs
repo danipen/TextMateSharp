@@ -13,7 +13,7 @@ namespace TextMateSharp.Tests.Internal.Themes.Reader
     class ThemeReaderTests
     {
         [Test]
-        public void TestReadTheme()
+        public void Theme_Should_Generate_Valid_Color_Map()
         {
             Registry.Registry registry = new Registry.Registry(
                 new TestRegistry("dark_vs.json"));
@@ -23,7 +23,7 @@ namespace TextMateSharp.Tests.Internal.Themes.Reader
 
 
         [Test]
-        public void TestIncludeTheme()
+        public void Theme_Include_Should_Add_Color_Map()
         {
             Registry.Registry registry = new Registry.Registry(
                 new TestRegistry("dark_plus.json"));

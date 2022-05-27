@@ -57,20 +57,7 @@ namespace TextMateSharp.Internal.Oniguruma
 
         private OnigResult GetOnigResult(string data, in int position)
         {
-            List<ORegexResult> results = _regex.SafeSearch(data, position);
-
-            if (results == null || results.Count == 0)
-                return null;
-
-            Region region = new Region(results.Count);
-
-            for (int i = 0; i < results.Count; i++)
-            {
-                region.Start[i] = results[i].Position;
-                region.End[i] = results[i].Position + results[i].Length;
-            }
-
-            return new OnigResult(region, -1);
+            return _regex.SafeSearch(data, position);
         }
     }
 }

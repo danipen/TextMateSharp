@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
+
 using System.Collections.Generic;
 using System.IO;
 using TextMateSharp.Grammars;
@@ -15,7 +15,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
     class GrammarTests
     {
         [Test]
-        public void ParseSimpleTokensTest()
+        public void Parse_Using_Statement_Should_Generate_Tokens()
         {
             string line = "using System;";
 
@@ -41,7 +41,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void ParseCssTokensTest()
+        public void Parse_Css_Statement_Should_Generate_Tokens()
         {
             string line =
                 "body { margin: 25px; }";
@@ -59,12 +59,10 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TestMatchScopeName()
+        public void Match_Scope_Should_Generate_Empty_Color()
         {
             Registry.Registry registry = new Registry.Registry(
                 new TestRegistry());
-
-            IGrammar grammar = registry.LoadGrammar("source.css");
 
             Theme theme = registry.GetTheme();
             List<ThemeTrieElementRule> themeRules =
@@ -76,7 +74,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TestBatchGrammar()
+        public void Parse_Batch_Statement_Should_Generate_Tokens()
         {
             string line =
                 "REM echo off";
@@ -92,7 +90,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void ParseMultilineTokensTest()
+        public void Parse_Multiline_Text_Should_Generate_Tokens()
         {
             string[] lines = new string[]
             {
@@ -143,7 +141,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TokenizeUnicodeCommentsTest()
+        public void Parse_Unicode_String_Should_Generate_Tokens()
         {
             string text = "string s = \"chars: 安定させる\";";
 
@@ -164,11 +162,9 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void TokenizeUnicodeCommentsTest2()
+        public void Parse_Unicode_Comments_Should_Generate_Tokens()
         {
-            // TODO: fix parsing unicode characters
-            string text = "\"安安安\"";
-            //string text = "string s = \"chars: 12345\";";
+            string text = "//安安安";
 
             Registry.Registry registry = new Registry.Registry(
                             new TestRegistry());
@@ -176,10 +172,24 @@ namespace TextMateSharp.Tests.Internal.Grammars
             IGrammar grammar = registry.LoadGrammar("source.cs");
 
             ITokenizeLineResult lineTokens = grammar.TokenizeLine(text);
+            
+            IToken[] tokens = lineTokens.Tokens;
+            
+            Assert.AreEqual(2, tokens.Length);
+            
+            AssertTokenValuesAreEqual(tokens[0],
+                0, 2,
+                "source.cs",
+                "comment.line.double-slash.cs",
+                "punctuation.definition.comment.cs");
+            
+            AssertTokenValuesAreEqual(tokens[1], 
+                2, 5,
+                "source.cs", "comment.line.double-slash.cs");
         }
 
         [Test]
-        public void GrammarInjectionTest()
+        public void Injected_Grammars_Should_Generate_Tokens()
         {
             Registry.Registry registry = new Registry.Registry(
                 new TestRegistry());

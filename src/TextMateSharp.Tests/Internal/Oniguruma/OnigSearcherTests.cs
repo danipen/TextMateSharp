@@ -6,10 +6,10 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
     class OnigSearcherTests
     {
         [Test]
-        public void TestOnigSearcherNoResult()
+        public void Onig_Searcher_With_No_Matches_Should_Null_Result()
         {
             string regexp = "whatever";
-            OnigSearcher searcher = new OnigSearcher(new string[] { regexp });
+            OnigSearcher searcher = new OnigSearcher(new[] { regexp });
 
             string text = "other";
 
@@ -17,10 +17,10 @@ namespace TextMateSharp.Tests.Internal.Oniguruma
         }
 
         [Test]
-        public void TestOnigSearcher()
+        public void Onig_Searcher_Should_Return_Valid_Result()
         {
             string regexp = "[鬼]";
-            OnigSearcher searcher = new OnigSearcher(new string[] { regexp });
+            OnigSearcher searcher = new OnigSearcher(new[] { regexp });
 
             string text = "鬼AAA";
 

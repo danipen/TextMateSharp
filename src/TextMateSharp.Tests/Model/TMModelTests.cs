@@ -2,8 +2,6 @@
 
 using NUnit.Framework;
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -14,7 +12,7 @@ using TextMateSharp.Tests.Resources;
 namespace TextMateSharp.Tests.Model
 {
     [TestFixture]
-    internal class TMModelTests
+    internal class TmModelTests
     {
         [Test]
         public void TMModel_Should_Parse_Until_Last_Document_Line()
@@ -35,14 +33,14 @@ namespace TextMateSharp.Tests.Model
                 modelLines.GetNumberOfLines());
             tmModel.AddModelTokensChangedListener(listenerMock);
 
-            while (!listenerMock._finished)
+            while (!listenerMock.Finished)
             {
                 Task.Delay(250).Wait();
             }
 
             Assert.AreEqual(
                 modelLines.GetNumberOfLines(),
-                listenerMock._lastParsedLine);
+                listenerMock.LastParsedLine);
         }
 
         [Test]
@@ -100,9 +98,9 @@ namespace TextMateSharp.Tests.Model
         }
         internal class ModelTokensChangedListenerMock : IModelTokensChangedListener
         {
-            internal volatile bool _finished = false;
-            internal volatile int _lastParsedLine;
-            private int _lineCount;
+            internal volatile bool Finished;
+            internal volatile int LastParsedLine;
+            private readonly int _lineCount;
             internal ModelTokensChangedListenerMock(int lineCount)
             {
                 _lineCount = lineCount;
@@ -111,11 +109,11 @@ namespace TextMateSharp.Tests.Model
             {
                 foreach (var range in e.Ranges)
                 {
-                    _lastParsedLine = range.ToLineNumber;
+                    LastParsedLine = range.ToLineNumber;
 
-                    if (_lastParsedLine >= _lineCount)
+                    if (LastParsedLine >= _lineCount)
                     {
-                        _finished = true;
+                        Finished = true;
                         break;
                     }
                 }
