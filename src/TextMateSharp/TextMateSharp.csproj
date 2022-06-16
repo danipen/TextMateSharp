@@ -36,14 +36,14 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
   </ItemGroup>
 
   <ItemGroup>
-    <!-- native oniguruma library for Windows x86 in nuget package -->
+    <!-- native oniguruma library for Windows-x86 in nuget package -->
     <Content Include="Internal\Oniguruma\Native\win-x86\onigwrap.dll">
       <Link>onigwrap.dll</Link>
       <PackagePath>runtimes/win-x86/native/onigwrap.dll</PackagePath>
       <Pack>true</Pack>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!-- native oniguruma library for Windows x64 in nuget package -->
+    <!-- native oniguruma library for Windows-x64 in nuget package -->
     <Content Include="Internal\Oniguruma\Native\win-x64\onigwrap.dll">
       <Link>onigwrap.dll</Link>
       <PackagePath>runtimes/win-x64/onigwrap.dll</PackagePath>
