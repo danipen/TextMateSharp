@@ -24,12 +24,12 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
       <TargetPath>onigwrap.dll</TargetPath>
     </ContentWithTargetPath>
     <!-- native oniguruma library for Linux -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\osx\libonigwrap.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+    <ContentWithTargetPath Include="Internal\Oniguruma\Native\linux\libonigwrap.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>libonigwrap.so</TargetPath>
     </ContentWithTargetPath>
     <!-- native oniguruma library for macOS -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\linux\libonigwrap.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
+    <ContentWithTargetPath Include="Internal\Oniguruma\Native\osx\libonigwrap.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>libonigwrap.dylib</TargetPath>
     </ContentWithTargetPath>
