@@ -41,7 +41,7 @@ Copy `onig\_s.lib` and `oniguruma.h` to the `src` folder.
 
 Build onigwrap:
 
-`cl.exe /DONIG_EXTERN=extern /D_USRDLL /D_WINDLL onigwrap.c /link /LTCG onig_s.lib /DLL /OUT:onigwrap.dll`
+`cl.exe /DONIG_EXTERN=extern /D_USRDLL /D_WINDLL onigwrap.c /link onig_s.lib /DLL /OUT:onigwrap.dll`
 
 Copy onigwrap.dll to the folder with your binary.
 
