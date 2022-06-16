@@ -19,7 +19,7 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
 
   <ItemGroup>
     <!-- native oniguruma library for Windows -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\win-x64\onigwrap.dll" Condition=" '$(OS)' == 'Windows_NT' ">
+    <ContentWithTargetPath Include="Internal\Oniguruma\Native\win-x86\onigwrap.dll" Condition=" '$(OS)' == 'Windows_NT' ">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>onigwrap.dll</TargetPath>
     </ContentWithTargetPath>
