@@ -9,16 +9,16 @@ namespace TextMateSharp.Internal.Rules
         private class RegExpSourceListAnchorCache
         {
 
-            public ICompiledRule A0_G0;
-            public ICompiledRule A0_G1;
-            public ICompiledRule A1_G0;
-            public ICompiledRule A1_G1;
+            public CompiledRule A0_G0;
+            public CompiledRule A0_G1;
+            public CompiledRule A1_G0;
+            public CompiledRule A1_G1;
 
         }
 
         private List<RegExpSource> _items;
         private bool _hasAnchors;
-        private ICompiledRule _cached;
+        private CompiledRule _cached;
         private RegExpSourceListAnchorCache _anchorCache;
 
         public RegExpSourceList()
@@ -62,7 +62,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public ICompiledRule Compile(IRuleRegistry grammar, bool allowA, bool allowG)
+        public CompiledRule Compile(IRuleRegistry grammar, bool allowA, bool allowG)
         {
             if (!this._hasAnchors)
             {
@@ -73,7 +73,7 @@ namespace TextMateSharp.Internal.Rules
                     {
                         regexps.Add(regExpSource.GetSource());
                     }
-                    this._cached = new ICompiledRule(CreateOnigScanner(regexps.ToArray()), GetRules());
+                    this._cached = new CompiledRule(CreateOnigScanner(regexps.ToArray()), GetRules());
                 }
                 return this._cached;
             }
@@ -112,14 +112,14 @@ namespace TextMateSharp.Internal.Rules
             return this._anchorCache.A0_G0;
         }
 
-        private ICompiledRule ResolveAnchors(bool allowA, bool allowG)
+        private CompiledRule ResolveAnchors(bool allowA, bool allowG)
         {
             List<string> regexps = new List<string>();
             foreach (RegExpSource regExpSource in _items)
             {
                 regexps.Add(regExpSource.ResolveAnchors(allowA, allowG));
             }
-            return new ICompiledRule(CreateOnigScanner(regexps.ToArray()), GetRules());
+            return new CompiledRule(CreateOnigScanner(regexps.ToArray()), GetRules());
         }
 
         private OnigScanner CreateOnigScanner(string[] regexps)

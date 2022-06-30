@@ -44,6 +44,6 @@ namespace TextMateSharp.Internal.Rules
 
         public abstract void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst);
 
-        public abstract ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG);
+        public abstract CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG);
     }
 }

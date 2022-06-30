@@ -21,7 +21,7 @@ namespace TextMateSharp.Internal.Rules
             sourceList.Push(this._match);
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             if (this._cachedCompiledPatterns == null)
             {

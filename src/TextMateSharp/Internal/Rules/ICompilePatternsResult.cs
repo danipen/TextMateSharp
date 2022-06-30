@@ -2,12 +2,12 @@ using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class ICompilePatternsResult
+    public class CompilePatternsResult
     {
         public int?[] Patterns { get; private set; }
         public bool HasMissingPatterns { get; private set; }
 
-        public ICompilePatternsResult(IEnumerable<int?> patterns, bool hasMissingPatterns)
+        public CompilePatternsResult(IEnumerable<int?> patterns, bool hasMissingPatterns)
         {
             HasMissingPatterns = hasMissingPatterns;
             Patterns = new List<int?>(patterns).ToArray();

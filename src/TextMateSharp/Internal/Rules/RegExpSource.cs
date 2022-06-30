@@ -18,7 +18,7 @@ namespace TextMateSharp.Internal.Rules
         private int? _ruleId;
         private bool _hasAnchor;
         private bool _hasBackReferences;
-        private IRegExpSourceAnchorCache _anchorCache;
+        private RegExpSourceAnchorCache _anchorCache;
         private string _source;
 
         public RegExpSource(string regExpSource, int? ruleId) :
@@ -156,7 +156,7 @@ namespace TextMateSharp.Internal.Rules
             });
         }
 
-        private IRegExpSourceAnchorCache BuildAnchorCache()
+        private RegExpSourceAnchorCache BuildAnchorCache()
         {
             StringBuilder A0_G0_result = new StringBuilder();
             StringBuilder A0_G1_result = new StringBuilder();
@@ -206,7 +206,7 @@ namespace TextMateSharp.Internal.Rules
                 }
             }
 
-            return new IRegExpSourceAnchorCache(
+            return new RegExpSourceAnchorCache(
                 A0_G0_result.ToString(),
                 A0_G1_result.ToString(),
                 A1_G0_result.ToString(),

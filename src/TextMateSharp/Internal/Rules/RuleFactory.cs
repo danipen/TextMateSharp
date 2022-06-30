@@ -126,7 +126,7 @@ namespace TextMateSharp.Internal.Rules
             return result;
         }
 
-        private static ICompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
+        private static CompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
             IRawRepository repository)
         {
             List<int?> r = new List<int?>();
@@ -261,7 +261,7 @@ namespace TextMateSharp.Internal.Rules
                 }
             }
 
-            return new ICompilePatternsResult(r, ((patterns != null ? patterns.Count : 0) != r.Count));
+            return new CompilePatternsResult(r, ((patterns != null ? patterns.Count : 0) != r.Count));
         }
             }
 }

@@ -19,7 +19,7 @@ namespace TextMateSharp.Internal.Rules
 
         public BeginWhileRule(int? id, string name, string contentName, string begin,
                 List<CaptureRule> beginCaptures, string whileStr, List<CaptureRule> whileCaptures,
-                ICompilePatternsResult patterns) : base(id, name, contentName)
+                CompilePatternsResult patterns) : base(id, name, contentName)
         {
             _begin = new RegExpSource(begin, this.Id);
             _while = new RegExpSource(whileStr, -2);
@@ -56,7 +56,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             this.Precompile(grammar);
             return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
@@ -71,7 +71,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public ICompiledRule CompileWhile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public CompiledRule CompileWhile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             this.PrecompileWhile();
             if (this._while.HasBackReferences())
