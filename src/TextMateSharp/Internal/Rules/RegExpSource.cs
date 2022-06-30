@@ -216,32 +216,20 @@ namespace TextMateSharp.Internal.Rules
         public string ResolveAnchors(bool allowA, bool allowG)
         {
             if (!this._hasAnchor)
-            {
                 return this._source;
-            }
 
             if (allowA)
             {
                 if (allowG)
-                {
                     return this._anchorCache.A1_G1;
-                }
-                else
-                {
-                    return this._anchorCache.A1_G0;
-                }
+
+                return this._anchorCache.A1_G0;
             }
-            else
-            {
-                if (allowG)
-                {
-                    return this._anchorCache.A0_G1;
-                }
-                else
-                {
-                    return this._anchorCache.A0_G0;
-                }
-            }
+
+            if (allowG)
+                return this._anchorCache.A0_G1;
+
+            return this._anchorCache.A0_G0;
         }
 
         public bool HasAnchor()

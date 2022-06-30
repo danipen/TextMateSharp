@@ -77,52 +77,39 @@ namespace TextMateSharp.Internal.Rules
                 }
                 return this._cached;
             }
-            else
+
+            if (this._anchorCache.A0_G0 == null)
             {
-                if (this._anchorCache.A0_G0 == null)
-                {
-                    this._anchorCache.A0_G0 = (allowA == false && allowG == false) ? this.ResolveAnchors(allowA, allowG)
-                            : null;
-                }
-                if (this._anchorCache.A0_G1 == null)
-                {
-                    this._anchorCache.A0_G1 = (allowA == false && allowG == true) ? this.ResolveAnchors(allowA, allowG)
-                            : null;
-                }
-                if (this._anchorCache.A1_G0 == null)
-                {
-                    this._anchorCache.A1_G0 = (allowA == true && allowG == false) ? this.ResolveAnchors(allowA, allowG)
-                            : null;
-                }
-                if (this._anchorCache.A1_G1 == null)
-                {
-                    this._anchorCache.A1_G1 = (allowA == true && allowG == true) ? this.ResolveAnchors(allowA, allowG)
-                            : null;
-                }
-                if (allowA)
-                {
-                    if (allowG)
-                    {
-                        return this._anchorCache.A1_G1;
-                    }
-                    else
-                    {
-                        return this._anchorCache.A1_G0;
-                    }
-                }
-                else
-                {
-                    if (allowG)
-                    {
-                        return this._anchorCache.A0_G1;
-                    }
-                    else
-                    {
-                        return this._anchorCache.A0_G0;
-                    }
-                }
+                this._anchorCache.A0_G0 = (allowA == false && allowG == false) ? this.ResolveAnchors(allowA, allowG)
+                        : null;
+            }
+            if (this._anchorCache.A0_G1 == null)
+            {
+                this._anchorCache.A0_G1 = (allowA == false && allowG == true) ? this.ResolveAnchors(allowA, allowG)
+                        : null;
+            }
+            if (this._anchorCache.A1_G0 == null)
+            {
+                this._anchorCache.A1_G0 = (allowA == true && allowG == false) ? this.ResolveAnchors(allowA, allowG)
+                        : null;
+            }
+            if (this._anchorCache.A1_G1 == null)
+            {
+                this._anchorCache.A1_G1 = (allowA == true && allowG == true) ? this.ResolveAnchors(allowA, allowG)
+                        : null;
+            }
+            if (allowA)
+            {
+                if (allowG)
+                    return this._anchorCache.A1_G1;
+
+                return this._anchorCache.A1_G0;
             }
 
+            if (allowG)
+                return this._anchorCache.A0_G1;
+
+            return this._anchorCache.A0_G0;
         }
 
         private ICompiledRule ResolveAnchors(bool allowA, bool allowG)
