@@ -16,22 +16,22 @@ namespace TextMateSharp.Internal.Grammars
 	 *     bbbb bbbb bfff ffff ffFF FTTT LLLL LLLL
 	 * - -------------------------------------------
 	 *  - L = LanguageId (8 bits)
-	 *  - T = StandardTokenType (3 bits)
-	 *  - F = FontStyle (3 bits)
+	 *  - T = StandardTokenType (2 bits)
+	 *  - F = FontStyle (4 bits)
 	 *  - f = foreground color (9 bits)
 	 *  - b = background color (9 bits)
 	 */
     public class MetadataConsts
     {
         public static uint LANGUAGEID_MASK = 0b00000000000000000000000011111111;
-        public static uint TOKEN_TYPE_MASK = 0b00000000000000000000011100000000;
-        public static uint FONT_STYLE_MASK = 0b00000000000000000011100000000000;
+        public static uint TOKEN_TYPE_MASK = 0b00000000000000000000001100000000;
+        public static uint FONT_STYLE_MASK = 0b00000000000000000011110000000000;
         public static uint FOREGROUND_MASK = 0b00000000011111111100000000000000;
         public static uint BACKGROUND_MASK = 0b11111111100000000000000000000000;
 
         public const int LANGUAGEID_OFFSET = 0;
         public const int TOKEN_TYPE_OFFSET = 8;
-        public const int FONT_STYLE_OFFSET = 11;
+        public const int FONT_STYLE_OFFSET = 10;
         public const int FOREGROUND_OFFSET = 14;
         public const int BACKGROUND_OFFSET = 23;
     }

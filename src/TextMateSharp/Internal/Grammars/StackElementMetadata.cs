@@ -17,32 +17,32 @@ namespace TextMateSharp.Internal.Grammars
         public static int GetLanguageId(int metadata)
         {
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.LANGUAGEID_MASK) >> MetadataConsts.LANGUAGEID_OFFSET;
+            return (int)((unitValue & MetadataConsts.LANGUAGEID_MASK) >> MetadataConsts.LANGUAGEID_OFFSET);
         }
 
         public static int GetTokenType(int metadata)
         {
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.TOKEN_TYPE_MASK) >> MetadataConsts.TOKEN_TYPE_OFFSET;
+            return (int)((unitValue & MetadataConsts.TOKEN_TYPE_MASK) >> MetadataConsts.TOKEN_TYPE_OFFSET);
         }
 
         public static int GetFontStyle(int metadata)
         {
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.FONT_STYLE_MASK) >> MetadataConsts.FONT_STYLE_OFFSET;
+            return (int)((unitValue & MetadataConsts.FONT_STYLE_MASK) >> MetadataConsts.FONT_STYLE_OFFSET);
         }
 
         public static int GetForeground(int metadata)
         {
 
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.FOREGROUND_MASK) >> MetadataConsts.FOREGROUND_OFFSET;
+            return (int)((unitValue & MetadataConsts.FOREGROUND_MASK) >> MetadataConsts.FOREGROUND_OFFSET);
         }
 
         public static int GetBackground(int metadata)
         {
-            uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.BACKGROUND_MASK) >> MetadataConsts.BACKGROUND_OFFSET;
+            ulong unitValue = (ulong)metadata;
+            return (int)((unitValue & MetadataConsts.BACKGROUND_MASK) >> MetadataConsts.BACKGROUND_OFFSET);
         }
 
         public static int Set(int metadata, int languageId, int tokenType, int fontStyle, int foreground, int background)
