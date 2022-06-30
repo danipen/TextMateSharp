@@ -35,7 +35,7 @@ namespace TextMateSharp.Internal.Rules
                         IRawRepository r = repository;
                         if (desc.GetRepository() != null)
                         {
-                            r = CloneUtils.MergeObjects(repository, desc.GetRepository());
+                            r = repository.Merge(desc.GetRepository());
                         }
                         return new IncludeOnlyRule(desc.GetId(), desc.GetName(), desc.GetContentName(),
                                 RuleFactory.CompilePatterns(desc.GetPatterns(), helper, r));

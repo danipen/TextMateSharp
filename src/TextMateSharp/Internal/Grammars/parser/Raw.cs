@@ -33,6 +33,20 @@ namespace TextMateSharp.Internal.Grammars.Parser
         private static string DOLLAR_BASE = "$base";
         private List<string> fileTypes;
 
+        public IRawRepository Merge(params IRawRepository[] sources)
+        {
+            Raw target = new Raw();
+            foreach (IRawRepository source in sources)
+            {
+                Raw sourceRaw = ((Raw)source);
+                foreach (string key in sourceRaw.Keys)
+                {
+                    target[key] = sourceRaw[key];
+                }
+            }
+            return target;
+        }
+
         public IRawRule GetProp(string name)
         {
             return TryGetObject<IRawRule>(name);
@@ -290,9 +304,46 @@ namespace TextMateSharp.Internal.Grammars.Parser
             return GetProp(captureId);
         }
 
-        public object Clone()
+        public IRawGrammar Clone()
         {
-            return CloneUtils.Clone(this);
+            return (IRawGrammar)Clone(this);
+        }
+
+        public object Clone(object value)
+        {
+            if (value is Raw)
+            {
+                Raw rawToClone = (Raw)value;
+                Raw raw = new Raw();
+
+                foreach (string key in rawToClone.Keys)
+                {
+                    raw[key] = Clone(rawToClone[key]);
+                }
+                return raw;
+            }
+            else if (value is IList)
+            {
+                List<object> result = new List<object>();
+                foreach (object obj in (IList)value)
+                {
+                    result.Add(Clone(obj));
+                }
+                return result;
+            }
+            else if (value is string)
+            {
+                return value;
+            }
+            else if (value is int)
+            {
+                return value;
+            }
+            else if (value is bool)
+            {
+                return value;
+            }
+            return value;
         }
 
         IEnumerator<string> IEnumerable<string>.GetEnumerator()

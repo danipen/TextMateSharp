@@ -9,7 +9,7 @@ namespace TextMateSharp.Internal.Utils
 {
     public static class CloneUtils
     {
-        public static object Clone(object value)
+        /*public static object Clone(object value)
         {
             if (value is Raw)
             {
@@ -44,9 +44,9 @@ namespace TextMateSharp.Internal.Utils
                 return value;
             }
             return value;
-        }
+        }*/
 
-        public static IRawRepository MergeObjects(params IRawRepository[] sources)
+        /*public static IRawRepository MergeObjects(params IRawRepository[] sources)
         {
             Raw target = new Raw();
             foreach (IRawRepository source in sources)
@@ -58,6 +58,6 @@ namespace TextMateSharp.Internal.Utils
                 }
             }
             return target;
-        }
+        }*/
     }
 }
