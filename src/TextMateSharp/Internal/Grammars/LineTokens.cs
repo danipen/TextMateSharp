@@ -68,7 +68,7 @@ namespace TextMateSharp.Internal.Grammars
 
             List<string> scopes = scopesList.GenerateScopes();
 
-            this._tokens.Add(new Token(this._lastTokenEndIndex, endIndex, scopes));
+            this._tokens.Add(new Token(this._lastTokenEndIndex >= 0 ? this._lastTokenEndIndex : 0, endIndex, scopes));
             this._lastTokenEndIndex = endIndex;
         }
 
