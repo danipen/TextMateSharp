@@ -69,7 +69,7 @@ namespace TextMateSharp.Internal.Rules
                     precompiled.SetSource(0, endRegexSource);
                 }
             }
-            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(allowA, allowG);
         }
 
         private RegExpSourceList Precompile(IRuleRegistry grammar)

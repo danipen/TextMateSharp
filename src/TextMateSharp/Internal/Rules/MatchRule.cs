@@ -28,7 +28,7 @@ namespace TextMateSharp.Internal.Rules
                 this._cachedCompiledPatterns = new RegExpSourceList();
                 this.CollectPatternsRecursive(grammar, this._cachedCompiledPatterns, true);
             }
-            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(allowA, allowG);
         }
     }
 }

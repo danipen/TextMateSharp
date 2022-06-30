@@ -62,7 +62,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public CompiledRule Compile(IRuleRegistry grammar, bool allowA, bool allowG)
+        public CompiledRule Compile(bool allowA, bool allowG)
         {
             if (!this._hasAnchors)
             {

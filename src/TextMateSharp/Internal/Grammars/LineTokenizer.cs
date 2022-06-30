@@ -487,7 +487,7 @@ namespace TextMateSharp.Internal.Grammars
             for (int i = whileRules.Count - 1; i >= 0; i--)
             {
                 WhileStack whileRule = whileRules[i];
-                CompiledRule ruleScanner = whileRule.Rule.CompileWhile(grammar, whileRule.Stack.EndRule, isFirstLine,
+                CompiledRule ruleScanner = whileRule.Rule.CompileWhile(whileRule.Stack.EndRule, isFirstLine,
                         currentanchorPosition == linePos);
                 IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
 
