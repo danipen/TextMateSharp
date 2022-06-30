@@ -97,9 +97,8 @@ namespace TextMateSharp.Internal.Grammars
             IOnigCaptureIndex[] captureIndices = r.CaptureIndexes;
             int? matchedRuleId = r.MatchedRuleId;
 
-            bool hasAdvanced = (captureIndices != null && captureIndices.Length > 0)
-                    ? (captureIndices[0].End > _linePos)
-                    : false;
+            bool hasAdvanced = captureIndices != null && captureIndices.Length > 0
+                && captureIndices[0].End > _linePos;
 
             if (matchedRuleId == -1)
             {
@@ -107,9 +106,9 @@ namespace TextMateSharp.Internal.Grammars
                 BeginEndRule poppedRule = (BeginEndRule)_stack.GetRule(_grammar);
 
                 /*
-				 * if (logger.isEnabled()) { logger.log("  popping " + poppedRule.debugName +
-				 * " - " + poppedRule.debugEndRegExp); }
-				 */
+                 * if (logger.isEnabled()) { logger.log("  popping " + poppedRule.debugName +
+                 * " - " + poppedRule.debugEndRegExp); }
+                 */
 
                 _lineTokens.Produce(_stack, captureIndices[0].Start);
                 _stack = _stack.setContentNameScopesList(_stack.NameScopesList);
