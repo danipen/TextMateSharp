@@ -103,6 +103,16 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
+        public void Convert_To_Binary_String_Should_Work()
+        {
+            string binValue1 = StackElementMetadata.ToBinaryStr(StackElementMetadata.Set(0, 0, 0, 0, 0, 511));
+            Assert.AreEqual("11111111100000000000000000000000", binValue1);
+
+            string binValue2 = StackElementMetadata.ToBinaryStr(StackElementMetadata.Set(0, 0, 0, 0, 511, 0));
+            Assert.AreEqual("00000000011111111100000000000000", binValue2);
+        }
+
+        [Test]
         public void Parse_Simple_Tokens_Should_Work()
         {
             string line = "using System;";

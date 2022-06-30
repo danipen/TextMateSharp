@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
@@ -6,12 +10,12 @@ namespace TextMateSharp.Internal.Grammars
     {
         public static string ToBinaryStr(int metadata)
         {
-            /*
-			 * let r = metadata.toString(2); while (r.length < 32) { r = '0' + r; }
-			 * return r;
-			 */
-            // TODO!!!
-            return null;
+            List<char> builder = new List<char>(Convert.ToString((uint)metadata, 2));
+
+            while (builder.Count < 32)
+                builder.Insert(0, '0');
+
+            return new string(builder.ToArray());
         }
 
         public static int GetLanguageId(int metadata)
