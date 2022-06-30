@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-
 using TextMateSharp.Grammars;
-using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Grammars
 {
