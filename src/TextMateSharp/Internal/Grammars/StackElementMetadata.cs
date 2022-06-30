@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
@@ -6,43 +10,43 @@ namespace TextMateSharp.Internal.Grammars
     {
         public static string ToBinaryStr(int metadata)
         {
-            /*
-			 * let r = metadata.toString(2); while (r.length < 32) { r = '0' + r; }
-			 * return r;
-			 */
-            // TODO!!!
-            return null;
+            List<char> builder = new List<char>(Convert.ToString((uint)metadata, 2));
+
+            while (builder.Count < 32)
+                builder.Insert(0, '0');
+
+            return new string(builder.ToArray());
         }
 
         public static int GetLanguageId(int metadata)
         {
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.LANGUAGEID_MASK) >> MetadataConsts.LANGUAGEID_OFFSET;
+            return (int)((unitValue & MetadataConsts.LANGUAGEID_MASK) >> MetadataConsts.LANGUAGEID_OFFSET);
         }
 
         public static int GetTokenType(int metadata)
         {
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.TOKEN_TYPE_MASK) >> MetadataConsts.TOKEN_TYPE_OFFSET;
+            return (int)((unitValue & MetadataConsts.TOKEN_TYPE_MASK) >> MetadataConsts.TOKEN_TYPE_OFFSET);
         }
 
         public static int GetFontStyle(int metadata)
         {
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.FONT_STYLE_MASK) >> MetadataConsts.FONT_STYLE_OFFSET;
+            return (int)((unitValue & MetadataConsts.FONT_STYLE_MASK) >> MetadataConsts.FONT_STYLE_OFFSET);
         }
 
         public static int GetForeground(int metadata)
         {
 
             uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.FOREGROUND_MASK) >> MetadataConsts.FOREGROUND_OFFSET;
+            return (int)((unitValue & MetadataConsts.FOREGROUND_MASK) >> MetadataConsts.FOREGROUND_OFFSET);
         }
 
         public static int GetBackground(int metadata)
         {
-            uint unitValue = (uint)metadata;
-            return (int)(unitValue & MetadataConsts.BACKGROUND_MASK) >> MetadataConsts.BACKGROUND_OFFSET;
+            ulong unitValue = (ulong)metadata;
+            return (int)((unitValue & MetadataConsts.BACKGROUND_MASK) >> MetadataConsts.BACKGROUND_OFFSET);
         }
 
         public static int Set(int metadata, int languageId, int tokenType, int fontStyle, int foreground, int background)

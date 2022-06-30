@@ -61,13 +61,13 @@ namespace TextMateSharp.Internal.Matcher
             while (matcher != null)
             {
                 matchers.Add(matcher);
-                if (_token.Equals("|") || _token.Equals(","))
+                if ("|".Equals(_token) || ",".Equals(_token))
                 {
                     do
                     {
                         _token = _tokenizer.Next();
-                    } while (_token.Equals("|") || _token.Equals(",")); // ignore subsequent
-                                                                      // commas
+                    } while ("|".Equals(_token) || ",".Equals(_token)); // ignore subsequent
+                    // commas
                 }
                 else
                 {

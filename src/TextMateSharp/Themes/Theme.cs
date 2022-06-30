@@ -161,17 +161,20 @@ namespace TextMateSharp.Themes
                     string[] segments = ((string)settingsFontStyle).Split(new[] { " " }, StringSplitOptions.None);
                     foreach (string segment in segments)
                     {
-                        if ("italic".Equals(segment))
+                        switch (segment)
                         {
-                            fontStyle = fontStyle | FontStyle.Italic;
-                        }
-                        else if ("bold".Equals(segment))
-                        {
-                            fontStyle = fontStyle | FontStyle.Bold;
-                        }
-                        else if ("underline".Equals(segment))
-                        {
-                            fontStyle = fontStyle | FontStyle.Underline;
+                            case "italic":
+                                fontStyle = fontStyle | FontStyle.Italic;
+                                break;
+                            case "bold":
+                                fontStyle = fontStyle | FontStyle.Bold;
+                                break;
+                            case "underline":
+                                fontStyle = fontStyle | FontStyle.Underline;
+                                break;
+                            case "strikethrough":
+                                fontStyle = fontStyle | FontStyle.Strikethrough;
+                                break;
                         }
                     }
                 }

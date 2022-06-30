@@ -25,13 +25,9 @@ namespace TextMateSharp.Internal.Oniguruma
         {
             int bytes = _region.Start[index];
             if (bytes > 0)
-            {
                 return bytes;
-            }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         public int Count()
@@ -43,13 +39,9 @@ namespace TextMateSharp.Internal.Oniguruma
         {
             int bytes = _region.End[index] - _region.Start[index];
             if (bytes > 0)
-            {
                 return bytes;
-            }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
     }
 }

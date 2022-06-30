@@ -18,7 +18,7 @@ namespace TextMateSharp.Internal.Rules
         private RegExpSourceList _cachedCompiledPatterns;
 
         public BeginEndRule(int? id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
-            string end, List<CaptureRule> endCaptures, bool applyEndPatternLast, ICompilePatternsResult patterns)
+            string end, List<CaptureRule> endCaptures, bool applyEndPatternLast, CompilePatternsResult patterns)
             : base(id, name, contentName)
         {
             _begin = new RegExpSource(begin, this.Id);
@@ -55,7 +55,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             RegExpSourceList precompiled = this.Precompile(grammar);
             if (this._end.HasBackReferences())
@@ -69,7 +69,7 @@ namespace TextMateSharp.Internal.Rules
                     precompiled.SetSource(0, endRegexSource);
                 }
             }
-            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(allowA, allowG);
         }
 
         private RegExpSourceList Precompile(IRuleRegistry grammar)

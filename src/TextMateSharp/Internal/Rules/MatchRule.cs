@@ -21,14 +21,14 @@ namespace TextMateSharp.Internal.Rules
             sourceList.Push(this._match);
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             if (this._cachedCompiledPatterns == null)
             {
                 this._cachedCompiledPatterns = new RegExpSourceList();
                 this.CollectPatternsRecursive(grammar, this._cachedCompiledPatterns, true);
             }
-            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(allowA, allowG);
         }
     }
 }

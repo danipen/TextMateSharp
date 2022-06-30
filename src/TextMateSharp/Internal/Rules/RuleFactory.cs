@@ -35,7 +35,7 @@ namespace TextMateSharp.Internal.Rules
                         IRawRepository r = repository;
                         if (desc.GetRepository() != null)
                         {
-                            r = CloneUtils.MergeObjects(repository, desc.GetRepository());
+                            r = repository.Merge(desc.GetRepository());
                         }
                         return new IncludeOnlyRule(desc.GetId(), desc.GetName(), desc.GetContentName(),
                                 RuleFactory.CompilePatterns(desc.GetPatterns(), helper, r));
@@ -126,7 +126,7 @@ namespace TextMateSharp.Internal.Rules
             return result;
         }
 
-        private static ICompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
+        private static CompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
             IRawRepository repository)
         {
             List<int?> r = new List<int?>();
@@ -261,7 +261,7 @@ namespace TextMateSharp.Internal.Rules
                 }
             }
 
-            return new ICompilePatternsResult(r, ((patterns != null ? patterns.Count : 0) != r.Count));
+            return new CompilePatternsResult(r, ((patterns != null ? patterns.Count : 0) != r.Count));
         }
             }
 }
