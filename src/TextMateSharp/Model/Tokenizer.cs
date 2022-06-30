@@ -57,7 +57,6 @@ namespace TextMateSharp.Model
                 }
             }
             return new LineTokens(tokens, offsetDelta + line.Length, freshState);
-
         }
 
         private string DecodeTextMateToken(DecodeMap decodeMap, List<string> scopes)

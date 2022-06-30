@@ -97,19 +97,9 @@ namespace TextMateSharp.Internal.Grammars.Parser
             return TryGetObject<string>(CONTENT_NAME);
         }
 
-        public void SetContentName(string name)
-        {
-            this[CONTENT_NAME] = name;
-        }
-
         public string GetMatch()
         {
             return TryGetObject<string>(MATCH);
-        }
-
-        public void SetMatch(string match)
-        {
-            this[MATCH] = match;
         }
 
         public IRawCaptures GetCaptures()
@@ -134,19 +124,9 @@ namespace TextMateSharp.Internal.Grammars.Parser
             }
         }
 
-        public void SetCaptures(IRawCaptures captures)
-        {
-            this[CAPTURES] = captures;
-        }
-
         public string GetBegin()
         {
             return TryGetObject<string>(BEGIN);
-        }
-
-        public void SetBegin(string begin)
-        {
-            this[BEGIN] = begin;
         }
 
         public string GetWhile()
@@ -180,20 +160,10 @@ namespace TextMateSharp.Internal.Grammars.Parser
             return TryGetObject<string>(END);
         }
 
-        public void SetEnd(string end)
-        {
-            this[END] = end;
-        }
-
         public IRawCaptures GetEndCaptures()
         {
             UpdateCaptures(END_CAPTURES);
             return TryGetObject<IRawCaptures>(END_CAPTURES);
-        }
-
-        public void SetEndCaptures(IRawCaptures endCaptures)
-        {
-            this[END_CAPTURES] = endCaptures;
         }
 
         public IRawCaptures GetWhileCaptures()

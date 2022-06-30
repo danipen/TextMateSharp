@@ -18,19 +18,11 @@ namespace TextMateSharp.Internal.Types
 
         string GetContentName();
 
-        void SetContentName(string name);
-
         string GetMatch();
-
-        void SetMatch(string match);
 
         IRawCaptures GetCaptures();
 
-        void SetCaptures(IRawCaptures captures);
-
         string GetBegin();
-
-        void SetBegin(string begin);
 
         IRawCaptures GetBeginCaptures();
 
@@ -38,13 +30,9 @@ namespace TextMateSharp.Internal.Types
 
         string GetEnd();
 
-        void SetEnd(string end);
-
         string GetWhile();
 
         IRawCaptures GetEndCaptures();
-
-        void SetEndCaptures(IRawCaptures endCaptures);
 
         IRawCaptures GetWhileCaptures();
 
@@ -57,7 +45,5 @@ namespace TextMateSharp.Internal.Types
         void SetRepository(IRawRepository repository);
 
         bool IsApplyEndPatternLast();
-
-        void SetApplyEndPatternLast(bool applyEndPatternLast);
     }
 }
