@@ -18,6 +18,38 @@ namespace TextMateSharp.Internal.Grammars
             Metadata = metadata;
         }
 
+        private static bool StructuralEquals(ScopeListElement a, ScopeListElement b)
+        {
+            do
+            {
+                if (a == b)
+                {
+                    return true;
+                }
+
+                if (a == null && b == null)
+                {
+                    // End of list reached for both
+                    return true;
+                }
+
+                if (a == null || b == null)
+                {
+                    // End of list reached only for one
+                    return false;
+                }
+
+                if (a.Scope != b.Scope || a.Metadata != b.Metadata)
+                {
+                    return false;
+                }
+
+                // Go to previous pair
+                a = a.Parent;
+                b = b.Parent;
+            } while (true);
+        }
+
         private static bool Equals(ScopeListElement a, ScopeListElement b)
         {
             if (a == b)
@@ -28,31 +60,22 @@ namespace TextMateSharp.Internal.Grammars
             {
                 return false;
             }
-            return Object.Equals(a.Scope, b.Scope) && a.Metadata == b.Metadata && Equals(a.Parent, b.Parent);
+            return StructuralEquals(a, b);
         }
 
         public override bool Equals(object other)
         {
-            if (other == this)
-            {
-                return true;
-            }
-            if (other == null)
-            {
+            if (other == null || (other is ScopeListElement))
                 return false;
-            }
-            if (!(other is ScopeListElement))
-            {
-                return false;
-            }
-            return ScopeListElement.Equals(this, (ScopeListElement)other);
+
+            return Equals(this, (ScopeListElement)other);
         }
 
         public override int GetHashCode()
         {
-            return Scope.GetHashCode() +
-                    Metadata.GetHashCode() +
-                Parent.GetHashCode();
+            return Parent.GetHashCode() +
+                   Scope.GetHashCode() +
+                   Metadata.GetHashCode();
         }
 
 
@@ -91,7 +114,7 @@ namespace TextMateSharp.Internal.Grammars
             return false;
         }
 
-        public static int mergeMetadata(int metadata, ScopeListElement scopesList, ScopeMetadata source)
+        public static int MergeMetadata(int metadata, ScopeListElement scopesList, ScopeMetadata source)
         {
             if (source == null)
             {
@@ -126,7 +149,7 @@ namespace TextMateSharp.Internal.Grammars
             foreach (string scope in scopes)
             {
                 ScopeMetadata rawMetadata = grammar.GetMetadataForScope(scope);
-                int metadata = ScopeListElement.mergeMetadata(target.Metadata, target, rawMetadata);
+                int metadata = ScopeListElement.MergeMetadata(target.Metadata, target, rawMetadata);
                 target = new ScopeListElement(target, scope, metadata);
             }
             return target;

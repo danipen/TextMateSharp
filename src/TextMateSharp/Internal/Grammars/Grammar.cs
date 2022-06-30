@@ -215,7 +215,7 @@ namespace TextMateSharp.Internal.Grammars
                 if (rootScopeName == null)
                     return null;
                 ScopeMetadata rawRootMetadata = this._scopeMetadataProvider.GetMetadataForScope(rootScopeName);
-                int rootMetadata = ScopeListElement.mergeMetadata(defaultMetadata, null, rawRootMetadata);
+                int rootMetadata = ScopeListElement.MergeMetadata(defaultMetadata, null, rawRootMetadata);
 
                 ScopeListElement scopeList = new ScopeListElement(null, rootScopeName, rootMetadata);
 
