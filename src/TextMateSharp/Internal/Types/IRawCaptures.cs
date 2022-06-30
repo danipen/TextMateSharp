@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+
 namespace TextMateSharp.Internal.Types
 {
-    public interface IRawCaptures : IBaseRaw
+    public interface IRawCaptures : IEnumerable<string>
     {
         IRawRule GetCapture(string captureId);
     }
