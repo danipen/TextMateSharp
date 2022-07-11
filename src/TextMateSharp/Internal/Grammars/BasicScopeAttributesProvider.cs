@@ -5,10 +5,10 @@ using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class ScopeMetadataProvider
+    public class BasicScopeAttributesProvider
     {
 
-        private static ScopeMetadata _NULL_SCOPE_METADATA = new ScopeMetadata("", 0, 0, null);
+        private static BasicScopeAttributes _NULL_SCOPE_METADATA = new BasicScopeAttributes("", 0, 0, null);
 
         private static Regex STANDARD_TOKEN_TYPE_REGEXP = new Regex("\\b(comment|string|regex)\\b");
         private const string COMMENT_TOKEN_TYPE = "comment";
@@ -18,17 +18,17 @@ namespace TextMateSharp.Internal.Grammars
 
         private int _initialLanguage;
         private IThemeProvider _themeProvider;
-        private Dictionary<string, ScopeMetadata> _cache = new Dictionary<string, ScopeMetadata>();
-        private ScopeMetadata _defaultMetaData;
+        private Dictionary<string, BasicScopeAttributes> _cache = new Dictionary<string, BasicScopeAttributes>();
+        private BasicScopeAttributes _defaultMetaData;
         private Dictionary<string, int> _embeddedLanguages;
         private Regex _embeddedLanguagesRegex;
 
-        public ScopeMetadataProvider(int initialLanguage, IThemeProvider themeProvider,
+        public BasicScopeAttributesProvider(int initialLanguage, IThemeProvider themeProvider,
             Dictionary<string, int> embeddedLanguages)
         {
             this._initialLanguage = initialLanguage;
             this._themeProvider = themeProvider;
-            this._defaultMetaData = new ScopeMetadata(
+            this._defaultMetaData = new BasicScopeAttributes(
                 "",
                 this._initialLanguage,
                 OptionalStandardTokenType.NotSet,
@@ -67,14 +67,14 @@ namespace TextMateSharp.Internal.Grammars
         public void OnDidChangeTheme()
         {
             this._cache.Clear();
-            this._defaultMetaData = new ScopeMetadata(
+            this._defaultMetaData = new BasicScopeAttributes(
                 "",
                 this._initialLanguage,
                 OptionalStandardTokenType.NotSet,
                 new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
         }
 
-        public ScopeMetadata GetDefaultMetadata()
+        public BasicScopeAttributes GetDefaultMetadata()
         {
             return this._defaultMetaData;
         }
@@ -85,13 +85,13 @@ namespace TextMateSharp.Internal.Grammars
             return value; //value.replace(/[\-\\\{\}\*\+\?\|\^\$\.\,\[\]\(\)\#\s]/g, '\\$&');
         }
 
-        public ScopeMetadata GetMetadataForScope(string scopeName)
+        public BasicScopeAttributes GetMetadataForScope(string scopeName)
         {
             if (scopeName == null)
             {
-                return ScopeMetadataProvider._NULL_SCOPE_METADATA;
+                return BasicScopeAttributesProvider._NULL_SCOPE_METADATA;
             }
-            ScopeMetadata value;
+            BasicScopeAttributes value;
             this._cache.TryGetValue(scopeName, out value);
             if (value != null)
             {
@@ -102,13 +102,13 @@ namespace TextMateSharp.Internal.Grammars
             return value;
         }
 
-        private ScopeMetadata DoGetMetadataForScope(string scopeName)
+        private BasicScopeAttributes DoGetMetadataForScope(string scopeName)
         {
             int languageId = this.ScopeToLanguage(scopeName);
-            int standardTokenType = ScopeMetadataProvider.ToStandardTokenType(scopeName);
+            int standardTokenType = BasicScopeAttributesProvider.ToStandardTokenType(scopeName);
             List<ThemeTrieElementRule> themeData = this._themeProvider.ThemeMatch(new string[] { scopeName });
 
-            return new ScopeMetadata(scopeName, languageId, standardTokenType, themeData);
+            return new BasicScopeAttributes(scopeName, languageId, standardTokenType, themeData);
         }
 
         private int ScopeToLanguage(string scope)

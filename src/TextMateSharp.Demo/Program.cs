@@ -51,7 +51,7 @@ namespace TextMateSharp
 
                 int tokenizeIni = Environment.TickCount;
 
-                IStackElement? ruleStack = null;
+                IStateStack? ruleStack = null;
 
                 using (StreamReader sr = new StreamReader(fileToParse))
                 {

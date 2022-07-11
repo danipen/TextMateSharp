@@ -6,7 +6,7 @@ using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public static class StackElementMetadata
+    public static class EncodedTokenAttributes
     {
         public static string ToBinaryStr(int metadata)
         {

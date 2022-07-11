@@ -21,7 +21,7 @@ namespace TextMateSharp.Internal.Grammars
         private IGrammarRepository _grammarRepository;
         private IRawGrammar _rawGrammar;
         private List<Injection> _injections;
-        private ScopeMetadataProvider _scopeMetadataProvider;
+        private BasicScopeAttributesProvider _scopeMetadataProvider;
         private List<TokenTypeMatcher> _tokenTypeMatchers;
         private BalancedBracketSelectors _balancedBracketSelectors;
 
@@ -36,7 +36,7 @@ namespace TextMateSharp.Internal.Grammars
             IThemeProvider themeProvider)
         {
             _rootScopeName = scopeName;
-            _scopeMetadataProvider = new ScopeMetadataProvider(initialLanguage, themeProvider, embeddedLanguages);
+            _scopeMetadataProvider = new BasicScopeAttributesProvider(initialLanguage, themeProvider, embeddedLanguages);
             _balancedBracketSelectors = balancedBracketSelectors;
             _rootId = null;
             _lastRuleId = 0;
@@ -53,7 +53,7 @@ namespace TextMateSharp.Internal.Grammars
             this._scopeMetadataProvider.OnDidChangeTheme();
         }
 
-        public ScopeMetadata GetMetadataForScope(string scope)
+        public BasicScopeAttributes GetMetadataForScope(string scope)
         {
             return this._scopeMetadataProvider.GetMetadataForScope(scope);
         }
@@ -205,9 +205,9 @@ namespace TextMateSharp.Internal.Grammars
             return TokenizeLine(lineText, null);
         }
 
-        public ITokenizeLineResult TokenizeLine(string lineText, IStackElement prevState)
+        public ITokenizeLineResult TokenizeLine(string lineText, IStateStack prevState)
         {
-            return (ITokenizeLineResult)Tokenize(lineText, (StackElement)prevState, false);
+            return (ITokenizeLineResult)Tokenize(lineText, (StateStack)prevState, false);
         }
 
         public ITokenizeLineResult2 TokenizeLine2(string lineText)
@@ -215,12 +215,12 @@ namespace TextMateSharp.Internal.Grammars
             return TokenizeLine2(lineText, null);
         }
 
-        public ITokenizeLineResult2 TokenizeLine2(string lineText, IStackElement prevState)
+        public ITokenizeLineResult2 TokenizeLine2(string lineText, IStateStack prevState)
         {
-            return (ITokenizeLineResult2)Tokenize(lineText, (StackElement)prevState, true);
+            return (ITokenizeLineResult2)Tokenize(lineText, (StateStack)prevState, true);
         }
 
-        private object Tokenize(string lineText, StackElement prevState, bool emitBinaryTokens)
+        private object Tokenize(string lineText, StateStack prevState, bool emitBinaryTokens)
         {
             if (this._rootId == null)
             {
@@ -228,24 +228,24 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             bool isFirstLine;
-            if (prevState == null || prevState.Equals(StackElement.NULL))
+            if (prevState == null || prevState.Equals(StateStack.NULL))
             {
                 isFirstLine = true;
-                ScopeMetadata rawDefaultMetadata = this._scopeMetadataProvider.GetDefaultMetadata();
+                BasicScopeAttributes rawDefaultMetadata = this._scopeMetadataProvider.GetDefaultMetadata();
                 ThemeTrieElementRule defaultTheme = rawDefaultMetadata.ThemeData[0];
-                int defaultMetadata = StackElementMetadata.Set(0, rawDefaultMetadata.LanguageId,
+                int defaultMetadata = EncodedTokenAttributes.Set(0, rawDefaultMetadata.LanguageId,
                         rawDefaultMetadata.TokenType, null, defaultTheme.fontStyle, defaultTheme.foreground,
                         defaultTheme.background);
 
                 string rootScopeName = this.GetRule(this._rootId)?.GetName(null, null);
                 if (rootScopeName == null)
                     return null;
-                ScopeMetadata rawRootMetadata = this._scopeMetadataProvider.GetMetadataForScope(rootScopeName);
-                int rootMetadata = ScopeListElement.MergeMetadata(defaultMetadata, null, rawRootMetadata);
+                BasicScopeAttributes rawRootMetadata = this._scopeMetadataProvider.GetMetadataForScope(rootScopeName);
+                int rootMetadata = AttributedScopeStack.MergeMetadata(defaultMetadata, null, rawRootMetadata);
 
-                ScopeListElement scopeList = new ScopeListElement(null, rootScopeName, rootMetadata);
+                AttributedScopeStack scopeList = new AttributedScopeStack(null, rootScopeName, rootMetadata);
 
-                prevState = new StackElement(null, this._rootId, -1, -1, false, null, scopeList, scopeList);
+                prevState = new StateStack(null, this._rootId, -1, -1, false, null, scopeList, scopeList);
             }
             else
             {
@@ -260,7 +260,7 @@ namespace TextMateSharp.Internal.Grammars
             }
             int lineLength = lineText.Length;
             LineTokens lineTokens = new LineTokens(emitBinaryTokens, lineText, _tokenTypeMatchers, _balancedBracketSelectors);
-            StackElement nextState = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
+            StateStack nextState = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
                 lineTokens, true);
 
             if (emitBinaryTokens)

@@ -9,8 +9,8 @@ namespace TextMateSharp.Grammars
         string GetScopeName();
         ICollection<string> GetFileTypes();
         ITokenizeLineResult TokenizeLine(string lineText);
-        ITokenizeLineResult TokenizeLine(string lineText, IStackElement prevState);
+        ITokenizeLineResult TokenizeLine(string lineText, IStateStack prevState);
         ITokenizeLineResult2 TokenizeLine2(string lineText);
-        ITokenizeLineResult2 TokenizeLine2(string lineText, IStackElement prevState);
+        ITokenizeLineResult2 TokenizeLine2(string lineText, IStateStack prevState);
     }
 }

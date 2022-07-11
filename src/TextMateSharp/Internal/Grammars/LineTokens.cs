@@ -43,12 +43,12 @@ namespace TextMateSharp.Internal.Grammars
             this._balancedBracketSelectors = balancedBracketSelectors;
         }
 
-        public void Produce(StackElement stack, int endIndex)
+        public void Produce(StateStack stack, int endIndex)
         {
             this.ProduceFromScopes(stack.ContentNameScopesList, endIndex);
         }
 
-        public void ProduceFromScopes(ScopeListElement scopesList, int endIndex)
+        public void ProduceFromScopes(AttributedScopeStack scopesList, int endIndex)
         {
             if (this._lastTokenEndIndex >= endIndex)
             {
@@ -75,7 +75,7 @@ namespace TextMateSharp.Internal.Grammars
                     {
                         if (tokenType.Matcher.Invoke(scopes2))
                         {
-                            metadata = StackElementMetadata.Set(
+                            metadata = EncodedTokenAttributes.Set(
                                     metadata,
                                     0,
                                     tokenType.Type, // toOptionalTokenType(tokenType.type),
@@ -93,7 +93,7 @@ namespace TextMateSharp.Internal.Grammars
 
                 if (containsBalancedBrackets)
                 {
-                    metadata = StackElementMetadata.Set(
+                    metadata = EncodedTokenAttributes.Set(
                             metadata,
                             0,
                             OptionalStandardTokenType.NotSet,
@@ -128,7 +128,7 @@ namespace TextMateSharp.Internal.Grammars
         }
 
 
-        public IToken[] GetResult(StackElement stack, int lineLength)
+        public IToken[] GetResult(StateStack stack, int lineLength)
         {
             if (this._tokens.Count != 0 && this._tokens[this._tokens.Count - 1].StartIndex == lineLength - 1)
             {
@@ -146,7 +146,7 @@ namespace TextMateSharp.Internal.Grammars
             return this._tokens.ToArray();
         }
 
-        public int[] GetBinaryResult(StackElement stack, int lineLength)
+        public int[] GetBinaryResult(StateStack stack, int lineLength)
         {
             if (this.binaryTokens.Count != 0 && this.binaryTokens[this.binaryTokens.Count - 2] == lineLength - 1)
             {

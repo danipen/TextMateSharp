@@ -6,35 +6,35 @@ using TextMateSharp.Internal.Rules;
 
 namespace TextMateSharp.Grammars
 {
-    public interface IStackElement
+    public interface IStateStack
     {
         int Depth { get; }
     }
 
-    public class StackElement : IStackElement
+    public class StateStack : IStateStack
     {
-        public static StackElement NULL = new StackElement(null, RuleId.NO_RULE, 0, 0, false, null, null, null);
+        public static StateStack NULL = new StateStack(null, RuleId.NO_RULE, 0, 0, false, null, null, null);
 
-        public StackElement Parent { get; private set; }
+        public StateStack Parent { get; private set; }
         public int Depth { get; private set; }
         public RuleId RuleId { get; private set; }
         public string EndRule { get; private set; }
-        public ScopeListElement NameScopesList { get; private set; }
-        public ScopeListElement ContentNameScopesList { get; private set; }
+        public AttributedScopeStack NameScopesList { get; private set; }
+        public AttributedScopeStack ContentNameScopesList { get; private set; }
         public bool BeginRuleCapturedEOL { get; private set; }
 
         private int _enterPosition;
         private int _anchorPos;
 
-        public StackElement(
-            StackElement parent,
+        public StateStack(
+            StateStack parent,
             RuleId ruleId,
             int enterPos,
             int anchorPos,
             bool beginRuleCapturedEOL,
             string endRule,
-            ScopeListElement nameScopesList,
-            ScopeListElement contentNameScopesList)
+            AttributedScopeStack nameScopesList,
+            AttributedScopeStack contentNameScopesList)
         {
             Parent = parent;
             Depth = (this.Parent != null ? this.Parent.Depth + 1 : 1);
@@ -48,7 +48,7 @@ namespace TextMateSharp.Grammars
             _anchorPos = anchorPos;
         }
 
-        private static bool StructuralEquals(StackElement a, StackElement b)
+        private static bool StructuralEquals(StateStack a, StateStack b)
         {
             if (a == b)
             {
@@ -71,10 +71,10 @@ namespace TextMateSharp.Grammars
             {
                 return false;
             }
-            if (!(other is StackElement)) {
+            if (!(other is StateStack)) {
                 return false;
             }
-            StackElement stackElement = (StackElement)other;
+            StateStack stackElement = (StateStack)other;
             return StructuralEquals(this, stackElement) && this.ContentNameScopesList.Equals(stackElement.ContentNameScopesList);
         }
 
@@ -89,7 +89,7 @@ namespace TextMateSharp.Grammars
 
         public void Reset()
         {
-            StackElement el = this;
+            StateStack el = this;
             while (el != null)
             {
                 el._enterPosition = -1;
@@ -97,12 +97,12 @@ namespace TextMateSharp.Grammars
             }
         }
 
-        public StackElement Pop()
+        public StateStack Pop()
         {
             return this.Parent;
         }
 
-        public StackElement SafePop()
+        public StateStack SafePop()
         {
             if (this.Parent != null)
             {
@@ -111,16 +111,16 @@ namespace TextMateSharp.Grammars
             return this;
         }
 
-        public StackElement Push(
+        public StateStack Push(
             RuleId ruleId,
             int enterPos,
             int anchorPos,
             bool beginRuleCapturedEOL,
             string endRule,
-            ScopeListElement nameScopesList,
-            ScopeListElement contentNameScopesList)
+            AttributedScopeStack nameScopesList,
+            AttributedScopeStack contentNameScopesList)
         {
-            return new StackElement(
+            return new StateStack(
                 this,
                 ruleId,
                 enterPos,
@@ -158,7 +158,7 @@ namespace TextMateSharp.Grammars
             return '[' + string.Join(", ", r) + ']';
         }
 
-        public StackElement setContentNameScopesList(ScopeListElement contentNameScopesList)
+        public StateStack setContentNameScopesList(AttributedScopeStack contentNameScopesList)
         {
             if (this.ContentNameScopesList.Equals(contentNameScopesList))
             {
@@ -174,13 +174,13 @@ namespace TextMateSharp.Grammars
                 contentNameScopesList);
         }
 
-        public StackElement SetEndRule(string endRule)
+        public StateStack SetEndRule(string endRule)
         {
             if (this.EndRule != null && this.EndRule.Equals(endRule))
             {
                 return this;
             }
-            return new StackElement(
+            return new StateStack(
                 this.Parent,
                 this.RuleId,
                 this._enterPosition,
@@ -191,7 +191,7 @@ namespace TextMateSharp.Grammars
                 this.ContentNameScopesList);
         }
 
-        public bool HasSameRuleAs(StackElement other)
+        public bool HasSameRuleAs(StateStack other)
         {
             return this.RuleId == other.RuleId;
         }

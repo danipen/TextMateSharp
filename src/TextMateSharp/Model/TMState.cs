@@ -5,20 +5,20 @@ namespace TextMateSharp.Model
     public class TMState
     {
         private TMState _parentEmbedderState;
-        private IStackElement _ruleStack;
+        private IStateStack _ruleStack;
 
-        public TMState(TMState parentEmbedderState, IStackElement ruleStatck)
+        public TMState(TMState parentEmbedderState, IStateStack ruleStatck)
         {
             this._parentEmbedderState = parentEmbedderState;
             this._ruleStack = ruleStatck;
         }
 
-        public void SetRuleStack(IStackElement ruleStack)
+        public void SetRuleStack(IStateStack ruleStack)
         {
             this._ruleStack = ruleStack;
         }
 
-        public IStackElement GetRuleStack()
+        public IStateStack GetRuleStack()
         {
             return _ruleStack;
         }

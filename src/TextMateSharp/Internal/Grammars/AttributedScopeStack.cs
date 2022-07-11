@@ -5,20 +5,20 @@ using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class ScopeListElement
+    public class AttributedScopeStack
     {
-        public ScopeListElement Parent { get; private set; }
+        public AttributedScopeStack Parent { get; private set; }
         public string Scope { get; private set; }
         public int Metadata { get; private set; }
 
-        public ScopeListElement(ScopeListElement parent, string scope, int metadata)
+        public AttributedScopeStack(AttributedScopeStack parent, string scope, int metadata)
         {
             Parent = parent;
             Scope = scope;
             Metadata = metadata;
         }
 
-        private static bool StructuralEquals(ScopeListElement a, ScopeListElement b)
+        private static bool StructuralEquals(AttributedScopeStack a, AttributedScopeStack b)
         {
             do
             {
@@ -50,7 +50,7 @@ namespace TextMateSharp.Internal.Grammars
             } while (true);
         }
 
-        private static bool Equals(ScopeListElement a, ScopeListElement b)
+        private static bool Equals(AttributedScopeStack a, AttributedScopeStack b)
         {
             if (a == b)
             {
@@ -65,10 +65,10 @@ namespace TextMateSharp.Internal.Grammars
 
         public override bool Equals(object other)
         {
-            if (other == null || (other is ScopeListElement))
+            if (other == null || (other is AttributedScopeStack))
                 return false;
 
-            return Equals(this, (ScopeListElement)other);
+            return Equals(this, (AttributedScopeStack)other);
         }
 
         public override int GetHashCode()
@@ -84,7 +84,7 @@ namespace TextMateSharp.Internal.Grammars
             return (selector.Equals(scope) || scope.StartsWith(selectorWithDot));
         }
 
-        static bool Matches(ScopeListElement target, List<string> parentScopes)
+        static bool Matches(AttributedScopeStack target, List<string> parentScopes)
         {
             if (parentScopes == null)
             {
@@ -114,7 +114,7 @@ namespace TextMateSharp.Internal.Grammars
             return false;
         }
 
-        public static int MergeMetadata(int metadata, ScopeListElement scopesList, ScopeMetadata source)
+        public static int MergeMetadata(int metadata, AttributedScopeStack scopesList, BasicScopeAttributes source)
         {
             if (source == null)
             {
@@ -140,22 +140,22 @@ namespace TextMateSharp.Internal.Grammars
                 }
             }
 
-            return StackElementMetadata.Set(metadata, source.LanguageId, source.TokenType, null,
+            return EncodedTokenAttributes.Set(metadata, source.LanguageId, source.TokenType, null,
                 fontStyle, foreground, background);
         }
 
-        private static ScopeListElement Push(ScopeListElement target, Grammar grammar, List<string> scopes)
+        private static AttributedScopeStack Push(AttributedScopeStack target, Grammar grammar, List<string> scopes)
         {
             foreach (string scope in scopes)
             {
-                ScopeMetadata rawMetadata = grammar.GetMetadataForScope(scope);
-                int metadata = ScopeListElement.MergeMetadata(target.Metadata, target, rawMetadata);
-                target = new ScopeListElement(target, scope, metadata);
+                BasicScopeAttributes rawMetadata = grammar.GetMetadataForScope(scope);
+                int metadata = AttributedScopeStack.MergeMetadata(target.Metadata, target, rawMetadata);
+                target = new AttributedScopeStack(target, scope, metadata);
             }
             return target;
         }
 
-        public ScopeListElement Push(Grammar grammar, string scope)
+        public AttributedScopeStack Push(Grammar grammar, string scope)
         {
             if (scope == null)
             {
@@ -170,7 +170,7 @@ namespace TextMateSharp.Internal.Grammars
             return Push(this, grammar, new List<string>() { scope });
         }
 
-        private static List<string> GenerateScopes(ScopeListElement scopesList)
+        private static List<string> GenerateScopes(AttributedScopeStack scopesList)
         {
             List<string> result = new List<string>();
             while (scopesList != null)
@@ -184,7 +184,7 @@ namespace TextMateSharp.Internal.Grammars
 
         public List<string> GenerateScopes()
         {
-            return ScopeListElement.GenerateScopes(this);
+            return AttributedScopeStack.GenerateScopes(this);
         }
     }
 }
