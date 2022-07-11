@@ -232,7 +232,7 @@ namespace TextMateSharp.Internal.Grammars
 
                 ScopeListElement scopeList = new ScopeListElement(null, rootScopeName, rootMetadata);
 
-                prevState = new StackElement(null, this._rootId, -1, null, scopeList, scopeList);
+                prevState = new StackElement(null, this._rootId, -1, -1, false, null, scopeList, scopeList);
             }
             else
             {

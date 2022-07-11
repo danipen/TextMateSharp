@@ -13,7 +13,7 @@ namespace TextMateSharp.Grammars
 
     public class StackElement : IStackElement
     {
-        public static StackElement NULL = new StackElement(null, RuleId.NO_RULE, 0, null, null, null);
+        public static StackElement NULL = new StackElement(null, RuleId.NO_RULE, 0, 0, false, null, null, null);
 
         public StackElement Parent { get; private set; }
         public int Depth { get; private set; }
@@ -21,13 +21,17 @@ namespace TextMateSharp.Grammars
         public string EndRule { get; private set; }
         public ScopeListElement NameScopesList { get; private set; }
         public ScopeListElement ContentNameScopesList { get; private set; }
+        public bool BeginRuleCapturedEOL { get; private set; }
 
         private int _enterPosition;
+        private int _anchorPos;
 
         public StackElement(
             StackElement parent,
             RuleId ruleId,
             int enterPos,
+            int anchorPos,
+            bool beginRuleCapturedEOL,
             string endRule,
             ScopeListElement nameScopesList,
             ScopeListElement contentNameScopesList)
@@ -35,11 +39,13 @@ namespace TextMateSharp.Grammars
             Parent = parent;
             Depth = (this.Parent != null ? this.Parent.Depth + 1 : 1);
             RuleId = ruleId;
+            BeginRuleCapturedEOL = beginRuleCapturedEOL;
             EndRule = endRule;
             NameScopesList = nameScopesList;
             ContentNameScopesList = contentNameScopesList;
 
             _enterPosition = enterPos;
+            _anchorPos = anchorPos;
         }
 
         private static bool StructuralEquals(StackElement a, StackElement b)
@@ -105,9 +111,24 @@ namespace TextMateSharp.Grammars
             return this;
         }
 
-        public StackElement Push(RuleId ruleId, int enterPos, string endRule, ScopeListElement nameScopesList, ScopeListElement contentNameScopesList)
+        public StackElement Push(
+            RuleId ruleId,
+            int enterPos,
+            int anchorPos,
+            bool beginRuleCapturedEOL,
+            string endRule,
+            ScopeListElement nameScopesList,
+            ScopeListElement contentNameScopesList)
         {
-            return new StackElement(this, ruleId, enterPos, endRule, nameScopesList, contentNameScopesList);
+            return new StackElement(
+                this,
+                ruleId,
+                enterPos,
+                anchorPos,
+                beginRuleCapturedEOL,
+                endRule,
+                nameScopesList,
+                contentNameScopesList);
         }
 
         public int GetEnterPos()
@@ -143,7 +164,14 @@ namespace TextMateSharp.Grammars
             {
                 return this;
             }
-            return this.Parent.Push(this.RuleId, this._enterPosition, this.EndRule, this.NameScopesList, contentNameScopesList);
+            return this.Parent.Push(
+                this.RuleId,
+                this._enterPosition,
+                this._anchorPos,
+                this.BeginRuleCapturedEOL,
+                this.EndRule,
+                this.NameScopesList,
+                contentNameScopesList);
         }
 
         public StackElement SetEndRule(string endRule)
@@ -152,7 +180,15 @@ namespace TextMateSharp.Grammars
             {
                 return this;
             }
-            return new StackElement(this.Parent, this.RuleId, this._enterPosition, endRule, this.NameScopesList, this.ContentNameScopesList);
+            return new StackElement(
+                this.Parent,
+                this.RuleId,
+                this._enterPosition,
+                this._anchorPos,
+                this.BeginRuleCapturedEOL,
+                endRule,
+                this.NameScopesList,
+                this.ContentNameScopesList);
         }
 
         public bool HasSameRuleAs(StackElement other)

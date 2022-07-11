@@ -11,36 +11,6 @@ namespace TextMateSharp.Internal.Grammars
 {
     class LineTokenizer
     {
-        class WhileStack
-        {
-
-            public StackElement Stack { get; private set; }
-            public BeginWhileRule Rule { get; private set; }
-
-            public WhileStack(StackElement stack, BeginWhileRule rule)
-            {
-                Stack = stack;
-                Rule = rule;
-            }
-        }
-
-        class WhileCheckResult
-        {
-
-            public StackElement Stack { get; private set; }
-            public int LinePos { get; private set; }
-            public int AnchorPosition { get; private set; }
-            public bool IsFirstLine { get; private set; }
-
-            public WhileCheckResult(StackElement stack, int linePos, int anchorPosition, bool isFirstLine)
-            {
-                Stack = stack;
-                LinePos = linePos;
-                AnchorPosition = anchorPosition;
-                IsFirstLine = isFirstLine;
-            }
-        }
-
         private Grammar _grammar;
         private string _lineText;
         private bool _isFirstLine;
@@ -147,7 +117,14 @@ namespace TextMateSharp.Internal.Grammars
                 // push it on the stack rule
                 string scopeName = rule.GetName(_lineText, captureIndices);
                 ScopeListElement nameScopesList = _stack.ContentNameScopesList.Push(_grammar, scopeName);
-                _stack = _stack.Push(matchedRuleId, _linePos, null, nameScopesList, nameScopesList);
+                _stack = _stack.Push(
+                    matchedRuleId,
+                    _linePos,
+                    _anchorPosition,
+                    captureIndices[0].End == _lineText.Length,
+                    null,
+                    nameScopesList,
+                    nameScopesList);
 
                 if (rule is BeginEndRule)
                 {
@@ -439,8 +416,15 @@ namespace TextMateSharp.Internal.Grammars
                     ScopeListElement contentNameScopesList = nameScopesList.Push(grammar, contentName);
 
                     // the capture requires additional matching
-                    StackElement stackClone = stack.Push(captureRule.RetokenizeCapturedWithRuleId, captureIndex.Start,
-                            null, nameScopesList, contentNameScopesList);
+                    StackElement stackClone = stack.Push(
+                        captureRule.RetokenizeCapturedWithRuleId,
+                        captureIndex.Start,
+                        -1,
+                        false,
+                        null,
+                        nameScopesList,
+                        contentNameScopesList);
+
                     TokenizeString(grammar,
                             lineText.SubstringAtIndexes(0, captureIndex.End),
                             (isFirstLine && captureIndex.Start == 0), captureIndex.Start, stackClone, lineTokens, false);
@@ -476,7 +460,7 @@ namespace TextMateSharp.Internal.Grammars
         private WhileCheckResult CheckWhileConditions(Grammar grammar, string lineText, bool isFirstLine,
                 int linePos, StackElement stack, LineTokens lineTokens)
         {
-            int currentanchorPosition = -1;
+            int anchorPosition = stack.BeginRuleCapturedEOL ? 0 : -1;
             List<WhileStack> whileRules = new List<WhileStack>();
             for (StackElement node = stack; node != null; node = node.Pop())
             {
@@ -490,14 +474,13 @@ namespace TextMateSharp.Internal.Grammars
             {
                 WhileStack whileRule = whileRules[i];
                 CompiledRule ruleScanner = whileRule.Rule.CompileWhile(whileRule.Stack.EndRule, isFirstLine,
-                        currentanchorPosition == linePos);
+                        anchorPosition == linePos);
                 IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
-
 
                 if (r != null)
                 {
                     RuleId matchedRuleId = ruleScanner.Rules[r.GetIndex()];
-                    if (!RuleId.WHILE_RULE.Equals(matchedRuleId))
+                    if (RuleId.WHILE_RULE.NotEquals(matchedRuleId))
                     {
                         // we shouldn't end up here
                         stack = whileRule.Stack.Pop();
@@ -509,7 +492,7 @@ namespace TextMateSharp.Internal.Grammars
                         HandleCaptures(grammar, lineText, isFirstLine, whileRule.Stack, lineTokens,
                                 whileRule.Rule.WhileCaptures, r.GetCaptureIndices());
                         lineTokens.Produce(whileRule.Stack, r.GetCaptureIndices()[0].End);
-                        currentanchorPosition = r.GetCaptureIndices()[0].End;
+                        anchorPosition = r.GetCaptureIndices()[0].End;
                         if (r.GetCaptureIndices()[0].End > linePos)
                         {
                             linePos = r.GetCaptureIndices()[0].End;
@@ -524,13 +507,41 @@ namespace TextMateSharp.Internal.Grammars
                 }
             }
 
-            return new WhileCheckResult(stack, linePos, currentanchorPosition, isFirstLine);
+            return new WhileCheckResult(stack, linePos, anchorPosition, isFirstLine);
         }
 
         public static StackElement TokenizeString(Grammar grammar, string lineText, bool isFirstLine, int linePos,
                 StackElement stack, LineTokens lineTokens, bool checkWhileConditions)
         {
             return new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens).Scan(checkWhileConditions);
+        }
+
+        class WhileStack
+        {
+            public StackElement Stack { get; private set; }
+            public BeginWhileRule Rule { get; private set; }
+
+            public WhileStack(StackElement stack, BeginWhileRule rule)
+            {
+                Stack = stack;
+                Rule = rule;
+            }
+        }
+
+        class WhileCheckResult
+        {
+            public StackElement Stack { get; private set; }
+            public int LinePos { get; private set; }
+            public int AnchorPosition { get; private set; }
+            public bool IsFirstLine { get; private set; }
+
+            public WhileCheckResult(StackElement stack, int linePos, int anchorPosition, bool isFirstLine)
+            {
+                Stack = stack;
+                LinePos = linePos;
+                AnchorPosition = anchorPosition;
+                IsFirstLine = isFirstLine;
+            }
         }
     }
 }
