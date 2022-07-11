@@ -1,3 +1,5 @@
+using System;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using TextMateSharp.Internal.Oniguruma;
@@ -9,6 +11,48 @@ namespace TextMateSharp.Internal.Utils
 
         private static Regex CAPTURING_REGEX_SOURCE = new Regex(
                 "\\$(\\d+)|\\$\\{(\\d+):\\/(downcase|upcase)}");
+
+        public static string EscapeRegExpCharacters(string value)
+        {
+            int valueLen = value.Length;
+            var sb = new StringBuilder(valueLen);
+            for (int i = 0; i < valueLen; i++)
+            {
+                char ch = value[i];
+                switch (ch)
+                {
+                    case '-':
+                    case '\\':
+                    case '{':
+                    case '}':
+                    case '*':
+                    case '+':
+                    case '?':
+                    case '|':
+                    case '^':
+                    case '$':
+                    case '.':
+                    case ',':
+                    case '[':
+                    case ']':
+                    case '(':
+                    case ')':
+                    case '#':
+                        /* escaping white space chars is actually not necessary:
+                        case ' ':
+                        case '\t':
+                        case '\n':
+                        case '\f':
+                        case '\r':
+                        case 0x0B: // vertical tab \v
+                        */
+                        sb.Append('\\');
+                        break;
+                }
+                sb.Append(ch);
+            }
+            return sb.ToString();
+        }
 
         public static bool HasCaptures(string regexSource)
         {

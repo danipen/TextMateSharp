@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
+using TextMateSharp.Internal.Utils;
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
@@ -8,7 +10,7 @@ namespace TextMateSharp.Internal.Grammars
     public class BasicScopeAttributesProvider
     {
 
-        private static BasicScopeAttributes _NULL_SCOPE_METADATA = new BasicScopeAttributes("", 0, 0, null);
+        private static BasicScopeAttributes _NULL_SCOPE_METADATA = new BasicScopeAttributes(0, 0, null);
 
         private static Regex STANDARD_TOKEN_TYPE_REGEXP = new Regex("\\b(comment|string|regex)\\b");
 
@@ -25,7 +27,6 @@ namespace TextMateSharp.Internal.Grammars
             this._initialLanguage = initialLanguage;
             this._themeProvider = themeProvider;
             this._defaultMetaData = new BasicScopeAttributes(
-                "",
                 this._initialLanguage,
                 OptionalStandardTokenType.NotSet,
                 new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
@@ -43,28 +44,29 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             // create the regex
-            /*var escapedScopes = this._embeddedLanguages.keySet().stream()
-                .map(ScopeMetadataProvider::escapeRegExpCharacters)
-                .collect(Collectors.toSet());*/
+            var escapedScopes = this._embeddedLanguages.Keys.Select(s => RegexSource.EscapeRegExpCharacters(s)).ToList();
 
-            //if (escapedScopes.isEmpty()) {
+            if (escapedScopes.Count == 0)
+            {
                 // no scopes registered
-            this._embeddedLanguagesRegex = null;
-            //} else {
-                // TODO!!!
-                //this.embeddedLanguagesRegex = null;
-                // escapedScopes.sort();
-                // escapedScopes.reverse();
-                // this._embeddedLanguagesRegex = new
-                // RegExp(`^((${escapedScopes.join(')|(')}))($|\\.)`, '');
-            //}
+                this._embeddedLanguagesRegex = null;
+            }
+            else
+            {
+                List<string> reversedScopes = new List<string>(escapedScopes);
+                reversedScopes.Sort();
+                reversedScopes.Reverse();
+                this._embeddedLanguagesRegex = new Regex(
+                    "^((" +
+                    string.Join(")|(", escapedScopes) +
+                    "))($|\\.)");
+            }
         }
 
         public void OnDidChangeTheme()
         {
             this._cache.Clear();
             this._defaultMetaData = new BasicScopeAttributes(
-                "",
                 this._initialLanguage,
                 OptionalStandardTokenType.NotSet,
                 new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
@@ -73,12 +75,6 @@ namespace TextMateSharp.Internal.Grammars
         public BasicScopeAttributes GetDefaultMetadata()
         {
             return this._defaultMetaData;
-        }
-
-        private static string EscapeRegExpCharacters(string value)
-        {
-            // TODO!!!
-            return value; //value.replace(/[\-\\\{\}\*\+\?\|\^\$\.\,\[\]\(\)\#\s]/g, '\\$&');
         }
 
         public BasicScopeAttributes GetMetadataForScope(string scopeName)
@@ -104,7 +100,7 @@ namespace TextMateSharp.Internal.Grammars
             int standardTokenType = BasicScopeAttributesProvider.ToStandardTokenType(scopeName);
             List<ThemeTrieElementRule> themeData = this._themeProvider.ThemeMatch(new string[] { scopeName });
 
-            return new BasicScopeAttributes(scopeName, languageId, standardTokenType, themeData);
+            return new BasicScopeAttributes(languageId, standardTokenType, themeData);
         }
 
         private int ScopeToLanguage(string scope)
