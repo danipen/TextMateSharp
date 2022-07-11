@@ -3,7 +3,7 @@ using TextMateSharp.Internal.Rules;
 
 namespace TextMateSharp.Internal.Matcher
 {
-    class MatchResult : IMatchResult
+    class MatchResult
     {
         public IOnigCaptureIndex[] CaptureIndexes { get; private set; }
         public RuleId MatchedRuleId { get; private set; }

@@ -57,7 +57,7 @@ namespace TextMateSharp.Internal.Grammars
 
         private void ScanNext()
         {
-            IMatchResult r = MatchRuleOrInjections(_grammar, _lineText, _isFirstLine, _linePos, _stack, _anchorPosition);
+            MatchResult r = MatchRuleOrInjections(_grammar, _lineText, _isFirstLine, _linePos, _stack, _anchorPosition);
 
             if (r == null)
             {
@@ -245,7 +245,7 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        private IMatchResult MatchRule(Grammar grammar, string lineText, in bool isFirstLine, in int linePos,
+        private MatchResult MatchRule(Grammar grammar, string lineText, in bool isFirstLine, in int linePos,
                 StateStack stack, in int anchorPosition)
         {
             Rule rule = stack.GetRule(grammar);
@@ -269,11 +269,11 @@ namespace TextMateSharp.Internal.Grammars
             return null;
         }
 
-        private IMatchResult MatchRuleOrInjections(Grammar grammar, string lineText, bool isFirstLine,
+        private MatchResult MatchRuleOrInjections(Grammar grammar, string lineText, bool isFirstLine,
             in int linePos, StateStack stack, in int anchorPosition)
         {
             // Look for normal grammar rule
-            IMatchResult matchResult = MatchRule(grammar, lineText, isFirstLine, linePos, stack, anchorPosition);
+            MatchResult matchResult = MatchRule(grammar, lineText, isFirstLine, linePos, stack, anchorPosition);
 
             // Look for injected rules
             List<Injection> injections = grammar.GetInjections();
@@ -283,7 +283,7 @@ namespace TextMateSharp.Internal.Grammars
                 return matchResult;
             }
 
-            IMatchInjectionsResult injectionResult = MatchInjections(injections, grammar, lineText, isFirstLine, linePos,
+            MatchInjectionsResult injectionResult = MatchInjections(injections, grammar, lineText, isFirstLine, linePos,
                     stack, anchorPosition);
             if (injectionResult == null)
             {
@@ -311,7 +311,7 @@ namespace TextMateSharp.Internal.Grammars
             return matchResult;
         }
 
-        private IMatchInjectionsResult MatchInjections(List<Injection> injections, Grammar grammar, string lineText,
+        private MatchInjectionsResult MatchInjections(List<Injection> injections, Grammar grammar, string lineText,
                 bool isFirstLine, in int linePos, StateStack stack, in int anchorPosition)
         {
             // The lower the better
