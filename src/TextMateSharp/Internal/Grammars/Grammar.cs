@@ -192,9 +192,9 @@ namespace TextMateSharp.Internal.Grammars
             return TokenizeLine(lineText, null);
         }
 
-        public ITokenizeLineResult TokenizeLine(string lineText, StackElement prevState)
+        public ITokenizeLineResult TokenizeLine(string lineText, IStackElement prevState)
         {
-            return (ITokenizeLineResult)Tokenize(lineText, prevState, false);
+            return (ITokenizeLineResult)Tokenize(lineText, (StackElement)prevState, false);
         }
 
         public ITokenizeLineResult2 TokenizeLine2(string lineText)
@@ -202,9 +202,9 @@ namespace TextMateSharp.Internal.Grammars
             return TokenizeLine2(lineText, null);
         }
 
-        public ITokenizeLineResult2 TokenizeLine2(string lineText, StackElement prevState)
+        public ITokenizeLineResult2 TokenizeLine2(string lineText, IStackElement prevState)
         {
-            return (ITokenizeLineResult2)Tokenize(lineText, prevState, true);
+            return (ITokenizeLineResult2)Tokenize(lineText, (StackElement)prevState, true);
         }
 
         private object Tokenize(string lineText, StackElement prevState, bool emitBinaryTokens)

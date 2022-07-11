@@ -207,7 +207,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             List<IToken> tokens = new List<IToken>();
 
-            StackElement ruleStack = null;
+            IStackElement ruleStack = null;
 
             foreach (string line in lines)
             {

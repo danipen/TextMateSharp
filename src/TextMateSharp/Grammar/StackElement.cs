@@ -6,7 +6,12 @@ using TextMateSharp.Internal.Rules;
 
 namespace TextMateSharp.Grammars
 {
-    public class StackElement
+    public interface IStackElement
+    {
+        int Depth { get; }
+    }
+
+    public class StackElement : IStackElement
     {
         public static StackElement NULL = new StackElement(null, 0, 0, null, null, null);
 

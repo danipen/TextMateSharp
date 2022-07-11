@@ -36,7 +36,7 @@ namespace TextMateSharp.Model
                 line = line.Substring(0, maxLen);
 
             ITokenizeLineResult textMateResult = _grammar.TokenizeLine(line, freshState.GetRuleStack());
-            freshState.setRuleStack(textMateResult.RuleStack);
+            freshState.SetRuleStack(textMateResult.RuleStack);
 
             // Create the result early and fill in the tokens later
             List<TMToken> tokens = new List<TMToken>();
