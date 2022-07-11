@@ -8,16 +8,17 @@ namespace TextMateSharp.Internal.Grammars
     public class ScopeMetadataProvider
     {
 
-        private static ScopeMetadata _NULL_SCOPE_METADATA = new ScopeMetadata("", 0, StandardTokenType.Other, null);
+        private static ScopeMetadata _NULL_SCOPE_METADATA = new ScopeMetadata("", 0, 0, null);
 
         private static Regex STANDARD_TOKEN_TYPE_REGEXP = new Regex("\\b(comment|string|regex)\\b");
         private const string COMMENT_TOKEN_TYPE = "comment";
         private const string STRING_TOKEN_TYPE = "string";
         private const string REGEX_TOKEN_TYPE = "regex";
+        private const string META_EMBEDDED_TOKEN_TYPE = "meta.embedded";
 
         private int _initialLanguage;
         private IThemeProvider _themeProvider;
-        private Dictionary<string, ScopeMetadata> _cache;
+        private Dictionary<string, ScopeMetadata> _cache = new Dictionary<string, ScopeMetadata>();
         private ScopeMetadata _defaultMetaData;
         private Dictionary<string, int> _embeddedLanguages;
         private Regex _embeddedLanguagesRegex;
@@ -27,13 +28,17 @@ namespace TextMateSharp.Internal.Grammars
         {
             this._initialLanguage = initialLanguage;
             this._themeProvider = themeProvider;
-            this._cache = new Dictionary<string, ScopeMetadata>();
-            this.OnDidChangeTheme();
+            this._defaultMetaData = new ScopeMetadata(
+                "",
+                this._initialLanguage,
+                OptionalStandardTokenType.NotSet,
+                new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
 
             // embeddedLanguages handling
             this._embeddedLanguages = new Dictionary<string, int>();
             if (embeddedLanguages != null)
             {
+                // If embeddedLanguages are configured, fill in `this.embeddedLanguages`
                 foreach (string scope in embeddedLanguages.Keys)
                 {
                     int languageId = embeddedLanguages[scope];
@@ -42,7 +47,7 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             // create the regex
-            /*Set<string> escapedScopes = this.embeddedLanguages.keySet().stream()
+            /*var escapedScopes = this._embeddedLanguages.keySet().stream()
                 .map(ScopeMetadataProvider::escapeRegExpCharacters)
                 .collect(Collectors.toSet());*/
 
@@ -65,7 +70,7 @@ namespace TextMateSharp.Internal.Grammars
             this._defaultMetaData = new ScopeMetadata(
                 "",
                 this._initialLanguage,
-                StandardTokenType.Other,
+                OptionalStandardTokenType.NotSet,
                 new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
         }
 
@@ -118,21 +123,15 @@ namespace TextMateSharp.Internal.Grammars
                 return 0;
             }
 
-            // TODO!!!!
+            var m = _embeddedLanguagesRegex.Match(scope);
+            if (!m.Success)
+            {
+                // no scopes matched
+                return 0;
+            }
 
-            /*let m = scope.match(this._embeddedLanguagesRegex);
-			if (!m) {
-				// no scopes matched
-				return 0;
-			}
-
-			let language = this._embeddedLanguages[m[1]] || 0;
-			if (!language) {
-				return 0;
-			}
-
-			return language;*/
-            return 0;
+            string scopeName = m.Groups[1].Value;
+            return _embeddedLanguages.ContainsKey(scopeName) ? _embeddedLanguages[scopeName] : 0;
         }
 
         private static int ToStandardTokenType(string tokenType)
@@ -140,21 +139,26 @@ namespace TextMateSharp.Internal.Grammars
             Match m = STANDARD_TOKEN_TYPE_REGEXP.Match(tokenType); // tokenType.match(ScopeMetadataProvider.STANDARD_TOKEN_TYPE_REGEXP);
             if (!m.Success)
             {
-                return StandardTokenType.Other;
+                return OptionalStandardTokenType.NotSet;
             }
             string group = m.Value;
             if (COMMENT_TOKEN_TYPE.Equals(group))
             {
-                return StandardTokenType.Comment;
+                return OptionalStandardTokenType.Comment;
             }
             else if (STRING_TOKEN_TYPE.Equals(group))
             {
-                return StandardTokenType.String;
+                return OptionalStandardTokenType.String;
             }
-            if (REGEX_TOKEN_TYPE.Equals(group))
+            else if (REGEX_TOKEN_TYPE.Equals(group))
             {
-                return StandardTokenType.RegEx;
+                return OptionalStandardTokenType.RegEx;
             }
+            else if (META_EMBEDDED_TOKEN_TYPE.Equals(group))
+            {
+                return OptionalStandardTokenType.Other;
+            }
+
             throw new TMException("Unexpected match for standard token type!");
         }
     }

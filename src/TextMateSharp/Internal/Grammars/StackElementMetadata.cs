@@ -57,19 +57,19 @@ namespace TextMateSharp.Internal.Grammars
         public static int Set(
             int metadata,
             int languageId,
-            int tokenType,
+            /*OptionalStandardTokenType*/ int tokenType,
             bool? containsBalancedBrackets,
             int fontStyle,
             int foreground,
             int background)
         {
-            languageId = languageId == 0 ? StackElementMetadata.GetLanguageId(metadata) : languageId;
-            tokenType = tokenType == StandardTokenType.Other ? StackElementMetadata.GetTokenType(metadata) : tokenType;
+            languageId = languageId == 0 ? GetLanguageId(metadata) : languageId;
+            tokenType = tokenType == OptionalStandardTokenType.NotSet ? GetTokenType(metadata) : tokenType;
             var containsBalancedBracketsBit = (containsBalancedBrackets == null ? ContainsBalancedBrackets(metadata)
                 : containsBalancedBrackets.Value) ? 1 : 0;
-            fontStyle = fontStyle == FontStyle.NotSet ? StackElementMetadata.GetFontStyle(metadata) : fontStyle;
-            foreground = foreground == 0 ? StackElementMetadata.GetForeground(metadata) : foreground;
-            background = background == 0 ? StackElementMetadata.GetBackground(metadata) : background;
+            fontStyle = fontStyle == FontStyle.NotSet ? GetFontStyle(metadata) : fontStyle;
+            foreground = foreground == 0 ? GetForeground(metadata) : foreground;
+            background = background == 0 ? GetBackground(metadata) : background;
 
             return ((languageId << MetadataConsts.LANGUAGEID_OFFSET) 
                     | (tokenType << MetadataConsts.TOKEN_TYPE_OFFSET)

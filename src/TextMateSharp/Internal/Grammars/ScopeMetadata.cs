@@ -9,10 +9,14 @@ namespace TextMateSharp.Internal.Grammars
 
         public string ScopeName { get; private set; }
         public int LanguageId { get; private set; }
-        public int TokenType { get; private set; }
+        public int TokenType { get; private set; } /* OptionalStandardTokenType */
         public List<ThemeTrieElementRule> ThemeData { get; private set; }
 
-        public ScopeMetadata(string scopeName, int languageId, int tokenType, List<ThemeTrieElementRule> themeData)
+        public ScopeMetadata(
+            string scopeName,
+            int languageId,
+            int tokenType,
+            List<ThemeTrieElementRule> themeData)
         {
             ScopeName = scopeName;
             LanguageId = languageId;
