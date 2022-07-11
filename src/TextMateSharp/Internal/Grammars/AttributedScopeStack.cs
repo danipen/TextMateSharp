@@ -114,9 +114,12 @@ namespace TextMateSharp.Internal.Grammars
             return false;
         }
 
-        public static int MergeAttributes(int existingTokenAttributes, AttributedScopeStack scopesList, BasicScopeAttributes source)
+        public static int MergeAttributes(
+            int existingTokenAttributes,
+            AttributedScopeStack scopesList,
+            BasicScopeAttributes basicScopeAttributes)
         {
-            if (source == null)
+            if (basicScopeAttributes == null)
             {
                 return existingTokenAttributes;
             }
@@ -125,10 +128,10 @@ namespace TextMateSharp.Internal.Grammars
             int foreground = 0;
             int background = 0;
 
-            if (source.ThemeData != null)
+            if (basicScopeAttributes.ThemeData != null)
             {
                 // Find the first themeData that matches
-                foreach (ThemeTrieElementRule themeData in source.ThemeData)
+                foreach (ThemeTrieElementRule themeData in basicScopeAttributes.ThemeData)
                 {
                     if (Matches(scopesList, themeData.parentScopes))
                     {
@@ -140,8 +143,14 @@ namespace TextMateSharp.Internal.Grammars
                 }
             }
 
-            return EncodedTokenAttributes.Set(existingTokenAttributes, source.LanguageId, source.TokenType, null,
-                fontStyle, foreground, background);
+            return EncodedTokenAttributes.Set(
+                existingTokenAttributes,
+                basicScopeAttributes.LanguageId,
+                basicScopeAttributes.TokenType,
+                null,
+                fontStyle,
+                foreground,
+                background);
         }
 
         private static AttributedScopeStack Push(AttributedScopeStack target, Grammar grammar, List<string> scopes)

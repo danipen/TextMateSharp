@@ -21,7 +21,7 @@ namespace TextMateSharp.Internal.Grammars
         private IGrammarRepository _grammarRepository;
         private IRawGrammar _rawGrammar;
         private List<Injection> _injections;
-        private BasicScopeAttributesProvider _scopeMetadataProvider;
+        private BasicScopeAttributesProvider _basicScopeAttributesProvider;
         private List<TokenTypeMatcher> _tokenTypeMatchers;
         private BalancedBracketSelectors _balancedBracketSelectors;
 
@@ -36,7 +36,7 @@ namespace TextMateSharp.Internal.Grammars
             IThemeProvider themeProvider)
         {
             _rootScopeName = scopeName;
-            _scopeMetadataProvider = new BasicScopeAttributesProvider(initialLanguage, themeProvider, embeddedLanguages);
+            _basicScopeAttributesProvider = new BasicScopeAttributesProvider(initialLanguage, themeProvider, embeddedLanguages);
             _balancedBracketSelectors = balancedBracketSelectors;
             _rootId = null;
             _lastRuleId = 0;
@@ -50,12 +50,12 @@ namespace TextMateSharp.Internal.Grammars
 
         public void OnDidChangeTheme()
         {
-            this._scopeMetadataProvider.OnDidChangeTheme();
+            this._basicScopeAttributesProvider.OnDidChangeTheme();
         }
 
         public BasicScopeAttributes GetMetadataForScope(string scope)
         {
-            return this._scopeMetadataProvider.GetMetadataForScope(scope);
+            return this._basicScopeAttributesProvider.GetBasicScopeAttributes(scope);
         }
 
         public bool IsCompiling => _isCompiling;
@@ -231,7 +231,7 @@ namespace TextMateSharp.Internal.Grammars
             if (prevState == null || prevState.Equals(StateStack.NULL))
             {
                 isFirstLine = true;
-                BasicScopeAttributes rawDefaultMetadata = this._scopeMetadataProvider.GetDefaultMetadata();
+                BasicScopeAttributes rawDefaultMetadata = this._basicScopeAttributesProvider.GetDefaultAttributes();
                 ThemeTrieElementRule defaultTheme = rawDefaultMetadata.ThemeData[0];
                 int defaultMetadata = EncodedTokenAttributes.Set(0, rawDefaultMetadata.LanguageId,
                         rawDefaultMetadata.TokenType, null, defaultTheme.fontStyle, defaultTheme.foreground,
@@ -240,7 +240,7 @@ namespace TextMateSharp.Internal.Grammars
                 string rootScopeName = this.GetRule(this._rootId)?.GetName(null, null);
                 if (rootScopeName == null)
                     return null;
-                BasicScopeAttributes rawRootMetadata = this._scopeMetadataProvider.GetMetadataForScope(rootScopeName);
+                BasicScopeAttributes rawRootMetadata = this._basicScopeAttributesProvider.GetBasicScopeAttributes(rootScopeName);
                 int rootMetadata = AttributedScopeStack.MergeAttributes(defaultMetadata, null, rawRootMetadata);
 
                 AttributedScopeStack scopeList = new AttributedScopeStack(null, rootScopeName, rootMetadata);

@@ -91,6 +91,7 @@ namespace TextMateSharp.Internal.Grammars
                 // pop
                 StateStack popped = _stack;
                 _stack = _stack.Pop();
+                _anchorPosition = popped.GetAnchorPos();
 
                 if (!hasAdvanced && popped.GetEnterPos() == _linePos)
                 {

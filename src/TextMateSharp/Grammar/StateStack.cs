@@ -13,7 +13,15 @@ namespace TextMateSharp.Grammars
 
     public class StateStack : IStateStack
     {
-        public static StateStack NULL = new StateStack(null, RuleId.NO_RULE, 0, 0, false, null, null, null);
+        public static StateStack NULL = new StateStack(
+            null,
+            RuleId.NO_RULE,
+            0,
+            0,
+            false,
+            null,
+            null,
+            null);
 
         public StateStack Parent { get; private set; }
         public int Depth { get; private set; }
@@ -23,7 +31,7 @@ namespace TextMateSharp.Grammars
         public AttributedScopeStack ContentNameScopesList { get; private set; }
         public bool BeginRuleCapturedEOL { get; private set; }
 
-        private int _enterPosition;
+        private int _enterPos;
         private int _anchorPos;
 
         public StateStack(
@@ -44,7 +52,7 @@ namespace TextMateSharp.Grammars
             NameScopesList = nameScopesList;
             ContentNameScopesList = contentNameScopesList;
 
-            _enterPosition = enterPos;
+            _enterPos = enterPos;
             _anchorPos = anchorPos;
         }
 
@@ -92,7 +100,7 @@ namespace TextMateSharp.Grammars
             StateStack el = this;
             while (el != null)
             {
-                el._enterPosition = -1;
+                el._enterPos = -1;
                 el = el.Parent;
             }
         }
@@ -133,7 +141,12 @@ namespace TextMateSharp.Grammars
 
         public int GetEnterPos()
         {
-            return this._enterPosition;
+            return this._enterPos;
+        }
+
+        public int GetAnchorPos()
+        {
+            return this._anchorPos;
         }
 
         public Rule GetRule(IRuleRegistry grammar)
@@ -166,7 +179,7 @@ namespace TextMateSharp.Grammars
             }
             return this.Parent.Push(
                 this.RuleId,
-                this._enterPosition,
+                this._enterPos,
                 this._anchorPos,
                 this.BeginRuleCapturedEOL,
                 this.EndRule,
@@ -183,7 +196,7 @@ namespace TextMateSharp.Grammars
             return new StateStack(
                 this.Parent,
                 this.RuleId,
-                this._enterPosition,
+                this._enterPos,
                 this._anchorPos,
                 this.BeginRuleCapturedEOL,
                 endRule,

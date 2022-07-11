@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
 
@@ -73,11 +72,6 @@ namespace TextMateSharp.Themes
 
     class ParsedTheme
     {
-        private static Regex rrggbb = new Regex("^#[0-9a-f]{6}", RegexOptions.IgnoreCase);
-        private static Regex rrggbbaa = new Regex("^#[0-9a-f]{8}", RegexOptions.IgnoreCase);
-        private static Regex rgb = new Regex("^#[0-9a-f]{3}", RegexOptions.IgnoreCase);
-        private static Regex rgba = new Regex("^#[0-9a-f]{4}", RegexOptions.IgnoreCase);
-
         private ThemeTrieElement _root;
         private ThemeTrieElementRule _defaults;
 
@@ -181,14 +175,14 @@ namespace TextMateSharp.Themes
 
                 string foreground = null;
                 object settingsForeground = entry.GetSetting().GetForeground();
-                if (settingsForeground is string && IsValidHexColor((string)settingsForeground))
+                if (settingsForeground is string && StringUtils.IsValidHexColor((string)settingsForeground))
                 {
                     foreground = (string)settingsForeground;
                 }
 
                 string background = null;
                 object settingsBackground = entry.GetSetting().GetBackground();
-                if (settingsBackground is string && IsValidHexColor((string)settingsBackground))
+                if (settingsBackground is string && StringUtils.IsValidHexColor((string)settingsBackground))
                 {
                     background = (string)settingsBackground;
                 }
@@ -213,40 +207,6 @@ namespace TextMateSharp.Themes
             }
         }
 
-        private static bool IsValidHexColor(string hex)
-        {
-            if (hex == null || hex.Length < 1)
-            {
-                return false;
-            }
-
-            if (rrggbb.Match(hex).Success)
-            {
-                // #rrggbb
-                return true;
-            }
-
-            if (rrggbbaa.Match(hex).Success)
-            {
-                // #rrggbbaa
-                return true;
-            }
-
-            if (rgb.Match(hex).Success)
-            {
-                // #rgb
-                return true;
-            }
-
-            if (rgba.Match(hex).Success)
-            {
-                // #rgba
-                return true;
-            }
-
-            return false;
-        }
-
         public static ParsedTheme CreateFromParsedTheme(
             List<ParsedThemeRule> source,
             ColorMap colorMap)
@@ -264,12 +224,12 @@ namespace TextMateSharp.Themes
             // Sort rules lexicographically, and then by index if necessary
             parsedThemeRules.Sort((a, b) =>
             {
-                int r = CompareUtils.StrCmp(a.scope, b.scope);
+                int r = StringUtils.StrCmp(a.scope, b.scope);
                 if (r != 0)
                 {
                     return r;
                 }
-                r = CompareUtils.StrArrCmp(a.parentScopes, b.parentScopes);
+                r = StringUtils.StrArrCmp(a.parentScopes, b.parentScopes);
                 if (r != 0)
                 {
                     return r;

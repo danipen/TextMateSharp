@@ -12,12 +12,12 @@ namespace TextMateSharp.Internal.Grammars
 
         private static BasicScopeAttributes _NULL_SCOPE_METADATA = new BasicScopeAttributes(0, 0, null);
 
-        private static Regex STANDARD_TOKEN_TYPE_REGEXP = new Regex("\\b(comment|string|regex)\\b");
+        private static Regex STANDARD_TOKEN_TYPE_REGEXP = new Regex("\\b(comment|string|regex|meta\\.embedded)\\b");
 
         private int _initialLanguage;
         private IThemeProvider _themeProvider;
         private Dictionary<string, BasicScopeAttributes> _cache = new Dictionary<string, BasicScopeAttributes>();
-        private BasicScopeAttributes _defaultMetaData;
+        private BasicScopeAttributes _defaultAttributes;
         private Dictionary<string, int> _embeddedLanguages;
         private Regex _embeddedLanguagesRegex;
 
@@ -26,7 +26,7 @@ namespace TextMateSharp.Internal.Grammars
         {
             this._initialLanguage = initialLanguage;
             this._themeProvider = themeProvider;
-            this._defaultMetaData = new BasicScopeAttributes(
+            this._defaultAttributes = new BasicScopeAttributes(
                 this._initialLanguage,
                 OptionalStandardTokenType.NotSet,
                 new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
@@ -66,18 +66,18 @@ namespace TextMateSharp.Internal.Grammars
         public void OnDidChangeTheme()
         {
             this._cache.Clear();
-            this._defaultMetaData = new BasicScopeAttributes(
+            this._defaultAttributes = new BasicScopeAttributes(
                 this._initialLanguage,
                 OptionalStandardTokenType.NotSet,
                 new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
         }
 
-        public BasicScopeAttributes GetDefaultMetadata()
+        public BasicScopeAttributes GetDefaultAttributes()
         {
-            return this._defaultMetaData;
+            return this._defaultAttributes;
         }
 
-        public BasicScopeAttributes GetMetadataForScope(string scopeName)
+        public BasicScopeAttributes GetBasicScopeAttributes(string scopeName)
         {
             if (scopeName == null)
             {
