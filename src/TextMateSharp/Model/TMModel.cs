@@ -93,26 +93,24 @@ namespace TextMateSharp.Model
 
                     var modelLine = model._lines.Get(toProcess);
 
-                    if (modelLine != null && modelLine.IsInvalid)
-                    {
-                        try
-                        {
-                            this.RevalidateTokensNow(toProcess, null);
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
+                    if (modelLine == null || modelLine.IsInvalid)
+                        continue;
 
-                            if (toProcess < model._lines.GetNumberOfLines())
-                            {
-                                model.InvalidateLine(toProcess);
-                            }
+                    try
+                    {
+                        this.RevalidateTokens(toProcess, null);
+                    }
+                    catch (Exception e)
+                    {
+                        if (toProcess < model._lines.GetNumberOfLines())
+                        {
+                            model.InvalidateLine(toProcess);
                         }
                     }
                 } while (!IsStopped && model._thread != null);
             }
 
-            private void RevalidateTokensNow(int startLine, int? toLineIndexOrNull)
+            private void RevalidateTokens(int startLine, int? toLineIndexOrNull)
             {
                 if (model._tokenizer == null)
                     return;
