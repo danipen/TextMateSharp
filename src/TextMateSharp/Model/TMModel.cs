@@ -93,7 +93,7 @@ namespace TextMateSharp.Model
 
                     var modelLine = model._lines.Get(toProcess);
 
-                    if (modelLine == null || modelLine.IsInvalid)
+                    if (modelLine == null || !modelLine.IsInvalid)
                         continue;
 
                     try
@@ -102,6 +102,8 @@ namespace TextMateSharp.Model
                     }
                     catch (Exception e)
                     {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+
                         if (toProcess < model._lines.GetNumberOfLines())
                         {
                             model.InvalidateLine(toProcess);
