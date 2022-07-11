@@ -9,12 +9,12 @@ namespace TextMateSharp.Internal.Rules
     public class RuleFactory
     {
         public static CaptureRule CreateCaptureRule(IRuleFactoryHelper helper, string name, string contentName,
-                int? retokenizeCapturedWithRuleId)
+                RuleId retokenizeCapturedWithRuleId)
         {
             return (CaptureRule)helper.RegisterRule(id => new CaptureRule(id, name, contentName, retokenizeCapturedWithRuleId));
         }
 
-        public static int? GetCompiledRuleId(IRawRule desc, IRuleFactoryHelper helper,
+        public static RuleId GetCompiledRuleId(IRawRule desc, IRuleFactoryHelper helper,
                 IRawRepository repository)
         {
             if (desc.GetId() == null)
@@ -103,7 +103,7 @@ namespace TextMateSharp.Internal.Rules
                 foreach (string captureId in captures)
                 {
                     numericCaptureId = ParseInt(captureId);
-                    int? retokenizeCapturedWithRuleId = null;
+                    RuleId retokenizeCapturedWithRuleId = null;
                     IRawRule rule = captures.GetCapture(captureId);
                     if (rule.GetPatterns() != null)
                     {
@@ -129,8 +129,8 @@ namespace TextMateSharp.Internal.Rules
         private static CompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
             IRawRepository repository)
         {
-            List<int?> r = new List<int?>();
-            int? patternId;
+            List<RuleId> r = new List<RuleId>();
+            RuleId patternId;
             IRawGrammar externalGrammar;
             Rule rule;
             bool skipRule;
@@ -227,7 +227,7 @@ namespace TextMateSharp.Internal.Rules
                         if (rule is IncludeOnlyRule)
                         {
                             IncludeOnlyRule ior = (IncludeOnlyRule)rule;
-                            if (ior.HasMissingPatterns && ior.Patterns.Length == 0)
+                            if (ior.HasMissingPatterns && ior.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }
@@ -235,7 +235,7 @@ namespace TextMateSharp.Internal.Rules
                         else if (rule is BeginEndRule)
                         {
                             BeginEndRule br = (BeginEndRule)rule;
-                            if (br.HasMissingPatterns && br.Patterns.Length == 0)
+                            if (br.HasMissingPatterns && br.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }
@@ -243,7 +243,7 @@ namespace TextMateSharp.Internal.Rules
                         else if (rule is BeginWhileRule)
                         {
                             BeginWhileRule br = (BeginWhileRule)rule;
-                            if (br.HasMissingPatterns && br.Patterns.Length == 0)
+                            if (br.HasMissingPatterns && br.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }

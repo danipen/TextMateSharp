@@ -93,26 +93,26 @@ namespace TextMateSharp.Model
 
                     var modelLine = model._lines.Get(toProcess);
 
-                    if (modelLine != null && modelLine.IsInvalid)
-                    {
-                        try
-                        {
-                            this.RevalidateTokensNow(toProcess, null);
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
+                    if (modelLine == null || !modelLine.IsInvalid)
+                        continue;
 
-                            if (toProcess < model._lines.GetNumberOfLines())
-                            {
-                                model.InvalidateLine(toProcess);
-                            }
+                    try
+                    {
+                        this.RevalidateTokens(toProcess, null);
+                    }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+
+                        if (toProcess < model._lines.GetNumberOfLines())
+                        {
+                            model.InvalidateLine(toProcess);
                         }
                     }
                 } while (!IsStopped && model._thread != null);
             }
 
-            private void RevalidateTokensNow(int startLine, int? toLineIndexOrNull)
+            private void RevalidateTokens(int startLine, int? toLineIndexOrNull)
             {
                 if (model._tokenizer == null)
                     return;
@@ -177,6 +177,7 @@ namespace TextMateSharp.Model
             public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex,
                 int endLineIndex)
             {
+                TimeSpan stopLineTokenizationAfter = TimeSpan.FromMilliseconds(3000);
                 int nextInvalidLineIndex = startIndex;
                 int lineIndex = startIndex;
                 while (lineIndex <= endLineIndex && lineIndex < model._lines.GetNumberOfLines())
@@ -197,7 +198,7 @@ namespace TextMateSharp.Model
                         if (text == null)
                             continue;
                         // Tokenize only the first X characters
-                        r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE);
+                        r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);
                     }
                     catch (Exception e)
                     {

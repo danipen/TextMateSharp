@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using TextMateSharp.Grammars;
@@ -20,12 +21,12 @@ namespace TextMateSharp.Model
             return new TMState(null, null);
         }
 
-        public LineTokens Tokenize(string line, TMState state)
+        public LineTokens Tokenize(string line, TMState state, TimeSpan timeLimit)
         {
-            return Tokenize(line, state, 0, 0);
+            return Tokenize(line, state, 0, 0, timeLimit);
         }
 
-        public LineTokens Tokenize(string line, TMState state, int offsetDelta, int maxLen)
+        public LineTokens Tokenize(string line, TMState state, int offsetDelta, int maxLen, TimeSpan timeLimit)
         {
             if (_grammar == null)
                 return null;
@@ -35,8 +36,8 @@ namespace TextMateSharp.Model
             if (line.Length > 0 && line.Length > maxLen)
                 line = line.Substring(0, maxLen);
 
-            ITokenizeLineResult textMateResult = _grammar.TokenizeLine(line, freshState.GetRuleStack());
-            freshState.setRuleStack(textMateResult.RuleStack);
+            ITokenizeLineResult textMateResult = _grammar.TokenizeLine(line, freshState.GetRuleStack(), timeLimit);
+            freshState.SetRuleStack(textMateResult.RuleStack);
 
             // Create the result early and fill in the tokens later
             List<TMToken> tokens = new List<TMToken>();

@@ -5,7 +5,7 @@ namespace TextMateSharp.Internal.Rules
 {
     public abstract class Rule
     {
-        public int? Id { get; private set; }
+        public RuleId Id { get; private set; }
 
         private bool _nameIsCapturing;
         private string _name;
@@ -13,7 +13,7 @@ namespace TextMateSharp.Internal.Rules
         private bool _contentNameIsCapturing;
         private string _contentName;
 
-        public Rule(int? id, string name, string contentName)
+        public Rule(RuleId id, string name, string contentName)
         {
             Id = id;
 
