@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace TextMateSharp.Grammars
@@ -9,8 +10,8 @@ namespace TextMateSharp.Grammars
         string GetScopeName();
         ICollection<string> GetFileTypes();
         ITokenizeLineResult TokenizeLine(string lineText);
-        ITokenizeLineResult TokenizeLine(string lineText, IStateStack prevState);
+        ITokenizeLineResult TokenizeLine(string lineText, IStateStack prevState, TimeSpan timeLimit);
         ITokenizeLineResult2 TokenizeLine2(string lineText);
-        ITokenizeLineResult2 TokenizeLine2(string lineText, IStateStack prevState);
+        ITokenizeLineResult2 TokenizeLine2(string lineText, IStateStack prevState, TimeSpan timeLimit);
     }
 }

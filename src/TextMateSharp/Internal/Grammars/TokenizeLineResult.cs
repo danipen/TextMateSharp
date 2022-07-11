@@ -6,11 +6,12 @@ namespace TextMateSharp.Internal.Grammars
     {
         public IToken[] Tokens { get; private set; }
         public IStateStack RuleStack { get; private set; }
-
-        public TokenizeLineResult(IToken[] tokens, IStateStack ruleStack)
+        public bool StoppedEarly { get; private set; }
+        public TokenizeLineResult(IToken[] tokens, IStateStack ruleStack, bool stoppedEarly)
         {
             Tokens = tokens;
             RuleStack = ruleStack;
+            StoppedEarly = stoppedEarly;
         }
     }
 }

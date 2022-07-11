@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Matcher;
@@ -33,7 +34,7 @@ namespace TextMateSharp.Internal.Grammars
             this._lineTokens = lineTokens;
         }
 
-        public StateStack Scan(bool checkWhileConditions)
+        public TokenizeStringResult Scan(bool checkWhileConditions, TimeSpan timeLimit)
         {
             _stop = false;
 
@@ -47,12 +48,18 @@ namespace TextMateSharp.Internal.Grammars
                 _anchorPosition = whileCheckResult.AnchorPosition;
             }
 
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
             while (!_stop)
             {
+                if (stopWatch.Elapsed > timeLimit)
+                {
+                    return new TokenizeStringResult(_stack, true);
+                }
                 ScanNext(); // potentially modifies linePos && anchorPosition
             }
 
-            return _stack;
+            return new TokenizeStringResult(_stack, false);
         }
 
         private void ScanNext()
@@ -451,7 +458,7 @@ namespace TextMateSharp.Internal.Grammars
 
                     TokenizeString(grammar,
                             lineText.SubstringAtIndexes(0, captureIndex.End),
-                            (isFirstLine && captureIndex.Start == 0), captureIndex.Start, stackClone, lineTokens, false);
+                            (isFirstLine && captureIndex.Start == 0), captureIndex.Start, stackClone, lineTokens, false, TimeSpan.MaxValue);
                     continue;
                 }
 
@@ -534,10 +541,10 @@ namespace TextMateSharp.Internal.Grammars
             return new WhileCheckResult(stack, linePos, anchorPosition, isFirstLine);
         }
 
-        public static StateStack TokenizeString(Grammar grammar, string lineText, bool isFirstLine, int linePos,
-                StateStack stack, LineTokens lineTokens, bool checkWhileConditions)
+        public static TokenizeStringResult TokenizeString(Grammar grammar, string lineText, bool isFirstLine, int linePos,
+                StateStack stack, LineTokens lineTokens, bool checkWhileConditions, TimeSpan timeLimit)
         {
-            return new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens).Scan(checkWhileConditions);
+            return new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens).Scan(checkWhileConditions, timeLimit);
         }
 
         class WhileStack

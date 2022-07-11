@@ -59,7 +59,7 @@ namespace TextMateSharp
 
                     while (line != null)
                     {
-                        ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack);
+                        ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack, TimeSpan.MaxValue);
 
                         ruleStack = result.RuleStack;
 

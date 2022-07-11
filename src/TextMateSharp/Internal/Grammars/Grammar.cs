@@ -202,25 +202,25 @@ namespace TextMateSharp.Internal.Grammars
 
         public ITokenizeLineResult TokenizeLine(string lineText)
         {
-            return TokenizeLine(lineText, null);
+            return TokenizeLine(lineText, null, TimeSpan.MaxValue);
         }
 
-        public ITokenizeLineResult TokenizeLine(string lineText, IStateStack prevState)
+        public ITokenizeLineResult TokenizeLine(string lineText, IStateStack prevState, TimeSpan timeLimit)
         {
-            return (ITokenizeLineResult)Tokenize(lineText, (StateStack)prevState, false);
+            return (ITokenizeLineResult)Tokenize(lineText, (StateStack)prevState, false, timeLimit);
         }
 
         public ITokenizeLineResult2 TokenizeLine2(string lineText)
         {
-            return TokenizeLine2(lineText, null);
+            return TokenizeLine2(lineText, null, TimeSpan.MaxValue);
         }
 
-        public ITokenizeLineResult2 TokenizeLine2(string lineText, IStateStack prevState)
+        public ITokenizeLineResult2 TokenizeLine2(string lineText, IStateStack prevState, TimeSpan timeLimit)
         {
-            return (ITokenizeLineResult2)Tokenize(lineText, (StateStack)prevState, true);
+            return (ITokenizeLineResult2)Tokenize(lineText, (StateStack)prevState, true, timeLimit);
         }
 
-        private object Tokenize(string lineText, StateStack prevState, bool emitBinaryTokens)
+        private object Tokenize(string lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
         {
             if (this._rootId == null)
             {
@@ -260,14 +260,16 @@ namespace TextMateSharp.Internal.Grammars
             }
             int lineLength = lineText.Length;
             LineTokens lineTokens = new LineTokens(emitBinaryTokens, lineText, _tokenTypeMatchers, _balancedBracketSelectors);
-            StateStack nextState = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
-                lineTokens, true);
+            TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
+                lineTokens, true, timeLimit);
 
             if (emitBinaryTokens)
             {
-                return new TokenizeLineResult2(lineTokens.GetBinaryResult(nextState, lineLength), nextState);
+                return new TokenizeLineResult2(lineTokens.GetBinaryResult(tokenizeResult.Stack, lineLength),
+                    tokenizeResult.Stack, tokenizeResult.StoppedEarly);
             }
-            return new TokenizeLineResult(lineTokens.GetResult(nextState, lineLength), nextState);
+            return new TokenizeLineResult(lineTokens.GetResult(tokenizeResult.Stack, lineLength),
+                tokenizeResult.Stack, tokenizeResult.StoppedEarly);
         }
 
         private void GenerateRootId()

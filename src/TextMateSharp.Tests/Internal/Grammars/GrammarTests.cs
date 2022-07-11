@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using NUnit.Framework;
@@ -113,7 +114,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             foreach (string line in lines)
             {
-                ITokenizeLineResult lineTokens = grammar.TokenizeLine(line, ruleStack);
+                ITokenizeLineResult lineTokens = grammar.TokenizeLine(line, ruleStack, TimeSpan.MaxValue);
 
                 ruleStack = lineTokens.RuleStack;
 

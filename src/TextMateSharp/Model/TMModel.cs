@@ -177,6 +177,7 @@ namespace TextMateSharp.Model
             public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex,
                 int endLineIndex)
             {
+                TimeSpan stopLineTokenizationAfter = TimeSpan.FromMilliseconds(3000);
                 int nextInvalidLineIndex = startIndex;
                 int lineIndex = startIndex;
                 while (lineIndex <= endLineIndex && lineIndex < model._lines.GetNumberOfLines())
@@ -197,7 +198,7 @@ namespace TextMateSharp.Model
                         if (text == null)
                             continue;
                         // Tokenize only the first X characters
-                        r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE);
+                        r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);
                     }
                     catch (Exception e)
                     {
