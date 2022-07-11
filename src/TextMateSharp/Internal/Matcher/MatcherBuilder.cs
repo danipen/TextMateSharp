@@ -6,8 +6,6 @@ namespace TextMateSharp.Internal.Matcher
 {
     public class MatcherBuilder<T>
     {
-        private static Regex IDENTIFIER_REGEXP = new Regex("[\\w\\.:]+");
-
         public List<MatcherWithPriority<T>> Results;
         private Tokenizer _tokenizer;
         private IMatchesName<T> _matchesName;
@@ -139,7 +137,7 @@ namespace TextMateSharp.Internal.Matcher
                 {
                     identifiers.Add(_token);
                     _token = _tokenizer.Next();
-                } while (IsIdentifier(_token));
+                } while (_token != null && IsIdentifier(_token));
                 return matcherInput => this._matchesName.Match(identifiers, matcherInput);
             }
             return null;
@@ -147,30 +145,54 @@ namespace TextMateSharp.Internal.Matcher
 
         private bool IsIdentifier(string token)
         {
-            return token != null && IDENTIFIER_REGEXP.Match(token).Success;
+            if (string.IsNullOrEmpty(token))
+                return false;
+
+            /* Aprox. 2-3 times faster than:
+             * static final Pattern IDENTIFIER_REGEXP = Pattern.compile("[\\w\\.:]+");
+             * IDENTIFIER_REGEXP.matcher(token).matches();
+             *
+             * Aprox. 10% faster than:
+             * token.chars().allMatch(ch -> ... )
+             */
+            for (int i = 0; i < token.Length; i++)
+            {
+                char ch = token[i];
+                if (ch == '.' || ch == ':' || ch == '_'
+                    || ch >= 'a' && ch <= 'z'
+                    || ch >= 'A' && ch <= 'Z'
+                    || ch >= '0' && ch <= '9')
+                    continue;
+                return false;
+            }
+            return true;
         }
 
         class Tokenizer
         {
 
-            private static Regex REGEXP = new Regex("([LR]:|[\\w\\.:]+|[\\,\\|\\-\\(\\)])");
-
-            Match match;
+            private static Regex REGEXP = new Regex("([LR]:|[\\w\\.:][\\w\\.:\\-]*|[\\,\\|\\-\\(\\)])");
+            private string _input;
+            Match _currentMatch;
 
             public Tokenizer(string input)
             {
-                this.match = REGEXP.Match(input);
+                _input = input;
             }
 
             public string Next()
             {
-                if (match == null)
-                    return null;
+                if (_currentMatch == null)
+                {
+                    _currentMatch = REGEXP.Match(_input);
+                }
+                else
+                {
+                    _currentMatch = _currentMatch.NextMatch();
+                }
 
-                match = match.NextMatch();
-
-                if (match != null)
-                    return match.Value;
+                if (_currentMatch.Success)
+                    return _currentMatch.Value;
 
                 return null;
             }

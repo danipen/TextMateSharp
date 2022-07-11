@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Linq;
 using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Matcher
@@ -20,16 +20,20 @@ namespace TextMateSharp.Internal.Matcher
                 return false;
             }
 
-            for (int i = 0; i < scopes.Count; i++)
+            int lastIndex = 0;
+            return identifers.All(identifier =>
             {
-                foreach (string identifier in identifers)
+                for (int i = lastIndex; i < scopes.Count; i++)
                 {
-                    if (!ScopesAreMatching(scopes[i], identifier))
-                        return false;
+                    if (ScopesAreMatching(scopes[i], identifier))
+                    {
+                        lastIndex++;
+                        return true;
+                    }
                 }
-            }
 
-            return true;
+                return false;
+            });
         }
 
         private bool ScopesAreMatching(string thisScopeName, string scopeName)
