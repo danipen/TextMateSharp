@@ -140,8 +140,8 @@ namespace TextMateSharp.Internal.Grammars
                 }
             }
 
-            return StackElementMetadata.Set(metadata, source.LanguageId, source.TokenType, fontStyle, foreground,
-                    background);
+            return StackElementMetadata.Set(metadata, source.LanguageId, source.TokenType, null,
+                fontStyle, foreground, background);
         }
 
         private static ScopeListElement Push(ScopeListElement target, Grammar grammar, List<string> scopes)

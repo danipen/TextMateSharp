@@ -11,6 +11,8 @@ namespace TextMateSharp.Internal.Matcher
 
     public class NameMatcher : IMatchesName<List<string>>
     {
+        public static IMatchesName<List<string>> Default = new NameMatcher();
+
         public bool Match(ICollection<string> identifers, List<string> scopes)
         {
             if (scopes.Count < identifers.Count)

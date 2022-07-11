@@ -12,6 +12,7 @@ namespace TextMateSharp.Internal.Grammars
 {
     public class Grammar : IGrammar, IRuleFactoryHelper
     {
+        private string _rootScopeName;
         private int? _rootId;
         private int _lastRuleId;
         private volatile bool _isCompiling;
@@ -21,11 +22,22 @@ namespace TextMateSharp.Internal.Grammars
         private IRawGrammar _rawGrammar;
         private List<Injection> _injections;
         private ScopeMetadataProvider _scopeMetadataProvider;
+        private List<TokenTypeMatcher> _tokenTypeMatchers;
+        private BalancedBracketSelectors _balancedBracketSelectors;
 
-        public Grammar(IRawGrammar grammar, int initialLanguage, Dictionary<string, int> embeddedLanguages,
-                IGrammarRepository grammarRepository, IThemeProvider themeProvider)
+        public Grammar(
+            string scopeName,
+            IRawGrammar grammar,
+            int initialLanguage,
+            Dictionary<string, int> embeddedLanguages,
+            Dictionary<string, int> tokenTypes,
+            BalancedBracketSelectors balancedBracketSelectors,
+            IGrammarRepository grammarRepository,
+            IThemeProvider themeProvider)
         {
+            _rootScopeName = scopeName;
             _scopeMetadataProvider = new ScopeMetadataProvider(initialLanguage, themeProvider, embeddedLanguages);
+            _balancedBracketSelectors = balancedBracketSelectors;
             _rootId = null;
             _lastRuleId = 0;
             _includedGrammars = new Dictionary<string, IRawGrammar>();
@@ -33,6 +45,7 @@ namespace TextMateSharp.Internal.Grammars
             _rawGrammar = InitGrammar(grammar, null);
             _ruleId2desc = new Dictionary<int?, Rule>();
             _injections = null;
+            _tokenTypeMatchers = GenerateTokenTypeMatchers(tokenTypes);
         }
 
         public void OnDidChangeTheme()
@@ -99,7 +112,7 @@ namespace TextMateSharp.Internal.Grammars
         private void CollectInjections(List<Injection> result, string selector, IRawRule rule,
                 IRuleFactoryHelper ruleFactoryHelper, IRawGrammar grammar)
         {
-            ICollection<MatcherWithPriority<List<string>>> matchers = Matcher<List<string>>.CreateMatchers(selector);
+            var matchers = Matcher.Matcher.CreateMatchers(selector);
             int? ruleId = RuleFactory.GetCompiledRuleId(rule, ruleFactoryHelper, grammar.GetRepository());
 
             foreach (MatcherWithPriority<List<string>> matcher in matchers)
@@ -208,7 +221,7 @@ namespace TextMateSharp.Internal.Grammars
                 ScopeMetadata rawDefaultMetadata = this._scopeMetadataProvider.GetDefaultMetadata();
                 ThemeTrieElementRule defaultTheme = rawDefaultMetadata.ThemeData[0];
                 int defaultMetadata = StackElementMetadata.Set(0, rawDefaultMetadata.LanguageId,
-                        rawDefaultMetadata.TokenType, defaultTheme.fontStyle, defaultTheme.foreground,
+                        rawDefaultMetadata.TokenType, null, defaultTheme.fontStyle, defaultTheme.foreground,
                         defaultTheme.background);
 
                 string rootScopeName = this.GetRule(this._rootId.Value)?.GetName(null, null);
@@ -233,7 +246,7 @@ namespace TextMateSharp.Internal.Grammars
                 lineText += '\n';
             }
             int lineLength = lineText.Length;
-            LineTokens lineTokens = new LineTokens(emitBinaryTokens, lineText);
+            LineTokens lineTokens = new LineTokens(emitBinaryTokens, lineText, _tokenTypeMatchers, _balancedBracketSelectors);
             StackElement nextState = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
                     lineTokens);
 
@@ -256,6 +269,24 @@ namespace TextMateSharp.Internal.Grammars
             {
                 _isCompiling = false;
             }
+        }
+
+        private List<TokenTypeMatcher> GenerateTokenTypeMatchers(Dictionary<string, int> tokenTypes)
+        {
+            var result = new List<TokenTypeMatcher>();
+
+            if (tokenTypes == null)
+                return result;
+
+            foreach (var selector in tokenTypes.Keys)
+            {
+                foreach (var matcher in Matcher.Matcher.CreateMatchers(selector))
+                {
+                    result.Add(new TokenTypeMatcher(tokenTypes[selector], matcher.Matcher));
+                }
+            }
+
+            return result;
         }
 
         public string GetName()

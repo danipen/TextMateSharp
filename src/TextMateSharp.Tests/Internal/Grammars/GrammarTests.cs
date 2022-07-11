@@ -18,7 +18,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         [Test]
         public void StackElementMetadata_Test_Should_Work()
         {
-            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101,
+            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
         }
@@ -26,65 +26,65 @@ namespace TextMateSharp.Tests.Internal.Grammars
         [Test]
         public void StackElementMetadata_Should_Allow_Overwrite_Language_Id()
         {
-            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101,
+            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
-            value = StackElementMetadata.Set(value, 2, StandardTokenType.Other, FontStyle.NotSet, 0, 0);
+            value = StackElementMetadata.Set(value, 2, StandardTokenType.Other, null, FontStyle.NotSet, 0, 0);
             AssertMetadataHasProperties(value, 2, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
         }
 
         [Test]
         public void StackElementMetadata_Should_Allow_Overwrite_Token_Type()
         {
-            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101,
+            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
-            value = StackElementMetadata.Set(value, 0, StandardTokenType.Comment, FontStyle.NotSet, 0, 0);
+            value = StackElementMetadata.Set(value, 0, StandardTokenType.Comment, null, FontStyle.NotSet, 0, 0);
             AssertMetadataHasProperties(value, 1, StandardTokenType.Comment, FontStyle.Underline | FontStyle.Bold, 101, 102);
         }
 
         [Test]
         public void StackElementMetadata_Should_Allow_Overwrite_Font_Style()
         {
-            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101,
+            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
-            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, FontStyle.None, 0, 0);
+            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, null, FontStyle.None, 0, 0);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.None, 101, 102);
         }
 
         [Test]
         public void CanOverwriteFontStyleWithStrikethrough()
         {
-            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, FontStyle.Strikethrough, 101, 102);
+            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Strikethrough, 101, 102);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Strikethrough, 101, 102);
 
-            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, FontStyle.None, 0, 0);
+            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, null, FontStyle.None, 0, 0);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.None, 101, 102);
         }
 
         [Test]
         public void StackElementMetadata_Should_Allow_Overwrite_Foreground()
         {
-            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101,
+            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
-            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, FontStyle.NotSet, 5, 0);
+            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, null, FontStyle.NotSet, 5, 0);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 5, 102);
         }
 
         [Test]
         public void StackElementMetadata_Should_Allow_Overwrite_Background()
         {
-            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101,
+            int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
-            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, FontStyle.NotSet, 0, 7);
+            value = StackElementMetadata.Set(value, 0, StandardTokenType.Other, null, FontStyle.NotSet, 0, 7);
             AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 7);
         }
 
@@ -96,20 +96,20 @@ namespace TextMateSharp.Tests.Internal.Grammars
                     | StandardTokenType.String;
             int maxFontStyle = FontStyle.Bold | FontStyle.Italic | FontStyle.Underline;
             int maxForeground = 511;
-            int maxBackground = 511;
+            int maxBackground = 254;
 
-            int value = StackElementMetadata.Set(0, maxLangId, maxTokenType, maxFontStyle, maxForeground, maxBackground);
+            int value = StackElementMetadata.Set(0, maxLangId, maxTokenType, null, maxFontStyle, maxForeground, maxBackground);
             AssertMetadataHasProperties(value, maxLangId, maxTokenType, maxFontStyle, maxForeground, maxBackground);
         }
 
         [Test]
         public void Convert_To_Binary_String_Should_Work()
         {
-            string binValue1 = StackElementMetadata.ToBinaryStr(StackElementMetadata.Set(0, 0, 0, 0, 0, 511));
-            Assert.AreEqual("11111111100000000000000000000000", binValue1);
+            string binValue1 = StackElementMetadata.ToBinaryStr(StackElementMetadata.Set(0, 0, 0, null, 0, 0, 511));
+            Assert.AreEqual("11111111000000000000000000000000", binValue1);
 
-            string binValue2 = StackElementMetadata.ToBinaryStr(StackElementMetadata.Set(0, 0, 0, 0, 511, 0));
-            Assert.AreEqual("00000000011111111100000000000000", binValue2);
+            string binValue2 = StackElementMetadata.ToBinaryStr(StackElementMetadata.Set(0, 0, 0, null, 0, 511, 0));
+            Assert.AreEqual("00000000111111111000000000000000", binValue2);
         }
 
         [Test]
