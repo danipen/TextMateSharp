@@ -127,9 +127,9 @@ namespace TextMateSharp.Internal.Rules
             return new OnigScanner(regexps);
         }
 
-        private int?[] GetRules()
+        private IList<RuleId> GetRules()
         {
-            List<int?> ruleIds = new List<int?>();
+            List<RuleId> ruleIds = new List<RuleId>();
             foreach (RegExpSource item in this._items)
             {
                 ruleIds.Add(item.GetRuleId());

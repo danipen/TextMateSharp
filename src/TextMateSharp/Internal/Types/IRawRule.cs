@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 
+using TextMateSharp.Internal.Rules;
+
 namespace TextMateSharp.Internal.Types
 {
     public interface IRawRule
     {
-        int? GetId();
+        RuleId GetId();
 
-        void SetId(int id);
+        void SetId(RuleId id);
 
         string GetInclude();
 

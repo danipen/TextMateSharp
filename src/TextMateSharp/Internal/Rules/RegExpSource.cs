@@ -14,18 +14,18 @@ namespace TextMateSharp.Internal.Rules
         private static Regex HAS_BACK_REFERENCES = new Regex("\\\\(\\d+)");
         private static Regex BACK_REFERENCING_END = new Regex("\\\\(\\d+)");
 
-        private int? _ruleId;
+        private RuleId _ruleId;
         private bool _hasAnchor;
         private bool _hasBackReferences;
         private RegExpSourceAnchorCache _anchorCache;
         private string _source;
 
-        public RegExpSource(string regExpSource, int? ruleId) :
+        public RegExpSource(string regExpSource, RuleId ruleId) :
             this(regExpSource, ruleId, true)
         {
         }
 
-        public RegExpSource(string regExpSource, int? ruleId, bool handleAnchors)
+        public RegExpSource(string regExpSource, RuleId ruleId, bool handleAnchors)
         {
             if (handleAnchors)
             {
@@ -286,7 +286,7 @@ namespace TextMateSharp.Internal.Rules
             return this._source;
         }
 
-        public int? GetRuleId()
+        public RuleId GetRuleId()
         {
             return this._ruleId;
         }

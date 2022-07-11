@@ -98,12 +98,12 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             IOnigCaptureIndex[] captureIndices = r.CaptureIndexes;
-            int? matchedRuleId = r.MatchedRuleId;
+            RuleId matchedRuleId = r.MatchedRuleId;
 
             bool hasAdvanced = captureIndices != null && captureIndices.Length > 0
                 && captureIndices[0].End > _linePos;
 
-            if (matchedRuleId == -1)
+            if (matchedRuleId.Equals(RuleId.END_RULE))
             {
                 // We matched the `end` for this rule => pop it
                 BeginEndRule poppedRule = (BeginEndRule)_stack.GetRule(_grammar);
@@ -317,7 +317,7 @@ namespace TextMateSharp.Internal.Grammars
             // The lower the better
             int bestMatchRating = int.MaxValue;
             IOnigCaptureIndex[] bestMatchCaptureIndices = null;
-            int? bestMatchRuleId = null;
+            RuleId bestMatchRuleId = null;
             int bestMatchResultPriority = 0;
 
             List<string> scopes = stack.ContentNameScopesList.GenerateScopes();
@@ -362,7 +362,7 @@ namespace TextMateSharp.Internal.Grammars
 
             if (bestMatchCaptureIndices != null)
             {
-                int? matchedRuleId = bestMatchRuleId;
+                RuleId matchedRuleId = bestMatchRuleId;
                 IOnigCaptureIndex[] matchCaptureIndices = bestMatchCaptureIndices;
                 bool isPriorityMatch = bestMatchResultPriority == -1;
 
@@ -496,8 +496,8 @@ namespace TextMateSharp.Internal.Grammars
 
                 if (r != null)
                 {
-                    int? matchedRuleId = ruleScanner.Rules[r.GetIndex()];
-                    if (matchedRuleId != -2)
+                    RuleId matchedRuleId = ruleScanner.Rules[r.GetIndex()];
+                    if (!RuleId.WHILE_RULE.Equals(matchedRuleId))
                     {
                         // we shouldn't end up here
                         stack = whileRule.Stack.Pop();

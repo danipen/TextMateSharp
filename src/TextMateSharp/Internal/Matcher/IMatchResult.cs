@@ -1,4 +1,5 @@
 using TextMateSharp.Internal.Oniguruma;
+using TextMateSharp.Internal.Rules;
 
 namespace TextMateSharp.Internal.Matcher
 {
@@ -6,6 +7,6 @@ namespace TextMateSharp.Internal.Matcher
     {
         IOnigCaptureIndex[] CaptureIndexes { get; }
 
-        int? MatchedRuleId { get; }
+        RuleId MatchedRuleId { get; }
     }
 }

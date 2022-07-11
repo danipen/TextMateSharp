@@ -13,10 +13,10 @@ namespace TextMateSharp.Internal.Grammars
     public class Grammar : IGrammar, IRuleFactoryHelper
     {
         private string _rootScopeName;
-        private int? _rootId;
+        private RuleId _rootId;
         private int _lastRuleId;
         private volatile bool _isCompiling;
-        private Dictionary<int?, Rule> _ruleId2desc;
+        private Dictionary<RuleId, Rule> _ruleId2desc;
         private Dictionary<string, IRawGrammar> _includedGrammars;
         private IGrammarRepository _grammarRepository;
         private IRawGrammar _rawGrammar;
@@ -43,7 +43,7 @@ namespace TextMateSharp.Internal.Grammars
             _includedGrammars = new Dictionary<string, IRawGrammar>();
             _grammarRepository = grammarRepository;
             _rawGrammar = InitGrammar(grammar, null);
-            _ruleId2desc = new Dictionary<int?, Rule>();
+            _ruleId2desc = new Dictionary<RuleId, Rule>();
             _injections = null;
             _tokenTypeMatchers = GenerateTokenTypeMatchers(tokenTypes);
         }
@@ -113,7 +113,7 @@ namespace TextMateSharp.Internal.Grammars
                 IRuleFactoryHelper ruleFactoryHelper, IRawGrammar grammar)
         {
             var matchers = Matcher.Matcher.CreateMatchers(selector);
-            int? ruleId = RuleFactory.GetCompiledRuleId(rule, ruleFactoryHelper, grammar.GetRepository());
+            RuleId ruleId = RuleFactory.GetCompiledRuleId(rule, ruleFactoryHelper, grammar.GetRepository());
 
             foreach (MatcherWithPriority<List<string>> matcher in matchers)
             {
@@ -121,15 +121,15 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        public Rule RegisterRule(Func<int, Rule> factory)
+        public Rule RegisterRule(Func<RuleId, Rule> factory)
         {
-            int id = (++this._lastRuleId);
+            RuleId id = RuleId.Of(++this._lastRuleId);
             Rule result = factory(id);
             this._ruleId2desc[id] = result;
             return result;
         }
 
-        public Rule GetRule(int? patternId)
+        public Rule GetRule(RuleId patternId)
         {
             Rule result;
             this._ruleId2desc.TryGetValue(patternId, out result);
@@ -224,7 +224,7 @@ namespace TextMateSharp.Internal.Grammars
                         rawDefaultMetadata.TokenType, null, defaultTheme.fontStyle, defaultTheme.foreground,
                         defaultTheme.background);
 
-                string rootScopeName = this.GetRule(this._rootId.Value)?.GetName(null, null);
+                string rootScopeName = this.GetRule(this._rootId)?.GetName(null, null);
                 if (rootScopeName == null)
                     return null;
                 ScopeMetadata rawRootMetadata = this._scopeMetadataProvider.GetMetadataForScope(rootScopeName);
@@ -232,7 +232,7 @@ namespace TextMateSharp.Internal.Grammars
 
                 ScopeListElement scopeList = new ScopeListElement(null, rootScopeName, rootMetadata);
 
-                prevState = new StackElement(null, this._rootId.Value, -1, null, scopeList, scopeList);
+                prevState = new StackElement(null, this._rootId, -1, null, scopeList, scopeList);
             }
             else
             {

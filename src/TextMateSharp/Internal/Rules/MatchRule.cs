@@ -9,7 +9,7 @@ namespace TextMateSharp.Internal.Rules
         private RegExpSource _match;
         private RegExpSourceList _cachedCompiledPatterns;
 
-        public MatchRule(int? id, string name, string match, List<CaptureRule> captures) : base(id, name, null)
+        public MatchRule(RuleId id, string name, string match, List<CaptureRule> captures) : base(id, name, null)
         {
             this._match = new RegExpSource(match, this.Id);
             this.Captures = captures;

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using TextMateSharp.Internal.Rules;
 using TextMateSharp.Internal.Types;
 using TextMateSharp.Internal.Utils;
 
@@ -72,12 +73,12 @@ namespace TextMateSharp.Internal.Grammars.Parser
             this[DOLLAR_SELF] = self;
         }
 
-        public int? GetId()
+        public RuleId GetId()
         {
-            return TryGetObject<int?>(ID);
+            return TryGetObject<RuleId>(ID);
         }
 
-        public void SetId(int id)
+        public void SetId(RuleId id)
         {
             this[ID] = id;
         }

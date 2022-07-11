@@ -13,11 +13,11 @@ namespace TextMateSharp.Grammars
 
     public class StackElement : IStackElement
     {
-        public static StackElement NULL = new StackElement(null, 0, 0, null, null, null);
+        public static StackElement NULL = new StackElement(null, RuleId.NO_RULE, 0, null, null, null);
 
         public StackElement Parent { get; private set; }
         public int Depth { get; private set; }
-        public int? RuleId { get; private set; }
+        public RuleId RuleId { get; private set; }
         public string EndRule { get; private set; }
         public ScopeListElement NameScopesList { get; private set; }
         public ScopeListElement ContentNameScopesList { get; private set; }
@@ -26,7 +26,7 @@ namespace TextMateSharp.Grammars
 
         public StackElement(
             StackElement parent,
-            int? ruleId,
+            RuleId ruleId,
             int enterPos,
             string endRule,
             ScopeListElement nameScopesList,
@@ -105,7 +105,7 @@ namespace TextMateSharp.Grammars
             return this;
         }
 
-        public StackElement Push(int? ruleId, int enterPos, string endRule, ScopeListElement nameScopesList, ScopeListElement contentNameScopesList)
+        public StackElement Push(RuleId ruleId, int enterPos, string endRule, ScopeListElement nameScopesList, ScopeListElement contentNameScopesList)
         {
             return new StackElement(this, ruleId, enterPos, endRule, nameScopesList, contentNameScopesList);
         }
