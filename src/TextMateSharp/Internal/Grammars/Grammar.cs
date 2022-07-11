@@ -248,7 +248,7 @@ namespace TextMateSharp.Internal.Grammars
             int lineLength = lineText.Length;
             LineTokens lineTokens = new LineTokens(emitBinaryTokens, lineText, _tokenTypeMatchers, _balancedBracketSelectors);
             StackElement nextState = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
-                    lineTokens);
+                lineTokens, true);
 
             if (emitBinaryTokens)
             {

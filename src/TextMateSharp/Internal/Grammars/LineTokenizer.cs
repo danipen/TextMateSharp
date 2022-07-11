@@ -63,16 +63,19 @@ namespace TextMateSharp.Internal.Grammars
             this._lineTokens = lineTokens;
         }
 
-        public StackElement Scan()
+        public StackElement Scan(bool checkWhileConditions)
         {
             _stop = false;
 
-            WhileCheckResult whileCheckResult = CheckWhileConditions(_grammar, _lineText, _isFirstLine, _linePos, _stack,
-                    _lineTokens);
-            _stack = whileCheckResult.Stack;
-            _linePos = whileCheckResult.LinePos;
-            _isFirstLine = whileCheckResult.IsFirstLine;
-            _anchorPosition = whileCheckResult.AnchorPosition;
+            if (checkWhileConditions)
+            {
+                WhileCheckResult whileCheckResult = CheckWhileConditions(_grammar, _lineText, _isFirstLine, _linePos, _stack,
+                        _lineTokens);
+                _stack = whileCheckResult.Stack;
+                _linePos = whileCheckResult.LinePos;
+                _isFirstLine = whileCheckResult.IsFirstLine;
+                _anchorPosition = whileCheckResult.AnchorPosition;
+            }
 
             while (!_stop)
             {
@@ -440,7 +443,7 @@ namespace TextMateSharp.Internal.Grammars
                             null, nameScopesList, contentNameScopesList);
                     TokenizeString(grammar,
                             lineText.SubstringAtIndexes(0, captureIndex.End),
-                            (isFirstLine && captureIndex.Start == 0), captureIndex.Start, stackClone, lineTokens);
+                            (isFirstLine && captureIndex.Start == 0), captureIndex.Start, stackClone, lineTokens, false);
                     continue;
                 }
 
@@ -525,9 +528,9 @@ namespace TextMateSharp.Internal.Grammars
         }
 
         public static StackElement TokenizeString(Grammar grammar, string lineText, bool isFirstLine, int linePos,
-                StackElement stack, LineTokens lineTokens)
+                StackElement stack, LineTokens lineTokens, bool checkWhileConditions)
         {
-            return new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens).Scan();
+            return new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens).Scan(checkWhileConditions);
         }
     }
 }
