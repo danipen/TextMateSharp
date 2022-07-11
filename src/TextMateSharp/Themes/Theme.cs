@@ -134,7 +134,8 @@ namespace TextMateSharp.Themes
                 if (settingScope is string)
                 {
                     string scope = (string)settingScope;
-
+                    // remove leading and trailing commas
+                    scope = scope.Trim(',');
                     scopes = new List<string>(scope.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries));
                 }
                 else if (settingScope is IList<object>)
