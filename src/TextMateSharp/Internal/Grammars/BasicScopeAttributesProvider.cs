@@ -11,10 +11,6 @@ namespace TextMateSharp.Internal.Grammars
         private static BasicScopeAttributes _NULL_SCOPE_METADATA = new BasicScopeAttributes("", 0, 0, null);
 
         private static Regex STANDARD_TOKEN_TYPE_REGEXP = new Regex("\\b(comment|string|regex)\\b");
-        private const string COMMENT_TOKEN_TYPE = "comment";
-        private const string STRING_TOKEN_TYPE = "string";
-        private const string REGEX_TOKEN_TYPE = "regex";
-        private const string META_EMBEDDED_TOKEN_TYPE = "meta.embedded";
 
         private int _initialLanguage;
         private IThemeProvider _themeProvider;
@@ -136,30 +132,21 @@ namespace TextMateSharp.Internal.Grammars
 
         private static int ToStandardTokenType(string tokenType)
         {
-            Match m = STANDARD_TOKEN_TYPE_REGEXP.Match(tokenType); // tokenType.match(ScopeMetadataProvider.STANDARD_TOKEN_TYPE_REGEXP);
-            if (!m.Success)
-            {
-                return OptionalStandardTokenType.NotSet;
-            }
-            string group = m.Value;
-            if (COMMENT_TOKEN_TYPE.Equals(group))
-            {
-                return OptionalStandardTokenType.Comment;
-            }
-            else if (STRING_TOKEN_TYPE.Equals(group))
-            {
-                return OptionalStandardTokenType.String;
-            }
-            else if (REGEX_TOKEN_TYPE.Equals(group))
-            {
-                return OptionalStandardTokenType.RegEx;
-            }
-            else if (META_EMBEDDED_TOKEN_TYPE.Equals(group))
-            {
-                return OptionalStandardTokenType.Other;
-            }
+            Match m = STANDARD_TOKEN_TYPE_REGEXP.Match(tokenType);
 
-            throw new TMException("Unexpected match for standard token type!");
+            if (!m.Success)
+                return OptionalStandardTokenType.NotSet;
+
+            string group = m.Value;
+
+            switch (group)
+            {
+                case "comment": return OptionalStandardTokenType.Comment;
+                case "string": return OptionalStandardTokenType.String;
+                case "regex": return OptionalStandardTokenType.RegEx;
+                case "meta.embedded": return OptionalStandardTokenType.Other;
+                default: throw new TMException("Unexpected match for standard token type!");
+            }
         }
     }
 }

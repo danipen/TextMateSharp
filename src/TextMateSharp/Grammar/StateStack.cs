@@ -158,7 +158,7 @@ namespace TextMateSharp.Grammars
             return '[' + string.Join(", ", r) + ']';
         }
 
-        public StateStack setContentNameScopesList(AttributedScopeStack contentNameScopesList)
+        public StateStack WithContentNameScopesList(AttributedScopeStack contentNameScopesList)
         {
             if (this.ContentNameScopesList.Equals(contentNameScopesList))
             {
@@ -174,7 +174,7 @@ namespace TextMateSharp.Grammars
                 contentNameScopesList);
         }
 
-        public StateStack SetEndRule(string endRule)
+        public StateStack WithEndRule(string endRule)
         {
             if (this.EndRule != null && this.EndRule.Equals(endRule))
             {

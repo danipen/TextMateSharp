@@ -78,10 +78,10 @@ namespace TextMateSharp.Themes
         private static Regex rgb = new Regex("^#[0-9a-f]{3}", RegexOptions.IgnoreCase);
         private static Regex rgba = new Regex("^#[0-9a-f]{4}", RegexOptions.IgnoreCase);
 
-        private ThemeTrieElement root;
-        private ThemeTrieElementRule defaults;
+        private ThemeTrieElement _root;
+        private ThemeTrieElementRule _defaults;
 
-        private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> cache;
+        private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> _cachedMatchRoot;
 
         internal static List<ParsedThemeRule> ParseTheme(IRawTheme source, int priority)
         {
@@ -314,26 +314,26 @@ namespace TextMateSharp.Themes
 
         ParsedTheme(ThemeTrieElementRule defaults, ThemeTrieElement root)
         {
-            this.root = root;
-            this.defaults = defaults;
-            cache = new Dictionary<string, List<ThemeTrieElementRule>>();
+            this._root = root;
+            this._defaults = defaults;
+            _cachedMatchRoot = new Dictionary<string, List<ThemeTrieElementRule>>();
         }
 
         internal List<ThemeTrieElementRule> Match(string scopeName)
         {
-            lock (this.cache)
+            lock (this._cachedMatchRoot)
             {
-                if (!this.cache.ContainsKey(scopeName))
+                if (!this._cachedMatchRoot.ContainsKey(scopeName))
                 {
-                    this.cache[scopeName] = this.root.Match(scopeName);
+                    this._cachedMatchRoot[scopeName] = this._root.Match(scopeName);
                 }
-                return this.cache[scopeName];
+                return this._cachedMatchRoot[scopeName];
             }
         }
 
         internal ThemeTrieElementRule GetDefaults()
         {
-            return this.defaults;
+            return this._defaults;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace TextMateSharp.Internal.Grammars
 
             if (this._emitBinaryTokens)
             {
-                int metadata = scopesList.Metadata;
+                int metadata = scopesList.TokenAttributes;
 
                 var containsBalancedBrackets = false;
                 var balancedBracketSelectors = _balancedBracketSelectors;
@@ -70,7 +70,7 @@ namespace TextMateSharp.Internal.Grammars
                         && !balancedBracketSelectors.MatchesAlways() && !balancedBracketSelectors.MatchesNever()))
                 {
                     // Only generate scope array when required to improve performance
-                    var scopes2 = scopesList.GenerateScopes();
+                    var scopes2 = scopesList.GetScopeNames();
                     foreach (var tokenType in _tokenTypeOverrides)
                     {
                         if (tokenType.Matcher.Invoke(scopes2))
@@ -117,7 +117,7 @@ namespace TextMateSharp.Internal.Grammars
                 return;
             }
 
-            List<string> scopes = scopesList.GenerateScopes();
+            List<string> scopes = scopesList.GetScopeNames();
 
             this._tokens.Add(new Token(
                 this._lastTokenEndIndex >= 0 ? this._lastTokenEndIndex : 0,
