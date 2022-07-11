@@ -65,35 +65,44 @@ namespace TextMateSharp.Internal.Grammars
             if (this._injections == null)
             {
                 this._injections = new List<Injection>();
-                // add injections from the current grammar
-                Dictionary<string, IRawRule> rawInjections = this._rawGrammar.GetInjections();
-                if (rawInjections != null)
+
+                var grammarRepository = new GrammarRepository(this);
+                var scopeName = this._rootScopeName;
+                var grammar = grammarRepository.Lookup(scopeName);
+
+                if (grammar != null)
                 {
-                    foreach (string expression in rawInjections.Keys)
+                    // add injections from the current grammar
+                    Dictionary<string, IRawRule> rawInjections = grammar.GetInjections();
+                    if (rawInjections != null)
                     {
-                        IRawRule rule = rawInjections[expression];
-                        CollectInjections(this._injections, expression, rule, this, this._rawGrammar);
+                        foreach (string expression in rawInjections.Keys)
+                        {
+                            IRawRule rule = rawInjections[expression];
+                            CollectInjections(this._injections, expression, rule, this, grammar);
+                        }
                     }
                 }
 
                 // add injection grammars contributed for the current scope
-                if (this._grammarRepository != null)
+                var injectionScopeNames = this._grammarRepository.Injections(scopeName);
+
+                if (injectionScopeNames != null)
                 {
-                    ICollection<string> injectionScopeNames = this._grammarRepository
-                            .Injections(this._rawGrammar.GetScopeName());
-                    if (injectionScopeNames != null)
+                    foreach (string injectionScopeName in injectionScopeNames)
                     {
-                        foreach (string injectionScopeName in injectionScopeNames)
+                        IRawGrammar injectionGrammar = this.GetExternalGrammar(injectionScopeName);
+                        if (injectionGrammar != null)
                         {
-                            IRawGrammar injectionGrammar = this.GetExternalGrammar(injectionScopeName);
-                            if (injectionGrammar != null)
+                            string selector = injectionGrammar.GetInjectionSelector();
+                            if (selector != null)
                             {
-                                string selector = injectionGrammar.GetInjectionSelector();
-                                if (selector != null)
-                                {
-                                    CollectInjections(this._injections, selector, (IRawRule)injectionGrammar, this,
-                                            injectionGrammar);
-                                }
+                                CollectInjections(
+                                    this._injections,
+                                    selector,
+                                    (IRawRule)injectionGrammar,
+                                    this,
+                                    injectionGrammar);
                             }
                         }
                     }
@@ -117,7 +126,11 @@ namespace TextMateSharp.Internal.Grammars
 
             foreach (MatcherWithPriority<List<string>> matcher in matchers)
             {
-                result.Add(new Injection(matcher.Matcher, ruleId, grammar, matcher.Priority));
+                result.Add(new Injection(
+                    matcher.Matcher,
+                    ruleId,
+                    grammar,
+                    matcher.Priority));
             }
         }
 
@@ -296,12 +309,36 @@ namespace TextMateSharp.Internal.Grammars
 
         public string GetScopeName()
         {
-            return _rawGrammar.GetScopeName();
+            return _rootScopeName;
         }
 
         public ICollection<string> GetFileTypes()
         {
             return _rawGrammar.GetFileTypes();
+        }
+
+        class GrammarRepository : IGrammarRepository
+        {
+            private Grammar _grammar;
+            internal GrammarRepository(Grammar grammar)
+            {
+                _grammar = grammar;
+            }
+
+            public IRawGrammar Lookup(string scopeName)
+            {
+                if (scopeName.Equals(_grammar._rootScopeName))
+                {
+                    return _grammar._rawGrammar;
+                }
+
+                return _grammar.GetExternalGrammar(scopeName, null);
+            }
+
+            public ICollection<string> Injections(string targetScope)
+            {
+                return _grammar._grammarRepository.Injections(targetScope);
+            }
         }
     }
 }
