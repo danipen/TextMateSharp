@@ -20,7 +20,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         {
             int value = StackElementMetadata.Set(0, 1, StandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
         }
 
         [Test]
@@ -28,10 +28,10 @@ namespace TextMateSharp.Tests.Internal.Grammars
         {
             int value = StackElementMetadata.Set(0, 1, OptionalStandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
             value = StackElementMetadata.Set(value, 2, OptionalStandardTokenType.NotSet, null, FontStyle.NotSet, 0, 0);
-            AssertMetadataHasProperties(value, 2, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 2, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
         }
 
         [Test]
@@ -39,10 +39,10 @@ namespace TextMateSharp.Tests.Internal.Grammars
         {
             int value = StackElementMetadata.Set(0, 1, OptionalStandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
             value = StackElementMetadata.Set(value, 0, OptionalStandardTokenType.Comment, null, FontStyle.NotSet, 0, 0);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.Comment, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.Comment, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
         }
 
         [Test]
@@ -50,20 +50,20 @@ namespace TextMateSharp.Tests.Internal.Grammars
         {
             int value = StackElementMetadata.Set(0, 1, OptionalStandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
             value = StackElementMetadata.Set(value, 0, OptionalStandardTokenType.NotSet, null, FontStyle.None, 0, 0);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.None, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.None, 101, 102);
         }
 
         [Test]
         public void CanOverwriteFontStyleWithStrikethrough()
         {
             int value = StackElementMetadata.Set(0, 1, OptionalStandardTokenType.RegEx, null, FontStyle.Strikethrough, 101, 102);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Strikethrough, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Strikethrough, 101, 102);
 
             value = StackElementMetadata.Set(value, 0, OptionalStandardTokenType.NotSet, null, FontStyle.None, 0, 0);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.None, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.None, 101, 102);
         }
 
         [Test]
@@ -71,10 +71,10 @@ namespace TextMateSharp.Tests.Internal.Grammars
         {
             int value = StackElementMetadata.Set(0, 1, OptionalStandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
             value = StackElementMetadata.Set(value, 0, OptionalStandardTokenType.NotSet, null, FontStyle.NotSet, 5, 0);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 5, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 5, 102);
         }
 
         [Test]
@@ -82,10 +82,10 @@ namespace TextMateSharp.Tests.Internal.Grammars
         {
             int value = StackElementMetadata.Set(0, 1, OptionalStandardTokenType.RegEx, null, FontStyle.Underline | FontStyle.Bold, 101,
                     102);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 102);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 102);
 
             value = StackElementMetadata.Set(value, 0, OptionalStandardTokenType.NotSet, null, FontStyle.NotSet, 0, 7);
-            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, FontStyle.Underline | FontStyle.Bold, 101, 7);
+            AssertMetadataHasProperties(value, 1, StandardTokenType.RegEx, false, FontStyle.Underline | FontStyle.Bold, 101, 7);
         }
 
         [Test]
@@ -98,8 +98,8 @@ namespace TextMateSharp.Tests.Internal.Grammars
             int maxForeground = 511;
             int maxBackground = 254;
 
-            int value = StackElementMetadata.Set(0, maxLangId, maxTokenType, null, maxFontStyle, maxForeground, maxBackground);
-            AssertMetadataHasProperties(value, maxLangId, maxTokenType, maxFontStyle, maxForeground, maxBackground);
+            int value = StackElementMetadata.Set(0, maxLangId, maxTokenType, true, maxFontStyle, maxForeground, maxBackground);
+            AssertMetadataHasProperties(value, maxLangId, maxTokenType, true, maxFontStyle, maxForeground, maxBackground);
         }
 
         [Test]
@@ -379,7 +379,8 @@ namespace TextMateSharp.Tests.Internal.Grammars
         static void AssertMetadataHasProperties(
             int metadata,
             int languageId,
-            int tokenType,
+            /*StandardTokenType*/ int tokenType,
+            bool containsBalancedBrackets,
             int fontStyle,
             int foreground,
             int background)
@@ -387,6 +388,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             string actual = "{\n" +
                 "languageId: " + StackElementMetadata.GetLanguageId(metadata) + ",\n" +
                 "tokenType: " + StackElementMetadata.GetTokenType(metadata) + ",\n" +
+                "containsBalancedBrackets: " + StackElementMetadata.ContainsBalancedBrackets(metadata) + ",\n" +
                 "fontStyle: " + StackElementMetadata.GetFontStyle(metadata) + ",\n" +
                 "foreground: " + StackElementMetadata.GetForeground(metadata) + ",\n" +
                 "background: " + StackElementMetadata.GetBackground(metadata) + ",\n" +
@@ -395,6 +397,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             string expected = "{\n" +
                     "languageId: " + languageId + ",\n" +
                     "tokenType: " + tokenType + ",\n" +
+                    "containsBalancedBrackets: " + containsBalancedBrackets + ",\n" +
                     "fontStyle: " + fontStyle + ",\n" +
                     "foreground: " + foreground + ",\n" +
                     "background: " + background + ",\n" +

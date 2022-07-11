@@ -30,7 +30,7 @@ namespace TextMateSharp.Internal.Grammars
             return (int)((uintValue & MetadataConsts.TOKEN_TYPE_MASK) >> MetadataConsts.TOKEN_TYPE_OFFSET);
         }
 
-        static bool ContainsBalancedBrackets(int metadata)
+        public static bool ContainsBalancedBrackets(int metadata)
         {
             uint uintValue = (uint)metadata;
             return (uintValue & MetadataConsts.BALANCED_BRACKETS_MASK) != 0;
