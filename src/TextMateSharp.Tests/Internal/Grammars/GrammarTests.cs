@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 using NUnit.Framework;
 using TextMateSharp.Grammars;
+using TextMateSharp.Grammars.Resources;
 using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
 using TextMateSharp.Internal.Types;
@@ -265,6 +267,31 @@ namespace TextMateSharp.Tests.Internal.Grammars
                 "source.ts",
                 "meta.decorator.ts",
                 "meta.brace.round.ts");
+        }
+
+        [Test]
+        public void Resource_Loader_Should_Work_With_Turkish_Culture()
+        {
+            var currentCultureBck = CultureInfo.CurrentCulture;
+            try
+            {
+                SetCurrentCulture(CultureInfo.GetCultureInfo("tr-TR"));
+                using var stream = ResourceLoader.OpenGrammarPackage("Ini");
+                Assert.IsNotNull(stream);
+            }
+            finally
+            {
+                SetCurrentCulture(currentCultureBck);
+            }
+        }
+
+        static void SetCurrentCulture(CultureInfo cultureInfo)
+        {
+            if (cultureInfo == null)
+                return;
+
+            CultureInfo.CurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
         }
 
         static void AssertTokenValuesAreEqual(IToken token, int startIndex, int endIndex, params string[] scopes)
