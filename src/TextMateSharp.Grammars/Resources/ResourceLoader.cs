@@ -11,7 +11,7 @@ namespace TextMateSharp.Grammars.Resources
 
         internal static Stream OpenGrammarPackage(string grammarName)
         {
-            string grammarPackage = GrammarPrefix + grammarName.ToLower() + "." + "package.json";
+            string grammarPackage = GrammarPrefix + grammarName.ToLowerInvariant() + "." + "package.json";
 
             var result = typeof(ResourceLoader).GetTypeInfo().Assembly.GetManifestResourceStream(
                 grammarPackage);
