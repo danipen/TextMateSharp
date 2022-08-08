@@ -4,7 +4,7 @@
 		"If you want to provide a fix or improvement, please create a pull request against the original repository.",
 		"Once accepted there, we are happy to receive an update request."
 	],
-	"version": "https://github.com/dart-lang/dart-syntax-highlight/commit/65f211722c85e9fdf0aa658d5663e6ccaf2ebe25",
+	"version": "https://github.com/dart-lang/dart-syntax-highlight/commit/9d4857e114b7000d94232d83187ad142961c678a",
 	"name": "Dart",
 	"scopeName": "source.dart",
 	"patterns": [
@@ -36,6 +36,10 @@
 				{
 					"name": "keyword.other.import.dart",
 					"match": "\\b(as|show|hide)\\b"
+				},
+				{
+					"name": "keyword.control.dart",
+					"match": "\\b(if)\\b"
 				}
 			]
 		},
@@ -105,9 +109,6 @@
 							"name": "variable.other.source.dart"
 						}
 					}
-				},
-				{
-					"match": "(\\*    .*)$"
 				}
 			]
 		},
@@ -219,16 +220,77 @@
 					"match": "(?<!\\$)\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)\\b(?!\\$)"
 				},
 				{
-					"name": "support.class.dart",
-					"match": "(?<![a-zA-Z0-9_$])([_$]*[A-Z][a-zA-Z0-9_$]*|bool\\b|num\\b|int\\b|double\\b|dynamic\\b)"
+					"include": "#class-identifier"
 				},
 				{
-					"match": "([_$]*[a-z][a-zA-Z0-9_$]*)(<|\\(|\\s+=>)",
+					"include": "#function-identifier"
+				}
+			]
+		},
+		"class-identifier": {
+			"patterns": [
+				{
+					"match": "(?<![a-zA-Z0-9_$])([_$]*[A-Z][a-zA-Z0-9_$]*(<(?:[a-zA-Z0-9_$<>?]|,\\s*|\\s+extends\\s+)+>)?|bool\\b|num\\b|int\\b|double\\b|dynamic\\b|(void)\\b)",
+					"captures": {
+						"1": {
+							"name": "support.class.dart"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#type-args"
+								}
+							]
+						},
+						"3": {
+							"name": "storage.type.primitive.dart"
+						}
+					}
+				}
+			]
+		},
+		"function-identifier": {
+			"patterns": [
+				{
+					"match": "([_$]*[a-z][a-zA-Z0-9_$]*)(<(?:[a-zA-Z0-9_$<>?]|,\\s*|\\s+extends\\s+)+>)?[!?]?(\\(|\\s+=>)",
 					"captures": {
 						"1": {
 							"name": "entity.name.function.dart"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#type-args"
+								}
+							]
 						}
 					}
+				}
+			]
+		},
+		"type-args": {
+			"begin": "(<)",
+			"end": "(>)",
+			"beginCaptures": {
+				"1": {
+					"name": "other.source.dart"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "other.source.dart"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#class-identifier"
+				},
+				{
+					"match": "[\\s,]+"
+				},
+				{
+					"name": "keyword.declaration.dart",
+					"match": "extends"
 				}
 			]
 		},
@@ -319,15 +381,30 @@
 		"string-interp": {
 			"patterns": [
 				{
-					"match": "\\$(([a-zA-Z0-9_]+)|\\{([^{}]+)\\})",
+					"match": "\\$([a-zA-Z0-9_]+)",
 					"captures": {
-						"2": {
-							"name": "variable.parameter.dart"
-						},
-						"3": {
+						"1": {
 							"name": "variable.parameter.dart"
 						}
 					}
+				},
+				{
+					"name": "string.interpolated.expression.dart",
+					"begin": "\\$\\{",
+					"end": "\\}",
+					"patterns": [
+						{
+							"include": "#constants-and-special-vars",
+							"name": "variable.parameter.dart"
+						},
+						{
+							"include": "#strings"
+						},
+						{
+							"name": "variable.parameter.dart",
+							"match": "[a-zA-Z0-9_]+"
+						}
+					]
 				},
 				{
 					"name": "constant.character.escape.dart",
