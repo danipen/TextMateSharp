@@ -36,6 +36,9 @@ namespace TextMateSharp.Grammars
                     if (language.Aliases == null || language.Aliases.Count == 0)
                         continue;
 
+                    if (!HasGrammar(language.Id, definition.Contributes.Grammars))
+                        continue;
+
                     result.Add(language);
                 }
             }
@@ -227,6 +230,17 @@ namespace TextMateSharp.Grammars
             }
 
             return null;
+        }
+
+        static bool HasGrammar(string id, List<Grammar> grammars)
+        {
+            foreach (Grammar grammar in grammars)
+            {
+                if (id == grammar.Language)
+                    return true;
+            }
+
+            return false;
         }
     }
 }
