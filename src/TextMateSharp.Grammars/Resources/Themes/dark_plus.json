@@ -19,7 +19,6 @@
 		{
 			"name": "Types declaration and references",
 			"scope": [
-				"meta.return-type",
 				"support.class",
 				"support.type",
 				"entity.name.type",
@@ -91,7 +90,6 @@
 				"variable",
 				"meta.definition.variable.name",
 				"support.variable",
-				"support.type.property-name",
 				"entity.name.variable",
 				"constant.other.placeholder", // placeholders in strings
 			],
