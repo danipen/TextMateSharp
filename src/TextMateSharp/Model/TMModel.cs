@@ -396,7 +396,7 @@ namespace TextMateSharp.Model
 
             var tokenizerThread = this._thread;
 
-            if (tokenizerThread != null || tokenizerThread.IsStopped)
+            if (tokenizerThread == null || tokenizerThread.IsStopped)
                 return;
 
             this.BuildEventWithCallback(eventBuilder =>
