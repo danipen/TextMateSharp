@@ -36,6 +36,9 @@ namespace TextMateSharp.Grammars
                     if (language.Aliases == null || language.Aliases.Count == 0)
                         continue;
 
+                    if (!HasGrammar(language.Id, definition.Contributes.Grammars))
+                        continue;
+
                     result.Add(language);
                 }
             }
@@ -220,9 +223,24 @@ namespace TextMateSharp.Grammars
                     return "solarized-light-color-theme.json";
                 case ThemeName.TomorrowNightBlue:
                     return "tomorrow-night-blue-color-theme.json";
+                case ThemeName.HighContrastLight:
+                    return "hc_light.json";
+                case ThemeName.HighContrastDark:
+                    return "hc_black.json";
             }
 
             return null;
+        }
+
+        static bool HasGrammar(string id, List<Grammar> grammars)
+        {
+            foreach (Grammar grammar in grammars)
+            {
+                if (id == grammar.Language)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

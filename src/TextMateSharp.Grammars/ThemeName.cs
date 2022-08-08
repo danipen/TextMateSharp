@@ -15,5 +15,7 @@
         SolarizedDark,
         SolarizedLight,
         TomorrowNightBlue,
+        HighContrastLight,
+        HighContrastDark,
     }
 }
