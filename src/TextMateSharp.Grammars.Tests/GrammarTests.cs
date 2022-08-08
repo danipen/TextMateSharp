@@ -9,7 +9,7 @@ namespace TextMateSharp.Grammars.Tests
         {
             RegistryOptions options = new RegistryOptions(ThemeName.Light);
 
-            Assert.IsTrue(options.GetAvailableLanguages().Count > 0);
+            Assert.That(options.GetAvailableLanguages().Count, Is.EqualTo(60));
         }
 
         [Test]
@@ -84,9 +84,17 @@ namespace TextMateSharp.Grammars.Tests
 
             foreach (var language in options.GetAvailableLanguages())
             {
-                string scopeName = options.GetScopeByLanguageId(language.Id);
-                IGrammar grammar = registry.LoadGrammar(scopeName);
-                Assert.That(grammar.TokenizeLine(sampleLine), Is.Not.Null, "Failed: " + language.Id);
+                try
+                {
+                    string scopeName = options.GetScopeByLanguageId(language.Id);
+                    IGrammar grammar = registry.LoadGrammar(scopeName);
+                    Assert.That(grammar.TokenizeLine(sampleLine), Is.Not.Null, "Failed: " + language.Id);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(
+                        string.Format("[{0} grammar]: {1}", language.Id, ex.Message));
+                }
             }
         }
     }
