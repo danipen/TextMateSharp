@@ -17,6 +17,9 @@ namespace TextMateSharp.Internal.Rules
         public static RuleId GetCompiledRuleId(IRawRule desc, IRuleFactoryHelper helper,
                 IRawRepository repository)
         {
+            if (desc == null)
+                return null;
+
             if (desc.GetId() == null)
             {
 
