@@ -75,6 +75,9 @@ namespace TextMateSharp.Grammars
             {
                 foreach (var language in definition.Contributes.Languages)
                 {
+                    if (language.Extensions == null)
+                        continue;
+
                     foreach (var languageExtension in language.Extensions)
                     {
                         if (extension.Equals(languageExtension,
