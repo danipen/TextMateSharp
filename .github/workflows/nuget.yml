@@ -22,15 +22,15 @@ jobs:
       id: extract_branch
 
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.6
+      uses: NuGet/setup-nuget@v1.1.1
 
     - name: Restore dependencies
       run: nuget restore $SOLUTION
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
     - name: Build
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{steps.extract_branch.outputs.branch}} --no-restore
