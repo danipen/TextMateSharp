@@ -8,11 +8,6 @@
   "engines": {
     "vscode": "*"
   },
-  "extensionKind": [
-    "ui",
-    "workspace",
-    "web"
-  ],
   "contributes": {
     "languages": [
       {
@@ -25,7 +20,8 @@
           ".gyp",
           ".gypi",
           ".pyi",
-          ".ipy"
+          ".ipy",
+          ".pyt"
         ],
         "aliases": [
           "Python",

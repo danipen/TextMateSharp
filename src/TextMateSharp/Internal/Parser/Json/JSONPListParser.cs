@@ -41,15 +41,13 @@ namespace TextMateSharp.Internal.Parser.Json
                         pList.EndElement("dict");
                         break;
                     case JsonToken.PropertyName:
-                        string lastName = (string)reader.Value;
                         pList.StartElement("key");
-                        pList.AddString(lastName);
+                        pList.AddString((string)reader.Value);
                         pList.EndElement("key");
                         break;
                     case JsonToken.String:
-                        string value = (string)reader.Value;
                         pList.StartElement("string");
-                        pList.AddString(value);
+                        pList.AddString((string)reader.Value);
                         pList.EndElement("string");
                         break;
                     case JsonToken.Null:

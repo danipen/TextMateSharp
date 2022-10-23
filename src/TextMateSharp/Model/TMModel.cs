@@ -98,26 +98,26 @@ namespace TextMateSharp.Model
 
                     var modelLine = model._lines.Get(toProcess);
 
-                    if (modelLine != null && modelLine.IsInvalid)
-                    {
-                        try
-                        {
-                            this.RevalidateTokensNow(toProcess, null);
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
+                    if (modelLine == null || !modelLine.IsInvalid)
+                        continue;
 
-                            if (toProcess < model._lines.GetNumberOfLines())
-                            {
-                                model.InvalidateLine(toProcess);
-                            }
+                    try
+                    {
+                        this.RevalidateTokens(toProcess, null);
+                    }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+
+                        if (toProcess < model._lines.GetNumberOfLines())
+                        {
+                            model.InvalidateLine(toProcess);
                         }
                     }
                 } while (!IsStopped && model._thread != null);
             }
 
-            private void RevalidateTokensNow(int startLine, int? toLineIndexOrNull)
+            private void RevalidateTokens(int startLine, int? toLineIndexOrNull)
             {
                 if (model._tokenizer == null)
                     return;
@@ -182,11 +182,12 @@ namespace TextMateSharp.Model
             public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex,
                 int endLineIndex)
             {
+                TimeSpan stopLineTokenizationAfter = TimeSpan.FromMilliseconds(3000);
                 int nextInvalidLineIndex = startIndex;
                 int lineIndex = startIndex;
                 while (lineIndex <= endLineIndex && lineIndex < model._lines.GetNumberOfLines())
                 {
-                    if (model._grammar.IsCompiling)
+                    if (model._grammar != null && model._grammar.IsCompiling)
                     {
                         lineIndex++;
                         continue;
@@ -202,7 +203,7 @@ namespace TextMateSharp.Model
                         if (text == null)
                             continue;
                         // Tokenize only the first X characters
-                        r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE);
+                        r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);
                     }
                     catch (Exception e)
                     {
@@ -303,19 +304,25 @@ namespace TextMateSharp.Model
             if (this._grammar != null)
                 Start();
 
-            if (!listeners.Contains(listener))
+            lock (listeners)
             {
-                listeners.Add(listener);
+                if (!listeners.Contains(listener))
+                {
+                    listeners.Add(listener);
+                }
             }
         }
 
         public void RemoveModelTokensChangedListener(IModelTokensChangedListener listener)
         {
-            listeners.Remove(listener);
-            if (listeners.Count == 0)
+            lock (listeners)
             {
-                // no need to keep tokenizing if no-one cares
-                Stop();
+                listeners.Remove(listener);
+                if (listeners.Count == 0)
+                {
+                    // no need to keep tokenizing if no-one cares
+                    Stop();
+                }
             }
         }
 
@@ -383,12 +390,7 @@ namespace TextMateSharp.Model
 
         public void ForceTokenization(int lineIndex)
         {
-            if (_grammar == null)
-                return;
-
-            this.BuildEventWithCallback(eventBuilder =>
-                this._thread.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex)
-            );
+            ForceTokenization(lineIndex, lineIndex);
         }
 
         public void ForceTokenization(int startLineIndex, int endLineIndex)
@@ -396,8 +398,13 @@ namespace TextMateSharp.Model
             if (_grammar == null)
                 return;
 
+            var tokenizerThread = this._thread;
+
+            if (tokenizerThread == null || tokenizerThread.IsStopped)
+                return;
+
             this.BuildEventWithCallback(eventBuilder =>
-                this._thread.UpdateTokensInRange(eventBuilder, startLineIndex, endLineIndex)
+                tokenizerThread.UpdateTokensInRange(eventBuilder, startLineIndex, endLineIndex)
             );
         }
 

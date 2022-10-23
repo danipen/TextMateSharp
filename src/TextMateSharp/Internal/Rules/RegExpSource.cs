@@ -13,20 +13,19 @@ namespace TextMateSharp.Internal.Rules
 
         private static Regex HAS_BACK_REFERENCES = new Regex("\\\\(\\d+)");
         private static Regex BACK_REFERENCING_END = new Regex("\\\\(\\d+)");
-        private static Regex REGEXP_CHARACTERS = new Regex("[\\-\\\\\\{\\}\\*\\+\\?\\|\\^\\$\\.\\,\\[\\]\\(\\)\\#\\s]");
 
-        private int? _ruleId;
+        private RuleId _ruleId;
         private bool _hasAnchor;
         private bool _hasBackReferences;
-        private IRegExpSourceAnchorCache _anchorCache;
+        private RegExpSourceAnchorCache _anchorCache;
         private string _source;
 
-        public RegExpSource(string regExpSource, int? ruleId) :
+        public RegExpSource(string regExpSource, RuleId ruleId) :
             this(regExpSource, ruleId, true)
         {
         }
 
-        public RegExpSource(string regExpSource, int? ruleId, bool handleAnchors)
+        public RegExpSource(string regExpSource, RuleId ruleId, bool handleAnchors)
         {
             if (handleAnchors)
             {
@@ -135,9 +134,16 @@ namespace TextMateSharp.Internal.Rules
 
                 return BACK_REFERENCING_END.Replace(this._source, m =>
                 {
-                    string value = m.Value;
-                    int index = int.Parse(m.Value.SubstringAtIndexes(1, value.Length));
-                    return EscapeRegExpCharacters(capturedValues.Count > index ? capturedValues[index] : "");
+                    try
+                    {
+                        string value = m.Value;
+                        int index = int.Parse(m.Value.SubstringAtIndexes(1, value.Length));
+                        return EscapeRegExpCharacters(capturedValues.Count > index ? capturedValues[index] : "");
+                    }
+                    catch (Exception)
+                    {
+                        return "";
+                    }
                 });
             }
             catch (Exception ex)
@@ -150,26 +156,64 @@ namespace TextMateSharp.Internal.Rules
 
         private string EscapeRegExpCharacters(string value)
         {
-            return REGEXP_CHARACTERS.Replace(value, m =>
+            int valueLen = value.Length;
+            var sb = new StringBuilder(valueLen);
+            for (int i = 0; i < valueLen; i++)
             {
-                return "\\\\\\\\" + m.Value;
-            });
+                char ch = value[i];
+                switch (ch)
+                {
+                    case '-':
+                    case '\\':
+                    case '{':
+                    case '}':
+                    case '*':
+                    case '+':
+                    case '?':
+                    case '|':
+                    case '^':
+                    case '$':
+                    case '.':
+                    case ',':
+                    case '[':
+                    case ']':
+                    case '(':
+                    case ')':
+                    case '#':
+                    /* escaping white space chars is actually not necessary:
+                    case ' ':
+                    case '\t':
+                    case '\n':
+                    case '\f':
+                    case '\r':
+                    case 0x0B: // vertical tab \v
+                    */
+                    sb.Append('\\');
+                    break;
+                }
+                sb.Append(ch);
+            }
+            return sb.ToString();
         }
 
-        private IRegExpSourceAnchorCache BuildAnchorCache()
+        private RegExpSourceAnchorCache BuildAnchorCache()
         {
-            StringBuilder A0_G0_result = new StringBuilder();
-            StringBuilder A0_G1_result = new StringBuilder();
-            StringBuilder A1_G0_result = new StringBuilder();
-            StringBuilder A1_G1_result = new StringBuilder();
+            string source = this._source;
+            var sourceLen = source.Length;
+
+            StringBuilder A0_G0_result = new StringBuilder(sourceLen);
+            StringBuilder A0_G1_result = new StringBuilder(sourceLen);
+            StringBuilder A1_G0_result = new StringBuilder(sourceLen);
+            StringBuilder A1_G1_result = new StringBuilder(sourceLen);
+
             int pos;
             int len;
             char ch;
             char nextCh;
 
-            for (pos = 0, len = this._source.Length; pos < len; pos++)
+            for (pos = 0, len = sourceLen; pos < len; pos++)
             {
-                ch = this._source[pos];
+                ch = source[pos];
                 A0_G0_result.Append(ch);
                 A0_G1_result.Append(ch);
                 A1_G0_result.Append(ch);
@@ -179,7 +223,7 @@ namespace TextMateSharp.Internal.Rules
                 {
                     if (pos + 1 < len)
                     {
-                        nextCh = this._source[pos + 1];
+                        nextCh = source[pos + 1];
                         if (nextCh == 'A')
                         {
                             A0_G0_result.Append('\uFFFF');
@@ -206,7 +250,7 @@ namespace TextMateSharp.Internal.Rules
                 }
             }
 
-            return new IRegExpSourceAnchorCache(
+            return new RegExpSourceAnchorCache(
                 A0_G0_result.ToString(),
                 A0_G1_result.ToString(),
                 A1_G0_result.ToString(),
@@ -216,32 +260,20 @@ namespace TextMateSharp.Internal.Rules
         public string ResolveAnchors(bool allowA, bool allowG)
         {
             if (!this._hasAnchor)
-            {
                 return this._source;
-            }
 
             if (allowA)
             {
                 if (allowG)
-                {
                     return this._anchorCache.A1_G1;
-                }
-                else
-                {
-                    return this._anchorCache.A1_G0;
-                }
+
+                return this._anchorCache.A1_G0;
             }
-            else
-            {
-                if (allowG)
-                {
-                    return this._anchorCache.A0_G1;
-                }
-                else
-                {
-                    return this._anchorCache.A0_G0;
-                }
-            }
+
+            if (allowG)
+                return this._anchorCache.A0_G1;
+
+            return this._anchorCache.A0_G0;
         }
 
         public bool HasAnchor()
@@ -254,7 +286,7 @@ namespace TextMateSharp.Internal.Rules
             return this._source;
         }
 
-        public int? GetRuleId()
+        public RuleId GetRuleId()
         {
             return this._ruleId;
         }

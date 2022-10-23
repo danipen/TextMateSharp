@@ -11,18 +11,18 @@ namespace TextMateSharp.Internal.Rules
         public List<CaptureRule> EndCaptures { get; private set; }
         public bool ApplyEndPatternLast { get; private set; }
         public bool HasMissingPatterns { get; private set; }
-        public int?[] Patterns { get; private set; }
+        public IList<RuleId> Patterns { get; private set; }
 
         private RegExpSource _begin;
         private RegExpSource _end;
         private RegExpSourceList _cachedCompiledPatterns;
 
-        public BeginEndRule(int? id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
-            string end, List<CaptureRule> endCaptures, bool applyEndPatternLast, ICompilePatternsResult patterns)
+        public BeginEndRule(RuleId id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
+            string end, List<CaptureRule> endCaptures, bool applyEndPatternLast, CompilePatternsResult patterns)
             : base(id, name, contentName)
         {
             _begin = new RegExpSource(begin, this.Id);
-            _end = new RegExpSource(end, -1);
+            _end = new RegExpSource(end, RuleId.END_RULE);
 
             BeginCaptures = beginCaptures;
             EndHasBackReferences = _end.HasBackReferences();
@@ -43,7 +43,7 @@ namespace TextMateSharp.Internal.Rules
         {
             if (isFirst)
             {
-                foreach (int pattern in this.Patterns)
+                foreach (RuleId pattern in this.Patterns)
                 {
                     Rule rule = grammar.GetRule(pattern);
                     rule.CollectPatternsRecursive(grammar, sourceList, false);
@@ -55,7 +55,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             RegExpSourceList precompiled = this.Precompile(grammar);
             if (this._end.HasBackReferences())
@@ -69,7 +69,7 @@ namespace TextMateSharp.Internal.Rules
                     precompiled.SetSource(0, endRegexSource);
                 }
             }
-            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(allowA, allowG);
         }
 
         private RegExpSourceList Precompile(IRuleRegistry grammar)

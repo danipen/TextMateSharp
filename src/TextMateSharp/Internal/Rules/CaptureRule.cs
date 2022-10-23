@@ -4,9 +4,9 @@ namespace TextMateSharp.Internal.Rules
 {
     public class CaptureRule : Rule
     {
-        public int? RetokenizeCapturedWithRuleId { get; private set; }
+        public RuleId RetokenizeCapturedWithRuleId { get; private set; }
 
-        public CaptureRule(int? id, string name, string contentName, int? retokenizeCapturedWithRuleId) : base(id, name, contentName)
+        public CaptureRule(RuleId id, string name, string contentName, RuleId retokenizeCapturedWithRuleId) : base(id, name, contentName)
         {
             RetokenizeCapturedWithRuleId = retokenizeCapturedWithRuleId;
         }
@@ -16,7 +16,7 @@ namespace TextMateSharp.Internal.Rules
             
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             return null;
         }

@@ -9,14 +9,17 @@ namespace TextMateSharp.Internal.Rules
     public class RuleFactory
     {
         public static CaptureRule CreateCaptureRule(IRuleFactoryHelper helper, string name, string contentName,
-                int? retokenizeCapturedWithRuleId)
+                RuleId retokenizeCapturedWithRuleId)
         {
             return (CaptureRule)helper.RegisterRule(id => new CaptureRule(id, name, contentName, retokenizeCapturedWithRuleId));
         }
 
-        public static int? GetCompiledRuleId(IRawRule desc, IRuleFactoryHelper helper,
+        public static RuleId GetCompiledRuleId(IRawRule desc, IRuleFactoryHelper helper,
                 IRawRepository repository)
         {
+            if (desc == null)
+                return null;
+
             if (desc.GetId() == null)
             {
 
@@ -35,7 +38,7 @@ namespace TextMateSharp.Internal.Rules
                         IRawRepository r = repository;
                         if (desc.GetRepository() != null)
                         {
-                            r = CloneUtils.MergeObjects(repository, desc.GetRepository());
+                            r = repository.Merge(desc.GetRepository());
                         }
                         return new IncludeOnlyRule(desc.GetId(), desc.GetName(), desc.GetContentName(),
                                 RuleFactory.CompilePatterns(desc.GetPatterns(), helper, r));
@@ -103,7 +106,7 @@ namespace TextMateSharp.Internal.Rules
                 foreach (string captureId in captures)
                 {
                     numericCaptureId = ParseInt(captureId);
-                    int? retokenizeCapturedWithRuleId = null;
+                    RuleId retokenizeCapturedWithRuleId = null;
                     IRawRule rule = captures.GetCapture(captureId);
                     if (rule.GetPatterns() != null)
                     {
@@ -126,11 +129,11 @@ namespace TextMateSharp.Internal.Rules
             return result;
         }
 
-        private static ICompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
+        private static CompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
             IRawRepository repository)
         {
-            List<int?> r = new List<int?>();
-            int? patternId;
+            List<RuleId> r = new List<RuleId>();
+            RuleId patternId;
             IRawGrammar externalGrammar;
             Rule rule;
             bool skipRule;
@@ -227,7 +230,7 @@ namespace TextMateSharp.Internal.Rules
                         if (rule is IncludeOnlyRule)
                         {
                             IncludeOnlyRule ior = (IncludeOnlyRule)rule;
-                            if (ior.HasMissingPatterns && ior.Patterns.Length == 0)
+                            if (ior.HasMissingPatterns && ior.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }
@@ -235,7 +238,7 @@ namespace TextMateSharp.Internal.Rules
                         else if (rule is BeginEndRule)
                         {
                             BeginEndRule br = (BeginEndRule)rule;
-                            if (br.HasMissingPatterns && br.Patterns.Length == 0)
+                            if (br.HasMissingPatterns && br.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }
@@ -243,7 +246,7 @@ namespace TextMateSharp.Internal.Rules
                         else if (rule is BeginWhileRule)
                         {
                             BeginWhileRule br = (BeginWhileRule)rule;
-                            if (br.HasMissingPatterns && br.Patterns.Length == 0)
+                            if (br.HasMissingPatterns && br.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }
@@ -261,7 +264,7 @@ namespace TextMateSharp.Internal.Rules
                 }
             }
 
-            return new ICompilePatternsResult(r, ((patterns != null ? patterns.Count : 0) != r.Count));
+            return new CompilePatternsResult(r, ((patterns != null ? patterns.Count : 0) != r.Count));
         }
             }
 }

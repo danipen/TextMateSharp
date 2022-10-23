@@ -10,19 +10,19 @@ namespace TextMateSharp.Internal.Rules
         public List<CaptureRule> WhileCaptures { get; private set; }
         public bool WhileHasBackReferences { get; private set; }
         public bool HasMissingPatterns { get; private set; }
-        public int?[] Patterns { get; private set; }
+        public IList<RuleId>Patterns { get; private set; }
 
         private RegExpSource _begin;
         private RegExpSource _while;
         private RegExpSourceList _cachedCompiledPatterns;
         private RegExpSourceList _cachedCompiledWhilePatterns;
 
-        public BeginWhileRule(int? id, string name, string contentName, string begin,
+        public BeginWhileRule(RuleId id, string name, string contentName, string begin,
                 List<CaptureRule> beginCaptures, string whileStr, List<CaptureRule> whileCaptures,
-                ICompilePatternsResult patterns) : base(id, name, contentName)
+                CompilePatternsResult patterns) : base(id, name, contentName)
         {
             _begin = new RegExpSource(begin, this.Id);
-            _while = new RegExpSource(whileStr, -2);
+            _while = new RegExpSource(whileStr, RuleId.WHILE_RULE);
 
             BeginCaptures = beginCaptures;
             WhileCaptures = whileCaptures;
@@ -44,7 +44,7 @@ namespace TextMateSharp.Internal.Rules
             if (isFirst)
             {
                 Rule rule;
-                foreach (int pattern in Patterns)
+                foreach (RuleId pattern in Patterns)
                 {
                     rule = grammar.GetRule(pattern);
                     rule.CollectPatternsRecursive(grammar, sourceList, false);
@@ -56,10 +56,10 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             this.Precompile(grammar);
-            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(allowA, allowG);
         }
 
         private void Precompile(IRuleRegistry grammar)
@@ -71,14 +71,14 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public ICompiledRule CompileWhile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public CompiledRule CompileWhile(string endRegexSource, bool allowA, bool allowG)
         {
             this.PrecompileWhile();
             if (this._while.HasBackReferences())
             {
                 this._cachedCompiledWhilePatterns.SetSource(0, endRegexSource);
             }
-            return this._cachedCompiledWhilePatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledWhilePatterns.Compile(allowA, allowG);
         }
 
         private void PrecompileWhile()

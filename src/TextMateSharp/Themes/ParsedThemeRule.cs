@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TextMateSharp.Themes
 {
@@ -37,6 +38,12 @@ namespace TextMateSharp.Themes
             return result;
         }
 
+        public override string ToString()
+        {
+            return "ParsedThemeRule [scope=" + scope + ", parentScopes=" + string.Join(", ", parentScopes) + ", index=" + index
+                + ", fontStyle=" + fontStyle + ", foreground=" + foreground + ", background=" + background + "]";
+        }
+
         public override bool Equals(object obj)
         {
             if (this == obj)
@@ -69,7 +76,7 @@ namespace TextMateSharp.Themes
                 if (other.parentScopes != null)
                     return false;
             }
-            else if (!parentScopes.Equals(other.parentScopes))
+            else if (!Enumerable.SequenceEqual(parentScopes, other.parentScopes))
                 return false;
             if (scope == null)
             {

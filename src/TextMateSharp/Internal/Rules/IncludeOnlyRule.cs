@@ -1,13 +1,15 @@
+using System.Collections.Generic;
+
 namespace TextMateSharp.Internal.Rules
 {
     public class IncludeOnlyRule : Rule
     {
         public bool HasMissingPatterns { get; private set; }
-        public int?[] Patterns { get; private set; }
+        public IList<RuleId> Patterns { get; private set; }
 
         private RegExpSourceList _cachedCompiledPatterns;
 
-        public IncludeOnlyRule(int? id, string name, string contentName, ICompilePatternsResult patterns) : base(id, name, contentName)
+        public IncludeOnlyRule(RuleId id, string name, string contentName, CompilePatternsResult patterns) : base(id, name, contentName)
         {
             Patterns = patterns.Patterns;
             HasMissingPatterns = patterns.HasMissingPatterns;
@@ -17,21 +19,21 @@ namespace TextMateSharp.Internal.Rules
 
         public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
-            foreach (int pattern in this.Patterns)
+            foreach (var pattern in this.Patterns)
             {
                 Rule rule = grammar.GetRule(pattern);
                 rule.CollectPatternsRecursive(grammar, sourceList, false);
             }
         }
 
-        public override ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
+        public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)
         {
             if (this._cachedCompiledPatterns == null)
             {
                 this._cachedCompiledPatterns = new RegExpSourceList();
                 this.CollectPatternsRecursive(grammar, this._cachedCompiledPatterns, true);
             }
-            return this._cachedCompiledPatterns.Compile(grammar, allowA, allowG);
+            return this._cachedCompiledPatterns.Compile(allowA, allowG);
         }
     }
 }

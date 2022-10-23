@@ -1,20 +1,17 @@
 ﻿using TextMateSharp.Internal.Oniguruma;
+using TextMateSharp.Internal.Rules;
 
 namespace TextMateSharp.Internal.Matcher
 {
-    internal class MatchInjectionsResult : IMatchInjectionsResult
+    internal class MatchInjectionsResult : MatchResult
     {
-        public IOnigCaptureIndex[] CaptureIndexes { get; private set; }
-        public int? MatchedRuleId { get; private set; }
         public bool IsPriorityMatch { get; private set; }
 
         internal MatchInjectionsResult(
             IOnigCaptureIndex[] captureIndexes,
-            int? matchedRuleId,
-            bool isPriorityMatch)
+            RuleId matchedRuleId,
+            bool isPriorityMatch) : base(captureIndexes, matchedRuleId)
         {
-            CaptureIndexes = captureIndexes;
-            MatchedRuleId = matchedRuleId;
             IsPriorityMatch = isPriorityMatch;
         }
     }

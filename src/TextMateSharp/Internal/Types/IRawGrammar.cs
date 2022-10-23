@@ -4,6 +4,7 @@ namespace TextMateSharp.Internal.Types
 {
     public interface IRawGrammar
     {
+        IRawGrammar Clone();
         IRawRepository GetRepository();
 
         string GetScopeName();

@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 
+using TextMateSharp.Internal.Rules;
+
 namespace TextMateSharp.Internal.Types
 {
     public interface IRawRule
     {
-        int? GetId();
+        RuleId GetId();
 
-        void SetId(int id);
+        void SetId(RuleId id);
 
         string GetInclude();
 
@@ -18,19 +20,11 @@ namespace TextMateSharp.Internal.Types
 
         string GetContentName();
 
-        void SetContentName(string name);
-
         string GetMatch();
-
-        void SetMatch(string match);
 
         IRawCaptures GetCaptures();
 
-        void SetCaptures(IRawCaptures captures);
-
         string GetBegin();
-
-        void SetBegin(string begin);
 
         IRawCaptures GetBeginCaptures();
 
@@ -38,13 +32,9 @@ namespace TextMateSharp.Internal.Types
 
         string GetEnd();
 
-        void SetEnd(string end);
-
         string GetWhile();
 
         IRawCaptures GetEndCaptures();
-
-        void SetEndCaptures(IRawCaptures endCaptures);
 
         IRawCaptures GetWhileCaptures();
 
@@ -57,7 +47,5 @@ namespace TextMateSharp.Internal.Types
         void SetRepository(IRawRepository repository);
 
         bool IsApplyEndPatternLast();
-
-        void SetApplyEndPatternLast(bool applyEndPatternLast);
     }
 }
