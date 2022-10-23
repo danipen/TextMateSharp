@@ -10,6 +10,7 @@
     <Authors>Daniel Peñalba</Authors>
     <Company />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +18,7 @@
     <EmbeddedResource Include="Resources\Grammars\**\*.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
+    <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
