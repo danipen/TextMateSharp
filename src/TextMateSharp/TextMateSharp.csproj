@@ -33,6 +33,11 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>libonigwrap.dylib</TargetPath>
     </ContentWithTargetPath>
+    <!-- native oniguruma library for web assembly -->
+    <ContentWithTargetPath Include="Internal\Oniguruma\Native\browser-wasm\libonigwrap.wasm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>libonigwrap.wasm</TargetPath>
+    </ContentWithTargetPath>
   </ItemGroup>
 
   <ItemGroup>
@@ -61,6 +66,13 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
     <Content Include="Internal\Oniguruma\Native\osx\libonigwrap.dylib">
       <Link>libonigwrap.dylib</Link>
       <PackagePath>runtimes/osx/native/libonigwrap.dylib</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- native oniguruma library for wasm in nuget package -->
+    <Content Include="Internal\Oniguruma\Native\browser-wasm\libonigwrap.wasm">
+      <Link>libonigwrap.wasm</Link>
+      <PackagePath>runtimes/browser-wasm/native/libonigwrap.wasm</PackagePath>
       <Pack>true</Pack>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -381,3 +381,4 @@ onigwrap/src/onigwrap.lib
 onigwrap/src/onigwrap.exp
 onigwrap/src/onigwrap.dll
 onigwrap/src/onig_s.lib
+onigwrap/src/libonigwrap.wasm
