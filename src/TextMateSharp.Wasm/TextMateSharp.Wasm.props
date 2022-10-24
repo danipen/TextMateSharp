@@ -4,7 +4,7 @@
     <WasmBuildNative Condition="'$(WasmBuildNative)' == ''">true</WasmBuildNative>
     <_OnigWrapBuildAssetsRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\onigwrap-wasm'))\</_OnigWrapBuildAssetsRoot>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFrameworkVersion)' != '' and $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0'))">
+  <ItemGroup>
     <NativeFileReference Include="$(_OnigWrapBuildAssetsRoot)/libonig.a" />
     <NativeFileReference Include="$(_OnigWrapBuildAssetsRoot)/onigwrap.c" />
   </ItemGroup>
