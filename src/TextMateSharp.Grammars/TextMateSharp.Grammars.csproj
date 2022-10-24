@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/danipen/TextMateSharp</PackageProjectUrl>
     <Authors>Daniel Peñalba</Authors>
     <Company />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

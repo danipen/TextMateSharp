@@ -15,6 +15,7 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
     <PackageProjectUrl>https://github.com/danipen/TextMateSharp</PackageProjectUrl>
     <Authors>Daniel Peñalba</Authors>
     <Company />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
