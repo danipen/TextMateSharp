@@ -62,3 +62,19 @@ Build onigwrap:
 
 Copy `libonigwrap.so` alongside your binary.
 
+Web Assembly
+-----
+
+In order to update web assembly native assets, you need to do the following:
+
+1. Build [oniguruma](https://github.com/kkos/oniguruma) using [emscripten](https://emscripten.org/) compiler:
+
+```
+autoreconf -vfi
+emconfigure ./configure
+emmake make
+```
+
+Then:
+- Replace the existing (libonig.a)[https://github.com/danipen/TextMateSharp/blob/master/src/TextMateSharp.Wasm/libonig.a] with the generated one (it usually is generated in `<oniguruma-root>/src/.libs/` folder).
+- Update the header file (oniguruma.h)[https://github.com/danipen/TextMateSharp/blob/master/onigwrap/src/oniguruma.h] with the (original one)[https://github.com/kkos/oniguruma/blob/master/src/oniguruma.h].
