@@ -362,7 +362,6 @@ FodyWeavers.xsd
 onigwrap/src/libonigwrap.dylib
 onigwrap/src/libonig.a
 onigwrap/.DS_Store
-onigwrap/src/oniguruma.h
 src/.DS_Store
 src/TextMateSharp/.DS_Store
 src/TextMateSharp/Internal/.DS_Store
