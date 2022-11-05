@@ -6,11 +6,12 @@ namespace TextMateSharp.Internal.Oniguruma
 {
     public class ORegex : IDisposable
     {
-        private static object _globalRegexSync = new object();
+        private static object _createRegexSync = new object();
 
         private IntPtr _regex;
         private IntPtr _region;
         private bool _disposed = false;
+        private object _syncObject = new object();
         private string _regexString;
 
         public bool Valid
@@ -29,7 +30,7 @@ namespace TextMateSharp.Internal.Oniguruma
             pattern = UnicodeCharEscape.AddBracesToUnicodePatterns(pattern);
             pattern = UnicodeCharEscape.ConstraintUnicodePatternLenght(pattern);
 
-            lock (_globalRegexSync)
+            lock (_createRegexSync)
             {
                 fixed (char* patternPtr = pattern)
                 {
@@ -56,7 +57,7 @@ namespace TextMateSharp.Internal.Oniguruma
             if (_disposed) throw new ObjectDisposedException("ORegex");
             if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", _regexString));
 
-            lock (_globalRegexSync)
+            lock (_syncObject)
             {
                 if (_region == IntPtr.Zero)
                     _region = OnigInterop.onigwrap_region_new();
@@ -104,7 +105,7 @@ namespace TextMateSharp.Internal.Oniguruma
         {
             if (!_disposed)
             {
-                lock (_globalRegexSync)
+                lock (_syncObject)
                 {
                     _disposed = true;
 
