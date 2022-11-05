@@ -85,15 +85,26 @@ Build and configure oniguruma [following the instructions](https://github.com/kk
 
 We need to prepare onig for static linking though, so add `-fPIC` to the `CFLAGS`. If your Mono version is 32bit, make sure to add `-m32` to the `CFLAGS` too. (You may need to install a package like `gcc-multilib` to make the build work with `-m32`.)
 
-`./configure "CFLAGS=-fPIC"`
+```
+./configure "CFLAGS=-fPIC"
+```
 
-Copy .libs/libonig.a to the onigwrap folder.
+Copy .libs/libonig.a to the onigwrap folder:
+```
+cp src/.libs/libonig.a ../TextMateSharp/onigwrap/src
+cp src/oniguruma.h ../TextMateSharp/onigwrap/src
+```
 
 Build onigwrap:
 
-`gcc -shared -fPIC onigwrap.c libonig.a -o libonigwrap.so`
+```
+gcc -shared -fPIC onigwrap.c libonig.a -o libonigwrap.so
+```
 
-Copy `libonigwrap.so` alongside your binary.
+Copy `libonigwrap.so` alongside your binary:
+```
+cp libonigwrap.so ../../src/TextMateSharp/Internal/Oniguruma/Native/linux/
+```
 
 Web Assembly
 -----
