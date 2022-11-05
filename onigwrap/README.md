@@ -24,26 +24,32 @@ make distclean
 autoreconf -vfi
 ./configure CC="gcc -arch x86_64 -arch arm64"
 make 
-make install
 ```
-Copy `$libs/libonig.a` to the onigwrap folder.
+Copy `$libs/libonig.a` to the onigwrap folder:
+```
+cp src/.libs/libonig.a ../TextMateSharp/onigwrap/src
+```
 
 Now we build onigwrap:
 
 2. Compile onigwrap in the following way:
 
 ```
+
 clang -target x86_64-apple-macos10.12 -dynamiclib -L. -lonig -o x86_libonigwrap.dylib onigwrap.c
 clang -target arm64-apple-macos11 -dynamiclib -L. -lonig -o arm_libonigwrap.dylib onigwrap.c 
 lipo -create -output libonigwrap.dylib x86_libonigwrap.dylib arm_libonigwrap.dylib
 ```
 3. Ensure that the library has the correct archs:
 ```
-$ lipo -archs libonigwrap.a
+$ lipo -archs libonigwrap.dylib
 x86_64 arm64
 ```
 
-Take the onigwrap.dylib and put it alongside your binary.
+Take the onigwrap.dylib and put it alongside your binary:
+```
+cp libonigwrap.dylib ../../src/TextMateSharp/Internal/Oniguruma/Native/osx/
+```
 
 Windows
 -------
@@ -87,6 +93,7 @@ In order to update web assembly native assets, you need to do the following:
 1. Build [oniguruma](https://github.com/kkos/oniguruma) using [emscripten](https://emscripten.org/) compiler:
 
 ```
+make distclean
 autoreconf -vfi
 emconfigure ./configure
 emmake make
@@ -94,4 +101,7 @@ emmake make
 
 Then:
 - Replace the existing (libonig.a)[https://github.com/danipen/TextMateSharp/blob/master/src/TextMateSharp.Wasm/libonig.a] with the generated one (it usually is generated in `<oniguruma-root>/src/.libs/` folder).
-- Update the header file (oniguruma.h)[https://github.com/danipen/TextMateSharp/blob/master/onigwrap/src/oniguruma.h] with the (original one)[https://github.com/kkos/oniguruma/blob/master/src/oniguruma.h].
+- Update the header file (oniguruma.h)[https://github.com/danipen/TextMateSharp/blob/master/onigwrap/src/oniguruma.h] with the (original one)[https://github.com/kkos/oniguruma/blob/master/src/oniguruma.h]:
+
+```
+cp src/.libs/libonig.a ../TextMateSharp/src/TextMateSharp.Wasm/
