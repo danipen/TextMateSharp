@@ -25,9 +25,10 @@ autoreconf -vfi
 ./configure CC="gcc -arch x86_64 -arch arm64"
 make 
 ```
-Copy `$libs/libonig.a` to the onigwrap folder:
+Copy `$libs/libonig.a` and `src/oniguruma.h` to the onigwrap folder:
 ```
 cp src/.libs/libonig.a ../TextMateSharp/onigwrap/src
+cp src/oniguruma.h ../TextMateSharp/onigwrap/src
 ```
 
 Now we build onigwrap:
