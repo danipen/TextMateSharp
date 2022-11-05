@@ -36,7 +36,7 @@ Now we build onigwrap:
 2. Compile onigwrap in the following way:
 
 ```
-
+cd ../TextMateSharp/onigwrap/src
 clang -target x86_64-apple-macos10.12 -dynamiclib -L. -lonig -o x86_libonigwrap.dylib onigwrap.c
 clang -target arm64-apple-macos11 -dynamiclib -L. -lonig -o arm_libonigwrap.dylib onigwrap.c 
 lipo -create -output libonigwrap.dylib x86_libonigwrap.dylib arm_libonigwrap.dylib
@@ -105,6 +105,7 @@ In order to update web assembly native assets, you need to do the following:
 ```
 make distclean
 autoreconf -vfi
+source ../emsdk/emsdk_env.sh
 emconfigure ./configure
 emmake make
 ```
@@ -115,3 +116,5 @@ Then:
 
 ```
 cp src/.libs/libonig.a ../TextMateSharp/src/TextMateSharp.Wasm/
+cp src/oniguruma.h ../TextMateSharp/onigwrap/src
+```
