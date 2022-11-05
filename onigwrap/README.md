@@ -60,13 +60,22 @@ Windows
 
 Then build and configure oniguruma [following the instructions](https://github.com/kkos/oniguruma#case-3-windows-6432bit-platform-visual-studio) on the Oniguruma repository.
 
-Copy `onig\_s.lib` and `oniguruma.h` to the `src` folder.
+Copy `onig_s.lib` and `oniguruma.h` to the `src` folder.
+```
+copy onig_s.lib ..\..\source\repos\TextMateSharp\onigwrap\src
+copy src\oniguruma.h ..\..\source\repos\TextMateSharp\onigwrap\src
+```
 
 Build onigwrap:
 
 `cl.exe /DONIG_EXTERN=extern /D_USRDLL /D_WINDLL onigwrap.c /link onig_s.lib /DLL /OUT:onigwrap.dll`
 
 Copy onigwrap.dll to the folder with your binary.
+```
+copy onigwrap.dll ..\..\src\TextMateSharp\Internal\Oniguruma\Native\win-x64
+```
+
+Repeat the same process for x86 platform:
 
 Linux
 -----
