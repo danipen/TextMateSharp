@@ -25,9 +25,10 @@ autoreconf -vfi
 ./configure CC="gcc -arch x86_64 -arch arm64"
 make 
 ```
-Copy `$libs/libonig.a` to the onigwrap folder:
+Copy `$libs/libonig.a` and `src/oniguruma.h` to the onigwrap folder:
 ```
 cp src/.libs/libonig.a ../TextMateSharp/onigwrap/src
+cp src/oniguruma.h ../TextMateSharp/onigwrap/src
 ```
 
 Now we build onigwrap:
@@ -35,7 +36,7 @@ Now we build onigwrap:
 2. Compile onigwrap in the following way:
 
 ```
-
+cd ../TextMateSharp/onigwrap/src
 clang -target x86_64-apple-macos10.12 -dynamiclib -L. -lonig -o x86_libonigwrap.dylib onigwrap.c
 clang -target arm64-apple-macos11 -dynamiclib -L. -lonig -o arm_libonigwrap.dylib onigwrap.c 
 lipo -create -output libonigwrap.dylib x86_libonigwrap.dylib arm_libonigwrap.dylib
@@ -60,13 +61,22 @@ Windows
 
 Then build and configure oniguruma [following the instructions](https://github.com/kkos/oniguruma#case-3-windows-6432bit-platform-visual-studio) on the Oniguruma repository.
 
-Copy `onig\_s.lib` and `oniguruma.h` to the `src` folder.
+Copy `onig_s.lib` and `oniguruma.h` to the `src` folder.
+```
+copy onig_s.lib ..\..\source\repos\TextMateSharp\onigwrap\src
+copy src\oniguruma.h ..\..\source\repos\TextMateSharp\onigwrap\src
+```
 
 Build onigwrap:
 
 `cl.exe /DONIG_EXTERN=extern /D_USRDLL /D_WINDLL onigwrap.c /link onig_s.lib /DLL /OUT:onigwrap.dll`
 
 Copy onigwrap.dll to the folder with your binary.
+```
+copy onigwrap.dll ..\..\src\TextMateSharp\Internal\Oniguruma\Native\win-x64
+```
+
+Repeat the same process for x86 platform:
 
 Linux
 -----
@@ -75,15 +85,26 @@ Build and configure oniguruma [following the instructions](https://github.com/kk
 
 We need to prepare onig for static linking though, so add `-fPIC` to the `CFLAGS`. If your Mono version is 32bit, make sure to add `-m32` to the `CFLAGS` too. (You may need to install a package like `gcc-multilib` to make the build work with `-m32`.)
 
-`./configure "CFLAGS=-fPIC"`
+```
+./configure "CFLAGS=-fPIC"
+```
 
-Copy .libs/libonig.a to the onigwrap folder.
+Copy .libs/libonig.a to the onigwrap folder:
+```
+cp src/.libs/libonig.a ../TextMateSharp/onigwrap/src
+cp src/oniguruma.h ../TextMateSharp/onigwrap/src
+```
 
 Build onigwrap:
 
-`gcc -shared -fPIC onigwrap.c libonig.a -o libonigwrap.so`
+```
+gcc -shared -fPIC onigwrap.c libonig.a -o libonigwrap.so
+```
 
-Copy `libonigwrap.so` alongside your binary.
+Copy `libonigwrap.so` alongside your binary:
+```
+cp libonigwrap.so ../../src/TextMateSharp/Internal/Oniguruma/Native/linux/
+```
 
 Web Assembly
 -----
@@ -95,6 +116,7 @@ In order to update web assembly native assets, you need to do the following:
 ```
 make distclean
 autoreconf -vfi
+source ../emsdk/emsdk_env.sh
 emconfigure ./configure
 emmake make
 ```
@@ -105,3 +127,5 @@ Then:
 
 ```
 cp src/.libs/libonig.a ../TextMateSharp/src/TextMateSharp.Wasm/
+cp src/oniguruma.h ../TextMateSharp/onigwrap/src
+```

@@ -380,3 +380,6 @@ onigwrap/src/onigwrap.lib
 onigwrap/src/onigwrap.exp
 onigwrap/src/onigwrap.dll
 onigwrap/src/onig_s.lib
+onigwrap/src/arm_libonigwrap.dylib
+onigwrap/src/x86_libonigwrap.dylib
+.idea/.idea.TextMateSharp/.idea/riderMarkupCache.xml

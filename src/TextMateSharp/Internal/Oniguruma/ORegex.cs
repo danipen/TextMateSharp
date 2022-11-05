@@ -52,55 +52,46 @@ namespace TextMateSharp.Internal.Oniguruma
         /// <param name="text">The text to search</param>
         /// <param name="offset">An offset from which to start</param>
         /// <returns></returns>
-        public List<ORegexResult> SafeSearch(string text, int offset = 0)
+        public unsafe OnigResult SafeSearch(string text, int offset = 0)
         {
             if (_disposed) throw new ObjectDisposedException("ORegex");
             if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", _regexString));
 
-
             lock (_syncObject)
             {
-                Search(text, offset);
+                if (_region == IntPtr.Zero)
+                    _region = OnigInterop.onigwrap_region_new();
+
+                fixed (char* textPtr = text)
+                {
+                    OnigInterop.onigwrap_search(
+                        _regex,
+                        textPtr,
+                        Encoding.Unicode.GetByteCount(textPtr, offset),
+                        Encoding.Unicode.GetByteCount(textPtr, text.Length),
+                        _region);
+                }
 
                 var captureCount = OnigInterop.onigwrap_num_regs(_region);
-                var resultList = new List<ORegexResult>(captureCount);
+
+                Region region = null;
+
                 for (var capture = 0; capture < captureCount; capture++)
                 {
                     var pos = OnigInterop.onigwrap_pos(_region, capture);
                     if (capture == 0 && pos < 0)
-                        break;
+                        return null;
 
                     int len = pos == -1 ? 0 : OnigInterop.onigwrap_len(_region, capture);
 
-                    resultList.Add(new ORegexResult()
-                    {
-                        Position = pos,
-                        Length = len
-                    });
+                    if (region == null)
+                        region = new Region(captureCount);
+
+                    region.Start[capture] = pos;
+                    region.End[capture] = pos + len;
                 }
 
-                OnigInterop.onigwrap_region_free(_region);
-                _region = IntPtr.Zero;
-
-                return resultList;
-            }
-        }
-
-        unsafe void Search(string text, int offset = 0)
-        {
-            if (_disposed) throw new ObjectDisposedException("ORegex");
-            if (!Valid) throw new ArgumentException(string.Format("Invalid Onigmo regular expression: {0}", _regexString));
-
-            if (_region != IntPtr.Zero)
-                OnigInterop.onigwrap_region_free(_region);
-
-            fixed (char* textPtr = text)
-            {
-                _region = OnigInterop.onigwrap_search(
-                    _regex,
-                    textPtr,
-                    Encoding.Unicode.GetByteCount(textPtr, offset),
-                    Encoding.Unicode.GetByteCount(textPtr, text.Length));
+                return new OnigResult(region, -1);
             }
         }
 
@@ -114,13 +105,16 @@ namespace TextMateSharp.Internal.Oniguruma
         {
             if (!_disposed)
             {
-                _disposed = true;
+                lock (_syncObject)
+                {
+                    _disposed = true;
 
-                if (_region != IntPtr.Zero)
-                    OnigInterop.onigwrap_region_free(_region);
+                    if (_region != IntPtr.Zero)
+                        OnigInterop.onigwrap_region_free(_region);
 
-                if (_regex != IntPtr.Zero)
-                    OnigInterop.onigwrap_free(_regex);
+                    if (_regex != IntPtr.Zero)
+                        OnigInterop.onigwrap_free(_regex);
+                }
             }
         }
 
@@ -128,11 +122,5 @@ namespace TextMateSharp.Internal.Oniguruma
         {
             Dispose(false);
         }
-    }
-
-    public struct ORegexResult
-    {
-        public int Position;
-        public int Length;
     }
 }
