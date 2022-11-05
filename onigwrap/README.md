@@ -77,6 +77,12 @@ copy onigwrap.dll ..\..\src\TextMateSharp\Internal\Oniguruma\Native\win-x64
 ```
 
 Repeat the same process for x86 platform:
+```
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvars32.bat"
+.\make_win.bat
+cl.exe /DONIG_EXTERN=extern /D_USRDLL /D_WINDLL onigwrap.c /link onig_s.lib /DLL /OUT:onigwrap.dll
+copy onigwrap.dll ..\..\src\TextMateSharp\Internal\Oniguruma\Native\win-x86
+```
 
 Linux
 -----
