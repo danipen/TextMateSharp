@@ -18,13 +18,30 @@ From here, the build steps diverge for each platform:
 Mac
 ---
 
-Build and configure oniguruma [following the instructions](https://github.com/kkos/oniguruma#case-2-manual-compilation-on-linux-unix-and-cygwin-platform) on the Oniguruma repository.
-
+1. Compile oniguruma targeting both x86_64 and arm64:
+```
+make distclean
+autoreconf -vfi
+./configure CC="gcc -arch x86_64 -arch arm64"
+make 
+make install
+```
 Copy `$libs/libonig.a` to the onigwrap folder.
 
 Now we build onigwrap:
 
-`clang -dynamiclib -L. -lonig -o libonigwrap.dylib onigwrap.c`
+2. Compile onigwrap in the following way:
+
+```
+clang -target x86_64-apple-macos10.12 -dynamiclib -L. -lonig -o x86_libonigwrap.dylib onigwrap.c
+clang -target arm64-apple-macos11 -dynamiclib -L. -lonig -o arm_libonigwrap.dylib onigwrap.c 
+lipo -create -output libonigwrap.dylib x86_libonigwrap.dylib arm_libonigwrap.dylib
+```
+3. Ensure that the library has the correct archs:
+```
+$ lipo -archs libonigwrap.a
+x86_64 arm64
+```
 
 Take the onigwrap.dylib and put it alongside your binary.
 
