@@ -51,7 +51,7 @@ namespace TextMateSharp
 
                 int tokenizeIni = Environment.TickCount;
 
-                StackElement? ruleStack = null;
+                IStateStack? ruleStack = null;
 
                 using (StreamReader sr = new StreamReader(fileToParse))
                 {
@@ -59,7 +59,7 @@ namespace TextMateSharp
 
                     while (line != null)
                     {
-                        ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack);
+                        ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack, TimeSpan.MaxValue);
 
                         ruleStack = result.RuleStack;
 

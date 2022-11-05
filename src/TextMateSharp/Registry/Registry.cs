@@ -114,7 +114,12 @@ namespace TextMateSharp.Registry
 
         public IGrammar GrammarForScopeName(string scopeName, int initialLanguage, Dictionary<string, int> embeddedLanguages)
         {
-            return this.syncRegistry.GrammarForScopeName(scopeName, initialLanguage, embeddedLanguages);
+            return this.syncRegistry.GrammarForScopeName(
+                scopeName,
+                initialLanguage,
+                embeddedLanguages,
+                null,
+                null);
         }
 
         public Theme GetTheme()

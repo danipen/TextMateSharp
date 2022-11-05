@@ -16,6 +16,13 @@ namespace TextMateSharp.Model
         public void SetModel(TMModel model)
         {
             this._model = model;
+            lock(mLock)
+            {
+                foreach (var line in _list)
+                {
+                    line.IsInvalid = true;
+                }
+            }
         }
 
         public void AddLine(int line)

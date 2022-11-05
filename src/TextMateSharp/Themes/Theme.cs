@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
 
@@ -73,15 +72,10 @@ namespace TextMateSharp.Themes
 
     class ParsedTheme
     {
-        private static Regex rrggbb = new Regex("^#[0-9a-f]{6}", RegexOptions.IgnoreCase);
-        private static Regex rrggbbaa = new Regex("^#[0-9a-f]{8}", RegexOptions.IgnoreCase);
-        private static Regex rgb = new Regex("^#[0-9a-f]{3}", RegexOptions.IgnoreCase);
-        private static Regex rgba = new Regex("^#[0-9a-f]{4}", RegexOptions.IgnoreCase);
+        private ThemeTrieElement _root;
+        private ThemeTrieElementRule _defaults;
 
-        private ThemeTrieElement root;
-        private ThemeTrieElementRule defaults;
-
-        private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> cache;
+        private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> _cachedMatchRoot;
 
         internal static List<ParsedThemeRule> ParseTheme(IRawTheme source, int priority)
         {
@@ -140,7 +134,8 @@ namespace TextMateSharp.Themes
                 if (settingScope is string)
                 {
                     string scope = (string)settingScope;
-
+                    // remove leading and trailing commas
+                    scope = scope.Trim(',');
                     scopes = new List<string>(scope.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries));
                 }
                 else if (settingScope is IList<object>)
@@ -161,31 +156,34 @@ namespace TextMateSharp.Themes
                     string[] segments = ((string)settingsFontStyle).Split(new[] { " " }, StringSplitOptions.None);
                     foreach (string segment in segments)
                     {
-                        if ("italic".Equals(segment))
+                        switch (segment)
                         {
-                            fontStyle = fontStyle | FontStyle.Italic;
-                        }
-                        else if ("bold".Equals(segment))
-                        {
-                            fontStyle = fontStyle | FontStyle.Bold;
-                        }
-                        else if ("underline".Equals(segment))
-                        {
-                            fontStyle = fontStyle | FontStyle.Underline;
+                            case "italic":
+                                fontStyle = fontStyle | FontStyle.Italic;
+                                break;
+                            case "bold":
+                                fontStyle = fontStyle | FontStyle.Bold;
+                                break;
+                            case "underline":
+                                fontStyle = fontStyle | FontStyle.Underline;
+                                break;
+                            case "strikethrough":
+                                fontStyle = fontStyle | FontStyle.Strikethrough;
+                                break;
                         }
                     }
                 }
 
                 string foreground = null;
                 object settingsForeground = entry.GetSetting().GetForeground();
-                if (settingsForeground is string && IsValidHexColor((string)settingsForeground))
+                if (settingsForeground is string && StringUtils.IsValidHexColor((string)settingsForeground))
                 {
                     foreground = (string)settingsForeground;
                 }
 
                 string background = null;
                 object settingsBackground = entry.GetSetting().GetBackground();
-                if (settingsBackground is string && IsValidHexColor((string)settingsBackground))
+                if (settingsBackground is string && StringUtils.IsValidHexColor((string)settingsBackground))
                 {
                     background = (string)settingsBackground;
                 }
@@ -210,40 +208,6 @@ namespace TextMateSharp.Themes
             }
         }
 
-        private static bool IsValidHexColor(string hex)
-        {
-            if (hex == null || hex.Length < 1)
-            {
-                return false;
-            }
-
-            if (rrggbb.Match(hex).Success)
-            {
-                // #rrggbb
-                return true;
-            }
-
-            if (rrggbbaa.Match(hex).Success)
-            {
-                // #rrggbbaa
-                return true;
-            }
-
-            if (rgb.Match(hex).Success)
-            {
-                // #rgb
-                return true;
-            }
-
-            if (rgba.Match(hex).Success)
-            {
-                // #rgba
-                return true;
-            }
-
-            return false;
-        }
-
         public static ParsedTheme CreateFromParsedTheme(
             List<ParsedThemeRule> source,
             ColorMap colorMap)
@@ -261,12 +225,12 @@ namespace TextMateSharp.Themes
             // Sort rules lexicographically, and then by index if necessary
             parsedThemeRules.Sort((a, b) =>
             {
-                int r = CompareUtils.StrCmp(a.scope, b.scope);
+                int r = StringUtils.StrCmp(a.scope, b.scope);
                 if (r != 0)
                 {
                     return r;
                 }
-                r = CompareUtils.StrArrCmp(a.parentScopes, b.parentScopes);
+                r = StringUtils.StrArrCmp(a.parentScopes, b.parentScopes);
                 if (r != 0)
                 {
                     return r;
@@ -311,23 +275,26 @@ namespace TextMateSharp.Themes
 
         ParsedTheme(ThemeTrieElementRule defaults, ThemeTrieElement root)
         {
-            this.root = root;
-            this.defaults = defaults;
-            cache = new Dictionary<string, List<ThemeTrieElementRule>>();
+            this._root = root;
+            this._defaults = defaults;
+            _cachedMatchRoot = new Dictionary<string, List<ThemeTrieElementRule>>();
         }
 
         internal List<ThemeTrieElementRule> Match(string scopeName)
         {
-            if (!this.cache.ContainsKey(scopeName))
+            lock (this._cachedMatchRoot)
             {
-                this.cache[scopeName] = this.root.Match(scopeName);
+                if (!this._cachedMatchRoot.ContainsKey(scopeName))
+                {
+                    this._cachedMatchRoot[scopeName] = this._root.Match(scopeName);
+                }
+                return this._cachedMatchRoot[scopeName];
             }
-            return this.cache[scopeName];
         }
 
         internal ThemeTrieElementRule GetDefaults()
         {
-            return this.defaults;
+            return this._defaults;
         }
     }
 }

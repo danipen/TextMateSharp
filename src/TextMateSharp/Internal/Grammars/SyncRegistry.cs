@@ -84,8 +84,12 @@ namespace TextMateSharp.Internal.Grammars
             return this._theme.Match(scopeNames);
         }
 
-        public IGrammar GrammarForScopeName(string scopeName, int initialLanguage,
-                Dictionary<string, int> embeddedLanguages)
+        public IGrammar GrammarForScopeName(
+            string scopeName,
+            int initialLanguage,
+            Dictionary<string, int> embeddedLanguages,
+            Dictionary<string, int> tokenTypes,
+            BalancedBracketSelectors balancedBracketSelectors)
         {
             if (!this._grammars.ContainsKey(scopeName))
             {
@@ -95,7 +99,15 @@ namespace TextMateSharp.Internal.Grammars
                     return null;
                 }
                 this._grammars.Add(scopeName,
-                        GrammarHelper.CreateGrammar(rawGrammar, initialLanguage, embeddedLanguages, this, this));
+                    new Grammar(
+                        scopeName,
+                        rawGrammar,
+                        initialLanguage,
+                        embeddedLanguages,
+                        tokenTypes,
+                        balancedBracketSelectors,
+                        this,
+                        this));
             }
             return this._grammars[scopeName];
         }

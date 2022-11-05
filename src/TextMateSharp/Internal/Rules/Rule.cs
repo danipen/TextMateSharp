@@ -5,7 +5,7 @@ namespace TextMateSharp.Internal.Rules
 {
     public abstract class Rule
     {
-        public int? Id { get; private set; }
+        public RuleId Id { get; private set; }
 
         private bool _nameIsCapturing;
         private string _name;
@@ -13,7 +13,7 @@ namespace TextMateSharp.Internal.Rules
         private bool _contentNameIsCapturing;
         private string _contentName;
 
-        public Rule(int? id, string name, string contentName)
+        public Rule(RuleId id, string name, string contentName)
         {
             Id = id;
 
@@ -44,6 +44,6 @@ namespace TextMateSharp.Internal.Rules
 
         public abstract void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst);
 
-        public abstract ICompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG);
+        public abstract CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG);
     }
 }

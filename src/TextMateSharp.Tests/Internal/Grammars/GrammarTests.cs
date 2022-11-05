@@ -1,8 +1,12 @@
-﻿using NUnit.Framework;
-
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+
+using NUnit.Framework;
 using TextMateSharp.Grammars;
+using TextMateSharp.Grammars.Resources;
 using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
 using TextMateSharp.Internal.Types;
@@ -107,11 +111,11 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             List<IToken> tokens = new List<IToken>();
 
-            StackElement ruleStack = null;
+            IStateStack ruleStack = null;
 
             foreach (string line in lines)
             {
-                ITokenizeLineResult lineTokens = grammar.TokenizeLine(line, ruleStack);
+                ITokenizeLineResult lineTokens = grammar.TokenizeLine(line, ruleStack, TimeSpan.MaxValue);
 
                 ruleStack = lineTokens.RuleStack;
 
@@ -146,7 +150,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             string text = "string s = \"chars: 安定させる\";";
 
             Registry.Registry registry = new Registry.Registry(
-                            new TestRegistry());
+                new TestRegistry());
 
             IGrammar grammar = registry.LoadGrammar("source.cs");
 
@@ -274,6 +278,31 @@ namespace TextMateSharp.Tests.Internal.Grammars
                 "source.ts",
                 "meta.decorator.ts",
                 "meta.brace.round.ts");
+        }
+
+        [Test]
+        public void Resource_Loader_Should_Work_With_Turkish_Culture()
+        {
+            var currentCultureBck = CultureInfo.CurrentCulture;
+            try
+            {
+                SetCurrentCulture(CultureInfo.GetCultureInfo("tr-TR"));
+                using var stream = ResourceLoader.OpenGrammarPackage("Ini");
+                Assert.IsNotNull(stream);
+            }
+            finally
+            {
+                SetCurrentCulture(currentCultureBck);
+            }
+        }
+
+        static void SetCurrentCulture(CultureInfo cultureInfo)
+        {
+            if (cultureInfo == null)
+                return;
+
+            CultureInfo.CurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
         }
 
         static void AssertTokenValuesAreEqual(IToken token, int startIndex, int endIndex, params string[] scopes)

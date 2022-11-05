@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>True</IsPackable>
+    <Description>Needed assts to build and run TextMateSharp on wasm.</Description>
+    <PackageProjectUrl>https://github.com/danipen/TextMateSharp</PackageProjectUrl>
+    <Authors>Daniel Peñalba</Authors>
+    <Company />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- native oniguruma library for wasm in nuget package -->
+    <Content Include="libonig.a">
+      <Link>libonig.a</Link>
+      <PackagePath>onigwrap-wasm/libonig.a</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- native oniguruma header files sources for wasm in nuget package -->
+    <Content Include="..\..\onigwrap\src\oniguruma.h">
+      <Link>onigwrap.h</Link>
+      <PackagePath>onigwrap-wasm/oniguruma.h</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- native onigwrap sources for wasm in nuget package -->
+    <Content Include="..\..\onigwrap\src\onigwrap.c">
+      <Link>onigwrap.c</Link>
+      <PackagePath>onigwrap-wasm/onigwrap.c</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- native onigwrap header files sources for wasm in nuget package -->
+    <Content Include="..\..\onigwrap\src\onigwrap.h">
+      <Link>onigwrap.h</Link>
+      <PackagePath>onigwrap-wasm/onigwrap.h</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- build props file sources for wasm in nuget package -->
+    <Content Include="TextMateSharp.Wasm.props">
+      <Link>TextMateSharp.Wasm.Props</Link>
+      <PackagePath>build/net6.0/TextMateSharp.Wasm.props</PackagePath>
+      <Pack>true</Pack>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

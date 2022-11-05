@@ -158,7 +158,7 @@ namespace TextMateSharp.Themes
             // Try to merge into existing rule
             foreach (ThemeTrieElementRule rule in this.rulesWithParentScopes)
             {
-                if (CompareUtils.StrArrCmp(rule.parentScopes, parentScopes) == 0)
+                if (StringUtils.StrArrCmp(rule.parentScopes, parentScopes) == 0)
                 {
                     // bingo! => we get to merge this into an existing one
                     rule.AcceptOverwrite(scopeDepth, fontStyle, foreground, background);
