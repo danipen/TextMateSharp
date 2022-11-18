@@ -3,6 +3,7 @@
     internal class GrammarNames
     {
         internal static string[] SupportedGrammars = new string[] {
+            "Asciidoc",
             "Bat",
             "Clojure",
             "CoffeeScript",

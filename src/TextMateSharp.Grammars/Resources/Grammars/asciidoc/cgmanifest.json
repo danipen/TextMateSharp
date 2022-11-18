@@ -1,0 +1,25 @@
+{
+	"registrations": [
+		{
+			"component": {
+				"type": "git",
+				"git": {
+					"name": "mattneub/AsciiDoc-TextMate-2.tmbundle",
+					"repositoryUrl": "https://github.com/mattneub/AsciiDoc-TextMate-2.tmbundle",
+					"commitHash": "df611ad3df9b71ebcc55351ee4e88e2dc0537957"
+				}
+			},
+			"licenseDetail": [
+				"Copyright (c) Matt Neuburg",
+				"",
+				"Probably MIT (http://choosealicense.com/licenses/mit/).",
+				"This seems closest to the Markdown bundle license which is what I would want to imitate.",
+				"Do what you want with it, don't pretend you wrote it if you didn't, and good luck to you.",
+				"https://github.com/mattneub/AsciiDoc-TextMate-2.tmbundle/issues/2#issuecomment-72376749"
+			],
+			"license": "MIT",
+			"version": "0.0.0"
+		}
+	],
+	"version": 1
+}
