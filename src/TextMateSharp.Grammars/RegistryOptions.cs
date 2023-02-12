@@ -11,6 +11,8 @@ using TextMateSharp.Internal.Themes.Reader;
 using TextMateSharp.Internal.Types;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace TextMateSharp.Grammars
 {
@@ -157,6 +159,16 @@ namespace TextMateSharp.Grammars
 
         void InitializeAvailableGrammars()
         {
+            KeepType<List<object>>();
+            KeepType<GrammarDefinition>();
+            KeepType<Repository>();
+            KeepType<Contributes>();
+            KeepType<Snippet>();
+            KeepType<Grammar>();
+            KeepType<Language>();
+            KeepType<Scripts>();
+            KeepType<Engines>();
+
             var serializer = new JsonSerializer();
 
             foreach (string grammar in GrammarNames.SupportedGrammars)
@@ -169,6 +181,13 @@ namespace TextMateSharp.Grammars
                     _availableGrammars.Add(grammar, definition);
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void KeepType<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>()
+        {
+            // No-op
         }
 
         string GetGrammarFile(string scopeName)
