@@ -6,8 +6,7 @@ namespace TextMateSharp.Internal.Parser.Json
 {
     public class JSONPListParser<T>
     {
-
-        private bool theme;
+        private readonly bool theme;
 
         public JSONPListParser(bool theme)
         {
@@ -18,7 +17,7 @@ namespace TextMateSharp.Internal.Parser.Json
         {
             PList<T> pList = new PList<T>(theme);
 
-            var buffer = new byte[contents.BaseStream.Length];
+            var buffer = new byte[2048];
 
             JsonReaderOptions options = new JsonReaderOptions()
             {
@@ -26,12 +25,24 @@ namespace TextMateSharp.Internal.Parser.Json
                 CommentHandling = JsonCommentHandling.Skip
             };
 
-            contents.BaseStream.Read(buffer, 0, buffer.Length);
+            int size = contents.BaseStream.Read(buffer, 0, buffer.Length);
+            var reader = new Utf8JsonReader(buffer.AsSpan(0, size), isFinalBlock: false, state: new JsonReaderState(options));
 
-            var reader = new Utf8JsonReader(buffer, true, new JsonReaderState(options));
-
-            while (reader.Read())
+            while (true)
             {
+                int bytesRead = -1;
+
+                while (!reader.Read())
+                {
+                    bytesRead = GetMoreBytesFromStream(contents.BaseStream, ref buffer, ref reader);
+
+                    if (bytesRead == 0)
+                        break;
+                }
+
+                if (bytesRead == 0)
+                    break;
+
                 var nextToken = reader.TokenType;
                 switch (nextToken)
                 {
@@ -60,6 +71,31 @@ namespace TextMateSharp.Internal.Parser.Json
                 }
             }
             return pList.GetResult();
+        }
+
+        private static int GetMoreBytesFromStream(Stream stream, ref byte[] buffer, ref Utf8JsonReader reader)
+        {
+            int bytesRead;
+            if (reader.BytesConsumed < buffer.Length)
+            {
+                ReadOnlySpan<byte> leftover = buffer.AsSpan((int)reader.BytesConsumed);
+
+                if (leftover.Length == buffer.Length)
+                {
+                    Array.Resize(ref buffer, buffer.Length * 2);
+                }
+
+                leftover.CopyTo(buffer);
+                bytesRead = stream.Read(buffer, leftover.Length, buffer.Length - leftover.Length);
+                reader = new Utf8JsonReader(buffer.AsSpan(0, bytesRead + leftover.Length), isFinalBlock: bytesRead == 0, reader.CurrentState);
+            }
+            else
+            {
+                bytesRead = stream.Read(buffer, 0, buffer.Length);
+                reader = new Utf8JsonReader(buffer.AsSpan(0, bytesRead), isFinalBlock: bytesRead == 0, reader.CurrentState);
+            }
+
+            return bytesRead;
         }
     }
 }
