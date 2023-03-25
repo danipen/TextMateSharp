@@ -1,30 +1,29 @@
 ﻿using System.Collections.Generic;
-
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace TextMateSharp.Grammars
 {
     public class Engines
     {
-        [JsonProperty("engines")]
+        [JsonPropertyName("engines")]
         public string VsCode { get; set; }
     }
 
     public class Scripts
     {
-        [JsonProperty("update-grammar")]
+        [JsonPropertyName("update-grammar")]
         public string UpdateGrammar { get; set; }
     }
 
     public class Language
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
-        [JsonProperty("extensions")]
+        [JsonPropertyName("extensions")]
         public List<string> Extensions { get; set; }
-        [JsonProperty("aliases")]
+        [JsonPropertyName("aliases")]
         public List<string> Aliases { get; set; }
-        [JsonProperty("configuration")]
+        [JsonPropertyName("configuration")]
         public string Configuration { get; set; }
 
         public override string ToString()
@@ -38,61 +37,61 @@ namespace TextMateSharp.Grammars
 
     public class Grammar
     {
-        [JsonProperty("language")]
+        [JsonPropertyName("language")]
         public string Language { get; set; }
-        [JsonProperty("scopeName")]
+        [JsonPropertyName("scopeName")]
         public string ScopeName { get; set; }
-        [JsonProperty("path")]
+        [JsonPropertyName("path")]
         public string Path { get; set; }
     }
 
     public class Snippet
     {
-        [JsonProperty("language")]
+        [JsonPropertyName("language")]
         public string Language { get; set; }
-        [JsonProperty("path")]
+        [JsonPropertyName("path")]
         public string Path { get; set; }
     }
 
     public class Contributes
     {
-        [JsonProperty("languages")]
+        [JsonPropertyName("languages")]
         public List<Language> Languages { get; set; }
-        [JsonProperty("grammars")]
+        [JsonPropertyName("grammars")]
         public List<Grammar> Grammars { get; set; }
-        [JsonProperty("snippets")]
+        [JsonPropertyName("snippets")]
         public List<Snippet> Snippets { get; set; }
     }
 
     public class Repository
     {
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url { get; set; }
     }
 
     public class GrammarDefinition
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonProperty("displayName")]
+        [JsonPropertyName("displayName")]
         public string DisplayName { get; set; }
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
-        [JsonProperty("version")]
+        [JsonPropertyName("version")]
         public string Version { get; set; }
-        [JsonProperty("publisher")]
+        [JsonPropertyName("publisher")]
         public string Publisher { get; set; }
-        [JsonProperty("license")]
+        [JsonPropertyName("license")]
         public string License { get; set; }
-        [JsonProperty("engines")]
+        [JsonPropertyName("engines")]
         public Engines Engines { get; set; }
-        [JsonProperty("scripts")]
+        [JsonPropertyName("scripts")]
         public Scripts Scripts { get; set; }
-        [JsonProperty("contributes")]
+        [JsonPropertyName("contributes")]
         public Contributes Contributes { get; set; }
-        [JsonProperty("repository")]
+        [JsonPropertyName("repository")]
         public Repository Repository { get; set; }
     }
 }

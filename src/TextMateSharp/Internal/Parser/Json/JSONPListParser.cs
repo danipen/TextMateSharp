@@ -1,13 +1,12 @@
+using System;
 using System.IO;
-
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace TextMateSharp.Internal.Parser.Json
 {
     public class JSONPListParser<T>
     {
-
-        private bool theme;
+        private readonly bool theme;
 
         public JSONPListParser(bool theme)
         {
@@ -18,46 +17,85 @@ namespace TextMateSharp.Internal.Parser.Json
         {
             PList<T> pList = new PList<T>(theme);
 
-            JsonReader reader = new JsonTextReader(contents);
+            var buffer = new byte[2048];
+
+            JsonReaderOptions options = new JsonReaderOptions()
+            {
+                AllowTrailingCommas = true,
+                CommentHandling = JsonCommentHandling.Skip
+            };
+
+            int size = contents.BaseStream.Read(buffer, 0, buffer.Length);
+            var reader = new Utf8JsonReader(buffer.AsSpan(0, size), isFinalBlock: false, state: new JsonReaderState(options));
 
             while (true)
             {
-                if (!reader.Read())
+                int bytesRead = -1;
+
+                while (!reader.Read())
+                {
+                    bytesRead = GetMoreBytesFromStream(contents.BaseStream, ref buffer, ref reader);
+
+                    if (bytesRead == 0)
+                        break;
+                }
+
+                if (bytesRead == 0)
                     break;
 
-                JsonToken nextToken = reader.TokenType;
+                var nextToken = reader.TokenType;
                 switch (nextToken)
                 {
-                    case JsonToken.StartArray:
+                    case JsonTokenType.StartArray:
                         pList.StartElement("array");
                         break;
-                    case JsonToken.EndArray:
+                    case JsonTokenType.EndArray:
                         pList.EndElement("array");
                         break;
-                    case JsonToken.StartObject:
+                    case JsonTokenType.StartObject:
                         pList.StartElement("dict");
                         break;
-                    case JsonToken.EndObject:
+                    case JsonTokenType.EndObject:
                         pList.EndElement("dict");
                         break;
-                    case JsonToken.PropertyName:
+                    case JsonTokenType.PropertyName:
                         pList.StartElement("key");
-                        pList.AddString((string)reader.Value);
+                        pList.AddString(reader.GetString());
                         pList.EndElement("key");
                         break;
-                    case JsonToken.String:
+                    case JsonTokenType.String:
                         pList.StartElement("string");
-                        pList.AddString((string)reader.Value);
+                        pList.AddString(reader.GetString());
                         pList.EndElement("string");
-                        break;
-                    case JsonToken.Null:
-                    case JsonToken.Boolean:
-                    case JsonToken.Integer:
-                    case JsonToken.Float:
                         break;
                 }
             }
             return pList.GetResult();
+        }
+
+        private static int GetMoreBytesFromStream(Stream stream, ref byte[] buffer, ref Utf8JsonReader reader)
+        {
+            int bytesRead;
+            if (reader.BytesConsumed < buffer.Length)
+            {
+                ReadOnlySpan<byte> leftover = buffer.AsSpan((int)reader.BytesConsumed);
+
+                if (leftover.Length == buffer.Length)
+                {
+                    Array.Resize(ref buffer, buffer.Length * 2);
+                }
+
+                leftover.CopyTo(buffer);
+                bytesRead = stream.Read(buffer, leftover.Length, buffer.Length - leftover.Length);
+                reader = new Utf8JsonReader(buffer.AsSpan(0, bytesRead + leftover.Length), isFinalBlock: bytesRead == 0, reader.CurrentState);
+            }
+            else
+            {
+                bytesRead = stream.Read(buffer, 0, buffer.Length);
+                reader = new Utf8JsonReader(buffer.AsSpan(0, bytesRead), isFinalBlock: bytesRead == 0, reader.CurrentState);
+            }
+
+            return bytesRead;
         }
     }
 }
