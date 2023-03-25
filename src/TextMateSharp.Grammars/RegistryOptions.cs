@@ -158,16 +158,6 @@ namespace TextMateSharp.Grammars
 
         void InitializeAvailableGrammars()
         {
-            KeepType<List<object>>();
-            KeepType<GrammarDefinition>();
-            KeepType<Repository>();
-            KeepType<Contributes>();
-            KeepType<Snippet>();
-            KeepType<Grammar>();
-            KeepType<Language>();
-            KeepType<Scripts>();
-            KeepType<Engines>();
-
             foreach (string grammar in GrammarNames.SupportedGrammars)
             {
                 using (Stream stream = ResourceLoader.OpenGrammarPackage(grammar))
@@ -176,13 +166,6 @@ namespace TextMateSharp.Grammars
                     _availableGrammars.Add(grammar, definition);
                 }
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void KeepType<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>()
-        {
-            // No-op
         }
 
         string GetGrammarFile(string scopeName)
