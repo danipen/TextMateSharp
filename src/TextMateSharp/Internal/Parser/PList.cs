@@ -151,6 +151,11 @@ namespace TextMateSharp.Internal.Parser
             this.text.Append(str);
         }
 
+        public void AddString(char[] value, int startIndex, int charCount)
+        {
+            this.text.Append(value, startIndex, charCount);
+        }
+
         public T GetResult()
         {
             return result;

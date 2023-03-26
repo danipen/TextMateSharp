@@ -18,6 +18,7 @@ namespace TextMateSharp.Internal.Parser.Json
             PList<T> pList = new PList<T>(theme);
 
             var buffer = new byte[2048];
+            var valueBuffer = new char[256];
 
             JsonReaderOptions options = new JsonReaderOptions()
             {
@@ -59,18 +60,29 @@ namespace TextMateSharp.Internal.Parser.Json
                         pList.EndElement("dict");
                         break;
                     case JsonTokenType.PropertyName:
-                        pList.StartElement("key");
-                        pList.AddString(reader.GetString());
-                        pList.EndElement("key");
+                        AddElement(reader, pList, "key", ref valueBuffer);
                         break;
                     case JsonTokenType.String:
-                        pList.StartElement("string");
-                        pList.AddString(reader.GetString());
-                        pList.EndElement("string");
+                        AddElement(reader, pList, "string", ref valueBuffer);
                         break;
                 }
             }
             return pList.GetResult();
+        }
+
+        private static void AddElement(Utf8JsonReader reader, PList<T> pList, string elementName, ref char[] buffer)
+        {
+            pList.StartElement(elementName);
+
+            long valuelength = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
+
+            if (buffer.Length < valuelength)
+                Array.Resize(ref buffer, (int)valuelength);
+
+            int copiedLength = reader.CopyString(buffer);
+            pList.AddString(buffer, 0, copiedLength);
+
+            pList.EndElement(elementName);
         }
 
         private static int GetMoreBytesFromStream(Stream stream, ref byte[] buffer, ref Utf8JsonReader reader)
