@@ -39,7 +39,8 @@ namespace TextMateSharp.Internal.Parser
                     currObject.SetLastKey(null);
                 }
             }
-            this.text = new StringBuilder("");
+            this.text ??= new StringBuilder("");
+            this.text.Clear();
         }
 
         private PListObject Create(PListObject parent, bool valueAsArray)
