@@ -11,7 +11,7 @@ jobs:
       BUILD_CONFIG: 'Release'
       SOLUTION: 'TextMateSharp.sln'
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -32,11 +32,25 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
+    - name: Decode the Pfx
+      run: |
+        $signing_keys_payload = [System.Convert]::FromBase64String("${{ secrets.SIGNING_KEY }}")
+        $currentDirectory = Get-Location
+        $certificatePath = Join-Path -Path $currentDirectory -ChildPath "TextMateSharp.snk"
+        [IO.File]::WriteAllBytes("$certificatePath", $signing_keys_payload)
+
+    - name: Materialize Signing Key
+      id: write_sign_key_file
+      uses: timheuer/base64-to-file@v1.2
+      with:
+        fileName: 'TextMateSharp.snk'
+        encodedString: ${{ secrets.SIGNING_KEY }} 
+
     - name: Build
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{steps.extract_branch.outputs.branch}} --no-restore
+      env:
+        SignAssembly: true
+        AssemblyOriginatorKeyFile: ${{ steps.write_sign_key_file.outputs.filePath }}
 
     - name: Run tests
       run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
-
-    - name: Publish
-      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
