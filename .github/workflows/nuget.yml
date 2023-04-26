@@ -11,7 +11,7 @@ jobs:
       BUILD_CONFIG: 'Release'
       SOLUTION: 'TextMateSharp.sln'
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
