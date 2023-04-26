@@ -70,14 +70,14 @@ namespace TextMateSharp.Themes
         }
     }
 
-    class ParsedTheme
+    public class ParsedTheme
     {
         private ThemeTrieElement _root;
         private ThemeTrieElementRule _defaults;
 
         private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> _cachedMatchRoot;
 
-        internal static List<ParsedThemeRule> ParseTheme(IRawTheme source, int priority)
+        public static List<ParsedThemeRule> ParseTheme(IRawTheme source, int priority)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 

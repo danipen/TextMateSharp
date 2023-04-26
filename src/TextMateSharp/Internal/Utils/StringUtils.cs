@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace TextMateSharp.Internal.Utils
 {
-    internal static class StringUtils
+    public static class StringUtils
     {
         private static Regex rrggbb = new Regex("^#[0-9a-f]{6}", RegexOptions.IgnoreCase);
         private static Regex rrggbbaa = new Regex("^#[0-9a-f]{8}", RegexOptions.IgnoreCase);

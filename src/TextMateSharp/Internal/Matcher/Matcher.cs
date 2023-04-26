@@ -4,9 +4,9 @@ using System.Text;
 
 namespace TextMateSharp.Internal.Matcher
 {
-    internal class Matcher
+    public class Matcher
     {
-        internal static ICollection<MatcherWithPriority<List<string>>> CreateMatchers(string selector)
+        public static ICollection<MatcherWithPriority<List<string>>> CreateMatchers(string selector)
         {
             return CreateMatchers(selector, NameMatcher.Default);
         }
