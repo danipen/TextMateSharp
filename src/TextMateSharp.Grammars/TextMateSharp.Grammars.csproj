@@ -11,6 +11,8 @@
     <Company />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\TextMateSharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

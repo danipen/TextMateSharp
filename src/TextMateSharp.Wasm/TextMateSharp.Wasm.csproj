@@ -10,6 +10,8 @@
     <Authors>Daniel Peñalba</Authors>
     <Company />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\TextMateSharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
