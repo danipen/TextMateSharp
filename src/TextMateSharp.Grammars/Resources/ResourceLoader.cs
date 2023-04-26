@@ -4,12 +4,12 @@ using System.Reflection;
 
 namespace TextMateSharp.Grammars.Resources
 {
-    public class ResourceLoader
+    internal class ResourceLoader
     {
         const string GrammarPrefix = "TextMateSharp.Grammars.Resources.Grammars.";
         const string ThemesPrefix = "TextMateSharp.Grammars.Resources.Themes.";
 
-        public static Stream OpenGrammarPackage(string grammarName)
+        internal static Stream OpenGrammarPackage(string grammarName)
         {
             string grammarPackage = GrammarPrefix + grammarName.ToLowerInvariant() + "." + "package.json";
 
