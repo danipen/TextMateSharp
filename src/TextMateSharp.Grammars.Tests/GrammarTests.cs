@@ -99,5 +99,49 @@ namespace TextMateSharp.Grammars.Tests
                 }
             }
         }
+
+        [Test]
+        public void Assert_Every_Grammar_With_Language_Configuration_File_Has_Language_Configuration()
+        {
+            RegistryOptions options = new RegistryOptions(ThemeName.Light);
+
+            foreach (var language in options.GetAvailableLanguages())
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(language.ConfigurationFile))
+                    {
+                        Assert.That(language.Configuration, Is.Not.Null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(
+                        string.Format("[{0} grammar]: {1}", language.Id, ex.Message));
+                }
+            }
+        }
+
+        [Test]
+        public void Assert_Every_Grammar_With_Snippets_Can_Load_Snippets()
+        {
+            RegistryOptions options = new RegistryOptions(ThemeName.Light);
+
+            foreach (var grammarDefinition in options.GetAvailableGrammarDefinitions())
+            {
+                try
+                {
+                    if (grammarDefinition.Contributes == null || grammarDefinition.Contributes.Snippets == null)
+                        continue;
+
+                    Assert.That(grammarDefinition.LanguageSnippets, Is.Not.Null);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(
+                        string.Format("[{0} grammar definition]: {1}", grammarDefinition.Name, ex.Message));
+                }
+            }
+        }
     }
 }

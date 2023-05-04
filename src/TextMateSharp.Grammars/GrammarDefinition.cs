@@ -1,5 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+
+using TextMateSharp.Grammars.Resources;
 
 namespace TextMateSharp.Grammars
 {
@@ -24,7 +28,8 @@ namespace TextMateSharp.Grammars
         [JsonPropertyName("aliases")]
         public List<string> Aliases { get; set; }
         [JsonPropertyName("configuration")]
-        public string Configuration { get; set; }
+        public string ConfigurationFile { get; set; }
+        public LanguageConfiguration Configuration {get; set;}
 
         public override string ToString()
         {
@@ -93,5 +98,6 @@ namespace TextMateSharp.Grammars
         public Contributes Contributes { get; set; }
         [JsonPropertyName("repository")]
         public Repository Repository { get; set; }
+        public LanguageSnippets LanguageSnippets { get; set; }
     }
 }

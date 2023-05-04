@@ -23,19 +23,10 @@ namespace TextMateSharp.Grammars.Resources
             return result;
         }
 
-        internal static Stream OpenLanguageConfiguration(string language, string configurationName)
+        internal static Stream TryOpenLanguageConfiguration(string grammarName, string configurationFileName)
         {
-            var result = TryOpenLanguageConfiguration(language, configurationName);
-
-            if (result == null)
-                throw new FileNotFoundException("The language configuration for'" + language + "' was not found.");
-
-            return result;
-        }
-
-        internal static Stream TryOpenLanguageConfiguration(string language, string configurationName)
-        {
-            string grammarPackage = GrammarPrefix + language.ToLowerInvariant() + "." + Path.GetFileName(configurationName);
+            configurationFileName = configurationFileName.Replace('/', '.').TrimStart('.');
+            string grammarPackage = GrammarPrefix + grammarName.ToLowerInvariant() + "." + configurationFileName;
 
             var result = typeof(ResourceLoader).GetTypeInfo().Assembly.GetManifestResourceStream(
                 grammarPackage);
@@ -43,19 +34,10 @@ namespace TextMateSharp.Grammars.Resources
             return result;
         }
 
-        internal static Stream OpenLanguageSnippet(string language, string snippetName)
+        internal static Stream TryOpenLanguageSnippet(string grammarName, string snippetFileName)
         {
-            var result = TryOpenLanguageSnippet(language, snippetName);
-            if (result == null)
-                throw new FileNotFoundException("The language snippet for'" + language + "' was not found.");
-
-            return result;
-        }
-
-        internal static Stream TryOpenLanguageSnippet(string language, string snippetName)
-        {
-            snippetName = snippetName.Replace('/', '.').TrimStart('.');
-            string snippetPackage = SnippetPrefix + language.ToLowerInvariant() + "." + snippetName;
+            snippetFileName = snippetFileName.Replace('/', '.').TrimStart('.');
+            string snippetPackage = SnippetPrefix + grammarName.ToLowerInvariant() + "." + snippetFileName;
 
             var result = typeof(ResourceLoader).GetTypeInfo().Assembly.GetManifestResourceStream(
                 snippetPackage);

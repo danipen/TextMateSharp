@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using TextMateSharp.Grammars.Resources;
+using TextMateSharp.Internal.Grammars;
 
 using CharacterPair = System.Collections.Generic.IList<char>;
 using StringPair = System.Collections.Generic.IList<string>;
@@ -37,74 +39,23 @@ namespace TextMateSharp.Grammars
         [JsonConverter(typeof(EnterRulesJsonConverter))]
         public EnterRules EnterRules { get; set; }
 
-        public static LanguageConfiguration LoadLanguageConfiguration(string language, string configurationName)
+        public static LanguageConfiguration Load(string grammarName, string configurationFile)
         {
-            if (string.IsNullOrEmpty(configurationName))
+            if (string.IsNullOrEmpty(configurationFile))
                 return null;
-            using (Stream stream = ResourceLoader.TryOpenLanguageConfiguration(language, configurationName))
+
+            using (Stream stream = ResourceLoader.TryOpenLanguageConfiguration(grammarName, configurationFile))
             {
-                if (stream != null)
+                if (stream == null)
+                    return null;
+
+                using (StreamReader reader = new StreamReader(stream))
                 {
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
 #pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-                        return JsonSerializer.Deserialize<LanguageConfiguration>(stream, new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
-#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-                        //return JsonSerializer.Deserialize<LanguageConfiguration>(stream, LanguageConfigurationSerializationContext.Default.LanguageConfiguration);
-                    }
+                    return JsonSerializer.Deserialize<LanguageConfiguration>(stream, new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
+#pragma warning restore IL2026
                 }
             }
-
-            return null;
-        }
-
-        public static GrammarDefinition LoadGrammarDefinition(string grammar)
-        {
-            if (string.IsNullOrEmpty(grammar))
-                return null;
-            using (Stream stream = ResourceLoader.OpenGrammarPackage(grammar))
-            {
-                if (stream != null)
-                {
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        return JsonSerializer.Deserialize<GrammarDefinition>(stream, GrammarDefinitionSerializationContext.Default.GrammarDefinition);
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public static LanguageSnippets LoadSnippets(string grammar)
-        {
-            GrammarDefinition definition = LoadGrammarDefinition(grammar);
-            if (definition?.Contributes?.Snippets != null)
-            {
-                var result = new LanguageSnippets();
-
-                foreach (var item in definition.Contributes.Snippets)
-                {
-                    if (!string.IsNullOrEmpty(item.Path))
-                    {
-                        using (Stream stream = ResourceLoader.TryOpenLanguageSnippet(item.Language, item.Path))
-                        {
-                            if (stream != null)
-                            {
-                                using (StreamReader reader = new StreamReader(stream))
-                                {
-                                    return JsonSerializer.Deserialize<LanguageSnippets>(stream, LanguageSnippetsSerializationContext.Default.LanguageSnippets);
-                                }
-
-                            }
-                        }
-                    }
-                }
-
-                return result;
-            }
-
-            return null;
         }
     }
 
@@ -219,6 +170,32 @@ namespace TextMateSharp.Grammars
     public class LanguageSnippets
     {
         public IDictionary<string, LanguageSnippet> Snippets { get; set; } = new Dictionary<string, LanguageSnippet>();
+
+        public static LanguageSnippets Load(string grammarName, Contributes contributes)
+        {
+            if (contributes == null || contributes.Snippets == null)
+                return null;
+
+            var result = new LanguageSnippets();
+
+            foreach (var snippet in contributes.Snippets)
+            {
+                using (Stream stream = ResourceLoader.TryOpenLanguageSnippet(grammarName, snippet.Path))
+                {
+                    if (stream == null)
+                        continue;
+
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
+                        return JsonSerializer.Deserialize<LanguageSnippets>(stream, new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
+#pragma warning restore IL2026
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 
     public class ClosingPairJsonConverter : JsonConverter<AutoClosingPairs>
