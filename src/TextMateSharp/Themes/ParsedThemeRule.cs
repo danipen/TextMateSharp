@@ -6,6 +6,7 @@ namespace TextMateSharp.Themes
     public class ParsedThemeRule
     {
         public string scope;
+        public string name;
         public List<string> parentScopes;
         public int index;
 
@@ -13,6 +14,17 @@ namespace TextMateSharp.Themes
         public int fontStyle;
         public string foreground;
         public string background;
+
+        public ParsedThemeRule(string name, string scope, List<string> parentScopes, int index, int fontStyle, string foreground, string background)
+        {
+            this.name = name;
+            this.scope = scope;
+            this.parentScopes = parentScopes;
+            this.index = index;
+            this.fontStyle = fontStyle;
+            this.foreground = foreground;
+            this.background = background;
+        }
 
         public ParsedThemeRule(string scope, List<string> parentScopes, int index, int fontStyle, string foreground,
                 string background)

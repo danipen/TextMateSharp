@@ -200,8 +200,9 @@ namespace TextMateSharp.Themes
                         parentScopes = new List<string>(segments);
                         parentScopes.Reverse();
                     }
+                    var name = entry.GetName();
 
-                    ParsedThemeRule t = new ParsedThemeRule(scope, parentScopes, i, fontStyle, foreground, background);
+                    ParsedThemeRule t = new ParsedThemeRule(name, scope, parentScopes, i, fontStyle, foreground, background);
                     parsedThemeRules.Add(t);
                 }
                 i++;
@@ -259,14 +260,14 @@ namespace TextMateSharp.Themes
                     defaultBackground = incomingDefaults.background;
                 }
             }
-            ThemeTrieElementRule defaults = new ThemeTrieElementRule(0, null, defaultFontStyle,
+            ThemeTrieElementRule defaults = new ThemeTrieElementRule(string.Empty, 0, null, defaultFontStyle,
                     colorMap.GetId(defaultForeground), colorMap.GetId(defaultBackground));
 
-            ThemeTrieElement root = new ThemeTrieElement(new ThemeTrieElementRule(0, null, FontStyle.NotSet, 0, 0),
+            ThemeTrieElement root = new ThemeTrieElement(new ThemeTrieElementRule(string.Empty, 0, null, FontStyle.NotSet, 0, 0),
                     new List<ThemeTrieElementRule>());
             foreach (ParsedThemeRule rule in parsedThemeRules)
             {
-                root.Insert(0, rule.scope, rule.parentScopes, rule.fontStyle, colorMap.GetId(rule.foreground),
+                root.Insert(rule.name, 0, rule.scope, rule.parentScopes, rule.fontStyle, colorMap.GetId(rule.foreground),
                         colorMap.GetId(rule.background));
             }
 
