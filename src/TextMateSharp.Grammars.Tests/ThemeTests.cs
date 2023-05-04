@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using NUnit.Framework;
 using TextMateSharp.Themes;
@@ -25,6 +26,21 @@ namespace TextMateSharp.Grammars.Tests
                         string.Format("[{0} theme]: {1}", themeName, ex.Message));
                 }
             }
+        }
+
+        [Test]
+        public void Theme_Match_Should_Add_Rule_Names()
+        {
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+
+            Registry.Registry registry = new Registry.Registry(options);
+
+            Theme theme = registry.GetTheme();
+
+            var rule = theme.Match(new List<string>() { "source.cs", "keyword.other.using.cs" });
+
+            Assert.That(rule.Count, Is.GreaterThan(0));
+            Assert.That(rule[0].name, Is.Not.Null.Or.Empty);
         }
     }
 }
