@@ -18,6 +18,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Themes\*.json" />
     <EmbeddedResource Include="Resources\Grammars\**\*.json" />
+    <EmbeddedResource Include="Resources\Grammars\**\snippets\*.code-snippets" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
