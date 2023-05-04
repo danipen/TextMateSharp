@@ -26,17 +26,6 @@ namespace TextMateSharp.Themes
             this.background = background;
         }
 
-        public ParsedThemeRule(string scope, List<string> parentScopes, int index, int fontStyle, string foreground,
-                string background)
-        {
-            this.scope = scope;
-            this.parentScopes = parentScopes;
-            this.index = index;
-            this.fontStyle = fontStyle;
-            this.foreground = foreground;
-            this.background = background;
-        }
-
         public override int GetHashCode()
         {
             int prime = 31;
