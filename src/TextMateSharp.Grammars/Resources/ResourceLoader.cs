@@ -8,6 +8,7 @@ namespace TextMateSharp.Grammars.Resources
     {
         const string GrammarPrefix = "TextMateSharp.Grammars.Resources.Grammars.";
         const string ThemesPrefix = "TextMateSharp.Grammars.Resources.Themes.";
+        private const string SnippetPrefix = "TextMateSharp.Grammars.Resources.Grammars.";
 
         internal static Stream OpenGrammarPackage(string grammarName)
         {
@@ -18,6 +19,28 @@ namespace TextMateSharp.Grammars.Resources
 
             if (result == null)
                 throw new FileNotFoundException("The grammar package '" + grammarPackage + "' was not found.");
+
+            return result;
+        }
+
+        internal static Stream TryOpenLanguageConfiguration(string grammarName, string configurationFileName)
+        {
+            configurationFileName = configurationFileName.Replace('/', '.').TrimStart('.');
+            string grammarPackage = GrammarPrefix + grammarName.ToLowerInvariant() + "." + configurationFileName;
+
+            var result = typeof(ResourceLoader).GetTypeInfo().Assembly.GetManifestResourceStream(
+                grammarPackage);
+
+            return result;
+        }
+
+        internal static Stream TryOpenLanguageSnippet(string grammarName, string snippetFileName)
+        {
+            snippetFileName = snippetFileName.Replace('/', '.').TrimStart('.');
+            string snippetPackage = SnippetPrefix + grammarName.ToLowerInvariant() + "." + snippetFileName;
+
+            var result = typeof(ResourceLoader).GetTypeInfo().Assembly.GetManifestResourceStream(
+                snippetPackage);
 
             return result;
         }

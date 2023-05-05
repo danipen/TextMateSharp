@@ -106,12 +106,12 @@ namespace TextMateSharp.Themes
             return ThemeTrieElement.SortBySpecificity(arr);
         }
 
-        public void Insert(int scopeDepth, string scope, List<string> parentScopes, int fontStyle, int foreground,
+        public void Insert(string name, int scopeDepth, string scope, List<string> parentScopes, int fontStyle, int foreground,
                 int background)
         {
             if ("".Equals(scope))
             {
-                this.DoInsertHere(scopeDepth, parentScopes, fontStyle, foreground, background);
+                this.DoInsertHere(name, scopeDepth, parentScopes, fontStyle, foreground, background);
                 return;
             }
 
@@ -141,17 +141,17 @@ namespace TextMateSharp.Themes
                 this.children[head] = child;
             }
 
-            child.Insert(scopeDepth + 1, tail, parentScopes, fontStyle, foreground, background);
+            child.Insert(name, scopeDepth + 1, tail, parentScopes, fontStyle, foreground, background);
         }
 
-        private void DoInsertHere(int scopeDepth, List<string> parentScopes, int fontStyle, int foreground,
+        private void DoInsertHere(string name, int scopeDepth, List<string> parentScopes, int fontStyle, int foreground,
                 int background)
         {
 
             if (parentScopes == null)
             {
                 // Merge into the main rule
-                this.mainRule.AcceptOverwrite(scopeDepth, fontStyle, foreground, background);
+                this.mainRule.AcceptOverwrite(name, scopeDepth, fontStyle, foreground, background);
                 return;
             }
 
@@ -161,7 +161,7 @@ namespace TextMateSharp.Themes
                 if (StringUtils.StrArrCmp(rule.parentScopes, parentScopes) == 0)
                 {
                     // bingo! => we get to merge this into an existing one
-                    rule.AcceptOverwrite(scopeDepth, fontStyle, foreground, background);
+                    rule.AcceptOverwrite(rule.name,  scopeDepth, fontStyle, foreground, background);
                     return;
                 }
             }
@@ -169,6 +169,10 @@ namespace TextMateSharp.Themes
             // Must add a new rule
 
             // Inherit from main rule
+            if (string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(mainRule.name))
+            {
+                name = mainRule.name;
+            }
             if (fontStyle == FontStyle.NotSet)
             {
                 fontStyle = this.mainRule.fontStyle;
@@ -183,7 +187,7 @@ namespace TextMateSharp.Themes
             }
 
             this.rulesWithParentScopes.Add(
-                new ThemeTrieElementRule(scopeDepth, parentScopes, fontStyle, foreground, background));
+                new ThemeTrieElementRule(name, scopeDepth, parentScopes, fontStyle, foreground, background));
         }
 
         public override int GetHashCode()

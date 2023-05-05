@@ -45,6 +45,11 @@ namespace TextMateSharp.Grammars
             return result;
         }
 
+        public IEnumerable<GrammarDefinition> GetAvailableGrammarDefinitions()
+        {
+            return new List<GrammarDefinition>(_availableGrammars.Values);
+        }
+
         public Language GetLanguageByExtension(string extension)
         {
             foreach (GrammarDefinition definition in _availableGrammars.Values)
@@ -160,7 +165,21 @@ namespace TextMateSharp.Grammars
             {
                 using (Stream stream = ResourceLoader.OpenGrammarPackage(grammar))
                 {
-                    GrammarDefinition definition = JsonSerializer.Deserialize<GrammarDefinition>(stream, GrammarDefinitionSerializationContext.Default.GrammarDefinition);
+                    GrammarDefinition definition = JsonSerializer.Deserialize(
+                        stream,
+                        GrammarDefinitionSerializationContext.Default.GrammarDefinition);
+
+                    foreach (var language in definition.Contributes.Languages)
+                    {
+                        language.Configuration = LanguageConfiguration.Load(
+                            grammar,
+                            language.ConfigurationFile);
+                    }
+
+                    definition.LanguageSnippets = LanguageSnippets.Load(
+                        grammar,
+                        definition.Contributes);
+
                     _availableGrammars.Add(grammar, definition);
                 }
             }

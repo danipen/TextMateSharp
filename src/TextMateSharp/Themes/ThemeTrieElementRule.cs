@@ -12,10 +12,12 @@ namespace TextMateSharp.Themes
         public int fontStyle;
         public int foreground;
         public int background;
+        public string name;
 
-        public ThemeTrieElementRule(int scopeDepth, List<string> parentScopes, int fontStyle, int foreground,
+        public ThemeTrieElementRule(string name, int scopeDepth, List<string> parentScopes, int fontStyle, int foreground,
                 int background)
         {
+            this.name = name;
             this.scopeDepth = scopeDepth;
             this.parentScopes = parentScopes;
             this.fontStyle = fontStyle;
@@ -25,7 +27,7 @@ namespace TextMateSharp.Themes
 
         public ThemeTrieElementRule Clone()
         {
-            return new ThemeTrieElementRule(this.scopeDepth, this.parentScopes, this.fontStyle, this.foreground,
+            return new ThemeTrieElementRule(this.name, this.scopeDepth, this.parentScopes, this.fontStyle, this.foreground,
                     this.background);
         }
 
@@ -39,7 +41,7 @@ namespace TextMateSharp.Themes
             return r;
         }
 
-        public void AcceptOverwrite(int scopeDepth, int fontStyle, int foreground, int background)
+        public void AcceptOverwrite(string name, int scopeDepth, int fontStyle, int foreground, int background)
         {
             if (this.scopeDepth > scopeDepth)
             {
@@ -61,6 +63,10 @@ namespace TextMateSharp.Themes
             if (background != 0)
             {
                 this.background = background;
+            }
+            if (!string.IsNullOrEmpty(name))
+            {
+                this.name = name;
             }
         }
 
