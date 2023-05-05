@@ -45,14 +45,6 @@ namespace TextMateSharp.Grammars
             return result;
         }
 
-        public GrammarDefinition GetGrammarDefinitionByName(string grammarName)
-        {
-            if (!_availableGrammars.TryGetValue(grammarName, out GrammarDefinition definition))
-                return null;
-
-            return definition;
-        }
-
         public IEnumerable<GrammarDefinition> GetAvailableGrammarDefinitions()
         {
             return new List<GrammarDefinition>(_availableGrammars.Values);
