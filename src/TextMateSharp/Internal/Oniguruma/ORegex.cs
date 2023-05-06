@@ -34,7 +34,7 @@ namespace TextMateSharp.Internal.Oniguruma
             {
                 fixed (char* patternPtr = pattern)
                 {
-                    _regex = OnigInterop.onigwrap_create(
+                    _regex = OnigInterop.Instance.onigwrap_create(
                         patternPtr,
                         Encoding.Unicode.GetByteCount(patternPtr, pattern.Length),
                         ignoreCaseArg,
@@ -60,11 +60,11 @@ namespace TextMateSharp.Internal.Oniguruma
             lock (_syncObject)
             {
                 if (_region == IntPtr.Zero)
-                    _region = OnigInterop.onigwrap_region_new();
+                    _region = OnigInterop.Instance.onigwrap_region_new();
 
                 fixed (char* textPtr = text)
                 {
-                    OnigInterop.onigwrap_search(
+                    OnigInterop.Instance.onigwrap_search(
                         _regex,
                         textPtr,
                         Encoding.Unicode.GetByteCount(textPtr, offset),
@@ -72,17 +72,17 @@ namespace TextMateSharp.Internal.Oniguruma
                         _region);
                 }
 
-                var captureCount = OnigInterop.onigwrap_num_regs(_region);
+                var captureCount = OnigInterop.Instance.onigwrap_num_regs(_region);
 
                 Region region = null;
 
                 for (var capture = 0; capture < captureCount; capture++)
                 {
-                    var pos = OnigInterop.onigwrap_pos(_region, capture);
+                    var pos = OnigInterop.Instance.onigwrap_pos(_region, capture);
                     if (capture == 0 && pos < 0)
                         return null;
 
-                    int len = pos == -1 ? 0 : OnigInterop.onigwrap_len(_region, capture);
+                    int len = pos == -1 ? 0 : OnigInterop.Instance.onigwrap_len(_region, capture);
 
                     if (region == null)
                         region = new Region(captureCount);
@@ -110,10 +110,10 @@ namespace TextMateSharp.Internal.Oniguruma
                     _disposed = true;
 
                     if (_region != IntPtr.Zero)
-                        OnigInterop.onigwrap_region_free(_region);
+                        OnigInterop.Instance.onigwrap_region_free(_region);
 
                     if (_regex != IntPtr.Zero)
-                        OnigInterop.onigwrap_free(_regex);
+                        OnigInterop.Instance.onigwrap_free(_regex);
                 }
             }
         }
