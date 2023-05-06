@@ -3,20 +3,20 @@ using System.Runtime.InteropServices;
 
 namespace TextMateSharp.Internal.Oniguruma
 {
-    internal unsafe interface IOnigInterop
+    internal static class OnigInterop
     {
-        IntPtr onigwrap_create(char* pattern, int len, int ignoreCase, int multiline);
-        IntPtr onigwrap_region_new();
-        void onigwrap_region_free(IntPtr region);
-        void onigwrap_free(IntPtr regex);
-        int onigwrap_search(IntPtr regex, char* text, int offset, int length, IntPtr region);
-        int onigwrap_num_regs(IntPtr region);
-        int onigwrap_pos(IntPtr region, int nth);
-        int onigwrap_len(IntPtr region, int nth);
-    }
+        internal unsafe interface IOnigInterop
+        {
+            IntPtr onigwrap_create(char* pattern, int len, int ignoreCase, int multiline);
+            IntPtr onigwrap_region_new();
+            void onigwrap_region_free(IntPtr region);
+            void onigwrap_free(IntPtr regex);
+            int onigwrap_search(IntPtr regex, char* text, int offset, int length, IntPtr region);
+            int onigwrap_num_regs(IntPtr region);
+            int onigwrap_pos(IntPtr region, int nth);
+            int onigwrap_len(IntPtr region, int nth);
+        }
 
-    internal unsafe class OnigInterop
-    {
         internal static IOnigInterop Instance { get; private set; }
 
         static OnigInterop()
