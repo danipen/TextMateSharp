@@ -22,9 +22,13 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
 
   <ItemGroup>
     <!-- native oniguruma library for Windows -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\win-x86\onigwrap.dll" Condition=" '$(OS)' == 'Windows_NT' ">
+    <ContentWithTargetPath Include="Internal\Oniguruma\Native\win-x86\onigwrap-x86.dll" Condition=" '$(OS)' == 'Windows_NT' ">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>onigwrap.dll</TargetPath>
+      <TargetPath>onigwrap-x86.dll</TargetPath>
+    </ContentWithTargetPath>
+	      <ContentWithTargetPath Include="Internal\Oniguruma\Native\win-x64\onigwrap-x64.dll" Condition=" '$(OS)' == 'Windows_NT' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>onigwrap-x64.dll</TargetPath>
     </ContentWithTargetPath>
     <!-- native oniguruma library for Linux -->
     <ContentWithTargetPath Include="Internal\Oniguruma\Native\linux\libonigwrap.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
@@ -40,16 +44,16 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
 
   <ItemGroup>
     <!-- native oniguruma library for Windows-x86 in nuget package -->
-    <Content Include="Internal\Oniguruma\Native\win-x86\onigwrap.dll">
-      <Link>onigwrap.dll</Link>
-      <PackagePath>runtimes/win-x86/native/onigwrap.dll</PackagePath>
+    <Content Include="Internal\Oniguruma\Native\win-x86\onigwrap-x86.dll">
+      <Link>onigwrap-x86.dll</Link>
+      <PackagePath>runtimes/win-x86/native/onigwrap-x86.dll</PackagePath>
       <Pack>true</Pack>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <!-- native oniguruma library for Windows-x64 in nuget package -->
-    <Content Include="Internal\Oniguruma\Native\win-x64\onigwrap.dll">
-      <Link>onigwrap.dll</Link>
-      <PackagePath>runtimes/win-x64/native/onigwrap.dll</PackagePath>
+    <Content Include="Internal\Oniguruma\Native\win-x64\onigwrap-x64.dll">
+      <Link>onigwrap-x64.dll</Link>
+      <PackagePath>runtimes/win-x64/native/onigwrap-x64.dll</PackagePath>
       <Pack>true</Pack>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
