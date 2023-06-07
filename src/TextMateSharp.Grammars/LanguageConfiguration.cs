@@ -39,6 +39,8 @@ namespace TextMateSharp.Grammars
         [JsonConverter(typeof(EnterRulesJsonConverter))]
         public EnterRules EnterRules { get; set; }
 
+        private readonly static JsonSerializationContext jsonContext = new(new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
+
         public static LanguageConfiguration Load(string grammarName, string configurationFile)
         {
             if (string.IsNullOrEmpty(configurationFile))
@@ -51,9 +53,7 @@ namespace TextMateSharp.Grammars
 
                 using (StreamReader reader = new StreamReader(stream))
                 {
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-                    return JsonSerializer.Deserialize<LanguageConfiguration>(stream, new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
-#pragma warning restore IL2026
+                    return JsonSerializer.Deserialize(stream, jsonContext.LanguageConfiguration);
                 }
             }
         }
@@ -170,6 +170,7 @@ namespace TextMateSharp.Grammars
     public class LanguageSnippets
     {
         public IDictionary<string, LanguageSnippet> Snippets { get; set; } = new Dictionary<string, LanguageSnippet>();
+        private readonly static JsonSerializationContext jsonContext = new(new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
 
         public static LanguageSnippets Load(string grammarName, Contributes contributes)
         {
@@ -187,9 +188,7 @@ namespace TextMateSharp.Grammars
 
                     using (StreamReader reader = new StreamReader(stream))
                     {
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-                        return JsonSerializer.Deserialize<LanguageSnippets>(stream, new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
-#pragma warning restore IL2026
+                        return JsonSerializer.Deserialize(stream, jsonContext.LanguageSnippets);
                     }
                 }
             }
@@ -233,12 +232,12 @@ namespace TextMateSharp.Grammars
                             string propName = string.Empty;
                             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
                             {
-                                switch(reader.TokenType)
+                                switch (reader.TokenType)
                                 {
                                     case JsonTokenType.StartArray:
                                         if (string.Compare(propName, "notIn") == 0)
                                         {
-                                            autoPair.NotIn = JsonSerializer.Deserialize<StringPair>(ref reader, StringPairSerializationContext.Default.IListString);
+                                            autoPair.NotIn = JsonSerializer.Deserialize(ref reader, JsonSerializationContext.Default.IListString);
                                         }
                                         break;
                                     case JsonTokenType.PropertyName:
@@ -257,7 +256,7 @@ namespace TextMateSharp.Grammars
                                         break;
                                 }
                             }
-                                autoPairs.Add(autoPair);
+                            autoPairs.Add(autoPair);
                             break;
                     }
                 }
@@ -368,7 +367,7 @@ namespace TextMateSharp.Grammars
                             break;
 
                         case JsonTokenType.StartObject:
-                            EnterRule rule = JsonSerializer.Deserialize<EnterRule>(ref reader, EnterRuleSerializationContext.Default.EnterRule);
+                            EnterRule rule = JsonSerializer.Deserialize(ref reader, JsonSerializationContext.Default.EnterRule);
                             enterRules.Rules.Add(rule);
                             break;
                     }
@@ -476,7 +475,7 @@ namespace TextMateSharp.Grammars
                             propName = reader.GetString();
                             break;
                         case JsonTokenType.StartObject:
-                            LanguageSnippet snippet = JsonSerializer.Deserialize<LanguageSnippet>(ref reader, LanguageSnippetSerializationContext.Default.LanguageSnippet);
+                            LanguageSnippet snippet = JsonSerializer.Deserialize(ref reader, JsonSerializationContext.Default.LanguageSnippet);
                             snippets.Snippets.Add(propName, snippet);
                             break;
                     }
@@ -547,41 +546,5 @@ namespace TextMateSharp.Grammars
         public override void Write(Utf8JsonWriter writer, LanguageSnippet value, JsonSerializerOptions options)
         {
         }
-    }
-
-    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
-    [JsonSerializable(typeof(StringPair))]
-    internal sealed partial class StringPairSerializationContext : JsonSerializerContext
-    {
-    }
-
-    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
-    [JsonSerializable(typeof(AutoPair))]
-    internal sealed partial class AutoPairSerializationContext : JsonSerializerContext
-    {
-    }
-
-    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
-    [JsonSerializable(typeof(EnterRule))]
-    internal sealed partial class EnterRuleSerializationContext : JsonSerializerContext
-    {
-    }
-
-    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
-    [JsonSerializable(typeof(LanguageConfiguration))]
-    internal sealed partial class LanguageConfigurationSerializationContext : JsonSerializerContext
-    {
-    }
-
-    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
-    [JsonSerializable(typeof(LanguageSnippet))]
-    internal sealed partial class LanguageSnippetSerializationContext : JsonSerializerContext
-    {
-    }
-
-    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
-    [JsonSerializable(typeof(LanguageSnippets))]
-    internal sealed partial class LanguageSnippetsSerializationContext : JsonSerializerContext
-    {
     }
 }

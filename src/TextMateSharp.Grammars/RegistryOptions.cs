@@ -167,7 +167,7 @@ namespace TextMateSharp.Grammars
                 {
                     GrammarDefinition definition = JsonSerializer.Deserialize(
                         stream,
-                        GrammarDefinitionSerializationContext.Default.GrammarDefinition);
+                        JsonSerializationContext.Default.GrammarDefinition);
 
                     foreach (var language in definition.Contributes.Languages)
                     {
@@ -259,12 +259,5 @@ namespace TextMateSharp.Grammars
 
             return false;
         }
-    }
-
-    // Enable Source Generator support for GrammarDefinition
-    [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
-    [JsonSerializable(typeof(GrammarDefinition))]
-    internal sealed partial class GrammarDefinitionSerializationContext : JsonSerializerContext
-    {
     }
 }
