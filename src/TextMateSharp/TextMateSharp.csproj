@@ -79,9 +79,6 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
   <ItemGroup>
     <Content Pack="True"
       PackagePath="build"
-      Include="..\..\build\CopyNativeLibraries.targets" />
-    <Content Pack="True"
-      PackagePath="build"
       Include="..\..\build\TextMateSharp.targets" />
   </ItemGroup>
   <Import Project="..\..\build\SourceLink.props" />
