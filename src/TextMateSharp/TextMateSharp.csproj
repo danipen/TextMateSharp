@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -75,6 +75,11 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Pack="True"
+      PackagePath="build"
+      Include="..\..\build\TextMateSharp.targets" />
   </ItemGroup>
   <Import Project="..\..\build\SourceLink.props" />
   <Import Project="..\..\build\Directory.Build.props" />
