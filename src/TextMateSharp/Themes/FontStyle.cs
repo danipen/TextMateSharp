@@ -1,14 +1,17 @@
+using System;
+
 namespace TextMateSharp.Themes
 {
-    public class FontStyle
+    [Flags]
+    public enum FontStyle
     {
-        public const int NotSet = -1;
+        NotSet = -1,
 
         // This can are bit-flags, so it can be `Italic | Bold`
-        public const int None = 0;
-        public const int Italic = 1;
-        public const int Bold = 2;
-        public const int Underline = 4;
-        public const int Strikethrough = 8;
+        None = 0,
+        Italic = 1,
+        Bold = 2,
+        Underline = 4,
+        Strikethrough = 8
     }
 }

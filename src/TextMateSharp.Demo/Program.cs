@@ -72,7 +72,7 @@ namespace TextMateSharp
 
                             int foreground = -1;
                             int background = -1;
-                            int fontStyle = -1;
+                            FontStyle fontStyle = FontStyle.NotSet;
 
                             foreach (var themeRule in theme.Match(token.Scopes))
                             {
@@ -82,7 +82,7 @@ namespace TextMateSharp
                                 if (background == -1 && themeRule.background > 0)
                                     background = themeRule.background;
 
-                                if (fontStyle == -1 && themeRule.fontStyle > 0)
+                                if (fontStyle == FontStyle.NotSet && themeRule.fontStyle > 0)
                                     fontStyle = themeRule.fontStyle;
                             }
 
@@ -103,7 +103,7 @@ namespace TextMateSharp
                 Console.WriteLine("ERROR: " + ex.Message);
             }
         }
-        static void WriteToken(string text, int foreground, int background, int fontStyle, Theme theme)
+        static void WriteToken(string text, int foreground, int background, FontStyle fontStyle, Theme theme)
         {
             if (foreground == -1)
             {
@@ -130,7 +130,7 @@ namespace TextMateSharp
             return HexToColor(theme.GetColor(colorId));
         }
 
-        static Decoration GetDecoration(int fontStyle)
+        static Decoration GetDecoration(FontStyle fontStyle)
         {
             Decoration result = Decoration.None;
 

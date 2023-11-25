@@ -124,7 +124,7 @@ namespace TextMateSharp.Internal.Grammars
                 return existingTokenAttributes;
             }
 
-            int fontStyle = FontStyle.NotSet;
+            FontStyle fontStyle = FontStyle.NotSet;
             int foreground = 0;
             int background = 0;
 

@@ -86,7 +86,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             int maxLangId = 255;
             int maxTokenType = StandardTokenType.Comment | StandardTokenType.Other | StandardTokenType.RegEx
                     | StandardTokenType.String;
-            int maxFontStyle = FontStyle.Bold | FontStyle.Italic | FontStyle.Underline;
+            FontStyle maxFontStyle = FontStyle.Bold | FontStyle.Italic | FontStyle.Underline;
             int maxForeground = 511;
             int maxBackground = 254;
 
@@ -109,7 +109,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             int languageId,
             /*StandardTokenType*/ int tokenType,
             bool containsBalancedBrackets,
-            int fontStyle,
+            FontStyle fontStyle,
             int foreground,
             int background)
         {
