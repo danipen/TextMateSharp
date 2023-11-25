@@ -106,7 +106,7 @@ namespace TextMateSharp.Themes
             return ThemeTrieElement.SortBySpecificity(arr);
         }
 
-        public void Insert(string name, int scopeDepth, string scope, List<string> parentScopes, int fontStyle, int foreground,
+        public void Insert(string name, int scopeDepth, string scope, List<string> parentScopes, FontStyle fontStyle, int foreground,
                 int background)
         {
             if ("".Equals(scope))
@@ -144,7 +144,7 @@ namespace TextMateSharp.Themes
             child.Insert(name, scopeDepth + 1, tail, parentScopes, fontStyle, foreground, background);
         }
 
-        private void DoInsertHere(string name, int scopeDepth, List<string> parentScopes, int fontStyle, int foreground,
+        private void DoInsertHere(string name, int scopeDepth, List<string> parentScopes, FontStyle fontStyle, int foreground,
                 int background)
         {
 

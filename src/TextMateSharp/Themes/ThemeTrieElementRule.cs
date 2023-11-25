@@ -9,12 +9,12 @@ namespace TextMateSharp.Themes
 
         public int scopeDepth;
         public List<string> parentScopes;
-        public int fontStyle;
+        public FontStyle fontStyle;
         public int foreground;
         public int background;
         public string name;
 
-        public ThemeTrieElementRule(string name, int scopeDepth, List<string> parentScopes, int fontStyle, int foreground,
+        public ThemeTrieElementRule(string name, int scopeDepth, List<string> parentScopes, FontStyle fontStyle, int foreground,
                 int background)
         {
             this.name = name;
@@ -41,7 +41,7 @@ namespace TextMateSharp.Themes
             return r;
         }
 
-        public void AcceptOverwrite(string name, int scopeDepth, int fontStyle, int foreground, int background)
+        public void AcceptOverwrite(string name, int scopeDepth, FontStyle fontStyle, int foreground, int background)
         {
             if (this.scopeDepth > scopeDepth)
             {

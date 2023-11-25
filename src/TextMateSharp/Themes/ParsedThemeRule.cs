@@ -11,11 +11,11 @@ namespace TextMateSharp.Themes
         public int index;
 
         // -1 if not set.An or mask of `FontStyle` otherwise.
-        public int fontStyle;
+        public FontStyle fontStyle;
         public string foreground;
         public string background;
 
-        public ParsedThemeRule(string name, string scope, List<string> parentScopes, int index, int fontStyle, string foreground, string background)
+        public ParsedThemeRule(string name, string scope, List<string> parentScopes, int index, FontStyle fontStyle, string foreground, string background)
         {
             this.name = name;
             this.scope = scope;
@@ -31,7 +31,7 @@ namespace TextMateSharp.Themes
             int prime = 31;
             int result = 1;
             result = prime * result + ((background == null) ? 0 : background.GetHashCode());
-            result = prime * result + fontStyle;
+            result = prime * result + (int)fontStyle;
             result = prime * result + ((foreground == null) ? 0 : foreground.GetHashCode());
             result = prime * result + index;
             result = prime * result + ((parentScopes == null) ? 0 : parentScopes.GetHashCode());

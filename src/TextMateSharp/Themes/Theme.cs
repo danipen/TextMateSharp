@@ -147,7 +147,7 @@ namespace TextMateSharp.Themes
                     scopes.Add("");
                 }
 
-                int fontStyle = FontStyle.NotSet;
+                FontStyle fontStyle = FontStyle.NotSet;
                 object settingsFontStyle = entry.GetSetting().GetFontStyle();
                 if (settingsFontStyle is string)
                 {
@@ -159,16 +159,16 @@ namespace TextMateSharp.Themes
                         switch (segment)
                         {
                             case "italic":
-                                fontStyle = fontStyle | FontStyle.Italic;
+                                fontStyle |= FontStyle.Italic;
                                 break;
                             case "bold":
-                                fontStyle = fontStyle | FontStyle.Bold;
+                                fontStyle |= FontStyle.Bold;
                                 break;
                             case "underline":
-                                fontStyle = fontStyle | FontStyle.Underline;
+                                fontStyle |= FontStyle.Underline;
                                 break;
                             case "strikethrough":
-                                fontStyle = fontStyle | FontStyle.Strikethrough;
+                                fontStyle |= FontStyle.Strikethrough;
                                 break;
                         }
                     }
@@ -240,7 +240,7 @@ namespace TextMateSharp.Themes
             });
 
             // Determine defaults
-            int defaultFontStyle = FontStyle.None;
+            FontStyle defaultFontStyle = FontStyle.None;
             string defaultForeground = "#000000";
             string defaultBackground = "#ffffff";
             while (parsedThemeRules.Count >= 1 && "".Equals(parsedThemeRules[0].scope))

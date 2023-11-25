@@ -36,10 +36,10 @@ namespace TextMateSharp.Internal.Grammars
             return (uintValue & MetadataConsts.BALANCED_BRACKETS_MASK) != 0;
         }
 
-        public static int GetFontStyle(int metadata)
+        public static FontStyle GetFontStyle(int metadata)
         {
             uint uintValue = (uint)metadata;
-            return (int)((uintValue & MetadataConsts.FONT_STYLE_MASK) >> MetadataConsts.FONT_STYLE_OFFSET);
+            return (FontStyle)((uintValue & MetadataConsts.FONT_STYLE_MASK) >> MetadataConsts.FONT_STYLE_OFFSET);
         }
 
         public static int GetForeground(int metadata)
@@ -59,7 +59,7 @@ namespace TextMateSharp.Internal.Grammars
             int languageId,
             /*OptionalStandardTokenType*/ int tokenType,
             bool? containsBalancedBrackets,
-            int fontStyle,
+            FontStyle fontStyle,
             int foreground,
             int background)
         {
@@ -74,7 +74,7 @@ namespace TextMateSharp.Internal.Grammars
             return ((languageId << MetadataConsts.LANGUAGEID_OFFSET) 
                     | (tokenType << MetadataConsts.TOKEN_TYPE_OFFSET)
                     | (containsBalancedBracketsBit << MetadataConsts.BALANCED_BRACKETS_OFFSET)
-                    | (fontStyle << MetadataConsts.FONT_STYLE_OFFSET) 
+                    | ((int)fontStyle << MetadataConsts.FONT_STYLE_OFFSET)
                     | (foreground << MetadataConsts.FOREGROUND_OFFSET)
                     | (background << MetadataConsts.BACKGROUND_OFFSET)) >> 0;
         }
