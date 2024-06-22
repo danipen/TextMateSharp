@@ -8,5 +8,6 @@ namespace TextMateSharp.Themes
         string GetInclude();
         ICollection<IRawThemeSetting> GetSettings();
         ICollection<IRawThemeSetting> GetTokenColors();
+        ICollection<KeyValuePair<string,object>> GetGuiColors();
     }
 }

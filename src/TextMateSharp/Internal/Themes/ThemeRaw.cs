@@ -11,6 +11,7 @@ namespace TextMateSharp.Internal.Themes
         private static string NAME = "name";
         private static string INCLUDE = "include";
         private static string SETTINGS = "settings";
+        private static string COLORS = "colors";
         private static string TOKEN_COLORS = "tokenColors";
         private static string SCOPE = "scope";
         private static string FONT_STYLE = "fontStyle";
@@ -45,6 +46,16 @@ namespace TextMateSharp.Internal.Themes
                 return null;
 
             return result.Cast<IRawThemeSetting>().ToList();
+        }
+
+        public ICollection<KeyValuePair<string,object>> GetGuiColors()
+        {
+            ICollection result = TryGetObject<ICollection>(COLORS);
+
+            if (result == null)
+                return null;
+
+            return result.Cast<KeyValuePair<string,object>>().ToList();
         }
 
         public object GetScope()

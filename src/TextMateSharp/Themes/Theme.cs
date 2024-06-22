@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
@@ -11,29 +12,40 @@ namespace TextMateSharp.Themes
         private ParsedTheme _theme;
         private ParsedTheme _include;
         private ColorMap _colorMap;
+        private Dictionary<string, string> _guiColorDictionary;
 
         public static Theme CreateFromRawTheme(
             IRawTheme source,
             IRegistryOptions registryOptions)
         {
             ColorMap colorMap = new ColorMap();
+            var guiColorsDictionary = new Dictionary<string, string>();
 
+            var themeRuleList = ParsedTheme.ParseTheme(source,0);
+            
             ParsedTheme theme = ParsedTheme.CreateFromParsedTheme(
-                ParsedTheme.ParseTheme(source, 0),
+                themeRuleList,
                 colorMap);
 
+            IRawTheme themeInclude;
             ParsedTheme include = ParsedTheme.CreateFromParsedTheme(
-                ParsedTheme.ParseInclude(source, registryOptions, 0),
+                ParsedTheme.ParseInclude(source, registryOptions, 0, out themeInclude),
                 colorMap);
 
-            return new Theme(colorMap, theme, include);
+            // First get colors from include, then try and overwrite with local colors..
+            // I don't see this happening currently, but here just in case that ever happens.
+            ParsedTheme.ParsedGuiColors(themeInclude, guiColorsDictionary);
+            ParsedTheme.ParsedGuiColors(source, guiColorsDictionary);
+
+            return new Theme(colorMap, theme, include, guiColorsDictionary);
         }
 
-        Theme(ColorMap colorMap, ParsedTheme theme, ParsedTheme include)
+        Theme(ColorMap colorMap, ParsedTheme theme, ParsedTheme include, Dictionary<string,string> guiColorDictionary)
         {
             _colorMap = colorMap;
             _theme = theme;
             _include = include;
+            _guiColorDictionary = guiColorDictionary;
         }
 
         public List<ThemeTrieElementRule> Match(IList<string> scopeNames)
@@ -47,6 +59,11 @@ namespace TextMateSharp.Themes
                 result.AddRange(this._include.Match(scopeNames[i]));
 
             return result;
+        }
+
+        public ReadOnlyDictionary<string, string> GetGuiColorDictionary()
+        {
+            return new ReadOnlyDictionary<string, string>(this._guiColorDictionary);
         }
 
         public ICollection<string> GetColorMap()
@@ -92,19 +109,37 @@ namespace TextMateSharp.Themes
             return result;
         }
 
+        internal static void ParsedGuiColors(IRawTheme source, Dictionary<string,string> colorDictionary)
+        {
+            var colors = source.GetGuiColors();
+            if (colors == null)
+            {
+                return;
+            }
+            foreach (var kvp in colors)
+            {
+                colorDictionary[kvp.Key] = (string)kvp.Value;
+            }
+        }
+
+
         internal static List<ParsedThemeRule> ParseInclude(
             IRawTheme source,
             IRegistryOptions registryOptions,
-            int priority)
+            int priority,
+            out IRawTheme themeInclude)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 
             string include = source.GetInclude();
 
             if (string.IsNullOrEmpty(include))
+            {
+                themeInclude = null;
                 return result;
+            }
 
-            IRawTheme themeInclude = registryOptions.GetTheme(include);
+            themeInclude = registryOptions.GetTheme(include);
 
             if (themeInclude == null)
                 return result;
@@ -270,7 +305,6 @@ namespace TextMateSharp.Themes
                 root.Insert(rule.name, 0, rule.scope, rule.parentScopes, rule.fontStyle, colorMap.GetId(rule.foreground),
                         colorMap.GetId(rule.background));
             }
-
             return new ParsedTheme(defaults, root);
         }
 

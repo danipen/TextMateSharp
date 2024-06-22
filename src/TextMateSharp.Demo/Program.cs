@@ -94,6 +94,16 @@ namespace TextMateSharp
                     }
                 }
 
+                var colorDictionary = theme.GetGuiColorDictionary();
+                if (colorDictionary is { Count: > 0 })
+                {
+                    Console.WriteLine("Gui Control Colors");
+                    foreach (var kvp in colorDictionary)
+                    {
+                        Console.WriteLine( $"  {kvp.Key}, {kvp.Value}");
+                    }
+                }
+
                 Console.WriteLine("File {0} tokenized in {1}ms.",
                     Path.GetFileName(fileToParse),
                     Environment.TickCount - tokenizeIni);
