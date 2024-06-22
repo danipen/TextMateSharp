@@ -34,7 +34,10 @@ namespace TextMateSharp.Themes
 
             // First get colors from include, then try and overwrite with local colors..
             // I don't see this happening currently, but here just in case that ever happens.
-            ParsedTheme.ParsedGuiColors(themeInclude, guiColorsDictionary);
+            if (themeInclude != null)
+            {
+                ParsedTheme.ParsedGuiColors(themeInclude, guiColorsDictionary);
+            }
             ParsedTheme.ParsedGuiColors(source, guiColorsDictionary);
 
             return new Theme(colorMap, theme, include, guiColorsDictionary);
