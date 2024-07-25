@@ -31,6 +31,10 @@ namespace TextMateSharp.Grammars
         public string ConfigurationFile { get; set; }
         public LanguageConfiguration Configuration {get; set;}
 
+        // May be null
+        [JsonPropertyName("mimetypes")]
+        public List<string> MimeTypes { get; set; }
+
         public override string ToString()
         {
             if (Aliases != null && Aliases.Count > 0)
