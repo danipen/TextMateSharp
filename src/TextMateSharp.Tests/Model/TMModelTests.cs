@@ -66,6 +66,48 @@ namespace TextMateSharp.Tests.Model
                 It.IsAny<ModelTokensChangedEvent>()), Times.Never());
         }
 
+        [Test]
+        public void TMModel_Should_Emit_ModelTokensChangedEvent_To_Clean_Highlighted_Lines_When_Setting_A_Null_Grammar_After_Having_Another_Grammar()
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "line 1", "line 2", "line 3" });
+
+            TMModel tmModel = new TMModel(modelLines);
+
+            Mock<IModelTokensChangedListener> changesListenerMock = new Mock<IModelTokensChangedListener>(
+                MockBehavior.Strict);
+            changesListenerMock.Setup(
+                c => c.ModelTokensChanged(It.IsAny<ModelTokensChangedEvent>()));
+
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+            Registry.Registry registry = new Registry.Registry(options);
+            IGrammar grammar = registry.LoadGrammar("source.cs");
+
+            tmModel.SetGrammar(grammar);
+
+            tmModel.AddModelTokensChangedListener(changesListenerMock.Object);
+            tmModel.SetGrammar(null);
+
+            // verify the three lines were invalidated
+            changesListenerMock.Verify(c => c.ModelTokensChanged(
+                It.Is<ModelTokensChangedEvent>(e => IsRangeValid(e, 0, 2))),
+                Times.Once());
+
+        }
+
+        static bool IsRangeValid(ModelTokensChangedEvent e, int fromLine, int toLine)
+        {
+            if (e.Ranges.Count != 1)
+                return false;
+
+            if (e.Ranges[0].FromLineNumber != fromLine)
+                return false;
+
+            if (e.Ranges[0].ToLineNumber != toLine)
+                return false;
+
+            return true;
+        }
+
         class ModelLinesMock : AbstractLineList
         {
             string[] _lines;

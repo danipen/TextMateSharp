@@ -10,5 +10,11 @@ namespace TextMateSharp.Model
             FromLineNumber = lineNumber;
             ToLineNumber = lineNumber;
         }
+
+        public Range(int fromLineNumber, int toLineNumber)
+        {
+            FromLineNumber = fromLineNumber;
+            ToLineNumber = toLineNumber;
+        }
     }
 }

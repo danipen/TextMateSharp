@@ -291,6 +291,10 @@ namespace TextMateSharp.Model
                     Start();
                     InvalidateLine(0);
                 }
+                else
+                {
+                    Emit(new ModelTokensChangedEvent(new Range(0, _lines.GetNumberOfLines() - 1), this));
+                }
             }
         }
 
