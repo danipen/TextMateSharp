@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-
-using TextMateSharp.Internal.Oniguruma;
+using Onigwrap;
 
 namespace TextMateSharp.Internal.Rules
 {
