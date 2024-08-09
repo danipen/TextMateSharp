@@ -31,8 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMateSharp.Grammars.Tests", "src\TextMateSharp.Grammars.Tests\TextMateSharp.Grammars.Tests.csproj", "{B9194474-83A7-47E6-B5E6-6CE360B1189B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextMateSharp.Wasm", "src\TextMateSharp.Wasm\TextMateSharp.Wasm.csproj", "{2B4FA8C9-D88A-4D78-9C22-E8873947B140}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,10 +57,6 @@ Global
 		{B9194474-83A7-47E6-B5E6-6CE360B1189B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9194474-83A7-47E6-B5E6-6CE360B1189B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9194474-83A7-47E6-B5E6-6CE360B1189B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2B4FA8C9-D88A-4D78-9C22-E8873947B140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B4FA8C9-D88A-4D78-9C22-E8873947B140}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B4FA8C9-D88A-4D78-9C22-E8873947B140}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B4FA8C9-D88A-4D78-9C22-E8873947B140}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
