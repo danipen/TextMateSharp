@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 
 using TextMateSharp.Internal.Grammars;
-using TextMateSharp.Internal.Oniguruma;
 using TextMateSharp.Internal.Types;
 using TextMateSharp.Themes;
 

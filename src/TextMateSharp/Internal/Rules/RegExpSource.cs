@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Onigwrap;
 
-using TextMateSharp.Internal.Oniguruma;
 using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Rules

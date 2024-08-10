@@ -1,8 +1,7 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
-
-using TextMateSharp.Internal.Oniguruma;
+using Onigwrap;
 
 namespace TextMateSharp.Internal.Utils
 {

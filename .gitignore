@@ -359,27 +359,16 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-onigwrap/src/libonigwrap.dylib
-onigwrap/src/libonig.a
-onigwrap/.DS_Store
 src/.DS_Store
 src/TextMateSharp/.DS_Store
 src/TextMateSharp/Internal/.DS_Store
-src/TextMateSharp/Internal/Oniguruma/.DS_Store
 .DS_Store
 src/.vscode/tasks.json
 src/.vscode/launch.json
 .idea/.idea.TextMateSharp/.idea/vcs.xml
 .idea/.idea.TextMateSharp/.idea/indexLayout.xml
 .idea/.idea.TextMateSharp/.idea/encodings.xml
-onigwrap/src/libonigwrap.so
 .idea/.idea.TextMateSharp.dir/.idea/encodings.xml
 .idea/.idea.TextMateSharp.dir/.idea/indexLayout.xml
 .idea/.idea.TextMateSharp.dir/.idea/vcs.xml
-onigwrap/src/onigwrap.lib
-onigwrap/src/onigwrap.exp
-onigwrap/src/onigwrap.dll
-onigwrap/src/onig_s.lib
-onigwrap/src/arm_libonigwrap.dylib
-onigwrap/src/x86_libonigwrap.dylib
 .idea/.idea.TextMateSharp/.idea/riderMarkupCache.xml

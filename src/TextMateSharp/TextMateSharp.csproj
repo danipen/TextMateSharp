@@ -5,13 +5,12 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>True</IsPackable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>8.0</LangVersion>
     <Description>An interpreter for grammar files as defined by TextMate. TextMate grammars use the oniguruma dialect (https://github.com/kkos/oniguruma). Supports loading grammar files only from JSON format. Cross - grammar injections are currently not supported.
 
 TextMateSharp is a port of microsoft/vscode-textmate that brings TextMate grammars to dotnet ecosystem. The implementation is based the Java port eclipse/tm4e.
 
-TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn how to build Oniguruma bindings.</Description>
+TextMateSharp uses a wrapper around Oniguruma regex engine.</Description>
     <PackageProjectUrl>https://github.com/danipen/TextMateSharp</PackageProjectUrl>
     <Authors>Daniel Peñalba</Authors>
     <Company />
@@ -21,65 +20,8 @@ TextMateSharp uses a wrapper around Oniguruma regex engine. Read below to learn 
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- native oniguruma library for Windows -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\win-x86\onigwrap-x86.dll" Condition=" '$(OS)' == 'Windows_NT' ">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>onigwrap-x86.dll</TargetPath>
-    </ContentWithTargetPath>
-	      <ContentWithTargetPath Include="Internal\Oniguruma\Native\win-x64\onigwrap-x64.dll" Condition=" '$(OS)' == 'Windows_NT' ">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>onigwrap-x64.dll</TargetPath>
-    </ContentWithTargetPath>
-    <!-- native oniguruma library for Linux -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\linux\libonigwrap.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>libonigwrap.so</TargetPath>
-    </ContentWithTargetPath>
-    <!-- native oniguruma library for macOS -->
-    <ContentWithTargetPath Include="Internal\Oniguruma\Native\osx\libonigwrap.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>libonigwrap.dylib</TargetPath>
-    </ContentWithTargetPath>
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- native oniguruma library for Windows-x86 in nuget package -->
-    <Content Include="Internal\Oniguruma\Native\win-x86\onigwrap-x86.dll">
-      <Link>onigwrap-x86.dll</Link>
-      <PackagePath>runtimes/win-x86/native/onigwrap-x86.dll</PackagePath>
-      <Pack>true</Pack>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <!-- native oniguruma library for Windows-x64 in nuget package -->
-    <Content Include="Internal\Oniguruma\Native\win-x64\onigwrap-x64.dll">
-      <Link>onigwrap-x64.dll</Link>
-      <PackagePath>runtimes/win-x64/native/onigwrap-x64.dll</PackagePath>
-      <Pack>true</Pack>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <!-- native oniguruma library for Linux in nuget package -->
-    <Content Include="Internal\Oniguruma\Native\linux\libonigwrap.so">
-      <Link>libonigwrap.so</Link>
-      <PackagePath>runtimes/linux/native/libonigwrap.so</PackagePath>
-      <Pack>true</Pack>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <!-- native oniguruma library for macOS in nuget package -->
-    <Content Include="Internal\Oniguruma\Native\osx\libonigwrap.dylib">
-      <Link>libonigwrap.dylib</Link>
-      <PackagePath>runtimes/osx/native/libonigwrap.dylib</PackagePath>
-      <Pack>true</Pack>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Pack="True"
-      PackagePath="build"
-      Include="..\..\build\TextMateSharp.targets" />
+    <PackageReference Include="Onigwrap" Version="$(OnigwrapVersion)" />
   </ItemGroup>
   <Import Project="..\..\build\SourceLink.props" />
   <Import Project="..\..\build\Directory.Build.props" />

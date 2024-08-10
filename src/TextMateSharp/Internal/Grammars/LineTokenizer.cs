@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Onigwrap;
 
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Matcher;
-using TextMateSharp.Internal.Oniguruma;
 using TextMateSharp.Internal.Rules;
 using TextMateSharp.Internal.Utils;
 
