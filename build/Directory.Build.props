@@ -3,5 +3,6 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <SystemTextJsonVersion>8.0.4</SystemTextJsonVersion>
+    <OnigwrapVersion>1.0.3</OnigwrapVersion>
   </PropertyGroup>
 </Project>
