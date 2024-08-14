@@ -91,15 +91,15 @@ namespace TextMateSharp.Internal.Grammars
             Dictionary<string, int> tokenTypes,
             BalancedBracketSelectors balancedBracketSelectors)
         {
-            if (!this._grammars.ContainsKey(scopeName))
+            if (!_grammars.TryGetValue(scopeName, out IGrammar value))
             {
                 IRawGrammar rawGrammar = Lookup(scopeName);
                 if (rawGrammar == null)
                 {
                     return null;
                 }
-                this._grammars.Add(scopeName,
-                    new Grammar(
+
+                value = new Grammar(
                         scopeName,
                         rawGrammar,
                         initialLanguage,
@@ -107,9 +107,10 @@ namespace TextMateSharp.Internal.Grammars
                         tokenTypes,
                         balancedBracketSelectors,
                         this,
-                        this));
+                        this);
+                this._grammars.Add(scopeName, value);
             }
-            return this._grammars[scopeName];
+            return value;
         }
 
         private static void CollectIncludedScopes(ICollection<string> result, IRawGrammar grammar)
