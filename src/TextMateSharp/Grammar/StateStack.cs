@@ -103,6 +103,7 @@ namespace TextMateSharp.Grammars
             while (el != null)
             {
                 el._enterPos = -1;
+                el._anchorPos = -1;
                 el = el.Parent;
             }
         }
