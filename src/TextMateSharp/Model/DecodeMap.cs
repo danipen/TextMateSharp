@@ -68,7 +68,7 @@ namespace TextMateSharp.Model
                     }
                     else
                     {
-                        result.Append(".");
+                        result.Append('.');
                         result.Append(this._tokenIdToToken[i]);
                     }
                 }
