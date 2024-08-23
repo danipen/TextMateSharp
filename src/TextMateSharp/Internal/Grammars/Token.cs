@@ -31,7 +31,7 @@ namespace TextMateSharp.Internal.Grammars
             s.Append(EndIndex);
             s.Append(", scopes: ");
             s.Append(string.Join(", ", Scopes));
-            s.Append("}");
+            s.Append('}');
             return s.ToString();
         }
     }
