@@ -156,9 +156,9 @@ namespace TextMateSharp.Internal.Grammars
 
         public IRawGrammar GetExternalGrammar(string scopeName, IRawRepository repository)
         {
-            if (this._includedGrammars.ContainsKey(scopeName))
+            if (_includedGrammars.TryGetValue(scopeName, out IRawGrammar value))
             {
-                return this._includedGrammars[scopeName];
+                return value;
             }
             else if (this._grammarRepository != null)
             {

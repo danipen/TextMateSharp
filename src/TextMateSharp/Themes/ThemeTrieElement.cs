@@ -94,9 +94,9 @@ namespace TextMateSharp.Themes
                 tail = scope.Substring(dotIndex + 1);
             }
 
-            if (this.children.ContainsKey(head))
+            if (children.TryGetValue(head, out ThemeTrieElement value))
             {
-                return this.children[head].Match(tail);
+                return value.Match(tail);
             }
 
             arr = new List<ThemeTrieElementRule>();
@@ -130,9 +130,9 @@ namespace TextMateSharp.Themes
             }
 
             ThemeTrieElement child;
-            if (this.children.ContainsKey(head))
+            if (children.TryGetValue(head, out ThemeTrieElement value))
             {
-                child = this.children[head];
+                child = value;
             }
             else
             {

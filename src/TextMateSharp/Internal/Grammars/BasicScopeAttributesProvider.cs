@@ -123,7 +123,7 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             string scopeName = m.Groups[1].Value;
-            return _embeddedLanguages.ContainsKey(scopeName) ? _embeddedLanguages[scopeName] : 0;
+            return _embeddedLanguages.TryGetValue(scopeName, out int value) ? value : 0;
         }
 
         private static int ToStandardTokenType(string tokenType)

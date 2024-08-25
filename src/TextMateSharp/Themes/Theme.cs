@@ -322,11 +322,12 @@ namespace TextMateSharp.Themes
         {
             lock (this._cachedMatchRoot)
             {
-                if (!this._cachedMatchRoot.ContainsKey(scopeName))
+                if (!_cachedMatchRoot.TryGetValue(scopeName, out List<ThemeTrieElementRule> value))
                 {
-                    this._cachedMatchRoot[scopeName] = this._root.Match(scopeName);
+                    value = this._root.Match(scopeName);
+                    this._cachedMatchRoot[scopeName] = value;
                 }
-                return this._cachedMatchRoot[scopeName];
+                return value;
             }
         }
 
