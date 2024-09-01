@@ -49,6 +49,7 @@
             "SQL",
             "Swift",
             "TypescriptBasics",
+            "Typst",
             "VB",
             "XML",
             "YAML"
