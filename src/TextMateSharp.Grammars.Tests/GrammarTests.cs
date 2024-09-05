@@ -11,7 +11,7 @@ namespace TextMateSharp.Grammars.Tests
         {
             RegistryOptions options = new RegistryOptions(ThemeName.Light);
 
-            Assert.That(options.GetAvailableLanguages().Count, Is.EqualTo(61));
+            Assert.That(options.GetAvailableLanguages().Count, Is.EqualTo(63));
         }
 
         [Test]
@@ -111,7 +111,10 @@ namespace TextMateSharp.Grammars.Tests
                 {
                     if (!string.IsNullOrEmpty(language.ConfigurationFile))
                     {
-                        Assert.That(language.Configuration, Is.Not.Null);
+                        if (language.Configuration == null)
+                        {
+                            Assert.Fail(string.Format("[{0} grammar]: Language configuration is null", language.Id));
+                        }
                     }
                 }
                 catch (Exception ex)
