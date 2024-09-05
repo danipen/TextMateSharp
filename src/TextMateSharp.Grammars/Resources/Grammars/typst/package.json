@@ -542,7 +542,7 @@
     "languages": [
       {
         "id": "typst",
-        "configuration": "./syntaxes/language-configuration.json",
+        "configuration": "./language-configuration.json",
         "extensions": [
           ".typ"
         ],
@@ -558,7 +558,7 @@
       },
       {
         "id": "typst-code",
-        "configuration": "./syntaxes/language-configuration.json",
+        "configuration": "./language-configuration.json",
         "extensions": [
           ".typc"
         ],
