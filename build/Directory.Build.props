@@ -2,7 +2,7 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <SystemTextJsonVersion>8.0.4</SystemTextJsonVersion>
+    <SystemTextJsonVersion>8.0.5</SystemTextJsonVersion>
     <OnigwrapVersion>1.0.6</OnigwrapVersion>
   </PropertyGroup>
 </Project>
