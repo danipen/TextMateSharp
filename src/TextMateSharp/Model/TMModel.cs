@@ -327,7 +327,11 @@ namespace TextMateSharp.Model
 
         public void Dispose()
         {
-            listeners.Clear();
+            lock (listeners)
+            {
+                listeners.Clear();
+            }
+
             Stop();
             GetLines().Dispose();
         }
@@ -375,15 +379,18 @@ namespace TextMateSharp.Model
 
         private void Emit(ModelTokensChangedEvent e)
         {
-            foreach (IModelTokensChangedListener listener in listeners)
+            lock (listeners)
             {
-                try
+                foreach (IModelTokensChangedListener listener in listeners)
                 {
-                    listener.ModelTokensChanged(e);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    try
+                    {
+                        listener.ModelTokensChanged(e);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex.Message);
+                    }
                 }
             }
         }
