@@ -1,576 +1,1584 @@
 {
-    "name": "typst",
-    "patterns": [
-        {
-            "include": "#markup"
-        }
-    ],
-    "repository": {
-        "comments": {
-            "patterns": [
-                {
-                    "name": "comment.block.typst",
-                    "begin": "/\\*",
-                    "end": "\\*/",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.comment.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#comments"
-                        }
-                    ]
-                },
-                {
-                    "name": "comment.line.double-slash.typst",
-                    "begin": "(?<!:)//",
-                    "end": "\n",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "punctuation.definition.comment.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#comments"
-                        }
-                    ]
-                }
-            ]
-        },
-        "common": {
-            "patterns": [
-                {
-                    "include": "#comments"
-                }
-            ]
-        },
-        "markup": {
-            "patterns": [
-                {
-                    "include": "#common"
-                },
-                {
-                    "name": "constant.character.escape.content.typst",
-                    "match": "\\\\([\\\\/\\[\\]{}#*_=~`$-.]|u\\{[0-9a-zA-Z]*\\}?)"
-                },
-                {
-                    "name": "punctuation.definition.linebreak.typst",
-                    "match": "\\\\"
-                },
-                {
-                    "name": "punctuation.definition.nonbreaking-space.typst",
-                    "match": "~"
-                },
-                {
-                    "name": "punctuation.definition.shy.typst",
-                    "match": "-\\?"
-                },
-                {
-                    "name": "punctuation.definition.em-dash.typst",
-                    "match": "---"
-                },
-                {
-                    "name": "punctuation.definition.en-dash.typst",
-                    "match": "--"
-                },
-                {
-                    "name": "punctuation.definition.ellipsis.typst",
-                    "match": "\\.\\.\\."
-                },
-                {
-                    "name": "constant.symbol.typst",
-                    "match": ":([a-zA-Z0-9]+:)+"
-                },
-                {
-                    "name": "markup.bold.typst",
-                    "begin": "(^\\*|\\*$|((?<=\\W|_)\\*)|(\\*(?=\\W|_)))",
-                    "end": "(^\\*|\\*$|((?<=\\W|_)\\*)|(\\*(?=\\W|_)))|\n|(?=\\])",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.bold.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#markup"
-                        }
-                    ]
-                },
-                {
-                    "name": "markup.italic.typst",
-                    "begin": "(^_|_$|((?<=\\W|_)_)|(_(?=\\W|_)))",
-                    "end": "(^_|_$|((?<=\\W|_)_)|(_(?=\\W|_)))|\n|(?=\\])",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.italic.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#markup"
-                        }
-                    ]
-                },
-                {
-                    "name": "markup.underline.link.typst",
-                    "match": "https?://[0-9a-zA-Z~/%#&=',;\\.\\+\\?]*"
-                },
-                {
-                    "name": "markup.raw.block.typst",
-                    "begin": "`{3,}",
-                    "end": "\\0",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.raw.typst"
-                        }
-                    }
-                },
-                {
-                    "name": "markup.raw.inline.typst",
-                    "begin": "`",
-                    "end": "`",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.raw.typst"
-                        }
-                    }
-                },
-                {
-                    "name": "string.other.math.typst",
-                    "begin": "\\$",
-                    "end": "\\$",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.string.math.typst"
-                        }
-                    }
-                },
-                {
-                    "name": "markup.heading.typst",
-                    "contentName": "entity.name.section.typst",
-                    "begin": "^\\s*=+\\s+",
-                    "end": "\n|(?=<)",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "punctuation.definition.heading.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#markup"
-                        }
-                    ]
-                },
-                {
-                    "name": "punctuation.definition.list.unnumbered.typst",
-                    "match": "^\\s*-\\s+"
-                },
-                {
-                    "name": "punctuation.definition.list.numbered.typst",
-                    "match": "^\\s*([0-9]*\\.|\\+)\\s+"
-                },
-                {
-                    "match": "^\\s*(/)\\s+([^:]*:)",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.list.description.typst"
-                        },
-                        "2": {
-                            "name": "markup.list.term.typst"
-                        }
-                    }
-                },
-                {
-                    "name": "entity.other.label.typst",
-                    "match": "<[[:alpha:]_][[:alnum:]_-]*>",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.label.typst"
-                        }
-                    }
-                },
-                {
-                    "name": "entity.other.reference.typst",
-                    "match": "(@)[[:alpha:]_][[:alnum:]_-]*",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.reference.typst"
-                        }
-                    }
-                },
-                {
-                    "begin": "(#)(let|set|show)\\b",
-                    "end": "\n|(;)|(?=])",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "keyword.other.typst"
-                        },
-                        "1": {
-                            "name": "punctuation.definition.keyword.typst"
-                        }
-                    },
-                    "endCaptures": {
-                        "1": {
-                            "name": "punctuation.terminator.statement.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#code"
-                        }
-                    ]
-                },
-                {
-                    "name": "keyword.other.typst",
-                    "match": "(#)(as|in)\\b",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.keyword.typst"
-                        }
-                    }
-                },
-                {
-                    "begin": "((#)if|(?<=(}|])\\s*)else)\\b",
-                    "end": "\n|(?=])|(?<=}|])",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "keyword.control.conditional.typst"
-                        },
-                        "2": {
-                            "name": "punctuation.definition.keyword.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#code"
-                        }
-                    ]
-                },
-                {
-                    "begin": "(#)(for|while)\\b",
-                    "end": "\n|(?=])|(?<=}|])",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "keyword.control.loop.typst"
-                        },
-                        "1": {
-                            "name": "punctuation.definition.keyword.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#code"
-                        }
-                    ]
-                },
-                {
-                    "name": "keyword.control.loop.typst",
-                    "match": "(#)(break|continue)\\b",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.keyword.typst"
-                        }
-                    }
-                },
-                {
-                    "begin": "(#)(import|include|export)\\b",
-                    "end": "\n|(;)|(?=])",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "keyword.control.import.typst"
-                        },
-                        "1": {
-                            "name": "punctuation.definition.keyword.typst"
-                        }
-                    },
-                    "endCaptures": {
-                        "1": {
-                            "name": "punctuation.terminator.statement.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#code"
-                        }
-                    ]
-                },
-                {
-                    "name": "keyword.control.flow.typst",
-                    "match": "(#)(return)\\b",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.keyword.typst"
-                        }
-                    }
-                },
-                {
-                    "comment": "Function name",
-                    "name": "entity.name.function.typst",
-                    "match": "((#)[[:alpha:]_][[:alnum:]_-]*!?)(?=\\[|\\()",
-                    "captures": {
-                        "2": {
-                            "name": "punctuation.definition.function.typst"
-                        }
-                    }
-                },
-                {
-                    "comment": "Function arguments",
-                    "begin": "(?<=#[[:alpha:]_][[:alnum:]_-]*!?)\\(",
-                    "end": "\\)",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.group.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#arguments"
-                        }
-                    ]
-                },
-                {
-                    "name": "entity.other.interpolated.typst",
-                    "match": "(#)[[:alpha:]_][.[:alnum:]_-]*",
-                    "captures": {
-                        "1": {
-                            "name": "punctuation.definition.variable.typst"
-                        }
-                    }
-                },
-                {
-                    "name": "meta.block.content.typst",
-                    "begin": "#",
-                    "end": "\\s",
-                    "patterns": [
-                        {
-                            "include": "#code"
-                        }
-                    ]
-                }
-            ]
-        },
-        "code": {
-            "patterns": [
-                {
-                    "include": "#common"
-                },
-                {
-                    "name": "meta.block.code.typst",
-                    "begin": "{",
-                    "end": "}",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.block.code.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#code"
-                        }
-                    ]
-                },
-                {
-                    "name": "meta.block.content.typst",
-                    "begin": "\\[",
-                    "end": "\\]",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.block.content.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#markup"
-                        }
-                    ]
-                },
-                {
-                    "name": "comment.line.double-slash.typst",
-                    "begin": "//",
-                    "end": "\n",
-                    "beginCaptures": {
-                        "0": {
-                            "name": "punctuation.definition.comment.typst"
-                        }
-                    }
-                },
-                {
-                    "name": "punctuation.separator.colon.typst",
-                    "match": ":"
-                },
-                {
-                    "name": "punctuation.separator.comma.typst",
-                    "match": ","
-                },
-                {
-                    "name": "keyword.operator.typst",
-                    "match": "=>|\\.\\."
-                },
-                {
-                    "name": "keyword.operator.relational.typst",
-                    "match": "==|!=|<=|<|>=|>"
-                },
-                {
-                    "name": "keyword.operator.assignment.typst",
-                    "match": "\\+=|-=|\\*=|/=|="
-                },
-                {
-                    "name": "keyword.operator.arithmetic.typst",
-                    "match": "\\+|\\*|/|(?<![[:alpha:]_][[:alnum:]_-]*)-(?![:alnum:]_-]*[[:alpha:]_])"
-                },
-                {
-                    "name": "keyword.operator.word.typst",
-                    "match": "\\b(and|or|not)\\b"
-                },
-                {
-                    "name": "keyword.other.typst",
-                    "match": "\\b(let|as|in|set|show)\\b"
-                },
-                {
-                    "name": "keyword.control.conditional.typst",
-                    "match": "\\b(if|else)\\b"
-                },
-                {
-                    "name": "keyword.control.loop.typst",
-                    "match": "\\b(for|while|break|continue)\\b"
-                },
-                {
-                    "name": "keyword.control.import.typst",
-                    "match": "\\b(import|include|export)\\b"
-                },
-                {
-                    "name": "keyword.control.flow.typst",
-                    "match": "\\b(return)\\b"
-                },
-                {
-                    "include": "#constants"
-                },
-                {
-                    "comment": "Function name",
-                    "name": "entity.name.function.typst",
-                    "match": "\\b[[:alpha:]_][[:alnum:]_-]*!?(?=\\[|\\()"
-                },
-                {
-                    "comment": "Function name",
-                    "name": "entity.name.function.typst",
-                    "match": "(?<=\\bshow\\s*)\\b[[:alpha:]_][[:alnum:]_-]*(?=\\s*[:.])"
-                },
-                {
-                    "comment": "Function arguments",
-                    "begin": "(?<=\\b[[:alpha:]_][[:alnum:]_-]*!?)\\(",
-                    "end": "\\)",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.group.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#arguments"
-                        }
-                    ]
-                },
-                {
-                    "name": "variable.other.typst",
-                    "match": "\\b[[:alpha:]_][[:alnum:]_-]*\\b"
-                },
-                {
-                    "name": "meta.group.typst",
-                    "begin": "\\(",
-                    "end": "\\)|(?=;)",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.group.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "include": "#code"
-                        }
-                    ]
-                }
-            ]
-        },
-        "constants": {
-            "patterns": [
-                {
-                    "name": "constant.language.none.typst",
-                    "match": "\\bnone\\b"
-                },
-                {
-                    "name": "constant.language.auto.typst",
-                    "match": "\\bauto\\b"
-                },
-                {
-                    "name": "constant.language.boolean.typst",
-                    "match": "\\b(true|false)\\b"
-                },
-                {
-                    "name": "constant.numeric.length.typst",
-                    "match": "\\b(\\d*)?\\.?\\d+([eE][+-]?\\d+)?(mm|pt|cm|in|em)\\b"
-                },
-                {
-                    "name": "constant.numeric.angle.typst",
-                    "match": "\\b(\\d*)?\\.?\\d+([eE][+-]?\\d+)?(rad|deg)\\b"
-                },
-                {
-                    "name": "constant.numeric.percentage.typst",
-                    "match": "\\b(\\d*)?\\.?\\d+([eE][+-]?\\d+)?%"
-                },
-                {
-                    "name": "constant.numeric.fr.typst",
-                    "match": "\\b(\\d*)?\\.?\\d+([eE][+-]?\\d+)?fr"
-                },
-                {
-                    "name": "constant.numeric.integer.typst",
-                    "match": "\\b\\d+\\b"
-                },
-                {
-                    "name": "constant.numeric.float.typst",
-                    "match": "\\b(\\d*)?\\.?\\d+([eE][+-]?\\d+)?\\b"
-                },
-                {
-                    "name": "string.quoted.double.typst",
-                    "begin": "\"",
-                    "end": "\"",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.string.typst"
-                        }
-                    },
-                    "patterns": [
-                        {
-                            "name": "constant.character.escape.string.typst",
-                            "match": "\\\\([\\\\\"nrt]|u\\{?[0-9a-zA-Z]*\\}?)"
-                        }
-                    ]
-                },
-                {
-                    "name": "string.other.math.typst",
-                    "begin": "\\$",
-                    "end": "\\$",
-                    "captures": {
-                        "0": {
-                            "name": "punctuation.definition.string.math.typst"
-                        }
-                    }
-                }
-            ]
-        },
-        "arguments": {
-            "patterns": [
-                {
-                    "name": "variable.parameter.typst",
-                    "match": "\\b[[:alpha:]_][[:alnum:]_-]*(?=:)"
-                },
-                {
-                    "include": "#code"
-                }
-            ]
-        }
+ "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+ "scopeName": "source.typst",
+ "name": "typst",
+ "patterns": [
+  {
+   "include": "#markup"
+  }
+ ],
+ "repository": {
+  "common": {
+   "patterns": [
+    {
+     "include": "#strictComments"
     },
-    "scopeName": "source.typst"
+    {
+     "include": "#blockRaw"
+    },
+    {
+     "include": "#inlineRaw"
+    }
+   ]
+  },
+  "math": {
+   "patterns": [
+    {
+     "include": "#markupEscape"
+    },
+    {
+     "include": "#stringLiteral"
+    },
+    {
+     "include": "#markupEnterCode"
+    },
+    {
+     "begin": "([_^\\/√∛∜])\\s*([\\[\\(\\{⌈⌊⌜⌞❲⟦⟨⟪⟬⟮⦃⦅⦇⦉⦋⦍⦏⦑⦓⦕⦗⧘⧚⧼])",
+     "end": "([\\]\\)\\}⌉⌋⌝⌟❳⟧⟩⟫⟭⟯⦄⦆⦈⦊⦌⦎⦐⦒⦔⦖⦘⧙⧛⧽])|(?=\\$)|$",
+     "beginCaptures": {
+      "1": {
+       "name": "punctuation.math.operator.typst"
+      },
+      "2": {
+       "name": "constant.other.symbol.typst"
+      }
+     },
+     "endCaptures": {
+      "0": {
+       "name": "constant.other.symbol.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#mathParen"
+      },
+      {
+       "include": "#math"
+      }
+     ]
+    },
+    {
+     "match": "[_^'&\\/√∛∜]",
+     "name": "punctuation.math.operator.typst"
+    },
+    {
+     "include": "#strictMathFuncCallOrPropAccess"
+    },
+    {
+     "include": "#mathPrimary"
+    },
+    {
+     "include": "#mathMoreBrace"
+    }
+   ]
+  },
+  "markup": {
+   "patterns": [
+    {
+     "include": "#common"
+    },
+    {
+     "include": "#markupEnterCode"
+    },
+    {
+     "include": "#markupEscape"
+    },
+    {
+     "name": "punctuation.definition.linebreak.typst",
+     "match": "\\\\"
+    },
+    {
+     "name": "punctuation.definition.nonbreaking-space.typst",
+     "match": "\\~"
+    },
+    {
+     "name": "punctuation.definition.shy.typst",
+     "match": "-\\?"
+    },
+    {
+     "name": "punctuation.definition.em-dash.typst",
+     "match": "---"
+    },
+    {
+     "name": "punctuation.definition.en-dash.typst",
+     "match": "--"
+    },
+    {
+     "name": "punctuation.definition.ellipsis.typst",
+     "match": "\\.\\.\\."
+    },
+    {
+     "include": "#markupBold"
+    },
+    {
+     "include": "#markupItalic"
+    },
+    {
+     "include": "#markupLink"
+    },
+    {
+     "include": "#markupMath"
+    },
+    {
+     "include": "#markupHeading"
+    },
+    {
+     "name": "punctuation.definition.list.unnumbered.typst",
+     "match": "^\\s*-\\s+"
+    },
+    {
+     "name": "punctuation.definition.list.numbered.typst",
+     "match": "^\\s*([0-9]+\\.|\\+)\\s+"
+    },
+    {
+     "include": "#markupLabel"
+    },
+    {
+     "include": "#markupReference"
+    },
+    {
+     "include": "#markupBrace"
+    }
+   ]
+  },
+  "code": {
+   "patterns": [
+    {
+     "include": "#common"
+    },
+    {
+     "include": "#comments"
+    },
+    {
+     "name": "punctuation.terminator.statement.typst",
+     "match": ";"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "comments": {
+   "patterns": [
+    {
+     "include": "#blockComment"
+    },
+    {
+     "include": "#lineComment"
+    }
+   ]
+  },
+  "codeBlock": {
+   "begin": "\\{",
+   "end": "\\}",
+   "beginCaptures": {
+    "0": {
+     "name": "meta.brace.curly.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "meta.brace.curly.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#code"
+    }
+   ]
+  },
+  "contentBlock": {
+   "begin": "\\[",
+   "end": "\\]",
+   "beginCaptures": {
+    "0": {
+     "name": "meta.brace.square.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "meta.brace.square.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#contentBlock"
+    },
+    {
+     "include": "#markup"
+    }
+   ]
+  },
+  "keywordConstants": {
+   "patterns": [
+    {
+     "name": "keyword.other.none.typst",
+     "match": "(?<!\\)|\\]|\\})\\bnone\\b(?!-)"
+    },
+    {
+     "name": "keyword.other.auto.typst",
+     "match": "(?<!\\)|\\]|\\})\\bauto\\b(?!-)"
+    },
+    {
+     "name": "constant.language.boolean.typst",
+     "match": "(?<!\\)|\\]|\\})\\b(false|true)\\b(?!-)"
+    }
+   ]
+  },
+  "constants": {
+   "patterns": [
+    {
+     "name": "constant.numeric.length.typst",
+     "match": "(?:\\d+\\.(?!\\d)|\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)(?<!\\.)(mm|pt|cm|in|em)($|\\b)"
+    },
+    {
+     "name": "constant.numeric.angle.typst",
+     "match": "(?:\\d+\\.(?!\\d)|\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)(?<!\\.)(rad|deg)($|\\b)"
+    },
+    {
+     "name": "constant.numeric.percentage.typst",
+     "match": "(?:\\d+\\.(?!\\d)|\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)%"
+    },
+    {
+     "name": "constant.numeric.fr.typst",
+     "match": "(?:\\d+\\.(?!\\d)|\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)(?<!\\.)fr"
+    },
+    {
+     "name": "constant.numeric.integer.typst",
+     "match": "(?<!\\)|\\]|\\})(^|(?<=\\s|#)|\\b)\\d+\\b(?!\\.(?:[^\\p{L}\\p{Nl}__]|$)|[eE])"
+    },
+    {
+     "name": "constant.numeric.hex.typst",
+     "match": "(?<!\\)|\\]|\\})(^|(?<=\\s|#)|\\b)0x[0-9a-fA-F]+\\b"
+    },
+    {
+     "name": "constant.numeric.octal.typst",
+     "match": "(?<!\\)|\\]|\\})(^|(?<=\\s|#)|\\b)0o[0-7]+\\b"
+    },
+    {
+     "name": "constant.numeric.binary.typst",
+     "match": "(?<!\\)|\\]|\\})(^|(?<=\\s|#)|\\b)0b[01]+\\b"
+    },
+    {
+     "name": "constant.numeric.float.typst",
+     "match": "(?:\\d+\\.(?!\\d)|\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)(?:)"
+    },
+    {
+     "include": "#stringLiteral"
+    },
+    {
+     "include": "#markupMath"
+    }
+   ]
+  },
+  "primitiveColors": {
+   "match": "\\b(red|blue|green|black|white|gray|silver|eastern|navy|aqua|teal|purple|fuchsia|maroon|orange|yellow|olive|lime|ltr|rtl|ttb|btt|start|left|center|right|end|top|horizon|bottom)\\b(?!-)",
+   "name": "variable.other.constant.builtin.typst"
+  },
+  "primitiveFunctions": {
+   "match": "\\b(?:luma|oklab|oklch|rgb|cmyk|range)\\b(?!-)",
+   "name": "support.function.builtin.typst"
+  },
+  "primitiveTypes": {
+   "match": "\\b(any|str|int|float|bool|type|length|content|array|dictionary|arguments)\\b(?!-)",
+   "name": "entity.name.type.primitive.typst"
+  },
+  "identifier": {
+   "match": "(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*",
+   "name": "variable.other.readwrite.typst"
+  },
+  "paramOrArgName": {
+   "match": "(?!(show|import|include)\\s*\\:)((?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*)\\s*(\\:)",
+   "captures": {
+    "2": {
+     "name": "variable.other.readwrite.typst"
+    },
+    "3": {
+     "name": "punctuation.separator.colon.typst"
+    }
+   }
+  },
+  "stringLiteral": {
+   "name": "string.quoted.double.typst",
+   "begin": "\"",
+   "end": "\"",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.string.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "punctuation.definition.string.typst"
+    }
+   },
+   "patterns": [
+    {
+     "match": "(\\\\(?:[^u]|u\\{?[0-9a-zA-Z]*\\}?))|[^\\\\\"]+",
+     "captures": {
+      "1": {
+       "name": "constant.character.escape.string.typst"
+      }
+     }
+    }
+   ]
+  },
+  "strictComments": {
+   "patterns": [
+    {
+     "include": "#blockComment"
+    },
+    {
+     "include": "#strictLineComment"
+    }
+   ]
+  },
+  "blockComment": {
+   "name": "comment.block.typst",
+   "begin": "\\/\\*",
+   "end": "\\*\\/",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.comment.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#blockComment"
+    }
+   ]
+  },
+  "lineComment": {
+   "name": "comment.line.double-slash.typst",
+   "begin": "\\/\\/",
+   "end": "(?=$|\\n)",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.comment.typst"
+    }
+   }
+  },
+  "strictLineComment": {
+   "name": "comment.line.double-slash.typst",
+   "begin": "(?<!:)\\/\\/",
+   "end": "(?=$|\\n)",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.comment.typst"
+    }
+   }
+  },
+  "mathIdentifier": {
+   "match": "(?:(?<=_)|\\b)(?:(?!_)[\\p{L}\\p{Nl}_])(?:(?!_)[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])+",
+   "name": "variable.other.readwrite.typst"
+  },
+  "mathBrace": {
+   "name": "markup.content.brace.typst",
+   "match": "[{}]"
+  },
+  "mathParen": {
+   "begin": "[\\[\\(\\{⌈⌊⌜⌞❲⟦⟨⟪⟬⟮⦃⦅⦇⦉⦋⦍⦏⦑⦓⦕⦗⧘⧚⧼]",
+   "end": "([\\]\\)\\}⌉⌋⌝⌟❳⟧⟩⟫⟭⟯⦄⦆⦈⦊⦌⦎⦐⦒⦔⦖⦘⧙⧛⧽])|(?=\\$)|$",
+   "beginCaptures": {
+    "0": {
+     "name": "markup.content.brace.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "markup.content.brace.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#mathParen"
+    },
+    {
+     "include": "#math"
+    }
+   ]
+  },
+  "mathPrimary": {
+   "begin": "(?:(?<=_)|\\b)(?:(?!_)[\\p{L}\\p{Nl}_])(?:(?!_)[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])+",
+   "beginCaptures": {
+    "0": {
+     "name": "variable.other.readwrite.typst"
+    }
+   },
+   "end": "(?!(?:\\(|\\.[\\p{L}\\p{Nl}_]))|(?=\\$)",
+   "patterns": [
+    {
+     "include": "#strictMathFuncCallOrPropAccess"
+    },
+    {
+     "match": "(\\.)((?:(?!_)[\\p{L}\\p{Nl}_])(?:(?!_)[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])*)",
+     "captures": {
+      "1": {
+       "name": "keyword.operator.accessor.typst"
+      },
+      "2": {
+       "name": "variable.other.readwrite.typst"
+      }
+     }
+    },
+    {
+     "include": "#mathCallArgs"
+    },
+    {
+     "include": "#mathIdentifier"
+    }
+   ]
+  },
+  "mathMoreBrace": {
+   "name": "markup.content.brace.typst",
+   "match": "[{}()\\[\\]]"
+  },
+  "mathCallArgs": {
+   "begin": "\\(",
+   "end": "\\)|(?=\\$)",
+   "beginCaptures": {
+    "0": {
+     "name": "meta.brace.round.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "meta.brace.round.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#mathParen"
+    },
+    {
+     "match": ",",
+     "name": "punctuation.separator.comma.typst"
+    },
+    {
+     "include": "#math"
+    }
+   ]
+  },
+  "strictMathFuncCallOrPropAccess": {
+   "name": "meta.expr.call.typst",
+   "begin": "(?=(?:(?:(\\.)((?:(?!_)[\\p{L}\\p{Nl}_])(?:(?!_)[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])*)|(?:(?<=_)|\\b)(?:(?!_)[\\p{L}\\p{Nl}_])(?:(?!_)[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])+)(?=\\()))",
+   "end": "(?:(?<=[\\)])(?![\\(\\.]|(?:(?<=_)|\\b)(?:(?!_)[\\p{L}\\p{Nl}_])(?:(?!_)[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])+(?=\\()))|(?=[\\$\\s;,\\}\\]\\)]|$)",
+   "patterns": [
+    {
+     "match": "\\.",
+     "name": "keyword.operator.accessor.typst"
+    },
+    {
+     "match": "(?:(?<=_)|\\b)(?:(?!_)[\\p{L}\\p{Nl}_])(?:(?!_)[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])+(?=\\()",
+     "name": "entity.name.function.typst",
+     "captures": {
+      "0": {
+       "name": "entity.name.function.typst",
+       "patterns": [
+        {
+         "include": "#primitiveFunctions"
+        },
+        {
+         "include": "#primitiveTypes"
+        },
+        {
+         "match": ".*",
+         "name": "entity.name.function.typst"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "include": "#mathIdentifier"
+    },
+    {
+     "match": "(\\()\\s*(\\))",
+     "captures": {
+      "1": {
+       "name": "meta.brace.round.typst"
+      },
+      "2": {
+       "name": "meta.brace.round.typst"
+      }
+     }
+    },
+    {
+     "include": "#mathCallArgs"
+    }
+   ]
+  },
+  "markupBrace": {
+   "name": "markup.content.brace.typst",
+   "match": "[{}()\\[\\]]"
+  },
+  "markupMath": {
+   "name": "markup.math.typst",
+   "begin": "\\$",
+   "end": "\\$",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.string.begin.math.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "punctuation.definition.string.end.math.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#math"
+    }
+   ]
+  },
+  "markupLabel": {
+   "name": "string.other.label.typst",
+   "match": "<[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-\\.:]*>"
+  },
+  "markupReference": {
+   "name": "string.other.reference.typst",
+   "match": "(@)[\\p{L}\\p{Nl}__](?:[\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]|[\\.:](?!:\\s|$|([\\.:]*[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-\\.:])))*",
+   "captures": {
+    "1": {
+     "name": "punctuation.definition.reference.typst"
+    }
+   }
+  },
+  "markupEscape": {
+   "name": "constant.character.escape.content.typst",
+   "match": "\\\\(?:[^u]|u\\{?[0-9a-zA-Z]*\\}?)"
+  },
+  "markupHeading": {
+   "name": "markup.heading.typst",
+   "begin": "^\\s*(=+)(?:(?=[\\r\\n]|$)|[^\\S\\n]+)",
+   "end": "\\n|(?=<)",
+   "beginCaptures": {
+    "1": {
+     "name": "punctuation.definition.heading.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#markup"
+    }
+   ]
+  },
+  "markupEnterCode": {
+   "patterns": [
+    {
+     "match": "(#)\\s",
+     "captures": {
+      "1": {
+       "name": "punctuation.definition.hash.typst"
+      }
+     }
+    },
+    {
+     "match": "(#)(;)",
+     "captures": {
+      "1": {
+       "name": "punctuation.definition.hash.typst"
+      },
+      "2": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     }
+    },
+    {
+     "begin": "#(?=(?:break|continue|and|or|not|return|as|in|include|import|let|else|if|for|while|context|set|show)\\b(?!-))",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "keyword.control.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?=(?:any|str|int|float|bool|type|length|content|array|dictionary|arguments)\\b(?!-))",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "entity.name.type.primitive.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?=(?:none)\\b(?!-))",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "keyword.other.none.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?=(?:false|true)\\b(?!-))",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "constant.language.boolean.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?=[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*[\\(\\[])",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "entity.name.function.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?=[\\p{L}\\p{Nl}__])",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "variable.other.readwrite.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?=\\\")",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "string.hash.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?=\\d|\\.\\d)",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "constant.numeric.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "begin": "#(?:)",
+     "end": "(?<=;)|(?<=[\\}\\]\\)])(?![;\\(\\[\\$]|(?:\\.(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=[\\(\\[])))|(?<!#)(?=[\"\\_])|(?=\\.(?:[^0-9\\p{L}\\p{Nl}__]|$))|(?=[\\s,\\}\\]\\)\\#\\$\\*]|$)|(;)",
+     "beginCaptures": {
+      "0": {
+       "name": "keyword.control.hash.typst"
+      }
+     },
+     "endCaptures": {
+      "1": {
+       "name": "punctuation.terminator.statement.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    }
+   ]
+  },
+  "markupBold": {
+   "name": "markup.bold.typst",
+   "begin": "(?:(^\\*|\\*$|((?<=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}])\\*)|(\\*(?=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}]))))",
+   "end": "(?:(^\\*|\\*$|((?<=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}])\\*)|(\\*(?=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}]))))|\\n|(?=\\])",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.bold.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "punctuation.definition.bold.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#markup"
+    }
+   ]
+  },
+  "markupLink": {
+   "name": "markup.underline.link.typst",
+   "begin": "(?:https?):\\/\\/",
+   "end": "(?=[\\s\\]\\)]|(?=[!,.:;?'](?:[\\s\\]\\)]|$)))",
+   "patterns": [
+    {
+     "include": "#markupLinkParen"
+    },
+    {
+     "include": "#markupLinkBracket"
+    },
+    {
+     "match": "(^|\\G)(?:[0-9a-zA-Z#$%&*\\+\\-\\/\\=\\@\\_\\~]+|(?:[!,.:;?']+(?![\\s\\]\\)]|$)))"
+    }
+   ]
+  },
+  "markupLinkParen": {
+   "begin": "\\(",
+   "end": "\\)|(?=[\\s\\]])",
+   "patterns": [
+    {
+     "include": "#markupLink"
+    }
+   ]
+  },
+  "markupLinkBracket": {
+   "begin": "\\[",
+   "end": "\\]|(?=[\\s\\)])",
+   "patterns": [
+    {
+     "include": "#markupLink"
+    }
+   ]
+  },
+  "markupItalic": {
+   "name": "markup.italic.typst",
+   "begin": "(?:(^_|_$|((?<=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}])_)|(_(?=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}]))))",
+   "end": "(?:(^_|_$|((?<=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}])_)|(_(?=[\\W\\p{Han}\\p{Hangul}\\p{Katakana}\\p{Hiragana}]))))|\\n|(?=\\])",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.italic.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "punctuation.definition.italic.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#markup"
+    }
+   ]
+  },
+  "inlineRaw": {
+   "name": "markup.raw.inline.typst string.other.raw.typst",
+   "begin": "`",
+   "end": "`",
+   "beginCaptures": {
+    "0": {
+     "name": "punctuation.definition.raw.inline.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "punctuation.definition.raw.inline.typst"
+    }
+   }
+  },
+  "blockRaw": {
+   "patterns": [
+    {
+     "include": "#blockRawGeneral"
+    }
+   ]
+  },
+  "blockRawGeneral": {
+   "name": "markup.raw.block.typst",
+   "begin": "(`{3,})([\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*\\b)?",
+   "beginCaptures": {
+    "1": {
+     "name": "punctuation.definition.raw.begin.typst"
+    },
+    "2": {
+     "name": "fenced_code.block.language.typst"
+    }
+   },
+   "end": "(\\1)",
+   "endCaptures": {
+    "1": {
+     "name": "punctuation.definition.raw.end.typst"
+    }
+   }
+  },
+  "expression": {
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#arrayOrDict"
+    },
+    {
+     "include": "#contentBlock"
+    },
+    {
+     "match": "\\b(else)\\b(?!-)",
+     "name": "keyword.control.conditional.typst"
+    },
+    {
+     "match": "\\b(break|continue)\\b(?!-)",
+     "name": "keyword.control.loop.typst"
+    },
+    {
+     "match": "\\b(in)\\b(?!-)",
+     "name": "keyword.other.range.typst"
+    },
+    {
+     "match": "\\b(and|or|not)\\b(?!-)",
+     "name": "keyword.other.logical.typst"
+    },
+    {
+     "match": "\\b(return)\\b(?!-)",
+     "name": "keyword.control.flow.typst"
+    },
+    {
+     "include": "#markupLabel"
+    },
+    {
+     "include": "#blockRaw"
+    },
+    {
+     "include": "#inlineRaw"
+    },
+    {
+     "include": "#codeBlock"
+    },
+    {
+     "include": "#letStatement"
+    },
+    {
+     "include": "#showStatement"
+    },
+    {
+     "include": "#contextStatement"
+    },
+    {
+     "include": "#setStatement"
+    },
+    {
+     "include": "#forStatement"
+    },
+    {
+     "include": "#whileStatement"
+    },
+    {
+     "include": "#ifStatement"
+    },
+    {
+     "include": "#importStatement"
+    },
+    {
+     "include": "#includeStatement"
+    },
+    {
+     "include": "#strictFuncCallOrPropAccess"
+    },
+    {
+     "include": "#primitiveColors"
+    },
+    {
+     "include": "#primitiveFunctions"
+    },
+    {
+     "include": "#primitiveTypes"
+    },
+    {
+     "include": "#keywordConstants"
+    },
+    {
+     "include": "#identifier"
+    },
+    {
+     "include": "#constants"
+    },
+    {
+     "match": "(as)\\b(?!-)",
+     "name": "keyword.control.typst"
+    },
+    {
+     "match": "(in)\\b(?!-)",
+     "name": "keyword.operator.range.typst"
+    },
+    {
+     "match": "\\.\\.",
+     "name": "keyword.operator.spread.typst"
+    },
+    {
+     "match": ":",
+     "name": "punctuation.separator.colon.typst"
+    },
+    {
+     "match": "\\.",
+     "name": "keyword.operator.accessor.typst"
+    },
+    {
+     "match": ",",
+     "name": "punctuation.separator.comma.typst"
+    },
+    {
+     "match": "=>",
+     "name": "storage.type.function.arrow.typst"
+    },
+    {
+     "match": "==|!=|<=|<|>=|>",
+     "name": "keyword.operator.relational.typst"
+    },
+    {
+     "begin": "(\\+=|-=|\\*=|\\/=|=)",
+     "end": "(?=[\\n;\\}\\]\\)])",
+     "beginCaptures": {
+      "1": {
+       "name": "keyword.operator.assignment.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#expression"
+      }
+     ]
+    },
+    {
+     "match": "\\+|\\\\|\\/|\\*|-",
+     "name": "keyword.operator.arithmetic.typst"
+    }
+   ]
+  },
+  "arrayOrDict": {
+   "patterns": [
+    {
+     "match": "(\\()\\s*(\\))",
+     "captures": {
+      "1": {
+       "name": "meta.brace.round.typst"
+      },
+      "2": {
+       "name": "meta.brace.round.typst"
+      }
+     }
+    },
+    {
+     "match": "(\\()\\s*(:)\\s*(\\))",
+     "captures": {
+      "1": {
+       "name": "meta.brace.round.typst"
+      },
+      "2": {
+       "name": "punctuation.separator.colon.typst"
+      },
+      "3": {
+       "name": "meta.brace.round.typst"
+      }
+     }
+    },
+    {
+     "begin": "\\(",
+     "end": "\\)|(?=[;\\}\\]])",
+     "beginCaptures": {
+      "0": {
+       "name": "meta.brace.round.typst"
+      }
+     },
+     "endCaptures": {
+      "0": {
+       "name": "meta.brace.round.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#literalContent"
+      }
+     ]
+    }
+   ]
+  },
+  "literalContent": {
+   "patterns": [
+    {
+     "include": "#paramOrArgName"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "contextStatement": {
+   "name": "meta.expr.context.typst",
+   "begin": "\\bcontext\\b(?!-)",
+   "end": "(?<=[\\}\\]\\d])|(?=[;\\}\\]\\)#\\n]|$)",
+   "beginCaptures": {
+    "0": {
+     "name": "keyword.control.other.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "includeStatement": {
+   "name": "meta.expr.include.typst",
+   "begin": "(\\binclude\\b(?!-))\\s*",
+   "end": "(?=[\\n;\\}\\]\\)])",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.import.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "importStatement": {
+   "name": "meta.expr.import.typst",
+   "begin": "(\\bimport\\b(?!-))\\s*",
+   "end": "(?=[\\n;\\}\\]\\)])",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.import.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#importPathClause"
+    },
+    {
+     "match": "\\:",
+     "name": "punctuation.separator.colon.typst"
+    },
+    {
+     "match": "\\*",
+     "name": "keyword.operator.wildcard.typst"
+    },
+    {
+     "match": "\\,",
+     "name": "punctuation.separator.comma.typst"
+    },
+    {
+     "include": "#importAsClause"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "importPathClause": {
+   "begin": "(\\bimport\\b(?!-))\\s*",
+   "end": "(?=\\:|as)",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.import.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "importAsClause": {
+   "begin": "(\\bas\\b)\\s*",
+   "end": "(?=[\\s;\\}\\]\\)\\:])",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.import.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#identifier"
+    }
+   ]
+  },
+  "letStatement": {
+   "name": "meta.expr.let.typst",
+   "begin": "(?=(?:(let\\b(?!-))))",
+   "end": "(?!\\=)(?=[\\s;\\}\\]\\)])",
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#letBindingClause"
+    },
+    {
+     "include": "#letInitClause"
+    }
+   ]
+  },
+  "letBindingClause": {
+   "begin": "(let\\b(?!-))\\s*",
+   "end": "(?=[=;\\]}\\n])",
+   "beginCaptures": {
+    "1": {
+     "name": "storage.type.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "begin": "(\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*)(\\()",
+     "end": "\\)|(?=[;\\}\\]])",
+     "beginCaptures": {
+      "1": {
+       "name": "entity.name.function.typst",
+       "patterns": [
+        {
+         "include": "#primitiveFunctions"
+        }
+       ]
+      },
+      "2": {
+       "name": "meta.brace.round.typst"
+      }
+     },
+     "endCaptures": {
+      "0": {
+       "name": "meta.brace.round.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#patternOrArgsBody"
+      }
+     ]
+    },
+    {
+     "begin": "\\(",
+     "end": "\\)|(?=[;\\}\\]])",
+     "beginCaptures": {
+      "0": {
+       "name": "meta.brace.round.typst"
+      }
+     },
+     "endCaptures": {
+      "0": {
+       "name": "meta.brace.round.typst"
+      }
+     },
+     "patterns": [
+      {
+       "include": "#patternOrArgsBody"
+      }
+     ]
+    },
+    {
+     "include": "#identifier"
+    }
+   ]
+  },
+  "letInitClause": {
+   "begin": "=\\s*",
+   "end": "(?=[\\n;\\}\\]\\)])",
+   "beginCaptures": {
+    "0": {
+     "name": "keyword.operator.assignment.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "ifStatement": {
+   "name": "meta.expr.if.typst",
+   "begin": "(?=(?:(else\\s+)?(if\\b(?!-))))",
+   "end": "(?<=\\}|\\])(?!\\s*(else)\\b(?!-)|[\\[\\{])|(?<=else)(?!\\s*(?:if\\b(?!-)|[\\[\\{]))|(?=[;\\}\\]\\)\\n]|$)",
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#ifClause"
+    },
+    {
+     "include": "#elseClause"
+    },
+    {
+     "include": "#codeBlock"
+    },
+    {
+     "include": "#contentBlock"
+    }
+   ]
+  },
+  "ifClause": {
+   "begin": "\\bif\\b(?!-)",
+   "end": "(?<!(?:\\bwhile)|(?:hile\\s{1})|(?:ile\\s{2})|(?:le\\s{3})|(?:[\\s\\S]{2}(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or))|(?:[\\s\\S](?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or)\\s)|(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or)\\s{2}|(?:if|in|or)\\s{3}|(?:[\\s\\S](?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:and|not))|(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:and|not)\\s|(?:and|not)\\s{2}|(?:[\\s\\S]{4}[=<>\\+\\-\\*\\/])|(?:[\\s\\S]{3}[=<>\\+\\-\\*\\/]\\s)|(?:[\\s\\S]{2}[=<>\\+\\-\\*\\/]\\s{2})|(?:[\\s\\S][=<>\\+\\-\\*\\/]\\s{3})|(?:[=<>\\+\\-\\*\\/]\\s{4}))(?=[\\[\\{])|(?=[;,\\}\\]\\)\\#\\n]|$)",
+   "beginCaptures": {
+    "0": {
+     "name": "keyword.control.conditional.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "elseClause": {
+   "match": "\\belse\\b(?!-)",
+   "name": "keyword.control.conditional.typst"
+  },
+  "forStatement": {
+   "name": "meta.expr.for.typst",
+   "begin": "(?=(?:(for\\b(?!-))\\s*))",
+   "end": "(?<=[\\}\\]])(?![\\{\\[])|(?=[;\\}\\]\\)\\n]|$)",
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#forClause"
+    },
+    {
+     "include": "#codeBlock"
+    },
+    {
+     "include": "#contentBlock"
+    }
+   ]
+  },
+  "forClause": {
+   "begin": "(for\\b)\\s*",
+   "end": "(?<!(?:\\bwhile)|(?:hile\\s{1})|(?:ile\\s{2})|(?:le\\s{3})|(?:[\\s\\S]{2}(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or))|(?:[\\s\\S](?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or)\\s)|(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or)\\s{2}|(?:if|in|or)\\s{3}|(?:[\\s\\S](?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:and|not))|(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:and|not)\\s|(?:and|not)\\s{2}|(?:[\\s\\S]{4}[=<>\\+\\-\\*\\/])|(?:[\\s\\S]{3}[=<>\\+\\-\\*\\/]\\s)|(?:[\\s\\S]{2}[=<>\\+\\-\\*\\/]\\s{2})|(?:[\\s\\S][=<>\\+\\-\\*\\/]\\s{3})|(?:[=<>\\+\\-\\*\\/]\\s{4}))(?=[\\[\\{])|(?=[;,\\}\\]\\)\\#\\n]|$)",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.loop.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "whileStatement": {
+   "name": "meta.expr.while.typst",
+   "begin": "(?=(?:(while\\b(?!-))))",
+   "end": "(?<=[\\}\\]])(?![\\{\\[])|(?=[;\\}\\]\\)\\n]|$)",
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#whileClause"
+    },
+    {
+     "include": "#codeBlock"
+    },
+    {
+     "include": "#contentBlock"
+    }
+   ]
+  },
+  "whileClause": {
+   "begin": "(while\\b)\\s*",
+   "end": "(?<!(?:\\bwhile)|(?:hile\\s{1})|(?:ile\\s{2})|(?:le\\s{3})|(?:[\\s\\S]{2}(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or))|(?:[\\s\\S](?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or)\\s)|(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:if|in|or)\\s{2}|(?:if|in|or)\\s{3}|(?:[\\s\\S](?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:and|not))|(?:\\s|[^\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}])(?:and|not)\\s|(?:and|not)\\s{2}|(?:[\\s\\S]{4}[=<>\\+\\-\\*\\/])|(?:[\\s\\S]{3}[=<>\\+\\-\\*\\/]\\s)|(?:[\\s\\S]{2}[=<>\\+\\-\\*\\/]\\s{2})|(?:[\\s\\S][=<>\\+\\-\\*\\/]\\s{3})|(?:[=<>\\+\\-\\*\\/]\\s{4}))(?=[\\[\\{])|(?=[;,\\}\\]\\)\\#\\n]|$)",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.loop.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "setStatement": {
+   "name": "meta.expr.set.typst",
+   "begin": "(?=(?:(set\\b(?!-))\\s*(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*))",
+   "end": "(?<=\\))(?!\\s*if\\b)|(?=[\\s;\\{\\[\\}\\]\\)])",
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#setClause"
+    },
+    {
+     "include": "#setIfClause"
+    }
+   ]
+  },
+  "setClause": {
+   "begin": "(set\\b)\\s+",
+   "end": "(?=if)|(?=[\\n;\\{\\[\\}\\]\\)])",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.other.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#strictFuncCallOrPropAccess"
+    },
+    {
+     "include": "#identifier"
+    }
+   ]
+  },
+  "setIfClause": {
+   "begin": "(if\\b(?!-))\\s*",
+   "end": "(?<=\\S)(?<!and|or|not|in|!=|==|<=|>=|<|>|\\+|-|\\*|\\/|=|\\+=|-=|\\*=|\\/=)(?!\\s*(?:and|or|not|in|!=|==|<=|>=|<|>|\\+|-|\\*|\\/|=|\\+=|-=|\\*=|\\/=|\\.))|(?=[\\n;\\}\\]\\)])",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.conditional.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "showStatement": {
+   "name": "meta.expr.show.typst",
+   "begin": "(?=(?:(show\\b(?!-))))",
+   "end": "(?=[\\s;\\{\\[\\}\\]\\)])",
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#showAnyClause"
+    },
+    {
+     "include": "#showSelectClause"
+    },
+    {
+     "include": "#showSubstClause"
+    }
+   ]
+  },
+  "showAnyClause": {
+   "match": "(show\\b)\\s*(?=\\:)",
+   "captures": {
+    "1": {
+     "name": "keyword.control.other.typst"
+    }
+   }
+  },
+  "showSelectClause": {
+   "begin": "(show\\b)\\s*",
+   "end": "(?=[:;\\}\\]\\n])",
+   "beginCaptures": {
+    "1": {
+     "name": "keyword.control.other.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#markupLabel"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "showSubstClause": {
+   "begin": "(\\:)\\s*",
+   "end": "(?=[\\n;\\}\\]\\)])",
+   "beginCaptures": {
+    "1": {
+     "name": "punctuation.separator.colon.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "callArgs": {
+   "begin": "\\(",
+   "end": "\\)|(?=[;\\}\\]])",
+   "beginCaptures": {
+    "0": {
+     "name": "meta.brace.round.typst"
+    }
+   },
+   "endCaptures": {
+    "0": {
+     "name": "meta.brace.round.typst"
+    }
+   },
+   "patterns": [
+    {
+     "include": "#patternOrArgsBody"
+    }
+   ]
+  },
+  "patternOrArgsBody": {
+   "patterns": [
+    {
+     "include": "#comments"
+    },
+    {
+     "include": "#paramOrArgName"
+    },
+    {
+     "include": "#expression"
+    }
+   ]
+  },
+  "strictFuncCallOrPropAccess": {
+   "name": "meta.expr.call.typst",
+   "begin": "(?=(?:(\\.)?(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=\\(|\\[)))",
+   "end": "(?:(?<=\\)|\\])(?![\\[\\(\\.]))|(?=[\\s;,\\}\\]\\)\\#]|$)",
+   "patterns": [
+    {
+     "match": "\\.",
+     "name": "keyword.operator.accessor.typst"
+    },
+    {
+     "match": "(?<!\\)|\\]|\\})\\b[\\p{L}\\p{Nl}__][\\p{L}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Nd}\\p{Pc}_\\-]*(?=\\(|\\[)",
+     "captures": {
+      "0": {
+       "patterns": [
+        {
+         "include": "#primitiveFunctions"
+        },
+        {
+         "include": "#primitiveTypes"
+        },
+        {
+         "match": ".*",
+         "name": "entity.name.function.typst"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "include": "#identifier"
+    },
+    {
+     "match": "(\\()\\s*(\\))",
+     "captures": {
+      "1": {
+       "name": "meta.brace.round.typst"
+      },
+      "2": {
+       "name": "meta.brace.round.typst"
+      }
+     }
+    },
+    {
+     "include": "#callArgs"
+    },
+    {
+     "include": "#contentBlock"
+    }
+   ]
+  }
+ }
 }
