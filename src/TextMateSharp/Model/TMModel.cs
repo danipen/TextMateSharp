@@ -430,7 +430,11 @@ namespace TextMateSharp.Model
 
         public void InvalidateLine(int lineIndex)
         {
-            this._lines.Get(lineIndex).IsInvalid = true;
+            var line = this._lines.Get(lineIndex);
+            if (line == null)
+                return;
+
+            line.IsInvalid = true;
 
             lock (_lock)
             {
