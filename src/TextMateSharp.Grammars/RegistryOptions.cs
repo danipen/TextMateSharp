@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using TextMateSharp.Grammars.Resources;
-
 using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
 using TextMateSharp.Internal.Types;
@@ -15,13 +14,99 @@ namespace TextMateSharp.Grammars
 {
     public class RegistryOptions : IRegistryOptions
     {
-        ThemeName _defaultTheme;
-        Dictionary<string, GrammarDefinition> _availableGrammars = new Dictionary<string, GrammarDefinition>();
+        private readonly ThemeName _defaultTheme;
+
+        private readonly Dictionary<string, GrammarDefinition> _availableGrammars
+            = new Dictionary<string, GrammarDefinition>();
 
         public RegistryOptions(ThemeName defaultTheme)
         {
             _defaultTheme = defaultTheme;
             InitializeAvailableGrammars();
+        }
+
+        /// <summary>
+        /// load from local folder like structure in project
+        /// </summary>
+        /// <param name="dirPath"></param>
+        /// <param name="overwrite"></param>
+        public void LoadFromLocalDir(string dirPath, bool overwrite = false)
+        {
+            var directories = new DirectoryInfo(dirPath).GetDirectories();
+            foreach (var directory in directories)
+            {
+                var grammar = directory.Name.ToUpper();
+                var packageFileInfo = directory.GetFiles("package.json").FirstOrDefault();
+                if (packageFileInfo == null)
+                    continue;
+                LoadFromLocalFile(grammar, packageFileInfo, overwrite);
+            }
+        }
+
+
+        /// <summary>
+        /// load from local file
+        /// </summary>
+        /// <param name="grammarName"></param>
+        /// <param name="packageJsonFileInfo"></param>
+        /// <param name="overwrite"></param>
+        public void LoadFromLocalFile(string grammarName, string packageJsonFileInfo, bool overwrite = false)
+        {
+            LoadFromLocalFile(grammarName, new FileInfo(packageJsonFileInfo), overwrite);
+        }
+
+        /// <summary>
+        /// load from local file
+        /// </summary>
+        /// <param name="grammarName"></param>
+        /// <param name="packageJsonFileInfo"></param>
+        /// <param name="overwrite"></param>
+        public void LoadFromLocalFile(string grammarName, FileInfo packageJsonFileInfo, bool overwrite = false)
+        {
+            if (_availableGrammars.ContainsKey(grammarName) && !overwrite)
+            {
+                return;
+            }
+
+            if (!packageJsonFileInfo.Exists)
+                return;
+            var baseDir = packageJsonFileInfo.Directory?.FullName ?? string.Empty;
+            using (Stream stream = packageJsonFileInfo.OpenRead())
+            {
+                var definition = JsonSerializer.Deserialize(
+                    stream, JsonSerializationContext.Default.GrammarDefinition);
+                if (definition == null)
+                {
+                    return;
+                }
+
+                foreach (var language in definition.Contributes.Languages)
+                {
+                    if (language.ConfigurationFile == null)
+                    {
+                        language.Configuration = null;
+                        continue;
+                    }
+
+                    var path = Path.GetFullPath(Path.Combine(baseDir, language.ConfigurationFile));
+                    language.Configuration = LanguageConfiguration.LoadFromLocal(path);
+                }
+
+                if (definition.Contributes?.Snippets != null)
+                {
+                    definition.LanguageSnippets = new LanguageSnippets();
+                    foreach (var snippet in definition.Contributes.Snippets)
+                    {
+                        var path = Path.GetFullPath(Path.Combine(baseDir, snippet.Path));
+                        var configuration = LanguageSnippets.LoadFromLocal(path);
+                        if (configuration == null) continue;
+                        definition.LanguageSnippets = configuration;
+                        break;
+                    }
+                }
+
+                _availableGrammars.Add(grammarName, definition);
+            }
         }
 
         public List<Language> GetAvailableLanguages()
@@ -62,7 +147,7 @@ namespace TextMateSharp.Grammars
                     foreach (var languageExtension in language.Extensions)
                     {
                         if (extension.Equals(languageExtension,
-                            StringComparison.OrdinalIgnoreCase))
+                                StringComparison.OrdinalIgnoreCase))
                         {
                             return language;
                         }
@@ -85,7 +170,7 @@ namespace TextMateSharp.Grammars
                     foreach (var languageExtension in language.Extensions)
                     {
                         if (extension.Equals(languageExtension,
-                            StringComparison.OrdinalIgnoreCase))
+                                StringComparison.OrdinalIgnoreCase))
                         {
                             foreach (var grammar in definition.Contributes.Grammars)
                             {

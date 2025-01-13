@@ -26,4 +26,17 @@
     <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="GrammarAssets\qml\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="GrammarAssets\qml\syntaxes\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GrammarAssets\" />
+  </ItemGroup>
+
 </Project>

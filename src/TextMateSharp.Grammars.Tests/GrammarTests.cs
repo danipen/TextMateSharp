@@ -1,5 +1,6 @@
 using System;
-
+using System.IO;
+using System.Linq;
 using NUnit.Framework;
 
 namespace TextMateSharp.Grammars.Tests
@@ -44,7 +45,7 @@ namespace TextMateSharp.Grammars.Tests
             RegistryOptions options = new RegistryOptions(ThemeName.Light);
 
             foreach (ThemeName themeName in Enum.GetValues<ThemeName>())
-            Assert.That(options.LoadTheme(themeName), Is.Not.Null, "Failed: " + themeName.ToString());
+                Assert.That(options.LoadTheme(themeName), Is.Not.Null, "Failed: " + themeName.ToString());
         }
 
         [Test]
@@ -145,6 +146,23 @@ namespace TextMateSharp.Grammars.Tests
                         string.Format("[{0} grammar definition]: {1}", grammarDefinition.Name, ex.Message));
                 }
             }
+        }
+
+        [Test]
+        public void AssertLoadFromLocalDir()
+        {
+            RegistryOptions options = new RegistryOptions(ThemeName.Light);
+            options.LoadFromLocalDir("GrammarAssets");
+            Assert.NotNull(options.GetAvailableLanguages().First((language => language.Id == "qml")));
+        }
+
+        [Test]
+        public void AssertLoadFromLocalFile()
+        {
+            RegistryOptions options = new RegistryOptions(ThemeName.Light);
+            var combine = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GrammarAssets", "qml", "package.json");
+            options.LoadFromLocalFile("QML", combine);
+            Assert.NotNull(options.GetAvailableLanguages().First((language => language.Id == "qml")));
         }
     }
 }

@@ -1,0 +1,105 @@
+{
+	"name": "felgo",
+	"displayName": "QML Syntax/Tools",
+	"description": "QML syntax highlighting and autocompletion. Run, test and develop Qt Quick applications with QML Hot Reload.",
+	"publisher": "felgo",
+	"author": {
+		"name": "Felgo GmbH",
+		"url": "https://felgo.com",
+		"email": "help@felgo.com"
+	},
+	"version": "2.0.1",
+	"engines": {
+		"vscode": "^1.81.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Other"
+	],
+	"keywords": [
+		"QML",
+		"Mobile App",
+		"Android",
+		"iOS",
+		"Qt"
+	],
+	"activationEvents": [
+		"onCommand:qml.runWebLive",
+		"onCommand:qml.runLive",
+		"workspaceContains:*.pro",
+		"workspaceContains:**/.qml",
+		"onLanguage:qml"
+	],
+	"main": "./src/extension.js",
+	"preview": false,
+	"contributes": {
+		"languages": [
+			{
+				"id": "qml",
+				"aliases": [
+					"QML",
+					"qml"
+				],
+				"extensions": [
+					".qml"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "qml",
+				"scopeName": "source.qml",
+				"path": "./syntaxes/qml.tmLanguage.json"
+			}
+		],
+		"commands": [
+			{
+				"command": "qml.runWebLive",
+				"title": "QML: Launch Web Live Client"
+			},
+			{
+				"command": "qml.runLive",
+				"title": "QML: Connect to Mobile Live Client"
+			}
+		]
+	},
+	"qna": "https://felgo.com/developers/forums",
+	"bugs": {
+		"url": "https://felgo.com/developers/forums"
+	},
+	"icon": "images/vscode-qml-logo.png",
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.81.0",
+		"@types/mocha": "^10.0.1",
+		"@types/node": "16.x",
+		"eslint": "^8.47.0",
+		"glob": "^10.3.3",
+		"mocha": "^10.2.0",
+		"typescript": "^5.1.6",
+		"@vscode/test-electron": "^2.3.4"
+	},
+	"dependencies": {
+		"lowdb": "^1.0.0",
+		"puid": "^1.0.7",
+		"ws": "^8.2.2"
+	},
+	"__metadata": {
+		"id": "a2715b65-4bbb-49c4-bdc6-fa47994e3bb9",
+		"publisherId": "ee85075b-b1d9-4fd6-93f5-11b4abeacc3e",
+		"publisherDisplayName": "Felgo",
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"isPreReleaseVersion": false,
+		"hasPreReleaseVersion": false,
+		"installedTimestamp": 1727576498238,
+		"pinned": false,
+		"preRelease": false,
+		"source": "gallery"
+	}
+}
