@@ -1,0 +1,335 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "QML",
+	"patterns": [
+		{
+			"include": "#jsKeywords"
+		},
+		{
+			"include": "#qmlKeywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comment"
+		},
+		{
+			"name": "storage.type.qml",
+			"match": "\\b(bool)\\b|\\b(double)\\b|\\b(int)\\b|\\b(real)\\b|\\b(string)\\b|\\b(variant)\\b|\\b(var)\\b|\\b(true)\\b|\\b(false)\\b|\\b(object)\\b|\\b(null)\\b|\\b(alias)\\b|\\b(variant)\\b|\\b(TextureInput)\\b|\\b(vector2d)\\b|\\b(vector3d)\\b|\\b(vector4d)\\b"
+		},
+		{
+			"name": "storage.type.qml",
+			"match": "\\b(color)\\b|\\b(coordinate)\\b|\\b(date)\\b|\\b(enumeration)\\b|\\b(font)\\b|\\b(geocircle)\\b|\\b(geopath)\\b|\\b(geopolygon)\\b|\\b(georectangle)\\b|\\b(geoshape)\\b|\\b(list)\\b|\\b(matrix4x4)\\b|\\b(mediaplayer-qml-dynamic)\\b|\\b(palette)\\b|\\b(point)\\b|\\b(quaternion)\\b|\\b(rect)\\b|\\b(size)\\b|\\b(url)\\b|\\b(vector2d)\\b|\\b(vector3d|vector4d)\\b"
+		},
+		{
+			"origin": "felgo",
+			"name": "markup.bold.qml",
+			"match": "\\b(ThemeNavigationTabControl)\\b|\\b(NavigationStack)\\b|\\b(SoundEffect)\\b|\\b(Utils)\\b|\\b(ActivityIndicatorBarItem)\\b|\\b(RubeRevoluteJoint)\\b|\\b(PhysicsWorld)\\b|\\b(LevelStore)\\b|\\b(PluginItem)\\b|\\b(GameNetworkView)\\b|\\b(TagManager)\\b|\\b(StyleSimpleRow)\\b|\\b(RubeParser)\\b|\\b(DownloadableResource)\\b|\\b(FelgoIOS)\\b|\\b(Promise)\\b|\\b(Dialog)\\b|\\b(NoRanking)\\b|\\b(Accelerometer)\\b|\\b(PolygonItem)\\b|\\b(MotorJoint)\\b|\\b(ThemeColors)\\b|\\b(RippleMouseArea)\\b|\\b(ComponentBase)\\b|\\b(AppleSignIn)\\b|\\b(WikitudeArView)\\b|\\b(MultiplayerView)\\b|\\b(RangeFilter)\\b|\\b(TexturePackerAnimatedSprite)\\b|\\b(Appodeal)\\b|\\b(SocialUserImage)\\b|\\b(SimpleSection)\\b|\\b(SwipeOptionsContainer)\\b|\\b(ThemeSimpleSection)\\b|\\b(EditableComponent)\\b|\\b(App)\\b|\\b(AppSwitch)\\b|\\b(ImageViewer)\\b|\\b(ThemeDialog)\\b|\\b(ThemeSimpleRow)\\b|\\b(AppListView)\\b|\\b(TexturePackerSpriteSequence)\\b|\\b(MultiplayerState)\\b|\\b(SingleUseGood)\\b|\\b(PullToRefreshHandler)\\b|\\b(Clipping)\\b|\\b(BluetoothLeDevice)\\b|\\b(Facebook)\\b|\\b(NotificationManager)\\b|\\b(LevelSelectionList)\\b|\\b(BackgroundImage)\\b|\\b(IconType)\\b|\\b(AppImage)\\b|\\b(WebSocket)\\b|\\b(SocialFlagImage)\\b|\\b(BluetoothLeManager)\\b|\\b(GigyaView)\\b|\\b(AppRadio)\\b|\\b(PlatformChanger)\\b|\\b(AppFlickable)\\b|\\b(SpriteSequence)\\b|\\b(RubeFixturePolygon)\\b|\\b(FloatingActionButton)\\b|\\b(Infinario)\\b|\\b(Sorter)\\b|\\b(LevelData)\\b|\\b(PolygonCollider)\\b|\\b(FelgoIOSView)\\b|\\b(AdMobRewardedVideo)\\b|\\b(InputDialog)\\b|\\b(GameButton)\\b|\\b(Edge)\\b|\\b(LevelEditor)\\b|\\b(SpineSkeleton)\\b|\\b(ValueFilter)\\b|\\b(EntityBase)\\b|\\b(YouTubeWebPlayer)\\b|\\b(Notification)\\b|\\b(GearJoint)\\b|\\b(TextFieldRow)\\b|\\b(SimpleRow)\\b|\\b(SocialUserDelegate)\\b|\\b(AppCardSwipeArea)\\b|\\b(GoogleAnalytics)\\b|\\b(Fixture)\\b|\\b(AppTextInput)\\b|\\b(VersionCheckLoader)\\b|\\b(SectionSelect)\\b|\\b(AppTabBar)\\b|\\b(MovementAnimation)\\b|\\b(SlotMachineReel)\\b|\\b(Page)\\b|\\b(SwipeButton)\\b|\\b(ImagePicker)\\b|\\b(NavigationBarItem)\\b|\\b(FirebaseStorageUploadTask)\\b|\\b(HockeyApp)\\b|\\b(ThemeSimpleSectionCompact)\\b|\\b(AppTextField)\\b|\\b(EntityManager)\\b|\\b(WheelJoint)\\b|\\b(DebugDraw)\\b|\\b(Icon)\\b|\\b(SwitchRole)\\b|\\b(HttpNetworkActivityIndicator)\\b|\\b(TextButtonBarItem)\\b|\\b(TypeWriterItem)\\b|\\b(ExpressionRole)\\b|\\b(ParallaxItem)\\b|\\b(AppleSignInButton)\\b|\\b(ScrollIndicator)\\b|\\b(Contact)\\b|\\b(MultiResolutionImage)\\b|\\b(GameTextField)\\b|\\b(EntityBaseDraggable)\\b|\\b(LineItem)\\b|\\b(MultiTouchEvent)\\b|\\b(Parse)\\b|\\b(CircleCollider)\\b|\\b(Profile)\\b|\\b(Achievement)\\b|\\b(SlotMachineModel)\\b|\\b(ProxyRole)\\b|\\b(Joint)\\b|\\b(Storage)\\b|\\b(AppRangeSlider)\\b|\\b(ParallaxScrollingBackground)\\b|\\b(Box2D)\\b|\\b(DistanceJoint)\\b|\\b(GameCenter)\\b|\\b(NativeDialog)\\b|\\b(FlickablePage)\\b|\\b(StringSorter)\\b|\\b(ExpressionSorter)\\b|\\b(IndexFilter)\\b|\\b(RegExpFilter)\\b|\\b(RoleFilter)\\b|\\b(IconButton)\\b|\\b(FelgoMultiplayer)\\b|\\b(JsonListModel)\\b|\\b(HttpRequest)\\b|\\b(GameScrollView)\\b|\\b(AdMobBanner)\\b|\\b(RevoluteJoint)\\b|\\b(BluetoothLeCharacteristic)\\b|\\b(Filter)\\b|\\b(TwoAxisController)\\b|\\b(AnyOf)\\b|\\b(Scene3D)\\b|\\b(Sprite)\\b|\\b(ThemeTabControl)\\b|\\b(RoleSorter)\\b|\\b(GameStyle)\\b|\\b(SimpleRanking)\\b|\\b(Chain)\\b|\\b(RoundedImage)\\b|\\b(GameWindow)\\b|\\b(FrictionJoint)\\b|\\b(TumblerColumn)\\b|\\b(StyleSimpleSection)\\b|\\b(AppCard)\\b|\\b(TexturePackerSprite)\\b|\\b(GoogleCloudMessaging)\\b|\\b(Tumbler)\\b|\\b(Body)\\b|\\b(RubeImage)\\b|\\b(GameSlider)\\b|\\b(Polygon)\\b|\\b(NavigationBarRow)\\b|\\b(Flurry)\\b|\\b(GameNetworkUser)\\b|\\b(NotificationBar)\\b|\\b(GameSwitch)\\b|\\b(ExpressionFilter)\\b|\\b(PictureViewer)\\b|\\b(AppText)\\b|\\b(BuildEntityButton)\\b|\\b(ListPage)\\b|\\b(AppDrawer)\\b|\\b(ItemEditor)\\b|\\b(NativeUtils)\\b|\\b(TargetCamTransformHelper)\\b|\\b(FpsMeter)\\b|\\b(AppActivityIndicator)\\b|\\b(AlphaVideo)\\b|\\b(AccelerometerReading)\\b|\\b(FirebaseConfig)\\b|\\b(FileUtils)\\b|\\b(AdMobInterstitial)\\b|\\b(TabControl)\\b|\\b(HttpImageUtils)\\b|\\b(ThemeAppRadio)\\b|\\b(Settings)\\b|\\b(AppSlider)\\b|\\b(SearchBar)\\b|\\b(Store)\\b|\\b(LifetimeGood)\\b|\\b(FelgoGameNetwork)\\b|\\b(RayCast)\\b|\\b(GameWindowItem)\\b|\\b(StorePurchase)\\b|\\b(Branch)\\b|\\b(AppTextEdit)\\b|\\b(NavigationItem)\\b|\\b(Circle)\\b|\\b(SlotMachine)\\b|\\b(MultiplayerUser)\\b|\\b(NavigationBar)\\b|\\b(Theme)\\b|\\b(SingleUsePackGood)\\b|\\b(IconButtonBarItem)\\b|\\b(MultiTouchArea)\\b|\\b(SocialPage)\\b|\\b(ThemeAppButton)\\b|\\b(CurrencyPack)\\b|\\b(AppTabButton)\\b|\\b(VirtualPurchase)\\b|\\b(Crashlytics)\\b|\\b(Navigation)\\b|\\b(AppMap)\\b|\\b(FirebaseAuth)\\b|\\b(AppListItem)\\b|\\b(FelgoAndroidFragment)\\b|\\b(AllOf)\\b|\\b(RubeBody)\\b|\\b(ThemeAppCheckBox)\\b|\\b(ButtonBarItem)\\b|\\b(ThemeNavigationBar)\\b|\\b(FacebookProfile)\\b|\\b(PulleyJoint)\\b|\\b(WeldJoint)\\b|\\b(SocialActionButton)\\b|\\b(MouseJoint)\\b|\\b(BluetoothLeService)\\b|\\b(AdMobNative)\\b|\\b(Camera)\\b|\\b(ColliderBase)\\b|\\b(Chartboost)\\b|\\b(LevelBase)\\b|\\b(SocialViewButton)\\b|\\b(AppPaper)\\b|\\b(SocialView)\\b|\\b(SortFilterProxyModel)\\b|\\b(Currency)\\b|\\b(OneSignal)\\b|\\b(FirebaseDatabase)\\b|\\b(FelgoAndroidActivity)\\b|\\b(Box)\\b|\\b(MoveToPointHelper)\\b|\\b(PrismaticJoint)\\b|\\b(PageControl)\\b|\\b(BoxCollider)\\b|\\b(AppModal)\\b|\\b(World)\\b|\\b(RubeManager)\\b|\\b(Scene)\\b|\\b(LevelLoader)\\b|\\b(SyncedStore)\\b|\\b(AppButton)\\b|\\b(JoinRole)\\b|\\b(AnimatedSprite)\\b|\\b(VisibilityRefreshHandler)\\b|\\b(FirebaseStorage)\\b|\\b(AppCheckBox)\\b|\\b(ThemeNavigationAppDrawer)\\b|\\b(DateFormatter)\\b|\\b(RubeFixtureCircle)\\b|\\b(GameTextDialog)\\b|\\b(GameWindowApplicationWindow)\\b|\\b(System)\\b|\\b(BackgroundMusic)\\b|\\b(VersionCheckDialog)\\b|\\b(Render3DABC)\\b|\\b(Particle)\\b|\\b(RopeJoint)\\b|\\b(WebStorage)\\b|\\b(Amplitude)\\b|\\b(ColorOverlay)\\b"
+		},
+		{
+			"origin": "qtgraphicaleffects",
+			"name": "markup.bold.qml",
+			"match": "\\b(Desaturate)\\b|\\b(OpacityMask)\\b|\\b(FastBlur)\\b|\\b(Colorize)\\b|\\b(LinearGradient)\\b|\\b(RadialGradient)\\b|\\b(BrightnessContrast)\\b|\\b(Displace)\\b|\\b(ConicalGradient)\\b|\\b(DropShadow)\\b|\\b(ThresholdMask)\\b|\\b(RectangularGlow)\\b|\\b(Glow)\\b|\\b(LevelAdjust)\\b|\\b(GammaAdjust)\\b|\\b(HueSaturation)\\b|\\b(ColorOverlay)\\b"
+		},
+		{
+			"origin": "qtvirtualkeyboard",
+			"name": "markup.bold.qml",
+			"match": "\\b(InputEngine)\\b|\\b(EnterKey)\\b|\\b(SelectionListModel)\\b|\\b(KeyboardRow)\\b|\\b(TraceInputKeyPanel)\\b|\\b(HandwritingInputPanel)\\b|\\b(ModeKey)\\b|\\b(VirtualKeyboardSettings)\\b|\\b(TraceInputArea)\\b|\\b(KeyboardStyle)\\b|\\b(KeyboardColumn)\\b|\\b(SymbolModeKey)\\b|\\b(NumberKey)\\b|\\b(HandwritingModeKey)\\b|\\b(KeyboardLayout)\\b|\\b(BaseKey)\\b|\\b(KeyboardLayoutLoader)\\b|\\b(BackspaceKey)\\b|\\b(EnterKeyAction)\\b|\\b(InputPanel)\\b|\\b(InputContext)\\b|\\b(ShiftKey)\\b|\\b(KeyPanel)\\b|\\b(Key)\\b|\\b(TraceInputKey)\\b|\\b(HideKeyboardKey)\\b|\\b(ShiftHandler)\\b|\\b(FillerKey)\\b|\\b(ChangeLanguageKey)\\b|\\b(KeyIcon)\\b|\\b(SpaceKey)\\b|\\b(SelectionListItem)\\b|\\b(InputMethod)\\b|\\b(TraceCanvas)\\b|\\b(Trace)\\b|\\b(InputModeKey)\\b"
+		},
+		{
+			"origin": "qtpim",
+			"name": "markup.bold.qml",
+			"match": "\\b(Detail)\\b|\\b(IntersectionFilter)\\b|\\b(Timestamp)\\b|\\b(Address)\\b|\\b(Name)\\b|\\b(Parent)\\b|\\b(Favorite)\\b|\\b(EventAttendee)\\b|\\b(Gender)\\b|\\b(EmailAddress)\\b|\\b(Classification)\\b|\\b(IdFilter)\\b|\\b(EventRsvp)\\b|\\b(Priority)\\b|\\b(JournalTime)\\b|\\b(TodoTime)\\b|\\b(DetailRangeFilter)\\b|\\b(ChangeLogFilter)\\b|\\b(ContactModel)\\b|\\b(SyncTarget)\\b|\\b(EventOccurrence)\\b|\\b(Reminder)\\b|\\b(Birthday)\\b|\\b(Event)\\b|\\b(GlobalPresence)\\b|\\b(ActionFilter)\\b|\\b(FetchHint)\\b|\\b(Relationship)\\b|\\b(GeoLocation)\\b|\\b(Family)\\b|\\b(ExtendedDetail)\\b|\\b(Tag)\\b|\\b(EventTime)\\b|\\b(Url)\\b|\\b(SortOrder)\\b|\\b(Comment)\\b|\\b(Ringtone)\\b|\\b(DetailFilter)\\b|\\b(Organization)\\b|\\b(Contact)\\b|\\b(VisualReminder)\\b|\\b(CollectionFilter)\\b|\\b(Recurrence)\\b|\\b(DetailFieldFilter)\\b|\\b(UnionFilter)\\b|\\b(Collection)\\b|\\b(Hobby)\\b|\\b(PhoneNumber)\\b|\\b(Todo)\\b|\\b(EmailReminder)\\b|\\b(OrganizerItem)\\b|\\b(TodoProgress)\\b|\\b(OnlineAccount)\\b|\\b(Avatar)\\b|\\b(Anniversary)\\b|\\b(RecurrenceRule)\\b|\\b(Description)\\b|\\b(Guid)\\b|\\b(Version)\\b|\\b(TodoOccurrence)\\b|\\b(ItemType)\\b|\\b(RelationshipFilter)\\b|\\b(Location)\\b|\\b(Journal)\\b|\\b(Nickname)\\b|\\b(OrganizerModel)\\b|\\b(Note)\\b|\\b(InvalidFilter)\\b|\\b(Filter)\\b|\\b(ContactDetail)\\b|\\b(AudibleReminder)\\b|\\b(DisplayLabel)\\b|\\b(Presence)\\b|\\b(RelationshipModel)\\b"
+		},
+		{
+			"origin": "qtwebchannel",
+			"name": "markup.bold.qml",
+			"match": "\\b(WebChannel)\\b"
+		},
+		{
+			"origin": "qtcanvas3d",
+			"name": "markup.bold.qml",
+			"match": "\\b(Canvas3DTextureProvider)\\b|\\b(GLStateDumpExt)\\b"
+		},
+		{
+			"origin": "qtlottie",
+			"name": "markup.bold.qml",
+			"match": "\\b(LottieAnimation)\\b"
+		},
+		{
+			"origin": "qtdeclarative",
+			"name": "markup.bold.qml",
+			"match": "\\b(ViewTransition)\\b|\\b(GridView)\\b|\\b(PathPercent)\\b|\\b(Translate)\\b|\\b(GridLayout)\\b|\\b(EnterKey)\\b|\\b(Matrix4x4)\\b|\\b(Behavior)\\b|\\b(DragEvent)\\b|\\b(Window)\\b|\\b(PathInterpolator)\\b|\\b(ParticlePainter)\\b|\\b(Rotation)\\b|\\b(Row)\\b|\\b(KeyEvent)\\b|\\b(ListElement)\\b|\\b(RowLayout)\\b|\\b(Palette)\\b|\\b(Screen)\\b|\\b(Text)\\b|\\b(ParticleSystem)\\b|\\b(Binding)\\b|\\b(DelegateModelGroup)\\b|\\b(TextInput)\\b|\\b(HandlerPoint)\\b|\\b(Keys)\\b|\\b(Package)\\b|\\b(SmoothedAnimation)\\b|\\b(Number)\\b|\\b(AngleDirection)\\b|\\b(PauseAnimation)\\b|\\b(GridMesh)\\b|\\b(TargetDirection)\\b|\\b(PinchHandler)\\b|\\b(KeyNavigation)\\b|\\b(TouchPoint)\\b|\\b(Path)\\b|\\b(PathAttribute)\\b|\\b(Repeater)\\b|\\b(Animation)\\b|\\b(Age)\\b|\\b(UniformAnimator)\\b|\\b(PointHandler)\\b|\\b(Friction)\\b|\\b(FolderListModel)\\b|\\b(StackLayout)\\b|\\b(SpringAnimation)\\b|\\b(TableModelColumn)\\b|\\b(GraphicsInfo)\\b|\\b(Wander)\\b|\\b(Attractor)\\b|\\b(SpriteSequence)\\b|\\b(BorderImageMesh)\\b|\\b(DragHandler)\\b|\\b(StateGroup)\\b|\\b(GroupGoal)\\b|\\b(PathView)\\b|\\b(BorderImage)\\b|\\b(ColorGroup)\\b|\\b(AnchorChanges)\\b|\\b(XAnimator)\\b|\\b(Drag)\\b|\\b(Vector3dAnimation)\\b|\\b(Timer)\\b|\\b(GestureEvent)\\b|\\b(RegularExpressionValidator)\\b|\\b(Flickable)\\b|\\b(WheelHandler)\\b|\\b(Column)\\b|\\b(LinearGradient)\\b|\\b(DoubleValidator)\\b|\\b(Scale)\\b|\\b(String)\\b|\\b(GradientStop)\\b|\\b(PropertyChanges)\\b|\\b(FontLoader)\\b|\\b(PointerDeviceHandler)\\b|\\b(TouchEventSequence)\\b|\\b(Date)\\b|\\b(NumberAnimation)\\b|\\b(MultiPointHandler)\\b|\\b(RadialGradient)\\b|\\b(DelegateChoice)\\b|\\b(Animator)\\b|\\b(TrailEmitter)\\b|\\b(ItemSelectionModel)\\b|\\b(Emitter)\\b|\\b(SystemPalette)\\b|\\b(ScaleAnimator)\\b|\\b(TapHandler)\\b|\\b(ListModel)\\b|\\b(AnchorAnimation)\\b|\\b(LayoutMirroring)\\b|\\b(WavefrontMesh)\\b|\\b(Connections)\\b|\\b(Transform)\\b|\\b(MouseEvent)\\b|\\b(ShaderEffectSource)\\b|\\b(SinglePointHandler)\\b|\\b(PathQuad)\\b|\\b(Instantiator)\\b|\\b(TableModel)\\b|\\b(Sprite)\\b|\\b(PathCubic)\\b|\\b(RotationAnimator)\\b|\\b(Positioner)\\b|\\b(MultiPointTouchArea)\\b|\\b(Transition)\\b|\\b(OpacityAnimator)\\b|\\b(State)\\b|\\b(CanvasImageData)\\b|\\b(PathCurve)\\b|\\b(Context2D)\\b|\\b(FontMetrics)\\b|\\b(SignalSpy)\\b|\\b(ScriptAction)\\b|\\b(PathElement)\\b|\\b(CanvasPixelArray)\\b|\\b(CloseEvent)\\b|\\b(CumulativeDirection)\\b|\\b(ConicalGradient)\\b|\\b(StateChangeScript)\\b|\\b(Component)\\b|\\b(Affector)\\b|\\b(AnimationController)\\b|\\b(CanvasGradient)\\b|\\b(LineShape)\\b|\\b(ShapeGradient)\\b|\\b(Shortcut)\\b|\\b(PathText)\\b|\\b(Settings)\\b|\\b(Loader)\\b|\\b(PathAngleArc)\\b|\\b(Shape)\\b|\\b(AnimatedImage)\\b|\\b(HoverHandler)\\b|\\b(ColumnLayout)\\b|\\b(Rectangle)\\b|\\b(PathMove)\\b|\\b(PathMultiline)\\b|\\b(Flow)\\b|\\b(MaskShape)\\b|\\b(ParentChange)\\b|\\b(WheelEvent)\\b|\\b(RotationAnimation)\\b|\\b(QtObject)\\b|\\b(BoundaryRule)\\b|\\b(YAnimator)\\b|\\b(PathLine)\\b|\\b(PropertyAnimation)\\b|\\b(Gradient)\\b|\\b(PathArc)\\b|\\b(PointerHandler)\\b|\\b(ShapePath)\\b|\\b(ParentAnimation)\\b|\\b(IntValidator)\\b|\\b(SpriteGoal)\\b|\\b(ListView)\\b|\\b(ColorAnimation)\\b|\\b(PropertyAction)\\b|\\b(WorkerScript)\\b|\\b(ParallelAnimation)\\b|\\b(Locale)\\b|\\b(RectangleShape)\\b|\\b(TableView)\\b|\\b(Flipable)\\b|\\b(Grid)\\b|\\b(TextMetrics)\\b|\\b(Direction)\\b|\\b(DelegateChooser)\\b|\\b(PathAnimation)\\b|\\b(ObjectModel)\\b|\\b(Item)\\b|\\b(Image)\\b|\\b(DelegateModel)\\b|\\b(FocusScope)\\b|\\b(EllipseShape)\\b|\\b(ImageParticle)\\b|\\b(ShaderEffect)\\b|\\b(TextEdit)\\b|\\b(Qt)\\b|\\b(Turbulence)\\b|\\b(PathSvg)\\b|\\b(Layout)\\b|\\b(AnimatedSprite)\\b|\\b(TestCase)\\b|\\b(PathPolyline)\\b|\\b(MouseArea)\\b|\\b(DropArea)\\b|\\b(Accessible)\\b|\\b(PinchEvent)\\b|\\b(ParticleGroup)\\b|\\b(ItemParticle)\\b|\\b(ParticleExtruder)\\b|\\b(Particle)\\b|\\b(Canvas)\\b|\\b(Gravity)\\b|\\b(PinchArea)\\b|\\b(PointDirection)\\b|\\b(LoggingCategory)\\b|\\b(SequentialAnimation)\\b"
+		},
+		{
+			"origin": "qtpurchasing",
+			"name": "markup.bold.qml",
+			"match": "\\b(Transaction)\\b|\\b(Product)\\b|\\b(Store)\\b"
+		},
+		{
+			"origin": "qtlocation",
+			"name": "markup.bold.qml",
+			"match": "\\b(MapItemView)\\b|\\b(RouteManeuver)\\b|\\b(EditorialModel)\\b|\\b(PlaceSearchSuggestionModel)\\b|\\b(Address)\\b|\\b(MapPolyline)\\b|\\b(Ratings)\\b|\\b(MapPinchEvent)\\b|\\b(MapIconObject)\\b|\\b(MapPolygon)\\b|\\b(DynamicParameter)\\b|\\b(Category)\\b|\\b(MapRectangle)\\b|\\b(Place)\\b|\\b(MapItemGroup)\\b|\\b(QtPositioning)\\b|\\b(MapParameter)\\b|\\b(CameraCapabilities)\\b|\\b(QtLocationLabs)\\b|\\b(MapCircleObject)\\b|\\b(PluginParameter)\\b|\\b(CategoryModel)\\b|\\b(PlaceAttribute)\\b|\\b(Icon)\\b|\\b(MapRoute)\\b|\\b(MapCopyrightNotice)\\b|\\b(Route)\\b|\\b(RouteQuery)\\b|\\b(MapPolygonObject)\\b|\\b(ImageModel)\\b|\\b(RouteLeg)\\b|\\b(Supplier)\\b|\\b(Navigator)\\b|\\b(PositionSource)\\b|\\b(ExtendedAttributes)\\b|\\b(ContactDetails)\\b|\\b(GeocodeModel)\\b|\\b(MapObjectView)\\b|\\b(MapGestureArea)\\b|\\b(RouteModel)\\b|\\b(MapRouteObject)\\b|\\b(GeoMapObject)\\b|\\b(Plugin)\\b|\\b(Location)\\b|\\b(MapPolylineObject)\\b|\\b(Position)\\b|\\b(PlaceSearchModel)\\b|\\b(MapQuickItem)\\b|\\b(Waypoint)\\b|\\b(Map)\\b|\\b(MapType)\\b|\\b(CoordinateAnimation)\\b|\\b(ContactDetail)\\b|\\b(ReviewModel)\\b|\\b(RouteSegment)\\b|\\b(User)\\b|\\b(MapCircle)\\b"
+		},
+		{
+			"origin": "qtscxml",
+			"name": "markup.bold.qml",
+			"match": "\\b(ScxmlStateMachine)\\b|\\b(EventConnection)\\b|\\b(InvokedServices)\\b|\\b(StateMachineLoader)\\b"
+		},
+		{
+			"origin": "qtdatavis3d",
+			"name": "markup.bold.qml",
+			"match": "\\b(AbstractGraph3D)\\b|\\b(Object3D)\\b|\\b(Surface3D)\\b|\\b(ColorGradientStop)\\b|\\b(Scatter3D)\\b|\\b(ColorGradient)\\b|\\b(ThemeColor)\\b"
+		},
+		{
+			"origin": "qtwebsockets",
+			"name": "markup.bold.qml",
+			"match": "\\b(WebSocketServer)\\b|\\b(WebSocket)\\b"
+		},
+		{
+			"origin": "qtquickcontrols2",
+			"name": "markup.bold.qml",
+			"match": "\\b(FolderDialog)\\b|\\b(TextField)\\b|\\b(MenuBarItem)\\b|\\b(ToolBar)\\b|\\b(ToolButton)\\b|\\b(Switch)\\b|\\b(ToolSeparator)\\b|\\b(Drawer)\\b|\\b(ItemDelegate)\\b|\\b(RangeSlider)\\b|\\b(Popup)\\b|\\b(Dialog)\\b|\\b(Container)\\b|\\b(DialogButtonBox)\\b|\\b(Tumbler)\\b|\\b(SystemTrayIcon)\\b|\\b(GroupBox)\\b|\\b(BusyIndicator)\\b|\\b(HorizontalHeaderView)\\b|\\b(MenuSeparator)\\b|\\b(TabButton)\\b|\\b(MenuItem)\\b|\\b(Pane)\\b|\\b(Page)\\b|\\b(StackView)\\b|\\b(MessageDialog)\\b|\\b(Slider)\\b|\\b(ColorDialog)\\b|\\b(Frame)\\b|\\b(StandardPaths)\\b|\\b(RadioButton)\\b|\\b(Label)\\b|\\b(RoundButton)\\b|\\b(AbstractButton)\\b|\\b(ComboBox)\\b|\\b(ScrollIndicator)\\b|\\b(VerticalHeaderView)\\b|\\b(CheckDelegate)\\b|\\b(MenuItemGroup)\\b|\\b(ScrollBar)\\b|\\b(ToolTip)\\b|\\b(CheckBox)\\b|\\b(SwipeView)\\b|\\b(ButtonGroup)\\b|\\b(ScrollView)\\b|\\b(TextArea)\\b|\\b(SwipeDelegate)\\b|\\b(Button)\\b|\\b(DelayButton)\\b|\\b(FileDialog)\\b|\\b(RadioDelegate)\\b|\\b(SpinBox)\\b|\\b(Action)\\b|\\b(ActionGroup)\\b|\\b(SwitchDelegate)\\b|\\b(ApplicationWindow)\\b|\\b(ProgressBar)\\b|\\b(SplitHandle)\\b|\\b(TabBar)\\b|\\b(Control)\\b|\\b(Menu)\\b|\\b(SplitView)\\b|\\b(MenuBar)\\b|\\b(FontDialog)\\b|\\b(PageIndicator)\\b|\\b(Overlay)\\b|\\b(Dial)\\b"
+		},
+		{
+			"origin": "qtquick3d",
+			"name": "markup.bold.qml",
+			"match": "\\b(SpotLight)\\b|\\b(Emboss)\\b|\\b(Flip)\\b|\\b(GaussianBlur)\\b|\\b(DepthOfFieldHQBlur)\\b|\\b(PointLight)\\b|\\b(Bounds)\\b|\\b(DefaultMaterial)\\b|\\b(HDRBloomTonemap)\\b|\\b(Vignette)\\b|\\b(FrustumCamera)\\b|\\b(Light)\\b|\\b(Node)\\b|\\b(SetUniformValue)\\b|\\b(DebugView)\\b|\\b(Desaturate)\\b|\\b(Texture)\\b|\\b(PrincipledMaterial)\\b|\\b(Camera)\\b|\\b(WasdController)\\b|\\b(View3D)\\b|\\b(Object3D)\\b|\\b(Shader)\\b|\\b(SCurveTonemap)\\b|\\b(QuaternionAnimation)\\b|\\b(GridGeometry)\\b|\\b(Fxaa)\\b|\\b(DistortionSphere)\\b|\\b(EdgeDetect)\\b|\\b(Buffer)\\b|\\b(Pass)\\b|\\b(SceneEnvironment)\\b|\\b(AxisHelper)\\b|\\b(RenderStats)\\b|\\b(DistortionRipple)\\b|\\b(TextureData)\\b|\\b(Effect)\\b|\\b(Scatter)\\b|\\b(BufferInput)\\b|\\b(PickResult)\\b|\\b(AdditiveColorGradient)\\b|\\b(OrthographicCamera)\\b|\\b(CustomMaterial)\\b|\\b(CustomCamera)\\b|\\b(Geometry)\\b|\\b(MotionBlur)\\b|\\b(Joint)\\b|\\b(ChromaticAberration)\\b|\\b(TiltShift)\\b|\\b(Skeleton)\\b|\\b(PerspectiveCamera)\\b|\\b(DirectionalLight)\\b|\\b(ColorMaster)\\b|\\b(Command)\\b|\\b(TextureInput)\\b|\\b(Repeater3D)\\b|\\b(BrushStrokes)\\b|\\b(Material)\\b|\\b(Loader3D)\\b|\\b(DistortionSpiral)\\b|\\b(Blur)\\b|\\b(Model)\\b"
+		},
+		{
+			"origin": "qtcharts",
+			"name": "markup.bold.qml",
+			"match": "\\b(AreaSeries)\\b|\\b(StackedBarSeries)\\b|\\b(BarSet)\\b|\\b(HBarModelMapper)\\b|\\b(XYPoint)\\b|\\b(VBoxPlotModelMapper)\\b|\\b(LineSeries)\\b|\\b(BarSeries)\\b|\\b(PercentBarSeries)\\b|\\b(CategoryAxis)\\b|\\b(Legend)\\b|\\b(Margins)\\b|\\b(HorizontalPercentBarSeries)\\b|\\b(VPieModelMapper)\\b|\\b(HXYModelMapper)\\b|\\b(SplineSeries)\\b|\\b(AbstractAxis)\\b|\\b(HorizontalBarSeries)\\b|\\b(PieSlice)\\b|\\b(HPieModelMapper)\\b|\\b(ScatterSeries)\\b|\\b(ChartView)\\b|\\b(CandlestickSeries)\\b|\\b(DateTimeAxis)\\b|\\b(BarCategoryAxis)\\b|\\b(LogValueAxis)\\b|\\b(CategoryRange)\\b|\\b(VXYModelMapper)\\b|\\b(AbstractSeries)\\b|\\b(ValueAxis)\\b|\\b(HorizontalStackedBarSeries)\\b|\\b(PieSeries)\\b|\\b(VCandlestickModelMapper)\\b|\\b(VBarModelMapper)\\b|\\b(AbstractBarSeries)\\b|\\b(BoxSet)\\b|\\b(PolarChartView)\\b|\\b(HCandlestickModelMapper)\\b|\\b(BoxPlotSeries)\\b|\\b(HBoxPlotModelMapper)\\b|\\b(CandlestickSet)\\b|\\b(XYSeries)\\b"
+		},
+		{
+			"origin": "qtwayland",
+			"name": "markup.bold.qml",
+			"match": "\\b(IdleInhibitManagerV1)\\b|\\b(WaylandOutput)\\b|\\b(XdgDecorationManagerV1)\\b|\\b(WaylandCompositor)\\b|\\b(QtTextInputMethodManager)\\b"
+		},
+		{
+			"origin": "qtsensors",
+			"name": "markup.bold.qml",
+			"match": "\\b(HumiditySensor)\\b|\\b(QmlSensors)\\b|\\b(Gyroscope)\\b|\\b(LidSensor)\\b|\\b(Altimeter)\\b|\\b(AltimeterReading)\\b|\\b(AmbientLightSensor)\\b|\\b(CompassReading)\\b|\\b(LidReading)\\b|\\b(TapReading)\\b|\\b(IRProximitySensor)\\b|\\b(Accelerometer)\\b|\\b(TiltSensor)\\b|\\b(RotationSensor)\\b|\\b(SensorReading)\\b|\\b(OrientationSensor)\\b|\\b(Sensor)\\b|\\b(LightReading)\\b|\\b(TapSensor)\\b|\\b(DistanceReading)\\b|\\b(HolsterReading)\\b|\\b(PressureSensor)\\b|\\b(OrientationReading)\\b|\\b(GrueSensorReading)\\b|\\b(TiltReading)\\b|\\b(DistanceSensor)\\b|\\b('.$no_q_sensor.')\\b|\\b(HolsterSensor)\\b|\\b(LightSensor)\\b|\\b(AmbientTemperatureSensor)\\b|\\b(IRProximityReading)\\b|\\b(HumidityReading)\\b|\\b(AccelerometerReading)\\b|\\b(Magnetometer)\\b|\\b(RotationReading)\\b|\\b(ProximityReading)\\b|\\b(AmbientTemperatureReading)\\b|\\b('.$no_q_reading.')\\b|\\b(AmbientLightReading)\\b|\\b(Compass)\\b|\\b(SensorGesture)\\b|\\b(PressureReading)\\b|\\b(GrueSensor)\\b|\\b(ProximitySensor)\\b|\\b(GyroscopeReading)\\b|\\b(MagnetometerReading)\\b"
+		},
+		{
+			"origin": "qtwebengine",
+			"name": "markup.bold.qml",
+			"match": "\\b(WebEngineNotification)\\b|\\b(WebEngine)\\b|\\b(FullScreenRequest)\\b|\\b(FileDialogRequest)\\b|\\b(RegisterProtocolHandlerRequest)\\b|\\b(WebEngineNavigationRequest)\\b|\\b(QuotaRequest)\\b|\\b(WebEngineView)\\b|\\b(WebEngineScript)\\b|\\b(WebEngineAction)\\b|\\b(FormValidationMessageRequest)\\b|\\b(WebEngineCertificateError)\\b|\\b(AuthenticationDialogRequest)\\b|\\b(FindTextResult)\\b|\\b(WebEngineHistoryListModel)\\b|\\b(WebEngineClientCertificateOption)\\b|\\b(WebEngineClientCertificateSelection)\\b|\\b(TooltipRequest)\\b|\\b(WebEngineProfile)\\b|\\b(JavaScriptDialogRequest)\\b|\\b(WebEngineLoadRequest)\\b|\\b(WebEngineSettings)\\b|\\b(WebEngineDownloadItem)\\b|\\b(WebEngineNewViewRequest)\\b|\\b(ContextMenuRequest)\\b|\\b(ColorDialogRequest)\\b|\\b(WebEngineHistory)\\b"
+		},
+		{
+			"origin": "qtfeedback",
+			"name": "markup.bold.qml",
+			"match": "\\b(Actuator)\\b|\\b(FileEffect)\\b|\\b(FeedbackEffect)\\b|\\b(HapticsEffect)\\b|\\b(ThemeEffect)\\b"
+		},
+		{
+			"origin": "qtconnectivity",
+			"name": "markup.bold.qml",
+			"match": "\\b(NdefFilter)\\b|\\b(BluetoothService)\\b|\\b(NdefRecord)\\b|\\b(NdefMimeRecord)\\b|\\b(NdefTextRecord)\\b|\\b(NearField)\\b|\\b(NdefUriRecord)\\b|\\b(BluetoothSocket)\\b|\\b(BluetoothDiscoveryModel)\\b"
+		},
+		{
+			"origin": "qtquicktimeline",
+			"name": "markup.bold.qml",
+			"match": "\\b(KeyframeGroup)\\b|\\b(TimelineAnimation)\\b|\\b(Timeline)\\b|\\b(Keyframe)\\b"
+		},
+		{
+			"origin": "qtwebview",
+			"name": "markup.bold.qml",
+			"match": "\\b(WebView)\\b|\\b(WebViewLoadRequest)\\b"
+		},
+		{
+			"origin": "qtmultimedia",
+			"name": "markup.bold.qml",
+			"match": "\\b(SoundEffect)\\b|\\b(PlaylistItem)\\b|\\b(AudioCategory)\\b|\\b(AudioEngine)\\b|\\b(Sound)\\b|\\b(QtMultimedia)\\b|\\b(AttenuationModelInverse)\\b|\\b(Video)\\b|\\b(CameraFocus)\\b|\\b(Torch)\\b|\\b(Camera)\\b|\\b(PlayVariation)\\b|\\b(Playlist)\\b|\\b(CameraRecorder)\\b|\\b(RadioData)\\b|\\b(AudioListener)\\b|\\b(AudioSample)\\b|\\b(CameraFlash)\\b|\\b(CameraCapture)\\b|\\b(Radio)\\b|\\b(SoundInstance)\\b|\\b(VideoOutput)\\b|\\b(MediaPlayer)\\b|\\b(CameraImageProcessing)\\b|\\b(AttenuationModelLinear)\\b|\\b(CameraExposure)\\b|\\b(Audio)\\b"
+		},
+		{
+			"origin": "qtquickcontrols",
+			"name": "markup.bold.qml",
+			"match": "\\b(TextField)\\b|\\b(MenuBarPrivate)\\b|\\b(ToolBar)\\b|\\b(ComboBoxStyle)\\b|\\b(Switch)\\b|\\b(Dialog)\\b|\\b(TableViewItemDelegateLoader)\\b|\\b(MenuSeparator)\\b|\\b(MenuItem)\\b|\\b(BasicButton)\\b|\\b(TumblerStyle)\\b|\\b(ModalPopupBehavior)\\b|\\b(MenuStyle)\\b|\\b(ToggleButtonStyle)\\b|\\b(TextArea)\\b|\\b(ToolButtonStyle)\\b|\\b(DelayButton)\\b|\\b(ProgressBarStyle)\\b|\\b(Action)\\b|\\b(TabView)\\b|\\b(Menu)\\b|\\b(DialStyle)\\b|\\b(Slider)\\b|\\b(SwitchStyle)\\b|\\b(TextAreaStyle)\\b|\\b(TableViewStyle)\\b|\\b(TextFieldStyle)\\b|\\b(Calendar)\\b|\\b(RadioButtonStyle)\\b|\\b(ComboBox)\\b|\\b(ApplicationWindowStyle)\\b|\\b(AbstractFontDialog)\\b|\\b(AbstractColorDialog)\\b|\\b(GaugeStyle)\\b|\\b(Button)\\b|\\b(MenuBarStyle)\\b|\\b(SpinBox)\\b|\\b(TabBar)\\b|\\b(Control)\\b|\\b(StatusBar)\\b|\\b(TableViewColumn)\\b|\\b(ToolButton)\\b|\\b(TumblerColumn)\\b|\\b(Tumbler)\\b|\\b(CircularGauge)\\b|\\b(QtColorDialog)\\b|\\b(GroupBox)\\b|\\b(Gauge)\\b|\\b(Tab)\\b|\\b(ToggleButton)\\b|\\b(BasicTableViewStyle)\\b|\\b(MenuPrivate)\\b|\\b(Style)\\b|\\b(AbstractStyle)\\b|\\b(DelayButtonStyle)\\b|\\b(CheckBox)\\b|\\b(FocusFrameStyle)\\b|\\b(StackViewDelegate)\\b|\\b(CheckBoxStyle)\\b|\\b(ScrollViewStyle)\\b|\\b(StackViewSlideTransition)\\b|\\b(BasicTableView)\\b|\\b(GroupBoxStyle)\\b|\\b(TabViewStyle)\\b|\\b(AbstractCheckable)\\b|\\b(ProgressBar)\\b|\\b(Picture)\\b|\\b(SplitView)\\b|\\b(PieMenu)\\b|\\b(ScrollViewHeader)\\b|\\b(QtFileDialog)\\b|\\b(CircularGaugeStyle)\\b|\\b(SpinBoxStyle)\\b|\\b(BusyIndicatorStyle)\\b|\\b(ButtonStyle)\\b|\\b(BusyIndicator)\\b|\\b(ToolBarStyle)\\b|\\b(StatusBarStyle)\\b|\\b(TreeView)\\b|\\b(QtFontDialog)\\b|\\b(StatusIndicatorStyle)\\b|\\b(CalendarStyle)\\b|\\b(TableView)\\b|\\b(TreeViewItemDelegateLoader)\\b|\\b(StackView)\\b|\\b(MessageDialog)\\b|\\b(ColorDialog)\\b|\\b(RadioButton)\\b|\\b(Label)\\b|\\b(SliderStyle)\\b|\\b(ScrollBar)\\b|\\b(ScrollView)\\b|\\b(AbstractFileDialog)\\b|\\b(AbstractMessageDialog)\\b|\\b(FocusFrame)\\b|\\b(StatusIndicator)\\b|\\b(FileDialog)\\b|\\b(QtMessageDialog)\\b|\\b(ApplicationWindow)\\b|\\b(Stack)\\b|\\b(PieMenuStyle)\\b|\\b(ExclusiveGroup)\\b|\\b(TreeViewStyle)\\b|\\b(MenuBar)\\b|\\b(FontDialog)\\b|\\b(Dial)\\b"
+		},
+		{
+			"origin": "qttools",
+			"name": "markup.bold.qml",
+			"match": "\\b(AnotherChild)\\b|\\b(DocTest)\\b|\\b(ColorAnimation)\\b|\\b(ClickableButton)\\b|\\b(PauseAnimation)\\b|\\b(ProgressBar)\\b|\\b(Child)\\b|\\b(Transform)\\b|\\b(Parent)\\b|\\b(ToggleSwitch)\\b|\\b(TextEdit)\\b|\\b(InternParent)\\b|\\b(Type)\\b|\\b(TabWidget)\\b|\\b(AbstractParent)\\b|\\b(YetAnotherChild)\\b"
+		},
+		{
+			"origin": "qtxmlpatterns",
+			"name": "markup.bold.qml",
+			"match": "\\b(XmlListModel)\\b|\\b(XmlRole)\\b"
+		},
+		{
+			"origin": "qtremoteobjects",
+			"name": "markup.bold.qml",
+			"match": "\\b(SettingsStore)\\b|\\b(Node)\\b|\\b(QtRemoteObjects)\\b"
+		},
+		{
+			"origin": "qt3d",
+			"name": "markup.bold.qml",
+			"match": "\\b(ForwardRenderer)\\b|\\b(Parameter)\\b|\\b(KeyframeAnimation)\\b|\\b(FrameAction)\\b|\\b(AbstractClipAnimator)\\b|\\b(SubtreeEnabler)\\b|\\b(KeyEvent)\\b|\\b(VertexBlendAnimation)\\b|\\b(DiffuseSpecularMaterial)\\b|\\b(SkeletonLoader)\\b|\\b(Texture2DMultisampleArray)\\b|\\b(TextureCubeMap)\\b|\\b(NoDepthMask)\\b|\\b(Armature)\\b|\\b(DebugOverlay)\\b|\\b(KeyboardHandler)\\b|\\b(AbstractClipBlendNode)\\b|\\b(RenderPass)\\b|\\b(LogicalDevice)\\b|\\b(CameraSelector)\\b|\\b(NormalDiffuseMapMaterial)\\b|\\b(Layer)\\b|\\b(AdditiveClipBlend)\\b|\\b(StencilMask)\\b|\\b(Skeleton)\\b|\\b(DirectionalLight)\\b|\\b(MouseDevice)\\b|\\b(Action)\\b|\\b(BlendEquationArguments)\\b|\\b(RenderCapabilities)\\b|\\b(TextureBuffer)\\b|\\b(ClipAnimator)\\b|\\b(Material)\\b|\\b(GraphicsApiFilter)\\b|\\b(LevelOfDetailBoundingSphere)\\b|\\b(Scene2D)\\b|\\b(ObjectPicker)\\b|\\b(ShaderProgramBuilder)\\b|\\b(Texture3D)\\b|\\b(InputSequence)\\b|\\b(AbstractRayCaster)\\b|\\b(FrustumCulling)\\b|\\b(AxisSetting)\\b|\\b(MorphingAnimation)\\b|\\b(DepthTest)\\b|\\b(LerpClipBlend)\\b|\\b(GeometryRenderer)\\b|\\b(TechniqueFilter)\\b|\\b(PolygonOffset)\\b|\\b(ScissorTest)\\b|\\b(NormalDiffuseMapAlphaMaterial)\\b|\\b(LayerFilter)\\b|\\b(InputSettings)\\b|\\b(SortPolicy)\\b|\\b(SceneLoader)\\b|\\b(MorphTarget)\\b|\\b(Dithering)\\b|\\b(Geometry)\\b|\\b(Joint)\\b|\\b(InputChord)\\b|\\b(AlphaCoverage)\\b|\\b(CoreSettings)\\b|\\b(TextureCubeMapArray)\\b|\\b(Component3D)\\b|\\b(RenderPassFilter)\\b|\\b(Transform)\\b|\\b(RenderState)\\b|\\b(AlphaTest)\\b|\\b(Viewport)\\b|\\b(AbstractActionInput)\\b|\\b(Scene3D)\\b|\\b(SpotLight)\\b|\\b(Entity)\\b|\\b(FilterKey)\\b|\\b(GoochMaterial)\\b|\\b(NoDraw)\\b|\\b(Texture1D)\\b|\\b(ComputeCommand)\\b|\\b(LevelOfDetailLoader)\\b|\\b(PickingSettings)\\b|\\b(StencilTest)\\b|\\b(ClearBuffers)\\b|\\b(BufferCapture)\\b|\\b(PerVertexColorMaterial)\\b|\\b(MemoryBarrier)\\b|\\b(RenderTarget)\\b|\\b(ShaderProgram)\\b|\\b(Texture2DMultisample)\\b|\\b(QuaternionAnimation)\\b|\\b(Texture2D)\\b|\\b(Texture1DArray)\\b|\\b(SharedGLTexture)\\b|\\b(Axis)\\b|\\b(RenderTargetOutput)\\b|\\b(AnimationController)\\b|\\b(PhongMaterial)\\b|\\b(Texture2DArray)\\b|\\b(LevelOfDetail)\\b|\\b(DiffuseSpecularMapMaterial)\\b|\\b(NodeInstantiator)\\b|\\b(PhongAlphaMaterial)\\b|\\b(RenderSurfaceSelector)\\b|\\b(RenderSettings)\\b|\\b(StencilOperationArguments)\\b|\\b(KeyboardDevice)\\b|\\b(AbstractPhysicalDevice)\\b|\\b(ShaderImage)\\b|\\b(StencilOperation)\\b|\\b(EntityLoader)\\b|\\b(ColorMask)\\b|\\b(NormalDiffuseSpecularMapMaterial)\\b|\\b(FrameGraphNode)\\b|\\b(TextureImage)\\b|\\b(StencilTestArguments)\\b|\\b(TextureRectangle)\\b|\\b(PickingProxy)\\b|\\b(SeamlessCubemap)\\b|\\b(PointLight)\\b|\\b(DispatchCompute)\\b|\\b(DepthRange)\\b|\\b(RayCaster)\\b|\\b(ActionInput)\\b|\\b(LineWidth)\\b|\\b(AbstractAnimation)\\b|\\b(Node)\\b|\\b(BlendEquation)\\b|\\b(NoPicking)\\b|\\b(BlendedClipAnimator)\\b|\\b(ScreenRayCaster)\\b|\\b(MultiSampleAntiAliasing)\\b|\\b(ClipBlendValue)\\b|\\b(PointSize)\\b|\\b(MetalRoughMaterial)\\b|\\b(BlitFramebuffer)\\b|\\b(DiffuseMapMaterial)\\b|\\b(OrbitCameraController)\\b|\\b(Effect)\\b|\\b(LevelOfDetailSwitch)\\b|\\b(AbstractTexture)\\b|\\b(RenderTargetSelector)\\b|\\b(FirstPersonCameraController)\\b|\\b(Technique)\\b|\\b(ProximityFilter)\\b|\\b(AbstractSkeleton)\\b|\\b(GeometryView)\\b|\\b(TextureLoader)\\b|\\b(ClipPlane)\\b|\\b(AbstractTextureImage)\\b|\\b(RenderStateSet)\\b|\\b(AxisAccumulator)\\b|\\b(RasterMode)\\b|\\b(CullFace)\\b|\\b(FrontFace)\\b|\\b(AnimationGroup)\\b"
+		},
+		{
+			"origin": "qtsystems",
+			"name": "markup.bold.qml",
+			"match": "\\b(NetworkInfo)\\b|\\b(ServiceFilter)\\b|\\b(ServiceDescriptor)\\b|\\b(ServiceList)\\b|\\b(DeviceInfo)\\b|\\b(ServiceLoader)\\b|\\b(DisplayInfo)\\b|\\b(ScreenSaver)\\b|\\b(Service)\\b|\\b(ValueSpaceSubscriber)\\b|\\b(ValueSpacePublisher)\\b"
+		},
+		{
+			"origin": "qtwinextras",
+			"name": "markup.bold.qml",
+			"match": "\\b(JumpList)\\b|\\b(JumpListSeparator)\\b|\\b(TaskbarButton)\\b|\\b(ThumbnailToolBar)\\b|\\b(JumpListDestination)\\b|\\b(ThumbnailToolButton)\\b|\\b(DwmFeatures)\\b|\\b(JumpListCategory)\\b|\\b(JumpListLink)\\b"
+		},
+		{
+			"origin": "qtdocgallery",
+			"name": "markup.bold.qml",
+			"match": "\\b(DocumentGalleryItem)\\b|\\b(GalleryLessThanFilter)\\b|\\b(GalleryGreaterThanFilter)\\b|\\b(GalleryFilterUnion)\\b|\\b(GalleryGreaterThanEqualsFilter)\\b|\\b(GalleryEqualsFilter)\\b|\\b(GalleryLessThanEqualsFilter)\\b|\\b(GalleryEndsWithFilter)\\b|\\b(GalleryWildcardFilter)\\b|\\b(DocumentGalleryModel)\\b|\\b(GalleryContainsFilter)\\b|\\b(DocumentGalleryType)\\b|\\b(GalleryFilterIntersection)\\b|\\b(GalleryStartsWithFilter)\\b"
+		},		
+		{
+			"name": "markup.changed.qml",
+			"match": "\\b(alias)\\b|\\b(signal)\\b"
+		},
+		{
+			"name": "entity.name.tag.qml",
+			"match": "[A-Za-z][_A-Za-z.0-9]*:"
+		},
+		{
+			"name": "comment.qml",
+			"match": "(//[\\t|\\s|\\w|\\d|\\.]*[\\r\\n|\\n|:])"
+		},
+		{
+			"name": "markup.changed.qml",
+			"match": "\\w+(?={|{ | {| { \\b)"
+		},
+		{
+			"origin": "felgo.4.udpate",
+			"name": "markup.bold.qml",
+			"match": "\\b(AppPage)\\b|\\b(AppButton)\\b|\\b(AppIcon)\\b|\\b(AppOverlay)\\b|\\b(AppScrollIndicator)\\b|\\b(AppToolTip)\\b|\\b(DatePicker)\\b|\\b(SpeechToText)\\b|\\b(ZeroConf)\\b|\\b(GameSoundEffect)\\b|\\b(XMLHttpRequest)\\b|\\b(FilterContainer)\\b|\\b(FilterRole)\\b|\\b(FilterSorter)\\b|\\b(LocaleAwareSorter)\\b|\\b(RangeFilter)\\b|\\b(SingleRole)\\b|\\b(SorterContainer)\\b|\\b(NativeObjectUtils)\\b|\\b(NativeViewBinding)\\b|\\b(NativeObject)\\b|\\b(Activity)\\b|\\b(View)\\b|\\b(AppDelegate)\\b|\\b(ViewController)\\b"
+		},
+		{
+			"origin": "qt.6.udpate",
+			"name": "markup.bold.qml",
+			"match": "\\b(Abstract3DSeries)\\b|\\b(AbstractAxis3D)\\b|\\b(AbstractAxisInput)\\b|\\b(AbstractDataProxy)\\b|\\b(AbstractInputHandler3D)\\b|\\b(Affector3D)\\b|\\b(AmbientSound)\\b|\\b(AnalogAxisInput)\\b|\\b(Application)\\b|\\b(ApplicationDescription)\\b|\\b(Attractor3D)\\b|\\b(Attribute)\\b|\\b(AttributeOperand)\\b|\\b(audioDevice)\\b|\\b(AudioInput)\\b|\\b(AudioOutput)\\b|\\b(AudioRoom)\\b|\\b(AuthenticationInformation)\\b|\\b(BakedLightmap)\\b|\\b(Bar3DSeries)\\b|\\b(BarDataProxy)\\b|\\b(Bars3D)\\b|\\b(Blend)\\b|\\b(BoundingVolume)\\b|\\b(BoxShape)\\b|\\b(ButtonAxisInput)\\b|\\b(CalendarModel)\\b|\\b(Camera3D)\\b|\\b(cameraDevice)\\b|\\b(cameraFormat)\\b|\\b(CameraLens)\\b|\\b(CapsuleShape)\\b|\\b(CaptureSession)\\b|\\b(CategoryAxis3D)\\b|\\b(CharacterController)\\b|\\b(CollisionShape)\\b|\\b(ConeGeometry)\\b|\\b(ConeGeometryView)\\b|\\b(ConeMesh)\\b|\\b(Connection)\\b|\\b(ConvexMeshShape)\\b|\\b(CubeMapTexture)\\b|\\b(CuboidGeometry)\\b|\\b(CuboidGeometryView)\\b|\\b(CuboidMesh)\\b|\\b(Custom3DItem)\\b|\\b(Custom3DLabel)\\b|\\b(Custom3DVolume)\\b|\\b(CylinderGeometry)\\b|\\b(CylinderGeometryView)\\b|\\b(CylinderMesh)\\b|\\b(DayOfWeekRow)\\b|\\b(DebugSettings)\\b|\\b(Direction3D)\\b|\\b(DirectionalBlur)\\b|\\b(DynamicBurst3D)\\b|\\b(DynamicRigidBody)\\b|\\b(ElementOperand)\\b|\\b(EmitBurst3D)\\b|\\b(EndpointDescription)\\b|\\b(EndpointDiscovery)\\b|\\b(EnvironmentLight)\\b|\\b(EventFilter)\\b|\\b(eventPoint)\\b|\\b(ExtendedSceneEnvironment)\\b|\\b(ExtrudedTextGeometry)\\b|\\b(ExtrudedTextMesh)\\b|\\b(FileInstancing)\\b|\\b(FilterElement)\\b|\\b(FinalState)\\b|\\b(FlickKey)\\b|\\b(Fog)\\b|\\b(FrameAnimation)\\b|\\b(GGammaAdjust)\\b|\\b(geoSatelliteInfo)\\b|\\b(Gravity3D)\\b|\\b(HhandlerPoint)\\b|\\b(HeightFieldGeometry)\\b|\\b(HeightFieldShape)\\b|\\b(HeightMapSurfaceDataProxy)\\b|\\b(HistoryState)\\b|\\b(Host)\\b|\\b(Iicon)\\b|\\b(ImageCapture)\\b|\\b(InfiniteGrid)\\b|\\b(InnerShadow)\\b|\\b(InputHandler3D)\\b|\\b(InstanceList)\\b|\\b(InstanceListEntry)\\b|\\b(InstanceModel)\\b|\\b(InstanceRange)\\b|\\b(InstanceRepeater)\\b|\\b(Instancing)\\b|\\b(ItemGrabResult)\\b|\\b(ItemModelBarDataProxy)\\b|\\b(ItemModelScatterDataProxy)\\b|\\b(ItemModelSurfaceDataProxy)\\b|\\b(IviApplication)\\b|\\b(IviSurface)\\b|\\b(JJavaScriptDialogRequest)\\b|\\b(KKey)\\b|\\b(KeyboardObserver)\\b|\\b(LLabel)\\b|\\b(Light3D)\\b|\\b(Lightmapper)\\b|\\b(LineParticle3D)\\b|\\b(LiteralOperand)\\b|\\b(LocalizedText)\\b|\\b(LodManager)\\b|\\b(LogValueAxis3DFormatter)\\b|\\b(LookAtNode)\\b|\\b(MMagnetometer)\\b|\\b(MapView)\\b|\\b(MaskedBlur)\\b|\\b(MediaDevices)\\b|\\b(mediaFormat)\\b|\\b(mediaMetaData)\\b|\\b(MediaRecorder)\\b|\\b(Mesh)\\b|\\b(MethodArgument)\\b|\\b(MethodNode)\\b|\\b(ModelBlendParticle3D)\\b|\\b(ModelParticle3D)\\b|\\b(MonthGrid)\\b|\\b(MouseHandler)\\b|\\b(MultiEffect)\\b|\\b(NNode)\\b|\\b(QtOpcUa)\\b|\\b(NodeId)\\b|\\b(OObject3D)\\b|\\b(Particle3D)\\b|\\b(ParticleAbstractShape3D)\\b|\\b(ParticleCustomShape3D)\\b|\\b(ParticleEmitter3D)\\b|\\b(ParticleModelShape3D)\\b|\\b(ParticleShape3D)\\b|\\b(ParticleSystem3D)\\b|\\b(ParticleSystem3DLogging)\\b|\\b(PdfBookmarkModel)\\b|\\b(PdfDocument)\\b|\\b(PdfLinkDelegate)\\b|\\b(PdfLinkModel)\\b|\\b(PdfMultiPageView)\\b|\\b(PdfPageImage)\\b|\\b(PdfPageNavigator)\\b|\\b(PdfPageView)\\b|\\b(PdfScrollablePageView)\\b|\\b(PdfSearchModel)\\b|\\b(PdfSelection)\\b|\\b(PdfStyle)\\b|\\b(PhysicsBody)\\b|\\b(PhysicsMaterial)\\b|\\b(PhysicsNode)\\b|\\b(PickEvent)\\b|\\b(PickLineEvent)\\b|\\b(PickPointEvent)\\b|\\b(PickTriangleEvent)\\b|\\b(PlaneGeometry)\\b|\\b(PlaneGeometryView)\\b|\\b(PlaneMesh)\\b|\\b(PlaneShape)\\b|\\b(QtLocation)\\b|\\b(PointerDevice)\\b|\\b(PointerEvent)\\b|\\b(pointingDeviceUniqueId)\\b|\\b(PointRotator3D)\\b|\\b(PresentationTime)\\b|\\b(ProceduralSkyTextureData)\\b|\\b(QAbstractState)\\b|\\b(QAbstractTransition)\\b|\\b(QSignalTransition)\\b|\\b(QtShell)\\b|\\b(QtShellChrome)\\b|\\b(QtShellSurface)\\b|\\b(RadialBlur)\\b|\\b(RandomInstancing)\\b|\\b(ReadItem)\\b|\\b(ReadResult)\\b|\\b(RecursiveBlur)\\b|\\b(ReflectionProbe)\\b|\\b(RelativeNodeId)\\b|\\b(RelativeNodePath)\\b|\\b(RenderCapture)\\b|\\b(RenderCaptureReply)\\b|\\b(Repeller3D)\\b|\\b(ResourceLoader)\\b|\\b(RuntimeLoader)\\b|\\b(SatelliteSource)\\b|\\b(ScaleAffector3D)\\b|\\b(Scatter3DSeries)\\b|\\b(ScatterDataProxy)\\b|\\b(ScreenCapture)\\b|\\b(SelectionRectangle)\\b|\\b(ServerDiscovery)\\b|\\b(ShellSurface)\\b|\\b(ShellSurfaceItem)\\b|\\b(SignalTransition)\\b|\\b(SimpleAttributeOperand)\\b|\\b(Skin)\\b|\\b(SkyboxEntity)\\b|\\b(SpatialSound)\\b|\\b(SpecularGlossyMaterial)\\b|\\b(SphereGeometry)\\b|\\b(SphereGeometryView)\\b|\\b(SphereMesh)\\b|\\b(SphereShape)\\b|\\b(SpriteParticle3D)\\b|\\b(SpriteSequence3D)\\b|\\b(QtStateMachine)\\b|\\b(StateMachine)\\b|\\b(StaticRigidBody)\\b|\\b(Status)\\b|\\b(Surface3DSeries)\\b|\\b(SurfaceDataProxy)\\b|\\b(SystemInformation)\\b|\\b(TargetDirection3D)\\b|\\b(Text2DEntity)\\b|\\b(TextInputManager)\\b|\\b(TextToSpeech)\\b|\\b(Theme3D)\\b|\\b(TimeoutTransition)\\b|\\b(TorusGeometry)\\b|\\b(TorusGeometryView)\\b|\\b(TorusMesh)\\b|\\b(TouchInputHandler3D)\\b|\\b(TouchSelectionMenuRequest)\\b|\\b(TrailEmitter3D)\\b|\\b(TreeViewDelegate)\\b|\\b(TriangleMeshShape)\\b|\\b(TriggerBody)\\b|\\b(UserTokenPolicy)\\b|\\b(ValueAxis3D)\\b|\\b(ValueAxis3DFormatter)\\b|\\b(ValueNode)\\b|\\b(VectorDirection3D)\\b|\\b(VirtualKeyboard)\\b|\\b(voice)\\b|\\b(Wander3D)\\b|\\b(WaylandClient)\\b|\\b(WaylandHardwareLayer)\\b|\\b(WaylandQuickItem)\\b|\\b(WaylandSeat)\\b|\\b(WaylandSurface)\\b|\\b(WaylandView)\\b|\\b(WebEngineDownloadRequest)\\b|\\b(WebEngineHistoryModel)\\b|\\b(WebEngineLoadingInfo)\\b|\\b(WebEngineNewWindowRequest)\\b|\\b(WebEngineScriptCollection)\\b|\\b(WebViewSettings)\\b|\\b(WeekNumberColumn)\\b|\\b(WlShell)\\b|\\b(WlShellSurface)\\b|\\b(WriteItem)\\b|\\b(WriteResult)\\b|\\b(XdgOutputManagerV1)\\b|\\b(XdgPopup)\\b|\\b(XdgShell)\\b|\\b(XdgSurface)\\b|\\b(XdgToplevel)\\b|\\b(XMLHttpRequest)\\b|\\b(XmlListModelRole)\\b|\\b(ZoomBlur)\\b"
+		}
+	],
+	"repository": {
+		"jsKeywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.qml",
+					"match": "\\b(break)\\b|\\b(case)\\b|\\b(catch)\\b|\\b(class)\\b|\\b(const)\\b|\\b(continue)\\b|\\b(debugger)\\b|\\b(default)\\b|\\b(delete)\\b|\\b(do)\\b|\\b(else)\\b|\\b(extends)\\b|\\b(finally)\\b|\\b(for)\\b|\\b(function)\\b|\\b(if)\\b|\\b(in)\\b|\\b(if)\\b|\\b(instanceof)\\b|\\b(let)\\b|\\b(new)\\b|\\b(return)\\b|\\b(super)\\b|\\b(switch)\\b|\\b(this)\\b|\\b(throw)\\b|\\b(try)\\b|\\b(typeof)\\b|\\b(var)\\b|\\b(void)\\b|\\b(while)\\b|\\b(with)\\b|\\b(yield)\\b|\\b(console)\\b|\\b(import)\\b"
+				}
+			]
+		},
+		"qmlKeywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.qml",
+					"match": "\\b(property)\\b|\\b(signal)\\b|\\b(readonly)\\b|\\b(required)\\b|\\b(parent)\\b|\\b(alias)\\b|\\b(qsTr)\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.qml",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.qml",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comment": {
+			"patterns": [
+				{
+					"name": "comment.block.documentation.qml",
+					"begin": "/\\*\\*(?!/)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.qml"
+						}
+					},
+					"end": "\\*/",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.qml"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#docblock"
+						}
+					]
+				},
+				{
+					"name": "comment.block.qml",
+					"begin": "(/\\*)(?:\\s*((@)internal)(?=\\s|(\\*/)))?",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.comment.qml"
+						},
+						"2": {
+							"name": "storage.type.internaldeclaration.qml"
+						},
+						"3": {
+							"name": "punctuation.decorator.internaldeclaration.qml"
+						}
+					},
+					"end": "\\*/",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.qml"
+						}
+					}
+				},
+				{
+					"begin": "(^[ \\t]+)?((//)(?:\\s*((@)internal)(?=\\s|$))?)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.whitespace.comment.leading.qml"
+						},
+						"2": {
+							"name": "comment.line.double-slash.qml"
+						},
+						"3": {
+							"name": "punctuation.definition.comment.qml"
+						},
+						"4": {
+							"name": "storage.type.internaldeclaration.qml"
+						},
+						"5": {
+							"name": "punctuation.decorator.internaldeclaration.qml"
+						}
+					},
+					"end": "(?=$)",
+					"contentName": "comment.line.double-slash.qml"
+				}
+			]
+		},
+		"single-line-comment-consuming-line-ending": {
+			"patterns": [
+				{
+					"begin": "(^[ \\t]+)?((//)(?:\\s*((@)internal)(?=\\s|$))?)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.whitespace.comment.leading.qml"
+						},
+						"2": {
+							"name": "comment.line.double-slash.qml"
+						},
+						"3": {
+							"name": "punctuation.definition.comment.qml"
+						},
+						"4": {
+							"name": "storage.type.internaldeclaration.qml"
+						},
+						"5": {
+							"name": "punctuation.decorator.internaldeclaration.qml"
+						}
+					},
+					"end": "(?=^)",
+					"contentName": "comment.line.double-slash.qml"
+				}
+			]
+		}
+	},
+	"scopeName": "source.qml"
+}

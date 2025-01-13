@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using System.Threading;
 using TextMateSharp.Grammars.Resources;
 using TextMateSharp.Internal.Grammars;
 
@@ -57,7 +57,22 @@ namespace TextMateSharp.Grammars
                 }
             }
         }
+
+        public static LanguageConfiguration LoadFromLocal(string configurationFile)
+        {
+            var fileInfo = new FileInfo(configurationFile);
+            if (!fileInfo.Exists)
+            {
+                return null;
+            }
+            using (var fileStream = fileInfo.OpenRead())
+            {
+                return JsonSerializer.Deserialize(fileStream, jsonContext.LanguageConfiguration);
+            }
+        }
+        
     }
+   
 
     public class Region
     {
@@ -194,6 +209,19 @@ namespace TextMateSharp.Grammars
             }
 
             return result;
+        }
+
+        public static LanguageSnippets LoadFromLocal(string filePath)
+        {
+            var fileInfo = new FileInfo(filePath);  
+            if (!fileInfo.Exists)
+            {
+                return null;
+            }
+            using (var fileStream = fileInfo.OpenRead())
+            {
+                return JsonSerializer.Deserialize(fileStream, jsonContext.LanguageSnippets);
+            }
         }
     }
 
