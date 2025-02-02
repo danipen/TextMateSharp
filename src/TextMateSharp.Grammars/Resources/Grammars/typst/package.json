@@ -1,14 +1,19 @@
 {
   "name": "tinymist",
-  "version": "0.11.20",
+  "version": "0.12.18",
   "description": "%description%",
+  "keywords": [
+    "typst",
+    "lsp",
+    "language-server"
+  ],
   "categories": [
     "Programming Languages",
     "Formatters"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Myriad-Dreamin/tinymist"
+    "url": "https://github.com/Myriad-Dreamin/tinymist.git"
   },
   "displayName": "%displayName%",
   "author": "Myriad-Dreamin",
@@ -22,6 +27,7 @@
     "vscode": "^1.82.0"
   },
   "main": "./out/extension.js",
+  "browser": "./out/extension.web.js",
   "icon": "./icons/ti-white.png",
   "contributes": {
     "viewsContainers": {
@@ -45,6 +51,16 @@
           "id": "tinymist.dev-kit",
           "name": "DevKit View",
           "when": "ext.tinymistActivated && ext.tinymistDevKit"
+        },
+        {
+          "id": "tinymist.tool-view",
+          "name": "Tool",
+          "when": "ext.tinymistActivated"
+        },
+        {
+          "id": "tinymist.package-view",
+          "name": "Package",
+          "when": "ext.tinymistActivated"
         },
         {
           "id": "tinymist.preview.content-preview",
@@ -260,6 +276,19 @@
       "type": "object",
       "title": "Tinymist Typst LSP",
       "properties": {
+        "tinymist.projectResolution": {
+          "type": "string",
+          "default": "singleFile",
+          "markdownDescription": "This configuration specifies the way to resolved projects.",
+          "enum": [
+            "singleFile",
+            "lockDatabase"
+          ],
+          "enumDescriptions": [
+            "Manage typst documents like what we did in Markdown. Each single file is an individual document and no project resolution is needed.",
+            "Manage typst documents like what we did in Rust. For each workspace, tinymist tracks your preview and compilation history, and stores the information in a lock file. Tinymist will automatically selects the main file to use according to the lock file. This also allows other tools push preview and export tasks to language server by updating the lock file."
+          ]
+        },
         "tinymist.outputPath": {
           "title": "Output path",
           "description": "The path pattern to store Typst artifacts, you can use `$root` or `$dir` or `$name` to do magic configuration, e.g. `$dir/$name` (default) and `$root/target/$dir/$name`.",
@@ -293,6 +322,20 @@
           ],
           "default": null
         },
+        "tinymist.configureDefaultWordSeparator": {
+          "title": "Configure default word separators",
+          "description": "Whether to configure default word separators on startup",
+          "type": "string",
+          "default": "enable",
+          "enum": [
+            "enable",
+            "disable"
+          ],
+          "enumDescriptions": [
+            "Override the default word separators on startup",
+            "Do not override the default word separators on startup"
+          ]
+        },
         "tinymist.semanticTokens": {
           "title": "Semantic tokens mode",
           "description": "Enable or disable semantic tokens (LSP syntax highlighting)",
@@ -306,6 +349,12 @@
             "Use semantic tokens for syntax highlighting",
             "Do not use semantic tokens for syntax highlighting"
           ]
+        },
+        "tinymist.typingContinueCommentsOnNewline": {
+          "title": "Continue Comments on Newline",
+          "markdownDescription": "Whether to prefix newlines after comments with the corresponding comment prefix.",
+          "type": "boolean",
+          "default": true
         },
         "tinymist.onEnterEvent": {
           "title": "Handling on enter events",
@@ -329,7 +378,7 @@
           "default": null
         },
         "tinymist.compileStatus": {
-          "title": "Show/Report compilation status",
+          "title": "Show/Report Compile Status",
           "description": "In VSCode, enable compile status meaning that the extension will show the compilation status in the status bar. Since Neovim and Helix don't have a such feature, it is disabled by default at the language server label.",
           "type": "string",
           "default": "enable",
@@ -337,6 +386,12 @@
             "enable",
             "disable"
           ]
+        },
+        "tinymist.statusBarFormat": {
+          "title": "Format of the Server Status in the Status Bar",
+          "markdownDescription": "Set format string of the server status. For example, `{compileStatusIcon}{wordCount} [{fileName}]` will format the status as `$(check) 123 words [main]`. Valid placeholders are:\n\n- `{compileStatusIcon}`: Icon indicating the compile status\n- `{wordCount}`: Number of words in the document\n- `{fileName}`: Name of the file being compiled\n\nNote: The status bar will be hidden if the format string is empty.",
+          "type": "string",
+          "default": "{compileStatusIcon} {wordCount} [{fileName}]"
         },
         "tinymist.typstExtraArgs": {
           "title": "Specifies the arguments for Typst as same as typst-cli",
@@ -351,7 +406,7 @@
         },
         "tinymist.serverPath": {
           "title": "Path to server executable",
-          "description": "The extension can use a local tinymist executable instead of the one bundled with the extension. This setting controls the path to the executable.",
+          "description": "The extension can use a local tinymist executable instead of the one bundled with the extension. This setting controls the path to the executable. The string \"tinymist\" means look up Tinymist in PATH.",
           "type": [
             "string",
             "null"
@@ -390,6 +445,75 @@
           "description": "Set the print width for the formatter, which is a **soft limit** of characters per line. See [the definition of *Print Width*](https://prettier.io/docs/en/options.html#print-width). Note: this has lower priority than the formatter's specific configurations.",
           "type": "number",
           "default": 120
+        },
+        "tinymist.showExportFileIn": {
+          "title": "(Experimental) Show Exported Files in Some Place",
+          "description": "Configures way of opening exported files, e.g. inside of editor tabs or using system application.",
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "For all kind of files.",
+              "enum": [
+                "editorTab",
+                "systemDefault"
+              ],
+              "default": "editorTab",
+              "enumDescriptions": [
+                "Show the exported files in editor tabs.",
+                "Show the exported files by system default application."
+              ]
+            }
+          ]
+        },
+        "tinymist.dragAndDrop": {
+          "title": "Drag and drop",
+          "description": "Whether to handle drag-and-drop of resources into the editing typst document. Note: restarting the editor is required to change this setting.",
+          "type": "string",
+          "default": "enable",
+          "enum": [
+            "enable",
+            "disable"
+          ]
+        },
+        "tinymist.renderDocs": {
+          "title": "(Experimental) Render Docs",
+          "description": "(Experimental) Whether to render typst elements in (hover) docs. In VS Code, when this feature is enabled, tinymist will store rendered results in the filesystem's temporary storage to show them in the hover content. Note: Please disable this feature if the editor doesn't support/handle image previewing in docs.",
+          "type": "string",
+          "default": "enable",
+          "enum": [
+            "enable",
+            "disable"
+          ]
+        },
+        "tinymist.completion.triggerOnSnippetPlaceholders": {
+          "title": "Trigger LSP Completion on Snippet Placeholders",
+          "markdownDescription": "Whether to trigger completions on arguments (placeholders) of snippets. For example, `box` will be completed to `box(|)`, and server will request the editor (lsp client) to request completion after moving cursor to the placeholder in the snippet. Note: this has no effect if the editor doesn't support `editor.action.triggerSuggest` or `tinymist.triggerSuggestAndParameterHints` command. Hint: Restarting the editor is required to change this setting.",
+          "type": "boolean",
+          "default": false
+        },
+        "tinymist.completion.postfix": {
+          "title": "Enable Postfix Code Completion",
+          "markdownDescription": "Whether to enable postfix code completion. For example, `[A].box|` will be completed to `box[A]|`. Hint: Restarting the editor is required to change this setting.",
+          "type": "boolean",
+          "default": true
+        },
+        "tinymist.completion.postfixUfcs": {
+          "title": "Completion: Convert Field Access to Call",
+          "markdownDescription": "Whether to enable UFCS-style completion. For example, `[A].box|` will be completed to `box[A]|`. Hint: Restarting the editor is required to change this setting.",
+          "type": "boolean",
+          "default": true
+        },
+        "tinymist.completion.postfixUfcsLeft": {
+          "title": "Completion: Convert Field Access to Call (Left Variant)",
+          "markdownDescription": "Whether to enable left-variant UFCS-style completion. For example, `[A].table|` will be completed to `table(|)[A]`. Hint: Restarting the editor is required to change this setting.",
+          "type": "boolean",
+          "default": true
+        },
+        "tinymist.completion.postfixUfcsRight": {
+          "title": "Completion: Convert Field Access to Call (Right Variant)",
+          "description": "Whether to enable right-variant UFCS-style completion. For example, `[A].table|` will be completed to `table([A], |)`. Hint: Restarting the editor is required to change this setting.",
+          "type": "boolean",
+          "default": true
         },
         "tinymist.previewFeature": {
           "title": "Enable preview features",
@@ -534,12 +658,26 @@
     "configurationDefaults": {
       "[typst]": {
         "editor.wordWrap": "on",
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+        "editor.semanticHighlighting.enabled": true,
+        "editor.tabSize": 2,
+        "editor.inlayHints.enabled": "off"
+      },
+      "[typst-code]": {
+        "editor.wordWrap": "on",
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
         "editor.semanticHighlighting.enabled": true,
         "editor.tabSize": 2,
         "editor.inlayHints.enabled": "off"
       }
     },
     "languages": [
+      {
+        "id": "toml",
+        "extensions": [
+          "tinymist.lock"
+        ]
+      },
       {
         "id": "typst",
         "configuration": "./language-configuration.json",
@@ -591,6 +729,7 @@
           "markup.raw.inline.typst",
           "string.other.label.typst",
           "string.quoted.double.typst",
+          "constant.other.symbol.typst",
           "constant.character.escape",
           "comment.block.typst",
           "comment.line.double-slash.typst"
@@ -611,6 +750,7 @@
           "markup.raw.inline.typst",
           "string.other.label.typst",
           "string.quoted.double.typst",
+          "constant.other.symbol.typst",
           "constant.character.escape",
           "comment.block.typst",
           "comment.line.double-slash.typst"
@@ -733,8 +873,7 @@
             "markup.underline.link.typst"
           ],
           "raw": [
-            "markup.inline.raw.typst",
-            "markup.raw.inline.typst"
+            "markup.other.raw.typst"
           ],
           "delim.math": [
             "punctuation.definition.math.typst",
@@ -782,12 +921,12 @@
     "commands": [
       {
         "command": "tinymist.exportCurrentPdf",
-        "title": "Export the currently open file as PDF",
+        "title": "Export the Opened File as PDF",
         "category": "Typst"
       },
       {
         "command": "tinymist.pinMainToCurrent",
-        "title": "Pin the main file to the currently opened document",
+        "title": "Pin the Main file to the Opening Document",
         "category": "Typst"
       },
       {
@@ -809,28 +948,33 @@
       {
         "command": "tinymist.showLog",
         "title": "Tinymist: Show Log",
-        "description": "Show log of LSP Server",
+        "description": "Show log of the language server",
         "category": "Typst",
         "icon": "$(list-flat)"
       },
       {
+        "command": "tinymist.restartServer",
+        "title": "Restart server",
+        "category": "Typst"
+      },
+      {
         "command": "tinymist.clearCache",
-        "title": "Clear all cached resources",
+        "title": "Clear all Cached Resources",
         "category": "Typst"
       },
       {
         "command": "tinymist.initTemplate",
-        "title": "Initialize a new Typst project based on a template",
+        "title": "Initialize a New Typst Project based on a Template",
         "category": "Typst"
       },
       {
         "command": "tinymist.initTemplateInPlace",
-        "title": "Insert the content of template entry in place",
+        "title": "Insert the Content of Template Entry in Place",
         "category": "Typst"
       },
       {
         "command": "tinymist.showTemplateGallery",
-        "title": "Show available Typst templates (gallery) for picking up a template to initialize",
+        "title": "Show Available Typst Templates (Gallery) for Picking up a Template to Initialize",
         "category": "Typst"
       },
       {
@@ -850,7 +994,12 @@
       },
       {
         "command": "tinymist.showSymbolView",
-        "title": "Show symbol view",
+        "title": "Show Symbol View",
+        "category": "Typst"
+      },
+      {
+        "command": "tinymist.showFontView",
+        "title": "Show Font View",
         "category": "Typst"
       },
       {
@@ -861,39 +1010,40 @@
       {
         "command": "tinymist.syncLabel",
         "title": "Scan workspace and collect all labels again",
-        "icon": "$(extensions-sync-enabled)"
+        "icon": "$(extensions-sync-enabled)",
+        "category": "Typst"
       },
       {
         "command": "typst-preview.preview",
-        "title": "Typst Preview: Preview current file",
+        "title": "Typst Preview: Preview Opened File",
         "description": "Launch typst-preview server",
         "icon": "$(open-preview)",
         "when": "resourceLangId == typst && editorTextFocus"
       },
       {
         "command": "typst-preview.browser",
-        "title": "Typst Preview: Preview current file in browser",
+        "title": "Typst Preview: Preview Opened File in Browser",
         "description": "Launch typst-preview server and open the preview in your browser",
         "icon": "$(open-preview)",
         "when": "resourceLangId == typst && editorTextFocus"
       },
       {
         "command": "typst-preview.preview-slide",
-        "title": "Typst Preview: Preview current file in slide mode",
+        "title": "Typst Preview: Preview Opened File in Slide Mode",
         "description": "Launch typst-preview server in slide mode",
         "icon": "$(open-preview)",
         "when": "resourceLangId == typst && editorTextFocus"
       },
       {
         "command": "typst-preview.browser-slide",
-        "title": "Typst Preview: Preview current file in browser and slide mode",
+        "title": "Typst Preview: Preview Opened file in Browser and Slide Mode",
         "description": "Launch typst-preview server in slide mode and open the preview in your browser",
         "icon": "$(open-preview)",
         "when": "resourceLangId == typst && editorTextFocus"
       },
       {
         "command": "typst-preview.sync",
-        "title": "Typst Preview: Sync preview with current cursor",
+        "title": "Typst Preview: Sync Preview with Current Cursor",
         "description": "Scroll preview to current cursor position",
         "icon": "$(sync)",
         "when": "resourceLangId == typst && editorTextFocus"
@@ -927,6 +1077,10 @@
         {
           "command": "tinymist.clearCache",
           "when": "editorLangId == typst"
+        },
+        {
+          "command": "tinymist.restartServer",
+          "when": "ext.tinymistActivated"
         }
       ],
       "editor/title": [
@@ -937,7 +1091,7 @@
         },
         {
           "command": "typst-preview.preview",
-          "when": "resourceLangId == typst && editorTextFocus",
+          "when": "resourceLangId == typst",
           "group": "navigation"
         }
       ],
@@ -968,11 +1122,15 @@
   "scripts": {
     "build:frontend": "cd ../../ && yarn build:preview && yarn build:editor-tools",
     "build:syntax": "cd ../../syntaxes/textmate && yarn run compile && yarn run bundle",
-    "build-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --target=node16",
-    "vscode:prepublish": "yarn run build-base -- --minify && yarn run build:frontend && node scripts/postinstall.cjs && node scripts/config-man.cjs",
+    "build-web-base": "node esbuild.web.mjs",
+    "build-system-base": "node esbuild.system.mjs",
+    "build-base": "yarn run build-web-base && yarn run build-system-base",
+    "compile-shared": "yarn run build:syntax && yarn run build:frontend && node scripts/check-version.mjs && node scripts/postinstall.cjs && node scripts/config-man.cjs",
+    "compile:web": "yarn run build-web-base -- --minify && yarn run compile-shared",
+    "compile:system": "yarn run build-system-base -- --minify && yarn run compile-shared",
     "package": "vsce package --yarn",
-    "compile": "yarn run build-base -- --sourcemap && yarn run build:syntax && yarn run build:frontend && node scripts/postinstall.cjs",
-    "watch": "yarn run build-base -- --sourcemap --watch",
+    "compile": "yarn run compile:system",
+    "watch": "yarn run build-system-base -- --sourcemap --watch",
     "check": "tsc --noEmit",
     "lint": "eslint ./src --ext .ts",
     "lint-fix": "eslint ./src --ext .ts --fix",
@@ -981,22 +1139,22 @@
     "test": "rimraf test-dist/ && tsc -p tsconfig.test.json && node test-dist/test/runTests.js"
   },
   "dependencies": {
-    "vscode-languageclient": "^9.0.0",
     "cpr": "^3.0.1",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
     "node-fetch": "^3.3.2",
+    "vscode-languageclient": "^9.0.0",
     "ws": "^8.13.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^20.8.10",
     "@types/vscode": "^1.82.0",
-    "@types/chai": "^4.3.16",
+    "@types/ws": "^8.5.5",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "@typescript-eslint/parser": "^6.9.1",
-    "@types/ws": "^8.5.5",
-    "@types/mocha": "^10.0.1",
-    "@vscode/vsce": "^2.22.0",
     "@vscode/test-electron": "^2.3.9",
-    "mocha": "^10.2.0",
+    "@vscode/vsce": "^2.22.0",
     "chai": "^5.1.1",
     "esbuild": "^0.19.5",
     "eslint": "^8.52.0",
@@ -1004,6 +1162,7 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-n": "^16.2.0",
     "eslint-plugin-promise": "^6.1.1",
+    "mocha": "^10.2.0",
     "ovsx": "^0.8.3",
     "typescript": "^5.2.2"
   }
