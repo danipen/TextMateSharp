@@ -31,6 +31,10 @@ namespace TextMateSharp.Grammars
         [JsonConverter(typeof(ClosingPairJsonConverter))]
         public AutoClosingPairs AutoClosingPairs { get; set; }
 
+        [JsonPropertyName("surroundingPairs")]
+        [JsonConverter(typeof(SurroundingPairJsonConverter))]
+        public CharacterPair[] SurroundingPairs { get; set; }
+
         [JsonPropertyName("indentationRules")]
         [JsonConverter(typeof(IntentationRulesJsonConverter))]
         public Indentation IndentationRules { get; set; }
@@ -297,6 +301,72 @@ namespace TextMateSharp.Grammars
         }
 
         public override void Write(Utf8JsonWriter writer, AutoClosingPairs value, JsonSerializerOptions options)
+        {
+        }
+    }
+
+    public class SurroundingPairJsonConverter : JsonConverter<CharacterPair[]>
+    {
+        public override CharacterPair[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var surroundingPairs = new List<CharacterPair>();
+            if (reader.TokenType == JsonTokenType.StartArray)
+            {
+                while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                {
+                    switch (reader.TokenType)
+                    {
+                        case JsonTokenType.StartArray:
+                            var pair = new List<char>();
+                            while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                            {
+                                switch (reader.TokenType)
+                                {
+                                    case JsonTokenType.String:
+                                        pair.Add(reader.GetString().First());
+                                        break;
+                                }
+                            }
+                            surroundingPairs.Add(pair.ToArray());
+                            break;
+
+                        case JsonTokenType.StartObject:
+                            string propName = string.Empty;
+                            string open = null;
+                            string close = null;
+                            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+                            {
+                                switch (reader.TokenType)
+                                {
+                                    case JsonTokenType.PropertyName:
+                                        propName = reader.GetString();
+                                        break;
+                                    case JsonTokenType.String:
+                                        switch (propName)
+                                        {
+                                            case "open":
+                                                open = reader.GetString();
+                                                break;
+                                            case "close":
+                                                close = reader.GetString();
+                                                break;
+                                        }
+                                        break;
+                                }
+                            }
+
+                            if (open != null && close != null) 
+                                surroundingPairs.Add([open.First(), close.First()]);
+
+                            break;
+                    }
+                }
+            }
+
+            return surroundingPairs.ToArray();
+        }
+
+        public override void Write(Utf8JsonWriter writer, CharacterPair[] value, JsonSerializerOptions options)
         {
         }
     }

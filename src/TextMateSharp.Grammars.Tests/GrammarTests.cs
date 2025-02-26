@@ -127,6 +127,20 @@ namespace TextMateSharp.Grammars.Tests
         }
 
         [Test]
+        public void Assert_Language_Configuration_Has_Surrounding_Pairs()
+        {
+            RegistryOptions options = new RegistryOptions(ThemeName.Light);
+
+            var surroundingPairs = options.GetLanguageByExtension(".cs").Configuration.SurroundingPairs;
+            Assert.IsNotEmpty(surroundingPairs);
+            Assert.IsTrue(surroundingPairs.Any(pair => pair[0] == '(' && pair[1] == ')'));
+
+            surroundingPairs = options.GetLanguageByExtension(".html").Configuration.SurroundingPairs;
+            Assert.IsNotEmpty(surroundingPairs);
+            Assert.IsTrue(surroundingPairs.Any(pair => pair[0] == '<' && pair[1] == '>'));
+        }
+
+        [Test]
         public void Assert_Every_Grammar_With_Snippets_Can_Load_Snippets()
         {
             RegistryOptions options = new RegistryOptions(ThemeName.Light);
