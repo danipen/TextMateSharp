@@ -356,7 +356,7 @@ namespace TextMateSharp.Grammars
                             }
 
                             if (open != null && close != null) 
-                                surroundingPairs.Add([open.First(), close.First()]);
+                                surroundingPairs.Add(new char[] { open.First(), close.First() });
 
                             break;
                     }
