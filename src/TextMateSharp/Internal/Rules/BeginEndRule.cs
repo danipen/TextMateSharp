@@ -38,20 +38,21 @@ namespace TextMateSharp.Internal.Rules
             return this._end.ResolveBackReferences(lineText, captureIndices);
         }
 
-        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
+        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFrist)
         {
-            if (isFirst)
+            if (!isFrist)
             {
+                // Do not attempt to add patrterns for the frist time
                 foreach (RuleId pattern in this.Patterns)
                 {
                     Rule rule = grammar.GetRule(pattern);
                     rule.CollectPatternsRecursive(grammar, sourceList, false);
                 }
+
+                return;
             }
-            else
-            {
-                sourceList.Push(this._begin);
-            }
+
+            sourceList.Push(this._begin);
         }
 
         public override CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG)

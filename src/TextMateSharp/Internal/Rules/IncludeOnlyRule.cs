@@ -17,7 +17,7 @@ namespace TextMateSharp.Internal.Rules
             _cachedCompiledPatterns = null;
         }
 
-        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
+        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFrist)
         {
             foreach (var pattern in this.Patterns)
             {
