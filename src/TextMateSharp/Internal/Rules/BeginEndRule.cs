@@ -42,7 +42,7 @@ namespace TextMateSharp.Internal.Rules
         {
             if (isFirst)
             {
-                // This is the firts time this is called
+                // This is the first time this is called
                 foreach (RuleId pattern in this.Patterns)
                 {
                     Rule rule = grammar.GetRule(pattern);
