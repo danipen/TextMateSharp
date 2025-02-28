@@ -11,7 +11,7 @@ namespace TextMateSharp.Internal.Rules
             RetokenizeCapturedWithRuleId = retokenizeCapturedWithRuleId;
         }
 
-        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFrist)
+        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
             
         }

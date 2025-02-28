@@ -43,7 +43,7 @@ namespace TextMateSharp.Internal.Rules
             return RegexSource.ReplaceCaptures(this._contentName, lineText, captureIndices);
         }
 
-        public abstract void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFrist);
+        public abstract void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst);
 
         public abstract CompiledRule Compile(IRuleRegistry grammar, string endRegexSource, bool allowA, bool allowG);
     }

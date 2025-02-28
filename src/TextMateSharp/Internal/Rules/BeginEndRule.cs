@@ -38,9 +38,9 @@ namespace TextMateSharp.Internal.Rules
             return this._end.ResolveBackReferences(lineText, captureIndices);
         }
 
-        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFrist)
+        public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
-            if (!isFrist)
+            if (!isFirst)
             {
                 // Do not attempt to add patrterns for the frist time
                 foreach (RuleId pattern in this.Patterns)
