@@ -42,7 +42,7 @@ namespace TextMateSharp.Internal.Rules
         {
             if (isFirst)
             {
-                // Do not attempt to add patrterns for the frist time
+                // This is the firts time this is called
                 foreach (RuleId pattern in this.Patterns)
                 {
                     Rule rule = grammar.GetRule(pattern);
