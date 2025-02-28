@@ -40,7 +40,7 @@ namespace TextMateSharp.Internal.Rules
 
         public override void CollectPatternsRecursive(IRuleRegistry grammar, RegExpSourceList sourceList, bool isFirst)
         {
-            if (!isFirst)
+            if (isFirst)
             {
                 // Do not attempt to add patrterns for the frist time
                 foreach (RuleId pattern in this.Patterns)
