@@ -329,6 +329,8 @@ namespace TextMateSharp.Grammars
                     return "hc_light.json";
                 case ThemeName.HighContrastDark:
                     return "hc_black.json";
+                case ThemeName.VisualStudioLight:
+                    return "visual-studio-light-theme.json";
             }
 
             return null;
