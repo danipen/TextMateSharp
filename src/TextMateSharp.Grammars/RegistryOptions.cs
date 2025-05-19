@@ -329,6 +329,8 @@ namespace TextMateSharp.Grammars
                     return "hc_light.json";
                 case ThemeName.HighContrastDark:
                     return "hc_black.json";
+                case ThemeName.AtomOneLight:
+                    return "atom-one-light-color-theme.json";
             }
 
             return null;
