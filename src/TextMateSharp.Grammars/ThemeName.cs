@@ -17,5 +17,6 @@
         TomorrowNightBlue,
         HighContrastLight,
         HighContrastDark,
+        Dracula,
     }
 }
