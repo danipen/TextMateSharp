@@ -337,6 +337,8 @@ namespace TextMateSharp.Grammars
                     return "atom-one-light-color-theme.json";
                 case ThemeName.AtomOneDark:
                     return "atom-one-dark-color-theme.json";
+                case ThemeName.VisualStudioDark:
+                    return "visual-studio-dark-theme.json";
             }
 
             return null;

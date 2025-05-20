@@ -20,6 +20,7 @@
         HighContrastDark,
         Dracula,
         AtomOneLight,
-        AtomOneDark
+        AtomOneDark,
+        VisualStudioDark,
     }
 }
