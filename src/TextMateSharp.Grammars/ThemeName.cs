@@ -18,6 +18,6 @@
         TomorrowNightBlue,
         HighContrastLight,
         HighContrastDark,
-        AtomOneDark
+        Dracula,
     }
 }
