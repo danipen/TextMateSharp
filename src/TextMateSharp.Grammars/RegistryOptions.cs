@@ -315,6 +315,8 @@ namespace TextMateSharp.Grammars
                     return "light_plus.json";
                 case ThemeName.Monokai:
                     return "monokai-color-theme.json";
+                case ThemeName.Onedark:
+                    return "onedark-color-theme.json";
                 case ThemeName.QuietLight:
                     return "quietlight-color-theme.json";
                 case ThemeName.Red:
