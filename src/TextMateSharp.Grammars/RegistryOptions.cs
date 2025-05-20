@@ -331,6 +331,8 @@ namespace TextMateSharp.Grammars
                     return "hc_light.json";
                 case ThemeName.HighContrastDark:
                     return "hc_black.json";
+                case ThemeName.Dracula:
+                    return "dracula-color-theme.json";
             }
 
             return null;
