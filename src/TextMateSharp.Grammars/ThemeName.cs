@@ -19,6 +19,7 @@
         HighContrastLight,
         HighContrastDark,
         Dracula,
+        AtomOneLight,
         AtomOneDark
     }
 }
