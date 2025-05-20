@@ -333,8 +333,14 @@ namespace TextMateSharp.Grammars
                     return "hc_black.json";
                 case ThemeName.Dracula:
                     return "dracula-color-theme.json";
+                case ThemeName.AtomOneLight:
+                    return "atom-one-light-color-theme.json";
                 case ThemeName.AtomOneDark:
                     return "atom-one-dark-color-theme.json";
+                case ThemeName.VisualStudioLight:
+                    return "visual-studio-light-theme.json";
+                case ThemeName.VisualStudioDark:
+                    return "visual-studio-dark-theme.json";
             }
 
             return null;
