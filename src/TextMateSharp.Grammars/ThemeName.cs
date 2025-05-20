@@ -18,6 +18,7 @@
         TomorrowNightBlue,
         HighContrastLight,
         HighContrastDark,
-        VisualStudioLight
+        Dracula,
+        VisualStudioLight,
     }
 }
