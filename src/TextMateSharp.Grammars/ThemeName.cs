@@ -21,6 +21,7 @@
         Dracula,
         AtomOneLight,
         AtomOneDark,
+        VisualStudioLight,
         VisualStudioDark,
     }
 }
