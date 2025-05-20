@@ -9,7 +9,7 @@
         KimbieDark,
         Light,
         LightPlus,
-        Onedark,
+        OneDark,
         Monokai,
         QuietLight,
         Red,
