@@ -176,7 +176,10 @@ namespace TextMateSharp.Grammars.Tests
             RegistryOptions options = new RegistryOptions(ThemeName.Light);
             var combine = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GrammarAssets", "qml", "package.json");
             options.LoadFromLocalFile("QML", combine);
-            Assert.NotNull(options.GetAvailableLanguages().First((language => language.Id == "qml")));
+            var language = options.GetAvailableLanguages().First((language => language.Id == "qml"));
+            Assert.NotNull(language);
+            string scopeName = options.GetScopeByLanguageId(language.Id);
+            Assert.That(options.GetGrammar(scopeName), Is.Not.Null, "Failed: " + language.Id);
         }
     }
 }
