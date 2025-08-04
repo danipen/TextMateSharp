@@ -245,6 +245,11 @@ namespace TextMateSharp.Grammars
         {
             Stream grammarStream = null;
             var grammarFile = GetGrammarFile(scopeName);
+            if (grammarFile == null)
+            {
+                return null;
+            }
+
             if (grammarFile.IsAbsoluteUri)
             {
                 if (grammarFile.IsFile)
@@ -308,25 +313,16 @@ namespace TextMateSharp.Grammars
                 {
                     if (scopeName.Equals(grammar.ScopeName))
                     {
-                        if (Path.IsPathRooted(grammar.Path))
+                        var grammarPath = grammar.Path;
+                        if (Path.IsPathRooted(grammarPath))
                         {
-                            return new  Uri(grammar.Path);
+                            return new Uri(grammarPath);
                         }
 
-                        if (Uri.TryCreate(grammar.Path, UriKind.RelativeOrAbsolute, out var uri))
-                        {
-                            if (!uri.IsAbsoluteUri)
-                            {
-                                string grammarPath = uri.OriginalString;
-                                if (grammarPath.StartsWith("./"))
-                                    grammarPath = grammarPath.Substring(2);
-
-                                grammarPath = grammarPath.Replace("/", ".");
-                                return new Uri(grammarName.ToLower() + "." + grammarPath, UriKind.Relative);
-                            }
-
-                            return uri;
-                        }
+                        if (grammarPath.StartsWith("./"))
+                            grammarPath = grammarPath.Substring(2);
+                        grammarPath = grammarPath.Replace("/", ".");
+                        return new Uri(grammarName.ToLower() + "." + grammarPath, UriKind.Relative);
                     }
                 }
             }
