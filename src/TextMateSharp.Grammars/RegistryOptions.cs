@@ -115,7 +115,6 @@ namespace TextMateSharp.Grammars
                     {
                         if (string.IsNullOrEmpty(grammar.Path.Trim()))
                             continue;
-
                         var path = Path.GetFullPath(Path.Combine(baseDir, grammar.Path));
                         grammar.Path = path;
                     }
@@ -309,6 +308,11 @@ namespace TextMateSharp.Grammars
                 {
                     if (scopeName.Equals(grammar.ScopeName))
                     {
+                        if (Path.IsPathRooted(grammar.Path))
+                        {
+                            return new  Uri(grammar.Path);
+                        }
+
                         if (Uri.TryCreate(grammar.Path, UriKind.RelativeOrAbsolute, out var uri))
                         {
                             if (!uri.IsAbsoluteUri)
