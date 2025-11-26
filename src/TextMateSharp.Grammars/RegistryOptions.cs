@@ -80,22 +80,26 @@ namespace TextMateSharp.Grammars
                     return;
                 }
 
-                foreach (var language in definition.Contributes.Languages)
+                var contributes = definition.Contributes;
+                if (contributes?.Languages != null)
                 {
-                    if (language.ConfigurationFile == null)
+                    foreach (var language in contributes.Languages)
                     {
-                        language.Configuration = null;
-                        continue;
-                    }
+                        if (language.ConfigurationFile == null)
+                        {
+                            language.Configuration = null;
+                            continue;
+                        }
 
-                    var path = Path.GetFullPath(Path.Combine(baseDir, language.ConfigurationFile));
-                    language.Configuration = LanguageConfiguration.LoadFromLocal(path);
+                        var path = Path.GetFullPath(Path.Combine(baseDir, language.ConfigurationFile));
+                        language.Configuration = LanguageConfiguration.LoadFromLocal(path);
+                    }
                 }
 
-                if (definition.Contributes?.Snippets != null)
+                if (contributes?.Snippets != null)
                 {
                     definition.LanguageSnippets = new LanguageSnippets();
-                    foreach (var snippet in definition.Contributes.Snippets)
+                    foreach (var snippet in contributes.Snippets)
                     {
                         var path = Path.GetFullPath(Path.Combine(baseDir, snippet.Path));
                         var configuration = LanguageSnippets.LoadFromLocal(path);
@@ -104,6 +108,18 @@ namespace TextMateSharp.Grammars
                         break;
                     }
                 }
+
+                if (contributes?.Grammars != null)
+                {
+                    foreach (var grammar in contributes.Grammars)
+                    {
+                        if (string.IsNullOrEmpty(grammar.Path.Trim()))
+                            continue;
+                        var path = Path.GetFullPath(Path.Combine(baseDir, grammar.Path));
+                        grammar.Path = path;
+                    }
+                }
+
 
                 _availableGrammars.Add(grammarName, definition);
             }
@@ -227,7 +243,24 @@ namespace TextMateSharp.Grammars
 
         public IRawGrammar GetGrammar(string scopeName)
         {
-            Stream grammarStream = ResourceLoader.TryOpenGrammarStream(GetGrammarFile(scopeName));
+            Stream grammarStream = null;
+            var grammarFile = GetGrammarFile(scopeName);
+            if (grammarFile == null)
+            {
+                return null;
+            }
+
+            if (grammarFile.IsAbsoluteUri)
+            {
+                if (grammarFile.IsFile)
+                {
+                    grammarStream = File.OpenRead(grammarFile.LocalPath);
+                }
+            }
+            else
+            {
+                grammarStream = ResourceLoader.TryOpenGrammarStream(grammarFile.OriginalString);
+            }
 
             if (grammarStream == null)
                 return null;
@@ -270,7 +303,7 @@ namespace TextMateSharp.Grammars
             }
         }
 
-        string GetGrammarFile(string scopeName)
+        Uri GetGrammarFile(string scopeName)
         {
             foreach (string grammarName in _availableGrammars.Keys)
             {
@@ -280,14 +313,16 @@ namespace TextMateSharp.Grammars
                 {
                     if (scopeName.Equals(grammar.ScopeName))
                     {
-                        string grammarPath = grammar.Path;
+                        var grammarPath = grammar.Path;
+                        if (Path.IsPathRooted(grammarPath))
+                        {
+                            return new Uri(grammarPath);
+                        }
 
                         if (grammarPath.StartsWith("./"))
                             grammarPath = grammarPath.Substring(2);
-
                         grammarPath = grammarPath.Replace("/", ".");
-
-                        return grammarName.ToLower() + "." + grammarPath;
+                        return new Uri(grammarName.ToLower() + "." + grammarPath, UriKind.Relative);
                     }
                 }
             }
