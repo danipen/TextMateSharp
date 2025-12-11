@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Onigwrap;
 
@@ -33,7 +34,7 @@ namespace TextMateSharp.Internal.Rules
             _cachedCompiledWhilePatterns = null;
         }
 
-        public string getWhileWithResolvedBackReferences(string lineText, IOnigCaptureIndex[] captureIndices)
+        public string getWhileWithResolvedBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
         {
             return this._while.ResolveBackReferences(lineText, captureIndices);
         }

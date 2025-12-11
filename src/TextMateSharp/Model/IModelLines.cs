@@ -1,5 +1,7 @@
 using System;
 
+using TextMateSharp.Grammars;
+
 namespace TextMateSharp.Model
 {
     public interface IModelLines
@@ -11,7 +13,7 @@ namespace TextMateSharp.Model
         ModelLine Get(int lineIndex);
         void ForEach(Action<ModelLine> action);
         int GetNumberOfLines();
-        string GetLineText(int lineIndex);
+        LineText GetLineText(int lineIndex);
         int GetLineLength(int lineIndex);
         void Dispose();
     }

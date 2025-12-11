@@ -200,27 +200,27 @@ namespace TextMateSharp.Internal.Grammars
             return (IRawGrammar)((Raw)grammar).Clone();
         }
 
-        public ITokenizeLineResult TokenizeLine(string lineText)
+        public ITokenizeLineResult TokenizeLine(LineText lineText)
         {
             return TokenizeLine(lineText, null, TimeSpan.MaxValue);
         }
 
-        public ITokenizeLineResult TokenizeLine(string lineText, IStateStack prevState, TimeSpan timeLimit)
+        public ITokenizeLineResult TokenizeLine(LineText lineText, IStateStack prevState, TimeSpan timeLimit)
         {
-            return (ITokenizeLineResult)Tokenize(lineText, (StateStack)prevState, false, timeLimit);
+            return (ITokenizeLineResult)Tokenize(lineText.Memory, (StateStack)prevState, false, timeLimit);
         }
 
-        public ITokenizeLineResult2 TokenizeLine2(string lineText)
+        public ITokenizeLineResult2 TokenizeLine2(LineText lineText)
         {
             return TokenizeLine2(lineText, null, TimeSpan.MaxValue);
         }
 
-        public ITokenizeLineResult2 TokenizeLine2(string lineText, IStateStack prevState, TimeSpan timeLimit)
+        public ITokenizeLineResult2 TokenizeLine2(LineText lineText, IStateStack prevState, TimeSpan timeLimit)
         {
-            return (ITokenizeLineResult2)Tokenize(lineText, (StateStack)prevState, true, timeLimit);
+            return (ITokenizeLineResult2)Tokenize(lineText.Memory, (StateStack)prevState, true, timeLimit);
         }
 
-        private object Tokenize(string lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
+        private object Tokenize(ReadOnlyMemory<char> lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
         {
             if (this._rootId == null)
             {
@@ -237,7 +237,7 @@ namespace TextMateSharp.Internal.Grammars
                         rawDefaultMetadata.TokenType, null, defaultTheme.fontStyle, defaultTheme.foreground,
                         defaultTheme.background);
 
-                string rootScopeName = this.GetRule(this._rootId)?.GetName(null, null);
+                string rootScopeName = this.GetRule(this._rootId)?.GetName(ReadOnlyMemory<char>.Empty, null);
                 if (rootScopeName == null)
                     return null;
                 BasicScopeAttributes rawRootMetadata = this._basicScopeAttributesProvider.GetBasicScopeAttributes(rootScopeName);
@@ -253,14 +253,25 @@ namespace TextMateSharp.Internal.Grammars
                 prevState.Reset();
             }
 
-            if (string.IsNullOrEmpty(lineText) || lineText[lineText.Length - 1] != '\n')
+            // Check if we need to append newline
+            ReadOnlyMemory<char> effectiveLineText;
+            if (lineText.Length == 0 || lineText.Span[lineText.Length - 1] != '\n')
             {
                 // Only add \n if the passed lineText didn't have it.
-                lineText += '\n';
+                // We need to allocate a new buffer with the newline
+                char[] buffer = new char[lineText.Length + 1];
+                lineText.Span.CopyTo(buffer);
+                buffer[lineText.Length] = '\n';
+                effectiveLineText = buffer.AsMemory();
             }
-            int lineLength = lineText.Length;
-            LineTokens lineTokens = new LineTokens(emitBinaryTokens, lineText, _tokenTypeMatchers, _balancedBracketSelectors);
-            TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, lineText, isFirstLine, 0, prevState,
+            else
+            {
+                effectiveLineText = lineText;
+            }
+
+            int lineLength = effectiveLineText.Length;
+            LineTokens lineTokens = new LineTokens(emitBinaryTokens, effectiveLineText, _tokenTypeMatchers, _balancedBracketSelectors);
+            TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, effectiveLineText, isFirstLine, 0, prevState,
                 lineTokens, true, timeLimit);
 
             if (emitBinaryTokens)

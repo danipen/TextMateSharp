@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace TextMateSharp.Internal.Utils
@@ -13,6 +14,21 @@ namespace TextMateSharp.Internal.Utils
         internal static string SubstringAtIndexes(this string str, int startIndex, int endIndex)
         {
             return str.Substring(startIndex, endIndex - startIndex);
+        }
+
+        internal static ReadOnlyMemory<char> SliceAtIndexes(this ReadOnlyMemory<char> memory, int startIndex, int endIndex)
+        {
+            return memory.Slice(startIndex, endIndex - startIndex);
+        }
+
+        internal static ReadOnlySpan<char> SliceAtIndexes(this ReadOnlySpan<char> span, int startIndex, int endIndex)
+        {
+            return span.Slice(startIndex, endIndex - startIndex);
+        }
+
+        internal static string SubstringAtIndexes(this ReadOnlyMemory<char> memory, int startIndex, int endIndex)
+        {
+            return memory.Slice(startIndex, endIndex - startIndex).Span.ToString();
         }
 
         internal static bool IsValidHexColor(string hex)
