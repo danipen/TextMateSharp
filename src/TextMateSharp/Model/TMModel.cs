@@ -195,8 +195,6 @@ namespace TextMateSharp.Model
                     try
                     {
                         text = model._lines.GetLineText(lineIndex);
-                        if (text.IsEmpty)
-                            continue;
                         // Tokenize only the first X characters
                         r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);
                     }
