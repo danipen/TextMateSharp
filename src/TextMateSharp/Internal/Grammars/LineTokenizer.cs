@@ -48,12 +48,11 @@ namespace TextMateSharp.Internal.Grammars
                 _anchorPosition = whileCheckResult.AnchorPosition;
             }
 
-            long startTimestamp = Stopwatch.GetTimestamp();
-            long timeoutTicks = (long)(timeLimit.TotalSeconds * Stopwatch.Frequency);
-
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
             while (!_stop)
             {
-                if (Stopwatch.GetTimestamp() - startTimestamp > timeoutTicks)
+                if (stopWatch.Elapsed > timeLimit)
                 {
                     return new TokenizeStringResult(_stack, true);
                 }
