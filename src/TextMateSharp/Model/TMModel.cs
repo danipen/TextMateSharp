@@ -190,12 +190,12 @@ namespace TextMateSharp.Model
 
                     int endStateIndex = lineIndex + 1;
                     LineTokens r = null;
-                    string text = null;
+                    LineText text = default;
                     ModelLine modeLine = model._lines.Get(lineIndex);
                     try
                     {
                         text = model._lines.GetLineText(lineIndex);
-                        if (text == null)
+                        if (text.IsEmpty)
                             continue;
                         // Tokenize only the first X characters
                         r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);

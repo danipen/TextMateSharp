@@ -125,7 +125,7 @@ namespace TextMateSharp.Tests.Model
             {
                 return _lines[lineIndex].Length;
             }
-            public override string GetLineText(int lineIndex)
+            public override LineText GetLineText(int lineIndex)
             {
                 return _lines[lineIndex];
             }
