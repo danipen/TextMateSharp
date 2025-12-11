@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 
 using TextMateSharp.Grammars;
@@ -254,34 +255,48 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             // Check if we need to append newline
+            char[] rentedBuffer = null;
             ReadOnlyMemory<char> effectiveLineText;
-            if (lineText.Length == 0 || lineText.Span[lineText.Length - 1] != '\n')
+            
+            try
             {
-                // Only add \n if the passed lineText didn't have it.
-                // We need to allocate a new buffer with the newline
-                char[] buffer = new char[lineText.Length + 1];
-                lineText.Span.CopyTo(buffer);
-                buffer[lineText.Length] = '\n';
-                effectiveLineText = buffer.AsMemory();
-            }
-            else
-            {
-                effectiveLineText = lineText;
-            }
+                if (lineText.Length == 0 || lineText.Span[lineText.Length - 1] != '\n')
+                {
+                    // Only add \n if the passed lineText didn't have it.
+                    // Use ArrayPool to avoid per-line allocation
+                    int requiredLength = lineText.Length + 1;
+                    rentedBuffer = ArrayPool<char>.Shared.Rent(requiredLength);
+                    lineText.Span.CopyTo(rentedBuffer);
+                    rentedBuffer[lineText.Length] = '\n';
+                    effectiveLineText = rentedBuffer.AsMemory(0, requiredLength);
+                }
+                else
+                {
+                    effectiveLineText = lineText;
+                }
 
-            int lineLength = effectiveLineText.Length;
-            LineTokens lineTokens = new LineTokens(emitBinaryTokens, effectiveLineText, _tokenTypeMatchers, _balancedBracketSelectors);
-            TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, effectiveLineText, isFirstLine, 0, prevState,
-                lineTokens, true, timeLimit);
+                int lineLength = effectiveLineText.Length;
+                LineTokens lineTokens = new LineTokens(emitBinaryTokens, effectiveLineText, _tokenTypeMatchers, _balancedBracketSelectors);
+                TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, effectiveLineText, isFirstLine, 0, prevState,
+                    lineTokens, true, timeLimit);
 
-            if (emitBinaryTokens)
-            {
-                return new TokenizeLineResult2(lineTokens.GetBinaryResult(tokenizeResult.Stack, lineLength),
+                if (emitBinaryTokens)
+                {
+                    return new TokenizeLineResult2(lineTokens.GetBinaryResult(tokenizeResult.Stack, lineLength),
+                        tokenizeResult.Stack, tokenizeResult.StoppedEarly);
+                }
+                return new TokenizeLineResult(lineTokens.GetResult(tokenizeResult.Stack, lineLength),
                     tokenizeResult.Stack, tokenizeResult.StoppedEarly);
             }
-            return new TokenizeLineResult(lineTokens.GetResult(tokenizeResult.Stack, lineLength),
-                tokenizeResult.Stack, tokenizeResult.StoppedEarly);
+            finally
+            {
+                if (rentedBuffer != null)
+                {
+                    ArrayPool<char>.Shared.Return(rentedBuffer);
+                }
+            }
         }
+
 
         private void GenerateRootId()
         {

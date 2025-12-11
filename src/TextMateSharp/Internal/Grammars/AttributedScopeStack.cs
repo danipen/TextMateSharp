@@ -10,6 +10,7 @@ namespace TextMateSharp.Internal.Grammars
         public AttributedScopeStack Parent { get; private set; }
         public string ScopePath { get; private set; }
         public int TokenAttributes { get; private set; }
+        private List<string> _cachedScopeNames;
 
         public AttributedScopeStack(AttributedScopeStack parent, string scopePath, int tokenAttributes)
         {
@@ -157,11 +158,16 @@ namespace TextMateSharp.Internal.Grammars
         {
             foreach (string scope in scopes)
             {
-                BasicScopeAttributes rawMetadata = grammar.GetMetadataForScope(scope);
-                int metadata = AttributedScopeStack.MergeAttributes(target.TokenAttributes, target, rawMetadata);
-                target = new AttributedScopeStack(target, scope, metadata);
+                target = PushSingleScope(target, grammar, scope);
             }
             return target;
+        }
+
+        private static AttributedScopeStack PushSingleScope(AttributedScopeStack target, Grammar grammar, string scope)
+        {
+            BasicScopeAttributes rawMetadata = grammar.GetMetadataForScope(scope);
+            int metadata = AttributedScopeStack.MergeAttributes(target.TokenAttributes, target, rawMetadata);
+            return new AttributedScopeStack(target, scope, metadata);
         }
 
         public AttributedScopeStack PushAtributed(string scopePath, Grammar grammar)
@@ -175,13 +181,18 @@ namespace TextMateSharp.Internal.Grammars
                 // there are multiple scopes to push
                 return Push(this, grammar, new List<string>(scopePath.Split(new[] {" "}, StringSplitOptions.None)));
             }
-            // there is a single scope to push
-            return Push(this, grammar, new List<string>() { scopePath });
+            // there is a single scope to push - avoid List allocation
+            return PushSingleScope(this, grammar, scopePath);
         }
+
 
         public List<string> GetScopeNames()
         {
-            return AttributedScopeStack.GenerateScopes(this);
+            if (_cachedScopeNames == null)
+            {
+                _cachedScopeNames = GenerateScopes(this);
+            }
+            return _cachedScopeNames;
         }
 
         private static List<string> GenerateScopes(AttributedScopeStack scopesList)

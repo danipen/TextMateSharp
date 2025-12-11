@@ -21,6 +21,8 @@ namespace TextMateSharp.Internal.Grammars
         private int _anchorPosition = -1;
         private bool _stop;
         private int _lineLength;
+        private readonly List<LocalStackElement> _localStackBuffer = new List<LocalStackElement>();
+        private readonly List<WhileStack> _whileRulesBuffer = new List<WhileStack>();
 
         public LineTokenizer(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos, StateStack stack,
                 LineTokens lineTokens)
@@ -48,11 +50,13 @@ namespace TextMateSharp.Internal.Grammars
                 _anchorPosition = whileCheckResult.AnchorPosition;
             }
 
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
+            // Use Stopwatch.GetTimestamp() instead of new Stopwatch() to avoid allocation
+            long startTimestamp = Stopwatch.GetTimestamp();
+            long timeoutTicks = (long)(timeLimit.TotalSeconds * Stopwatch.Frequency);
+            
             while (!_stop)
             {
-                if (stopWatch.Elapsed > timeLimit)
+                if (Stopwatch.GetTimestamp() - startTimestamp > timeoutTicks)
                 {
                     return new TokenizeStringResult(_stack, true);
                 }
@@ -61,6 +65,7 @@ namespace TextMateSharp.Internal.Grammars
 
             return new TokenizeStringResult(_stack, false);
         }
+
 
         private void ScanNext()
         {
@@ -392,7 +397,8 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             int len = Math.Min(captures.Count, captureIndices.Length);
-            List<LocalStackElement> localStack = new List<LocalStackElement>();
+            _localStackBuffer.Clear();
+            var localStack = _localStackBuffer;
             int maxEnd = captureIndices[0].End;
             IOnigCaptureIndex captureIndex;
 
@@ -492,7 +498,8 @@ namespace TextMateSharp.Internal.Grammars
                 int linePos, StateStack stack, LineTokens lineTokens)
         {
             int anchorPosition = stack.BeginRuleCapturedEOL ? 0 : -1;
-            List<WhileStack> whileRules = new List<WhileStack>();
+            _whileRulesBuffer.Clear();
+            var whileRules = _whileRulesBuffer;
             for (StateStack node = stack; node != null; node = node.Pop())
             {
                 Rule nodeRule = node.GetRule(grammar);
