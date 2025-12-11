@@ -13,8 +13,6 @@ namespace TextMateSharp
     {
         static void Main(string[] args)
         {
-            // empty change just to pass the tests
-
             try
             {
                 if (args.Length < 1)
