@@ -266,7 +266,7 @@ namespace TextMateSharp.Internal.Grammars
             if (ruleScanner == null)
                 return null;
 
-            IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
+            IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText.AsMemory(), linePos);
 
             if (r != null)
             {
@@ -340,7 +340,7 @@ namespace TextMateSharp.Internal.Grammars
 
                 CompiledRule ruleScanner = grammar.GetRule(injection.RuleId).Compile(grammar, null, isFirstLine,
                         linePos == anchorPosition);
-                IOnigNextMatchResult matchResult = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
+                IOnigNextMatchResult matchResult = ruleScanner.Scanner.FindNextMatchSync(lineText.AsMemory(), linePos);
 
                 if (matchResult == null)
                 {
@@ -506,7 +506,7 @@ namespace TextMateSharp.Internal.Grammars
                 WhileStack whileRule = whileRules[i];
                 CompiledRule ruleScanner = whileRule.Rule.CompileWhile(whileRule.Stack.EndRule, isFirstLine,
                         anchorPosition == linePos);
-                IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
+                IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText.AsMemory(), linePos);
 
                 if (r != null)
                 {
