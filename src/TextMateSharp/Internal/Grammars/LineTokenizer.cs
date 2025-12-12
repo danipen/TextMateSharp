@@ -20,6 +20,7 @@ namespace TextMateSharp.Internal.Grammars
         private LineTokens _lineTokens;
         private int _anchorPosition = -1;
         private bool _stop;
+        private Stopwatch _stopwatch = new Stopwatch();
         private int _lineLength;
 
         public LineTokenizer(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos, StateStack stack,
@@ -48,11 +49,10 @@ namespace TextMateSharp.Internal.Grammars
                 _anchorPosition = whileCheckResult.AnchorPosition;
             }
 
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
+            _stopwatch.Restart();
             while (!_stop)
             {
-                if (stopWatch.Elapsed > timeLimit)
+                if (_stopwatch.Elapsed > timeLimit)
                 {
                     return new TokenizeStringResult(_stack, true);
                 }
