@@ -372,3 +372,7 @@ src/.vscode/launch.json
 .idea/.idea.TextMateSharp.dir/.idea/indexLayout.xml
 .idea/.idea.TextMateSharp.dir/.idea/vcs.xml
 .idea/.idea.TextMateSharp/.idea/riderMarkupCache.xml
+.idea/.idea.TextMateSharp/.idea/copilot.data.migration.agent.xml
+.idea/.idea.TextMateSharp/.idea/copilot.data.migration.ask.xml
+.idea/.idea.TextMateSharp/.idea/copilot.data.migration.ask2agent.xml
+.idea/.idea.TextMateSharp/.idea/copilot.data.migration.edit.xml

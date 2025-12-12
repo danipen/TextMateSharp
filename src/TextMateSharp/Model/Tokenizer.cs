@@ -21,22 +21,23 @@ namespace TextMateSharp.Model
             return new TMState(null, null);
         }
 
-        public LineTokens Tokenize(string line, TMState state, TimeSpan timeLimit)
+        public LineTokens Tokenize(LineText line, TMState state, TimeSpan timeLimit)
         {
             return Tokenize(line, state, 0, 0, timeLimit);
         }
 
-        public LineTokens Tokenize(string line, TMState state, int offsetDelta, int maxLen, TimeSpan timeLimit)
+        public LineTokens Tokenize(LineText line, TMState state, int offsetDelta, int maxLen, TimeSpan timeLimit)
         {
             if (_grammar == null)
                 return null;
 
             TMState freshState = state != null ? state.Clone() : GetInitialState();
 
-            if (line.Length > 0 && line.Length > maxLen)
-                line = line.Substring(0, maxLen);
+            ReadOnlyMemory<char> effectiveLine = line.Memory;
+            if (maxLen > 0 && effectiveLine.Length > maxLen)
+                effectiveLine = effectiveLine.Slice(0, maxLen);
 
-            ITokenizeLineResult textMateResult = _grammar.TokenizeLine(line, freshState.GetRuleStack(), timeLimit);
+            ITokenizeLineResult textMateResult = _grammar.TokenizeLine(effectiveLine, freshState.GetRuleStack(), timeLimit);
             freshState.SetRuleStack(textMateResult.RuleStack);
 
             // Create the result early and fill in the tokens later
@@ -57,7 +58,7 @@ namespace TextMateSharp.Model
                     lastTokenType = tokenType;
                 }
             }
-            return new LineTokens(tokens, offsetDelta + line.Length, freshState);
+            return new LineTokens(tokens, offsetDelta + effectiveLine.Length, freshState);
         }
 
         private string DecodeTextMateToken(DecodeMap decodeMap, List<string> scopes)

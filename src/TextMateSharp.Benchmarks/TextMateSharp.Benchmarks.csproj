@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,13 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="testdata\**" />
-    <EmbeddedResource Remove="testdata\**" />
-    <None Remove="testdata\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-      <PackageReference Include="Spectre.Console" Version="0.46.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
   </ItemGroup>
 
   <ItemGroup>

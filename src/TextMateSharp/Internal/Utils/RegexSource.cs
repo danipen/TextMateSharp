@@ -62,13 +62,13 @@ namespace TextMateSharp.Internal.Utils
             return CAPTURING_REGEX_SOURCE.Match(regexSource).Success;
         }
 
-        public static string ReplaceCaptures(string regexSource, string captureSource, IOnigCaptureIndex[] captureIndices)
+        public static string ReplaceCaptures(string regexSource, ReadOnlyMemory<char> captureSource, IOnigCaptureIndex[] captureIndices)
         {
             return CAPTURING_REGEX_SOURCE.Replace(
                 regexSource, m => GetReplacement(m.Value, captureSource, captureIndices));
         }
 
-        private static string GetReplacement(string match, string captureSource, IOnigCaptureIndex[] captureIndices)
+        private static string GetReplacement(string match, ReadOnlyMemory<char> captureSource, IOnigCaptureIndex[] captureIndices)
         {
             int index = -1;
             string command = null;
@@ -82,7 +82,7 @@ namespace TextMateSharp.Internal.Utils
             {
                 index = int.Parse(match.SubstringAtIndexes(1, match.Length));
             }
-            IOnigCaptureIndex capture = captureIndices.Length > index ? captureIndices[index] : null;
+            IOnigCaptureIndex capture = captureIndices != null && captureIndices.Length > index ? captureIndices[index] : null;
             if (capture != null)
             {
                 string result = captureSource.SubstringAtIndexes(capture.Start, capture.End);

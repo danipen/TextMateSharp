@@ -119,7 +119,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public string ResolveBackReferences(string lineText, IOnigCaptureIndex[] captureIndices)
+        public string ResolveBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
         {
             List<string> capturedValues = new List<string>();
 
@@ -151,7 +151,7 @@ namespace TextMateSharp.Internal.Rules
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
 
-            return lineText;
+            return lineText.Span.ToString();
         }
 
         private string EscapeRegExpCharacters(string value)

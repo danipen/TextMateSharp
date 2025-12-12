@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using TextMateSharp.Grammars;
+
 namespace TextMateSharp.Model
 {
     public abstract class AbstractLineList : IModelLines
@@ -94,7 +96,7 @@ namespace TextMateSharp.Model
 
         public abstract int GetNumberOfLines();
 
-        public abstract string GetLineText(int lineIndex); 
+        public abstract LineText GetLineText(int lineIndex);
 
         public abstract int GetLineLength(int lineIndex); 
 

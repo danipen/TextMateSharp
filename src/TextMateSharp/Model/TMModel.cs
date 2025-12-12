@@ -112,6 +112,8 @@ namespace TextMateSharp.Model
                 } while (!IsStopped && model._thread != null);
             }
 
+            Stopwatch _stopwatch = new Stopwatch();
+
             private void RevalidateTokens(int startLine, int? toLineIndexOrNull)
             {
                 if (model._tokenizer == null)
@@ -130,8 +132,7 @@ namespace TextMateSharp.Model
                     long MAX_ALLOWED_TIME = 5;
                     long currentEstimatedTimeToTokenize = 0;
                     long elapsedTime;
-                    Stopwatch stopwatch = new Stopwatch();
-                    stopwatch.Start();
+                    _stopwatch.Restart();
                     // Tokenize at most 1000 lines. Estimate the tokenization speed per
                     // character and stop when:
                     // - MAX_ALLOWED_TIME is reached
@@ -140,7 +141,7 @@ namespace TextMateSharp.Model
                     int lineIndex = startLine;
                     while (lineIndex <= toLineIndex && lineIndex < model.GetLines().GetNumberOfLines())
                     {
-                        elapsedTime = stopwatch.ElapsedMilliseconds;
+                        elapsedTime = _stopwatch.ElapsedMilliseconds;
                         if (elapsedTime > MAX_ALLOWED_TIME)
                         {
                             // Stop if MAX_ALLOWED_TIME is reached
@@ -190,13 +191,11 @@ namespace TextMateSharp.Model
 
                     int endStateIndex = lineIndex + 1;
                     LineTokens r = null;
-                    string text = null;
+                    LineText text = default;
                     ModelLine modeLine = model._lines.Get(lineIndex);
                     try
                     {
                         text = model._lines.GetLineText(lineIndex);
-                        if (text == null)
-                            continue;
                         // Tokenize only the first X characters
                         r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);
                     }

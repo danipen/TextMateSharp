@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TextMateSharp.Grammars;
 using TextMateSharp.Themes;
@@ -6,7 +7,7 @@ namespace TextMateSharp.Internal.Grammars
 {
     internal class LineTokens
     {
-        private string _lineText;
+        private ReadOnlyMemory<char> _lineText;
 
         // used only if `_emitBinaryTokens` is false.
         private List<IToken> _tokens;
@@ -23,7 +24,7 @@ namespace TextMateSharp.Internal.Grammars
 
         internal LineTokens(
             bool emitBinaryTokens,
-            string lineText,
+            ReadOnlyMemory<char> lineText,
             List<TokenTypeMatcher> tokenTypeOverrides,
             BalancedBracketSelectors balancedBracketSelectors)
         {
