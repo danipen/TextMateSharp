@@ -22,6 +22,8 @@ namespace TextMateSharp.Internal.Grammars
         private bool _stop;
         private Stopwatch _stopwatch = new Stopwatch();
         private int _lineLength;
+        private readonly List<LocalStackElement> _localStackBuffer = new List<LocalStackElement>();
+        private readonly List<WhileStack> _whileRulesBuffer = new List<WhileStack>();
 
         public LineTokenizer(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos, StateStack stack,
                 LineTokens lineTokens)
@@ -392,7 +394,8 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             int len = Math.Min(captures.Count, captureIndices.Length);
-            List<LocalStackElement> localStack = new List<LocalStackElement>();
+            _localStackBuffer.Clear();
+            var localStack = _localStackBuffer;
             int maxEnd = captureIndices[0].End;
             IOnigCaptureIndex captureIndex;
 
@@ -492,7 +495,8 @@ namespace TextMateSharp.Internal.Grammars
                 int linePos, StateStack stack, LineTokens lineTokens)
         {
             int anchorPosition = stack.BeginRuleCapturedEOL ? 0 : -1;
-            List<WhileStack> whileRules = new List<WhileStack>();
+            _whileRulesBuffer.Clear();
+            var whileRules = _whileRulesBuffer;
             for (StateStack node = stack; node != null; node = node.Pop())
             {
                 Rule nodeRule = node.GetRule(grammar);
