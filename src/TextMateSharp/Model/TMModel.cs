@@ -195,7 +195,7 @@ namespace TextMateSharp.Model
                     ModelLine modeLine = model._lines.Get(lineIndex);
                     try
                     {
-                        text = model._lines.GetLineText(lineIndex);
+                        text = model._lines.GetLineTextIncludingTerminators(lineIndex);
                         // Tokenize only the first X characters
                         r = model._tokenizer.Tokenize(text, modeLine.State, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);
                     }

@@ -60,7 +60,7 @@ namespace TextMateSharp.Model
         /// the tokenization engine will allocate a new buffer to append a newline character,
         /// which impacts performance and memory usage.
         /// </remarks>
-        LineText GetLineText(int lineIndex);
+        LineText GetLineTextIncludingTerminators(int lineIndex);
 
         /// <summary>
         /// Gets the length of the line at the specified index.
