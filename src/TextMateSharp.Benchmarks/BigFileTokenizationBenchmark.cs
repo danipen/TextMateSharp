@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using BenchmarkDotNet.Attributes;
@@ -11,7 +12,7 @@ namespace TextMateSharp.Benchmarks
     public class BigFileTokenizationBenchmark
     {
         private IGrammar _grammar = null!;
-        private string[] _lines = null!;
+        private string _content = null!;
 
         [GlobalSetup]
         public void Setup()
@@ -40,8 +41,8 @@ namespace TextMateSharp.Benchmarks
 
 
             // Load the file into memory
-            _lines = File.ReadAllLines(bigFilePath);
-            Console.WriteLine($"Loaded {_lines.Length} lines from bigfile.cs");
+            _content = File.ReadAllText(bigFilePath);
+            Console.WriteLine($"Loaded bigfile.cs");
 
             // Load the C# grammar
             RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
@@ -60,14 +61,38 @@ namespace TextMateSharp.Benchmarks
             int totalTokens = 0;
             IStateStack? ruleStack = null;
 
-            for (int i = 0; i < _lines.Length; i++)
+            ReadOnlyMemory<char> contentMemory = _content.AsMemory();
+
+            foreach (var lineRange in GetLineRanges(_content))
             {
-                ITokenizeLineResult result = _grammar.TokenizeLine(_lines[i], ruleStack, TimeSpan.MaxValue);
+                ReadOnlyMemory<char> lineMemory = contentMemory.Slice(lineRange.Start, lineRange.Length);
+                ITokenizeLineResult result = _grammar.TokenizeLine(lineMemory, ruleStack, TimeSpan.MaxValue);
                 ruleStack = result.RuleStack;
                 totalTokens += result.Tokens.Length;
             }
 
             return totalTokens;
+        }
+
+        static IEnumerable<(int Start, int Length)> GetLineRanges(string content)
+        {
+            int lineStart = 0;
+
+            for (int i = 0; i < content.Length; i++)
+            {
+                if (content[i] == '\n')
+                {
+                    int lineLength = i - lineStart + 1; // Include the \n
+                    yield return (lineStart, lineLength);
+                    lineStart = i + 1;
+                }
+            }
+
+            // Handle last line without terminator
+            if (lineStart < content.Length)
+            {
+                yield return (lineStart, content.Length - lineStart);
+            }
         }
     }
 }
