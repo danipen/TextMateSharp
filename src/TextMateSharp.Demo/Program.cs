@@ -57,11 +57,9 @@ namespace TextMateSharp
                 string fileContent = File.ReadAllText(fileToParse);
                 ReadOnlyMemory<char> contentMemory = fileContent.AsMemory();
 
-                bool needsedLineBreak = true;
-
                 foreach (var lineRange in GetLineRanges(fileContent))
                 {
-                    needsedLineBreak = true;
+                    bool needsLineBreak = true;
 
                     ReadOnlyMemory<char> lineMemory = contentMemory.Slice(lineRange.Start, lineRange.Length);
                     ITokenizeLineResult result = grammar.TokenizeLine(lineMemory, ruleStack, TimeSpan.MaxValue);
@@ -93,10 +91,10 @@ namespace TextMateSharp
                         WriteToken(tokenSpan, foreground, background, fontStyle, theme);
 
                         if (tokenSpan.IndexOf('\n') != -1)
-                            needsedLineBreak = false;
+                            needsLineBreak = false;
                     }
 
-                    if (needsedLineBreak)
+                    if (needsLineBreak)
                         Console.WriteLine();
                 }
 
