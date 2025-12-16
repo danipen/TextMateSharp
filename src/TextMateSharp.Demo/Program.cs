@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
@@ -53,45 +54,48 @@ namespace TextMateSharp
 
                 IStateStack? ruleStack = null;
 
-                using (StreamReader sr = new StreamReader(fileToParse))
+                string fileContent = File.ReadAllText(fileToParse);
+                ReadOnlyMemory<char> contentMemory = fileContent.AsMemory();
+
+                foreach (var lineRange in GetLineRanges(fileContent))
                 {
-                    string? line = sr.ReadLine();
+                    bool needsLineBreak = true;
 
-                    while (line != null)
+                    ReadOnlyMemory<char> lineMemory = contentMemory.Slice(lineRange.Start, lineRange.Length);
+                    ITokenizeLineResult result = grammar.TokenizeLine(lineMemory, ruleStack, TimeSpan.MaxValue);
+
+                    ruleStack = result.RuleStack;
+
+                    foreach (IToken token in result.Tokens)
                     {
-                        ITokenizeLineResult result = grammar.TokenizeLine(line, ruleStack, TimeSpan.MaxValue);
+                        int startIndex = Math.Min(token.StartIndex, lineRange.Length);
+                        int endIndex = Math.Min(token.EndIndex, lineRange.Length);
 
-                        ruleStack = result.RuleStack;
+                        int foreground = -1;
+                        int background = -1;
+                        FontStyle fontStyle = FontStyle.NotSet;
 
-                        foreach (IToken token in result.Tokens)
+                        foreach (var themeRule in theme.Match(token.Scopes))
                         {
-                            int startIndex = (token.StartIndex > line.Length) ?
-                                line.Length : token.StartIndex;
-                            int endIndex = (token.EndIndex > line.Length) ?
-                                line.Length : token.EndIndex;
+                            if (foreground == -1 && themeRule.foreground > 0)
+                                foreground = themeRule.foreground;
 
-                            int foreground = -1;
-                            int background = -1;
-                            FontStyle fontStyle = FontStyle.NotSet;
+                            if (background == -1 && themeRule.background > 0)
+                                background = themeRule.background;
 
-                            foreach (var themeRule in theme.Match(token.Scopes))
-                            {
-                                if (foreground == -1 && themeRule.foreground > 0)
-                                    foreground = themeRule.foreground;
-
-                                if (background == -1 && themeRule.background > 0)
-                                    background = themeRule.background;
-
-                                if (fontStyle == FontStyle.NotSet && themeRule.fontStyle > 0)
-                                    fontStyle = themeRule.fontStyle;
-                            }
-
-                            WriteToken(line.SubstringAtIndexes(startIndex, endIndex), foreground, background, fontStyle, theme);
+                            if (fontStyle == FontStyle.NotSet && themeRule.fontStyle > 0)
+                                fontStyle = themeRule.fontStyle;
                         }
 
-                        Console.WriteLine();
-                        line = sr.ReadLine();
+                        ReadOnlySpan<char> tokenSpan = lineMemory.Span.Slice(startIndex, endIndex - startIndex);
+                        WriteToken(tokenSpan, foreground, background, fontStyle, theme);
+
+                        if (tokenSpan.IndexOf('\n') != -1)
+                            needsLineBreak = false;
                     }
+
+                    if (needsLineBreak)
+                        Console.WriteLine();
                 }
 
                 var colorDictionary = theme.GetGuiColorDictionary();
@@ -113,11 +117,12 @@ namespace TextMateSharp
                 Console.WriteLine("ERROR: " + ex.Message);
             }
         }
-        static void WriteToken(string text, int foreground, int background, FontStyle fontStyle, Theme theme)
+
+        static void WriteToken(ReadOnlySpan<char> text, int foreground, int background, FontStyle fontStyle, Theme theme)
         {
             if (foreground == -1)
             {
-                Console.Write(text);
+                Console.Out.Write(text);
                 return;
             }
 
@@ -127,7 +132,8 @@ namespace TextMateSharp
             Color foregroundColor = GetColor(foreground, theme);
 
             Style style = new Style(foregroundColor, backgroundColor, decoration);
-            Markup markup = new Markup(text.Replace("[", "[[").Replace("]", "]]"), style);
+            string textStr = text.ToString();
+            Markup markup = new Markup(textStr.Replace("[", "[[").Replace("]", "]]"), style);
 
             AnsiConsole.Write(markup);
         }
@@ -173,13 +179,26 @@ namespace TextMateSharp
 
             return new Color(r, g, b);
         }
-    }
 
-    internal static class StringExtensions
-    {
-        internal static string SubstringAtIndexes(this string str, int startIndex, int endIndex)
+        static IEnumerable<(int Start, int Length)> GetLineRanges(string content)
         {
-            return str.Substring(startIndex, endIndex - startIndex);
+            int lineStart = 0;
+
+            for (int i = 0; i < content.Length; i++)
+            {
+                if (content[i] == '\n')
+                {
+                    int lineLength = i - lineStart + 1; // Include the \n
+                    yield return (lineStart, lineLength);
+                    lineStart = i + 1;
+                }
+            }
+
+            // Handle last line without terminator
+            if (lineStart < content.Length)
+            {
+                yield return (lineStart, content.Length - lineStart);
+            }
         }
     }
 }

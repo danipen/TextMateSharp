@@ -96,7 +96,7 @@ namespace TextMateSharp.Model
 
         public abstract int GetNumberOfLines();
 
-        public abstract LineText GetLineText(int lineIndex);
+        public abstract LineText GetLineTextIncludingTerminators(int lineIndex);
 
         public abstract int GetLineLength(int lineIndex); 
 

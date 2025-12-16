@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 
 using NUnit.Framework;
 
@@ -125,9 +126,9 @@ namespace TextMateSharp.Tests.Model
             {
                 return _lines[lineIndex].Length;
             }
-            public override LineText GetLineText(int lineIndex)
+            public override LineText GetLineTextIncludingTerminators(int lineIndex)
             {
-                return _lines[lineIndex];
+                return _lines[lineIndex] + Environment.NewLine;
             }
             public override int GetNumberOfLines()
             {
