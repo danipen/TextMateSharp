@@ -2,23 +2,55 @@
 ![GitHub license](https://img.shields.io/github/license/danipen/TextMateSharp)
 [![Current stable version](https://img.shields.io/nuget/v/TextMateSharp.svg)](https://www.nuget.org/packages/TextMateSharp)
 [![Downloads](https://img.shields.io/nuget/dt/TextMateSharp)](https://www.nuget.org/packages/TextMateSharp)
-![Size](https://img.shields.io/github/repo-size/danipen/textmatesharp.svg) 
+![Size](https://img.shields.io/github/repo-size/danipen/textmatesharp.svg)
 ![GitHub language count](https://img.shields.io/github/languages/count/danipen/TextMateSharp)
 ![GitHub top language](https://img.shields.io/github/languages/top/danipen/TextMateSharp)
 
 # TextMateSharp
-An interpreter for grammar files as defined by TextMate. TextMate grammars use the oniguruma dialect (https://github.com/kkos/oniguruma). Supports loading grammar files only from JSON format. Cross - grammar injections are currently not supported.
 
-TextMateSharp is a port of [microsoft/vscode-textmate](https://github.com/microsoft/vscode-textmate) that brings TextMate grammars to dotnet ecosystem. The implementation is based the Java port [eclipse/tm4e](https://github.com/eclipse/tm4e).
+An interpreter for grammar files as defined by TextMate. TextMate grammars use the oniguruma dialect (https://github.com/kkos/oniguruma). Supports loading grammar files only from JSON format. Cross-grammar injections are currently not supported.
 
-TextMateSharp uses a [wrapper](https://github.com/aikawayataro/Onigwrap) via [nuget packges](https://www.nuget.org/packages/Onigwrap) around [Oniguruma](https://github.com/kkos/oniguruma) regex engine. Thanks [@aikawayataro](https://github.com/aikawayataro) for your contribution.
+TextMateSharp is a port of [microsoft/vscode-textmate](https://github.com/microsoft/vscode-textmate) that brings TextMate grammars to the .NET ecosystem. The implementation is based on the Java port [eclipse/tm4e](https://github.com/eclipse/tm4e).
+
+TextMateSharp uses a [wrapper](https://github.com/aikawayataro/Onigwrap) via [NuGet packages](https://www.nuget.org/packages/Onigwrap) around the [Oniguruma](https://github.com/kkos/oniguruma) regex engine. Thanks [@aikawayataro](https://github.com/aikawayataro) for your contribution.
 
 TextMateSharp is used by [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit).
 
-## Building
-Just execute `dotnet build` under the folder [TextMateSharp](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp)
+## Installation
 
-## Using
+TextMateSharp is available as NuGet packages:
+
+- [TextMateSharp](https://www.nuget.org/packages/TextMateSharp) - Core library
+- [TextMateSharp.Grammars](https://www.nuget.org/packages/TextMateSharp.Grammars) - Bundled grammars and themes
+
+```bash
+dotnet add package TextMateSharp
+dotnet add package TextMateSharp.Grammars
+```
+
+## Supported Languages
+
+TextMateSharp.Grammars includes syntax highlighting for 50+ languages including:
+
+C#, C/C++, Java, JavaScript, TypeScript, Python, Ruby, Rust, Go, Swift, Dart, PHP, SQL, HTML, CSS, SCSS, Less, JSON, XML, YAML, Markdown, LaTeX, Lua, PowerShell, Bash, F#, VB.NET, and many more.
+
+## Available Themes
+
+The following themes are included:
+
+Abyss, Dark, Dark+, Dimmed Monokai, Kimbie Dark, Light, Light+, One Dark, Monokai, Quiet Light, Red, Solarized Dark, Solarized Light, Tomorrow Night Blue, High Contrast Light, High Contrast Dark, Dracula, Atom One Light, Atom One Dark, Visual Studio Light, Visual Studio Dark.
+
+## Building
+
+Execute `dotnet build` under the [TextMateSharp](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp) folder:
+
+```bash
+cd src/TextMateSharp
+dotnet build
+```
+
+## Usage
+
 ```csharp
 using System;
 using System.Collections.Generic;
@@ -44,7 +76,7 @@ class Program
 
             IGrammar grammar = registry.LoadGrammar("source.cs");
 
-            IStateStack ruleStack = null;
+            IStateStack? ruleStack = null;
 
             foreach (var line in textLines)
             {
@@ -88,7 +120,8 @@ class Program
 }
 ```
 
-OUTPUT:
+**Output:**
+
 ```
 Tokenizing line: using static System; /* comment here */
   - token from 0 to 5 -->using<-- with scopes source.cs,keyword.other.directive.using.cs
@@ -121,14 +154,18 @@ Tokenizing line: }
 
 ## Demo
 
-There is a demo project in [TextMateSharp.Demo](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo) folder.
+There is a demo project in the [TextMateSharp.Demo](https://github.com/danipen/TextMateSharp/tree/master/src/TextMateSharp.Demo) folder.
 
 ![image](https://user-images.githubusercontent.com/501613/154065980-44b416ab-3b01-45f7-a8b3-7185413e769c.png)
 
 Build and run:
 
-```
-cd src/TestMateSharp.Demo
+```bash
+cd src/TextMateSharp.Demo
 dotnet build
 dotnet run -- ./testdata/samplefiles/sample.cs
 ```
+
+## License
+
+TextMateSharp is licensed under the [MIT License](LICENSE.md).
