@@ -149,5 +149,344 @@ namespace TextMateSharp.Tests.Grammar
             Assert.AreEqual(5, lineText.Length);
             Assert.AreEqual("abcde", lineText.ToString());
         }
+
+        #region Equals Tests
+
+        [Test]
+        public void Equals_SameContent_ShouldBeEqual()
+        {
+            LineText lineText1 = "hello world";
+            LineText lineText2 = "hello world";
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+            Assert.IsTrue(lineText2.Equals(lineText1));
+        }
+
+        [Test]
+        public void Equals_DifferentContent_ShouldNotBeEqual()
+        {
+            LineText lineText1 = "hello";
+            LineText lineText2 = "world";
+
+            Assert.IsFalse(lineText1.Equals(lineText2));
+            Assert.IsFalse(lineText2.Equals(lineText1));
+        }
+
+        [Test]
+        public void Equals_DifferentLengths_ShouldNotBeEqual()
+        {
+            LineText lineText1 = "hello";
+            LineText lineText2 = "hello world";
+
+            Assert.IsFalse(lineText1.Equals(lineText2));
+            Assert.IsFalse(lineText2.Equals(lineText1));
+        }
+
+        [Test]
+        public void Equals_BothEmpty_ShouldBeEqual()
+        {
+            LineText lineText1 = "";
+            LineText lineText2 = "";
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_BothDefault_ShouldBeEqual()
+        {
+            LineText lineText1 = default;
+            LineText lineText2 = default;
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_EmptyAndDefault_ShouldBeEqual()
+        {
+            LineText lineText1 = "";
+            LineText lineText2 = default;
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_SameMemoryReference_ShouldBeEqual()
+        {
+            char[] buffer = "hello world".ToCharArray();
+            ReadOnlyMemory<char> memory = buffer.AsMemory();
+
+            LineText lineText1 = memory;
+            LineText lineText2 = memory;
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_SameArraySameOffset_ShouldUseReferenceEquality()
+        {
+            char[] buffer = "hello world".ToCharArray();
+            ReadOnlyMemory<char> slice1 = buffer.AsMemory().Slice(0, 5);
+            ReadOnlyMemory<char> slice2 = buffer.AsMemory().Slice(0, 5);
+
+            LineText lineText1 = slice1;
+            LineText lineText2 = slice2;
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_SameArrayDifferentOffsetsSameContent_ShouldBeEqual()
+        {
+            // Create buffer with repeated content
+            char[] buffer = "hellohello".ToCharArray();
+            ReadOnlyMemory<char> slice1 = buffer.AsMemory().Slice(0, 5);  // "hello"
+            ReadOnlyMemory<char> slice2 = buffer.AsMemory().Slice(5, 5);  // "hello"
+
+            LineText lineText1 = slice1;
+            LineText lineText2 = slice2;
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_DifferentArraysSameContent_ShouldBeEqual()
+        {
+            string buffer1 = "hello";
+            string buffer2 = "hello";
+
+            LineText lineText1 = buffer1.AsMemory();
+            LineText lineText2 = buffer2.AsMemory();
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_ObjectOverload_WithLineText_ShouldWork()
+        {
+            LineText lineText1 = "hello";
+            object lineText2 = (LineText)"hello";
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_ObjectOverload_WithNull_ShouldReturnFalse()
+        {
+            LineText lineText = "hello";
+
+            Assert.IsFalse(lineText.Equals(null));
+        }
+
+        [Test]
+        public void Equals_ObjectOverload_WithDifferentType_ShouldReturnFalse()
+        {
+            LineText lineText = "hello";
+            Assert.IsFalse(lineText.Equals(42));
+        }
+
+        [Test]
+        public void OperatorEquals_SameContent_ShouldReturnTrue()
+        {
+            LineText lineText1 = "hello";
+            LineText lineText2 = "hello";
+
+            Assert.IsTrue(lineText1 == lineText2);
+        }
+
+        [Test]
+        public void OperatorEquals_DifferentContent_ShouldReturnFalse()
+        {
+            LineText lineText1 = "hello";
+            LineText lineText2 = "world";
+
+            Assert.IsFalse(lineText1 == lineText2);
+        }
+
+        [Test]
+        public void OperatorNotEquals_SameContent_ShouldReturnFalse()
+        {
+            LineText lineText1 = "hello";
+            LineText lineText2 = "hello";
+
+            Assert.IsFalse(lineText1 != lineText2);
+        }
+
+        [Test]
+        public void OperatorNotEquals_DifferentContent_ShouldReturnTrue()
+        {
+            LineText lineText1 = "hello";
+            LineText lineText2 = "world";
+
+            Assert.IsTrue(lineText1 != lineText2);
+        }
+
+        [Test]
+        public void Equals_UnicodeContent_ShouldWork()
+        {
+            LineText lineText1 = "안녕하세요";
+            LineText lineText2 = "안녕하세요";
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+        }
+
+        [Test]
+        public void Equals_CaseSensitive_ShouldNotBeEqual()
+        {
+            LineText lineText1 = "Hello";
+            LineText lineText2 = "hello";
+
+            Assert.IsFalse(lineText1.Equals(lineText2));
+        }
+
+        #endregion
+
+        #region GetHashCode Tests
+
+        [Test]
+        public void GetHashCode_SameContent_ShouldReturnSameHash()
+        {
+            LineText lineText1 = "hello world";
+            LineText lineText2 = "hello world";
+
+            Assert.AreEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_DifferentContent_ShouldReturnDifferentHash()
+        {
+            LineText lineText1 = "hello";
+            LineText lineText2 = "world";
+
+            Assert.AreNotEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_EmptyLineText_ShouldReturnZero()
+        {
+            LineText lineText = "";
+
+            Assert.AreEqual(0, lineText.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_DefaultLineText_ShouldReturnZero()
+        {
+            LineText lineText = default;
+
+            Assert.AreEqual(0, lineText.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_SameInstance_ShouldBeConsistent()
+        {
+            LineText lineText = "hello world";
+
+            int hash1 = lineText.GetHashCode();
+            int hash2 = lineText.GetHashCode();
+            int hash3 = lineText.GetHashCode();
+
+            Assert.AreEqual(hash1, hash2);
+            Assert.AreEqual(hash2, hash3);
+        }
+
+        [Test]
+        public void GetHashCode_DifferentArraysSameContent_ShouldReturnSameHash()
+        {
+            string buffer1 = "hello";
+            string buffer2 = "hello";
+
+            LineText lineText1 = buffer1.AsMemory();
+            LineText lineText2 = buffer2.AsMemory();
+
+            Assert.AreEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_SlicedMemorySameContent_ShouldReturnSameHash()
+        {
+            char[] buffer = "hello world".ToCharArray();
+            ReadOnlyMemory<char> slice = buffer.AsMemory().Slice(6, 5); // "world"
+
+            LineText lineText1 = slice;
+            LineText lineText2 = "world";
+
+            Assert.AreEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_UnicodeContent_ShouldWork()
+        {
+            LineText lineText1 = "안녕하세요";
+            LineText lineText2 = "안녕하세요";
+
+            Assert.AreEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_SimilarStrings_ShouldProduceDifferentHashes()
+        {
+            // These are similar but should have different hashes
+            LineText lineText1 = "abc";
+            LineText lineText2 = "abd";
+            LineText lineText3 = "bbc";
+
+            Assert.AreNotEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+            Assert.AreNotEqual(lineText1.GetHashCode(), lineText3.GetHashCode());
+            Assert.AreNotEqual(lineText2.GetHashCode(), lineText3.GetHashCode());
+        }
+
+        [Test]
+        public void GetHashCode_SingleCharacter_ShouldWork()
+        {
+            LineText lineText1 = "a";
+            LineText lineText2 = "a";
+            LineText lineText3 = "b";
+
+            Assert.AreEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+            Assert.AreNotEqual(lineText1.GetHashCode(), lineText3.GetHashCode());
+        }
+
+        #endregion
+
+        #region HashCode and Equals Contract Tests
+
+        [Test]
+        public void HashCodeEqualsContract_EqualObjects_ShouldHaveSameHashCode()
+        {
+            // If two objects are equal, they must have the same hash code
+            LineText lineText1 = "test string";
+            LineText lineText2 = "test string";
+
+            Assert.IsTrue(lineText1.Equals(lineText2));
+            Assert.AreEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
+        }
+
+        [Test]
+        public void HashCodeEqualsContract_WorksWithDictionary()
+        {
+            var dictionary = new System.Collections.Generic.Dictionary<LineText, int>();
+
+            LineText key1 = "hello";
+            dictionary[key1] = 42;
+
+            LineText key2 = "hello"; // Different instance, same content
+            Assert.IsTrue(dictionary.ContainsKey(key2));
+            Assert.AreEqual(42, dictionary[key2]);
+        }
+
+        [Test]
+        public void HashCodeEqualsContract_WorksWithHashSet()
+        {
+            var hashSet = new System.Collections.Generic.HashSet<LineText>();
+
+            LineText item1 = "hello";
+            hashSet.Add(item1);
+
+            LineText item2 = "hello"; // Different instance, same content
+            Assert.IsTrue(hashSet.Contains(item2));
+            Assert.IsFalse(hashSet.Add(item2)); // Should return false as it already exists
+        }
+
+        #endregion
     }
 }
