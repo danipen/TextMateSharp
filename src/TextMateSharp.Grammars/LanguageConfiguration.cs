@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading;
+
+using SimpleJSON;
+
 using TextMateSharp.Grammars.Resources;
-using TextMateSharp.Internal.Grammars;
 
 using CharacterPair = System.Collections.Generic.IList<char>;
 using StringPair = System.Collections.Generic.IList<string>;
@@ -15,35 +14,21 @@ namespace TextMateSharp.Grammars
 {
     public class LanguageConfiguration
     {
-        [JsonPropertyName("autoCloseBefore")]
         public string AutoCloseBefore { get; set; }
 
-        [JsonPropertyName("folding")]
         public Folding Folding { get; set; }
 
-        [JsonPropertyName("brackets")]
         public StringPair[] Brackets { get; set; }
 
-        [JsonPropertyName("comments")]
         public Comments Comments { get; set; }
 
-        [JsonPropertyName("autoClosingPairs")]
-        [JsonConverter(typeof(ClosingPairJsonConverter))]
         public AutoClosingPairs AutoClosingPairs { get; set; }
 
-        [JsonPropertyName("surroundingPairs")]
-        [JsonConverter(typeof(SurroundingPairJsonConverter))]
         public CharacterPair[] SurroundingPairs { get; set; }
 
-        [JsonPropertyName("indentationRules")]
-        [JsonConverter(typeof(IntentationRulesJsonConverter))]
         public Indentation IndentationRules { get; set; }
 
-        [JsonPropertyName("onEnterRules")]
-        [JsonConverter(typeof(EnterRulesJsonConverter))]
         public EnterRules EnterRules { get; set; }
-
-        private readonly static JsonSerializationContext jsonContext = new(new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
 
         public static LanguageConfiguration Load(string grammarName, string configurationFile)
         {
@@ -57,7 +42,7 @@ namespace TextMateSharp.Grammars
 
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    return JsonSerializer.Deserialize(stream, jsonContext.LanguageConfiguration);
+                    return Parse(reader.ReadToEnd());
                 }
             }
         }
@@ -70,41 +55,290 @@ namespace TextMateSharp.Grammars
                 return null;
             }
             using (var fileStream = fileInfo.OpenRead())
+            using (var reader = new StreamReader(fileStream))
             {
-                return JsonSerializer.Deserialize(fileStream, jsonContext.LanguageConfiguration);
+                return Parse(reader.ReadToEnd());
             }
         }
-        
+
+        public static LanguageConfiguration Parse(string jsonContent)
+        {
+            JSONNode json = JSON.Parse(jsonContent);
+            if (json == null)
+                return null;
+
+            var config = new LanguageConfiguration
+            {
+                AutoCloseBefore = json["autoCloseBefore"]
+            };
+
+            // Parse folding
+            if (json["folding"] != null && !json["folding"].IsNull)
+            {
+                config.Folding = ParseFolding(json["folding"]);
+            }
+
+            // Parse brackets
+            if (json["brackets"] != null && json["brackets"].IsArray)
+            {
+                config.Brackets = ParseBrackets(json["brackets"]);
+            }
+
+            // Parse comments
+            if (json["comments"] != null && !json["comments"].IsNull)
+            {
+                config.Comments = ParseComments(json["comments"]);
+            }
+
+            // Parse autoClosingPairs
+            if (json["autoClosingPairs"] != null && json["autoClosingPairs"].IsArray)
+            {
+                config.AutoClosingPairs = ParseAutoClosingPairs(json["autoClosingPairs"]);
+            }
+
+            // Parse surroundingPairs
+            if (json["surroundingPairs"] != null && json["surroundingPairs"].IsArray)
+            {
+                config.SurroundingPairs = ParseSurroundingPairs(json["surroundingPairs"]);
+            }
+
+            // Parse indentationRules
+            if (json["indentationRules"] != null && !json["indentationRules"].IsNull)
+            {
+                config.IndentationRules = ParseIndentation(json["indentationRules"]);
+            }
+
+            // Parse onEnterRules
+            if (json["onEnterRules"] != null && json["onEnterRules"].IsArray)
+            {
+                config.EnterRules = ParseEnterRules(json["onEnterRules"]);
+            }
+
+            return config;
+        }
+
+        private static Folding ParseFolding(JSONNode node)
+        {
+            var folding = new Folding
+            {
+                OffSide = node["offSide"].AsBool
+            };
+
+            if (node["markers"] != null && !node["markers"].IsNull)
+            {
+                folding.Markers = new Markers
+                {
+                    Start = node["markers"]["start"],
+                    End = node["markers"]["end"]
+                };
+            }
+
+            return folding;
+        }
+
+        private static StringPair[] ParseBrackets(JSONNode node)
+        {
+            var brackets = new List<StringPair>();
+            foreach (JSONNode bracketPair in node.Children)
+            {
+                if (bracketPair.IsArray && bracketPair.Count >= 2)
+                {
+                    brackets.Add(new List<string> { bracketPair[0].Value, bracketPair[1].Value });
+                }
+            }
+            return brackets.ToArray();
+        }
+
+        private static Comments ParseComments(JSONNode node)
+        {
+            var comments = new Comments
+            {
+                LineComment = node["lineComment"]
+            };
+
+            if (node["blockComment"] != null && node["blockComment"].IsArray && node["blockComment"].Count >= 2)
+            {
+                comments.BlockComment = new List<string>
+                {
+                    node["blockComment"][0].Value,
+                    node["blockComment"][1].Value
+                };
+            }
+
+            return comments;
+        }
+
+        private static AutoClosingPairs ParseAutoClosingPairs(JSONNode node)
+        {
+            var autoClosingPairs = new AutoClosingPairs();
+            var charPairs = new List<CharacterPair>();
+            var autoPairs = new List<AutoPair>();
+
+            foreach (JSONNode pairNode in node.Children)
+            {
+                if (pairNode.IsArray)
+                {
+                    // It's a simple character pair like ["(", ")"]
+                    var pair = new List<char>();
+                    foreach (JSONNode charNode in pairNode.Children)
+                    {
+                        string value = charNode.Value;
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            pair.Add(value[0]);
+                        }
+                    }
+                    if (pair.Count > 0)
+                    {
+                        charPairs.Add(pair);
+                    }
+                }
+                else if (pairNode.IsObject)
+                {
+                    // It's an object like {"open": "(", "close": ")", "notIn": ["string"]}
+                    var autoPair = new AutoPair
+                    {
+                        Open = pairNode["open"],
+                        Close = pairNode["close"]
+                    };
+
+                    if (pairNode["notIn"] != null && pairNode["notIn"].IsArray)
+                    {
+                        var notIn = new List<string>();
+                        foreach (JSONNode notInNode in pairNode["notIn"].Children)
+                        {
+                            notIn.Add(notInNode.Value);
+                        }
+                        autoPair.NotIn = notIn;
+                    }
+
+                    autoPairs.Add(autoPair);
+                }
+            }
+
+            autoClosingPairs.CharPairs = charPairs.ToArray();
+            autoClosingPairs.AutoPairs = autoPairs.ToArray();
+
+            return autoClosingPairs;
+        }
+
+        private static CharacterPair[] ParseSurroundingPairs(JSONNode node)
+        {
+            var surroundingPairs = new List<CharacterPair>();
+
+            foreach (JSONNode pairNode in node.Children)
+            {
+                if (pairNode.IsArray)
+                {
+                    var pair = new List<char>();
+                    foreach (JSONNode charNode in pairNode.Children)
+                    {
+                        string value = charNode.Value;
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            pair.Add(value[0]);
+                        }
+                    }
+                    if (pair.Count > 0)
+                    {
+                        surroundingPairs.Add(pair.ToArray());
+                    }
+                }
+                else if (pairNode.IsObject)
+                {
+                    string open = pairNode["open"];
+                    string close = pairNode["close"];
+                    if (!string.IsNullOrEmpty(open) && !string.IsNullOrEmpty(close))
+                    {
+                        surroundingPairs.Add(new char[] { open[0], close[0] });
+                    }
+                }
+            }
+
+            return surroundingPairs.ToArray();
+        }
+
+        private static Indentation ParseIndentation(JSONNode node)
+        {
+            var indentation = new Indentation();
+
+            // Handle both string format and object format with pattern property
+            indentation.Increase = GetPatternValue(node["increaseIndentPattern"]);
+            indentation.Decrease = GetPatternValue(node["decreaseIndentPattern"]);
+            indentation.Unindent = GetPatternValue(node["unIndentedLinePattern"]);
+
+            return indentation;
+        }
+
+        private static string GetPatternValue(JSONNode node)
+        {
+            if (node == null || node.IsNull)
+                return string.Empty;
+
+            if (node.IsString)
+                return node.Value;
+
+            if (node.IsObject && node["pattern"] != null)
+                return node["pattern"].Value;
+
+            return string.Empty;
+        }
+
+        private static EnterRules ParseEnterRules(JSONNode node)
+        {
+            var enterRules = new EnterRules();
+
+            foreach (JSONNode ruleNode in node.Children)
+            {
+                if (ruleNode.IsObject)
+                {
+                    enterRules.Rules.Add(ParseEnterRule(ruleNode));
+                }
+            }
+
+            return enterRules;
+        }
+
+        private static EnterRule ParseEnterRule(JSONNode node)
+        {
+            var rule = new EnterRule();
+
+            // beforeText can be a string or an object with pattern
+            rule.BeforeText = GetPatternValue(node["beforeText"]);
+            rule.AfterText = GetPatternValue(node["afterText"]);
+
+            // action is an object with indent/appendText
+            if (node["action"] != null && !node["action"].IsNull)
+            {
+                rule.ActionIndent = node["action"]["indent"];
+                rule.AppendText = node["action"]["appendText"];
+            }
+
+            return rule;
+        }
     }
-   
+
 
     public class Region
     {
-        [JsonPropertyName("prefix")]
         public string Prefix { get; set; }
 
-        [JsonPropertyName("body")]
         public string[] Body { get; set; }
 
-        [JsonPropertyName("description")]
         public string Description { get; set; }
     }
 
     public class Markers
     {
-        [JsonPropertyName("start")]
         public string Start { get; set; }
 
-        [JsonPropertyName("end")]
         public string End { get; set; }
     }
 
     public class Folding
     {
-        [JsonPropertyName("offSide")]
         public bool OffSide { get; set; }
 
-        [JsonPropertyName("markers")]
         public Markers Markers { get; set; }
 
         public bool IsEmpty
@@ -118,10 +352,8 @@ namespace TextMateSharp.Grammars
 
     public class Comments
     {
-        [JsonPropertyName("lineComment")]
         public string LineComment { get; set; }
 
-        [JsonPropertyName("blockComment")]
         public StringPair BlockComment { get; set; }
     }
 
@@ -142,7 +374,6 @@ namespace TextMateSharp.Grammars
         }
     }
 
-    [JsonConverter(typeof(EnterRuleJsonConverter))]
     public class EnterRule
     {
         public string BeforeText { get; set; }
@@ -175,7 +406,6 @@ namespace TextMateSharp.Grammars
         public AutoPair[] AutoPairs { get; set; } = new AutoPair[] { };
     }
 
-    [JsonConverter(typeof(LanguageSnippetJsonConverter))]
     public class LanguageSnippet
     {
         public string Prefix { get; set; }
@@ -185,18 +415,14 @@ namespace TextMateSharp.Grammars
         public string Description { get; set; }
     }
 
-    [JsonConverter(typeof(LanguageSnippetsJsonConverter))]
     public class LanguageSnippets
     {
         public IDictionary<string, LanguageSnippet> Snippets { get; set; } = new Dictionary<string, LanguageSnippet>();
-        private readonly static JsonSerializationContext jsonContext = new(new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip });
 
         public static LanguageSnippets Load(string grammarName, Contributes contributes)
         {
             if (contributes == null || contributes.Snippets == null)
                 return null;
-
-            var result = new LanguageSnippets();
 
             foreach (var snippet in contributes.Snippets)
             {
@@ -207,442 +433,65 @@ namespace TextMateSharp.Grammars
 
                     using (StreamReader reader = new StreamReader(stream))
                     {
-                        return JsonSerializer.Deserialize(stream, jsonContext.LanguageSnippets);
+                        return Parse(reader.ReadToEnd());
                     }
                 }
             }
 
-            return result;
+            return new LanguageSnippets();
         }
 
         public static LanguageSnippets LoadFromLocal(string filePath)
         {
-            var fileInfo = new FileInfo(filePath);  
+            var fileInfo = new FileInfo(filePath);
             if (!fileInfo.Exists)
             {
                 return null;
             }
             using (var fileStream = fileInfo.OpenRead())
+            using (var reader = new StreamReader(fileStream))
             {
-                return JsonSerializer.Deserialize(fileStream, jsonContext.LanguageSnippets);
+                return Parse(reader.ReadToEnd());
             }
         }
-    }
 
-    public class ClosingPairJsonConverter : JsonConverter<AutoClosingPairs>
-    {
-        public override AutoClosingPairs Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public static LanguageSnippets Parse(string jsonContent)
         {
-            var autoClosingPairs = new AutoClosingPairs();
+            JSONNode json = JSON.Parse(jsonContent);
+            if (json == null)
+                return null;
 
-            if (reader.TokenType == JsonTokenType.StartArray)
-            {
-                var charPairs = new List<CharacterPair>();
-                var autoPairs = new List<AutoPair>();
-
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                {
-                    switch (reader.TokenType)
-                    {
-                        case JsonTokenType.StartArray:
-                            var charPair = new List<char>();
-                            while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                            {
-                                switch (reader.TokenType)
-                                {
-                                    case JsonTokenType.String:
-                                        charPair.Add(reader.GetString().ToCharArray().First());
-                                        break;
-                                }
-                            }
-                            //var charPair = JsonSerializer.Deserialize<CharPair>(ref reader, CharacterPairSerializationContext.Default.CharPair);
-                            charPairs.Add(charPair);
-                            break;
-
-                        case JsonTokenType.StartObject:
-                            var autoPair = new AutoPair();
-                            string propName = string.Empty;
-                            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                            {
-                                switch (reader.TokenType)
-                                {
-                                    case JsonTokenType.StartArray:
-                                        if (string.Compare(propName, "notIn") == 0)
-                                        {
-                                            autoPair.NotIn = JsonSerializer.Deserialize(ref reader, JsonSerializationContext.Default.IListString);
-                                        }
-                                        break;
-                                    case JsonTokenType.PropertyName:
-                                        propName = reader.GetString();
-                                        break;
-                                    case JsonTokenType.String:
-                                        switch (propName)
-                                        {
-                                            case "open":
-                                                autoPair.Open = reader.GetString();
-                                                break;
-                                            case "close":
-                                                autoPair.Close = reader.GetString();
-                                                break;
-                                        }
-                                        break;
-                                }
-                            }
-                            autoPairs.Add(autoPair);
-                            break;
-                    }
-                }
-
-                autoClosingPairs.CharPairs = charPairs.ToArray();
-                autoClosingPairs.AutoPairs = autoPairs.ToArray();
-            }
-
-            return autoClosingPairs;
-        }
-
-        public override void Write(Utf8JsonWriter writer, AutoClosingPairs value, JsonSerializerOptions options)
-        {
-        }
-    }
-
-    public class SurroundingPairJsonConverter : JsonConverter<CharacterPair[]>
-    {
-        public override CharacterPair[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var surroundingPairs = new List<CharacterPair>();
-            if (reader.TokenType == JsonTokenType.StartArray)
-            {
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                {
-                    switch (reader.TokenType)
-                    {
-                        case JsonTokenType.StartArray:
-                            var pair = new List<char>();
-                            while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                            {
-                                switch (reader.TokenType)
-                                {
-                                    case JsonTokenType.String:
-                                        pair.Add(reader.GetString().First());
-                                        break;
-                                }
-                            }
-                            surroundingPairs.Add(pair.ToArray());
-                            break;
-
-                        case JsonTokenType.StartObject:
-                            string propName = string.Empty;
-                            string open = null;
-                            string close = null;
-                            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                            {
-                                switch (reader.TokenType)
-                                {
-                                    case JsonTokenType.PropertyName:
-                                        propName = reader.GetString();
-                                        break;
-                                    case JsonTokenType.String:
-                                        switch (propName)
-                                        {
-                                            case "open":
-                                                open = reader.GetString();
-                                                break;
-                                            case "close":
-                                                close = reader.GetString();
-                                                break;
-                                        }
-                                        break;
-                                }
-                            }
-
-                            if (open != null && close != null) 
-                                surroundingPairs.Add(new char[] { open.First(), close.First() });
-
-                            break;
-                    }
-                }
-            }
-
-            return surroundingPairs.ToArray();
-        }
-
-        public override void Write(Utf8JsonWriter writer, CharacterPair[] value, JsonSerializerOptions options)
-        {
-        }
-    }
-
-    public class IntentationRulesJsonConverter : JsonConverter<Indentation>
-    {
-        public override Indentation Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var rules = new Indentation();
-
-            if (reader.TokenType == JsonTokenType.StartObject)
-            {
-                string propName = string.Empty;
-                string internalName = string.Empty;
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                {
-                    switch (reader.TokenType)
-                    {
-                        case JsonTokenType.PropertyName:
-                            propName = reader.GetString();
-                            break;
-                        case JsonTokenType.String:
-                            switch (propName)
-                            {
-                                case "increaseIndentPattern":
-                                    rules.Increase = reader.GetString();
-                                    break;
-                                case "decreaseIndentPattern":
-                                    rules.Decrease = reader.GetString();
-                                    break;
-                                case "unIndentedLinePattern":
-                                    rules.Unindent = reader.GetString();
-                                    break;
-                            }
-
-                            break;
-
-                        case JsonTokenType.StartObject:
-                            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                            {
-                                switch (reader.TokenType)
-                                {
-                                    case JsonTokenType.PropertyName:
-                                        internalName = reader.GetString();
-                                        break;
-                                    case JsonTokenType.String:
-                                        switch (internalName)
-                                        {
-                                            case "pattern":
-                                                switch (propName)
-                                                {
-                                                    case "increaseIndentPattern":
-                                                        rules.Increase = reader.GetString();
-                                                        break;
-                                                    case "decreaseIndentPattern":
-                                                        rules.Decrease = reader.GetString();
-                                                        break;
-                                                    case "unIndentedLinePattern":
-                                                        rules.Unindent = reader.GetString();
-                                                        break;
-                                                }
-
-                                                break;
-                                        }
-
-                                        break;
-                                }
-                            }
-
-                            break;
-                    }
-                }
-            }
-
-            return rules;
-        }
-
-        public override void Write(Utf8JsonWriter writer, Indentation value, JsonSerializerOptions options)
-        {
-        }
-    }
-
-    public class EnterRulesJsonConverter : JsonConverter<EnterRules>
-    {
-        public override EnterRules Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var enterRules = new EnterRules();
-
-            if (reader.TokenType == JsonTokenType.StartArray)
-            {
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                {
-                    switch (reader.TokenType)
-                    {
-                        case JsonTokenType.StartArray:
-                            break;
-
-                        case JsonTokenType.StartObject:
-                            EnterRule rule = JsonSerializer.Deserialize(ref reader, JsonSerializationContext.Default.EnterRule);
-                            enterRules.Rules.Add(rule);
-                            break;
-                    }
-                }
-            }
-
-            return enterRules;
-        }
-
-        public override void Write(Utf8JsonWriter writer, EnterRules value, JsonSerializerOptions options)
-        {
-        }
-    }
-
-    public class EnterRuleJsonConverter : JsonConverter<EnterRule>
-    {
-        public override EnterRule Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var enterRule = new EnterRule();
-            string propName = string.Empty;
-            string internalName = string.Empty;
-            if (reader.TokenType == JsonTokenType.StartObject)
-            {
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                {
-                    switch (reader.TokenType)
-                    {
-                        case JsonTokenType.PropertyName:
-                            propName = reader.GetString();
-                            break;
-                        case JsonTokenType.StartObject:
-                            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                            {
-                                switch (reader.TokenType)
-                                {
-                                    case JsonTokenType.PropertyName:
-                                        internalName = reader.GetString();
-                                        break;
-                                    case JsonTokenType.String:
-                                        switch (internalName)
-                                        {
-                                            case "pattern":
-                                                switch (propName)
-                                                {
-                                                    case "beforeText":
-                                                        enterRule.BeforeText = reader.GetString();
-                                                        break;
-                                                    case "afterText":
-                                                        enterRule.AfterText = reader.GetString();
-                                                        break;
-                                                }
-
-                                                break;
-                                            case "indent":
-                                                enterRule.ActionIndent = reader.GetString();
-                                                break;
-                                            case "appendText":
-                                                enterRule.AppendText = reader.GetString();
-                                                break;
-                                        }
-
-                                        break;
-                                }
-                            }
-
-                            break;
-                        case JsonTokenType.String:
-                            switch (propName)
-                            {
-                                case "beforeText":
-                                    enterRule.BeforeText = reader.GetString();
-                                    break;
-                                case "afterText":
-                                    enterRule.AfterText = reader.GetString();
-                                    break;
-                            }
-
-                            break;
-                    }
-                }
-            }
-
-            return enterRule;
-        }
-
-        public override void Write(Utf8JsonWriter writer, EnterRule value, JsonSerializerOptions options)
-        {
-        }
-    }
-
-    public class LanguageSnippetsJsonConverter : JsonConverter<LanguageSnippets>
-    {
-        public override LanguageSnippets Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
             var snippets = new LanguageSnippets();
 
-            if (reader.TokenType == JsonTokenType.StartObject)
+            foreach (var kvp in json.Linq)
             {
-                string propName = string.Empty;
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+                var snippet = new LanguageSnippet
                 {
-                    switch (reader.TokenType)
+                    Prefix = kvp.Value["prefix"],
+                    Description = kvp.Value["description"]
+                };
+
+                if (kvp.Value["body"] != null)
+                {
+                    if (kvp.Value["body"].IsArray)
                     {
-                        case JsonTokenType.PropertyName:
-                            propName = reader.GetString();
-                            break;
-                        case JsonTokenType.StartObject:
-                            LanguageSnippet snippet = JsonSerializer.Deserialize(ref reader, JsonSerializationContext.Default.LanguageSnippet);
-                            snippets.Snippets.Add(propName, snippet);
-                            break;
+                        var bodyList = new List<string>();
+                        foreach (JSONNode bodyNode in kvp.Value["body"].Children)
+                        {
+                            bodyList.Add(bodyNode.Value);
+                        }
+                        snippet.Body = bodyList.ToArray();
+                    }
+                    else if (kvp.Value["body"].IsString)
+                    {
+                        snippet.Body = new string[] { kvp.Value["body"].Value };
                     }
                 }
+
+                snippets.Snippets.Add(kvp.Key, snippet);
             }
 
             return snippets;
-        }
-
-        public override void Write(Utf8JsonWriter writer, LanguageSnippets value, JsonSerializerOptions options)
-        {
-        }
-    }
-
-    public class LanguageSnippetJsonConverter : JsonConverter<LanguageSnippet>
-    {
-        public override LanguageSnippet Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var snippet = new LanguageSnippet();
-
-            if (reader.TokenType == JsonTokenType.StartObject)
-            {
-                string propName = string.Empty;
-                while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                {
-                    switch (reader.TokenType)
-                    {
-                        case JsonTokenType.PropertyName:
-                            propName = reader.GetString();
-                            break;
-                        case JsonTokenType.StartArray:
-                            IList<string> body = new List<string>();
-                            while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                            {
-                                if (string.Compare(propName, "body") == 0)
-                                {
-                                    switch (reader.TokenType)
-                                    {
-                                        case JsonTokenType.String:
-                                            body.Add(reader.GetString());
-                                            break;
-                                    }
-                                }
-                            }
-
-                            snippet.Body = body.ToArray();
-
-                            break;
-                        case JsonTokenType.String:
-                            switch (propName)
-                            {
-                                case "prefix":
-                                    snippet.Prefix = reader.GetString();
-                                    break;
-                                case "description":
-                                    snippet.Description = reader.GetString();
-                                    break;
-                            }
-
-                            break;
-                    }
-                }
-            }
-
-            return snippet;
-        }
-
-        public override void Write(Utf8JsonWriter writer, LanguageSnippet value, JsonSerializerOptions options)
-        {
         }
     }
 }

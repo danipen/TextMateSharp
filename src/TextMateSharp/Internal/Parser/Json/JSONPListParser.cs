@@ -1,6 +1,6 @@
-using System;
 using System.IO;
-using System.Text.Json;
+
+using SimpleJSON;
 
 namespace TextMateSharp.Internal.Parser.Json
 {
@@ -17,85 +17,59 @@ namespace TextMateSharp.Internal.Parser.Json
         {
             PList<T> pList = new PList<T>(theme);
 
-            var buffer = new byte[2048];
+            string jsonContent = contents.ReadToEnd();
+            JSONNode root = JSON.Parse(jsonContent);
 
-            JsonReaderOptions options = new JsonReaderOptions()
-            {
-                AllowTrailingCommas = true,
-                CommentHandling = JsonCommentHandling.Skip
-            };
+            ProcessNode(root, pList);
 
-            int size = contents.BaseStream.Read(buffer, 0, buffer.Length);
-            var reader = new Utf8JsonReader(buffer.AsSpan(0, size), isFinalBlock: false, state: new JsonReaderState(options));
-
-            while (true)
-            {
-                int bytesRead = -1;
-
-                while (!reader.Read())
-                {
-                    bytesRead = GetMoreBytesFromStream(contents.BaseStream, ref buffer, ref reader);
-
-                    if (bytesRead == 0)
-                        break;
-                }
-
-                if (bytesRead == 0)
-                    break;
-
-                var nextToken = reader.TokenType;
-                switch (nextToken)
-                {
-                    case JsonTokenType.StartArray:
-                        pList.StartElement("array");
-                        break;
-                    case JsonTokenType.EndArray:
-                        pList.EndElement("array");
-                        break;
-                    case JsonTokenType.StartObject:
-                        pList.StartElement("dict");
-                        break;
-                    case JsonTokenType.EndObject:
-                        pList.EndElement("dict");
-                        break;
-                    case JsonTokenType.PropertyName:
-                        pList.StartElement("key");
-                        pList.AddString(reader.GetString());
-                        pList.EndElement("key");
-                        break;
-                    case JsonTokenType.String:
-                        pList.StartElement("string");
-                        pList.AddString(reader.GetString());
-                        pList.EndElement("string");
-                        break;
-                }
-            }
             return pList.GetResult();
         }
 
-        private static int GetMoreBytesFromStream(Stream stream, ref byte[] buffer, ref Utf8JsonReader reader)
+        private void ProcessNode(JSONNode node, PList<T> pList)
         {
-            int bytesRead;
-            if (reader.BytesConsumed < buffer.Length)
-            {
-                ReadOnlySpan<byte> leftover = buffer.AsSpan((int)reader.BytesConsumed);
+            if (node == null)
+                return;
 
-                if (leftover.Length == buffer.Length)
+            if (node.IsArray)
+            {
+                pList.StartElement("array");
+                foreach (JSONNode child in node.Children)
                 {
-                    Array.Resize(ref buffer, buffer.Length * 2);
+                    ProcessNode(child, pList);
                 }
-
-                leftover.CopyTo(buffer);
-                bytesRead = stream.Read(buffer, leftover.Length, buffer.Length - leftover.Length);
-                reader = new Utf8JsonReader(buffer.AsSpan(0, bytesRead + leftover.Length), isFinalBlock: bytesRead == 0, reader.CurrentState);
+                pList.EndElement("array");
             }
-            else
+            else if (node.IsObject)
             {
-                bytesRead = stream.Read(buffer, 0, buffer.Length);
-                reader = new Utf8JsonReader(buffer.AsSpan(0, bytesRead), isFinalBlock: bytesRead == 0, reader.CurrentState);
-            }
+                pList.StartElement("dict");
+                foreach (var kvp in node.Linq)
+                {
+                    pList.StartElement("key");
+                    pList.AddString(kvp.Key);
+                    pList.EndElement("key");
 
-            return bytesRead;
+                    ProcessNode(kvp.Value, pList);
+                }
+                pList.EndElement("dict");
+            }
+            else if (node.IsString)
+            {
+                pList.StartElement("string");
+                pList.AddString(node.Value);
+                pList.EndElement("string");
+            }
+            else if (node.IsNumber)
+            {
+                pList.StartElement("string");
+                pList.AddString(node.Value);
+                pList.EndElement("string");
+            }
+            else if (node.IsBoolean)
+            {
+                pList.StartElement("string");
+                pList.AddString(node.Value);
+                pList.EndElement("string");
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+
+using SimpleJSON;
 
 using TextMateSharp.Grammars.Resources;
 
@@ -9,30 +9,21 @@ namespace TextMateSharp.Grammars
 {
     public class Engines
     {
-        [JsonPropertyName("engines")]
         public string VsCode { get; set; }
     }
 
     public class Scripts
     {
-        [JsonPropertyName("update-grammar")]
         public string UpdateGrammar { get; set; }
     }
 
     public class Language
     {
-        [JsonPropertyName("id")]
         public string Id { get; set; }
-        [JsonPropertyName("extensions")]
         public List<string> Extensions { get; set; }
-        [JsonPropertyName("aliases")]
         public List<string> Aliases { get; set; }
-        [JsonPropertyName("configuration")]
         public string ConfigurationFile { get; set; }
         public LanguageConfiguration Configuration {get; set;}
-
-        // May be null
-        [JsonPropertyName("mimetypes")]
         public List<string> MimeTypes { get; set; }
 
         public override string ToString()
@@ -46,62 +37,175 @@ namespace TextMateSharp.Grammars
 
     public class Grammar
     {
-        [JsonPropertyName("language")]
         public string Language { get; set; }
-        [JsonPropertyName("scopeName")]
         public string ScopeName { get; set; }
-        [JsonPropertyName("path")]
         public string Path { get; set; }
     }
 
     public class Snippet
     {
-        [JsonPropertyName("language")]
         public string Language { get; set; }
-        [JsonPropertyName("path")]
         public string Path { get; set; }
     }
 
     public class Contributes
     {
-        [JsonPropertyName("languages")]
         public List<Language> Languages { get; set; }
-        [JsonPropertyName("grammars")]
         public List<Grammar> Grammars { get; set; }
-        [JsonPropertyName("snippets")]
         public List<Snippet> Snippets { get; set; }
     }
 
     public class Repository
     {
-        [JsonPropertyName("type")]
         public string Type { get; set; }
-        [JsonPropertyName("url")]
         public string Url { get; set; }
     }
 
     public class GrammarDefinition
     {
-        [JsonPropertyName("name")]
         public string Name { get; set; }
-        [JsonPropertyName("displayName")]
         public string DisplayName { get; set; }
-        [JsonPropertyName("description")]
         public string Description { get; set; }
-        [JsonPropertyName("version")]
         public string Version { get; set; }
-        [JsonPropertyName("publisher")]
         public string Publisher { get; set; }
-        [JsonPropertyName("license")]
         public string License { get; set; }
-        [JsonPropertyName("engines")]
         public Engines Engines { get; set; }
-        [JsonPropertyName("scripts")]
         public Scripts Scripts { get; set; }
-        [JsonPropertyName("contributes")]
         public Contributes Contributes { get; set; }
-        [JsonPropertyName("repository")]
         public Repository Repository { get; set; }
         public LanguageSnippets LanguageSnippets { get; set; }
+
+        public static GrammarDefinition Parse(Stream stream)
+        {
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return Parse(reader.ReadToEnd());
+            }
+        }
+
+        public static GrammarDefinition Parse(string jsonContent)
+        {
+            JSONNode json = JSON.Parse(jsonContent);
+            if (json == null)
+                return null;
+
+            var definition = new GrammarDefinition
+            {
+                Name = json["name"],
+                DisplayName = json["displayName"],
+                Description = json["description"],
+                Version = json["version"],
+                Publisher = json["publisher"],
+                License = json["license"]
+            };
+
+            if (json["engines"] != null && !json["engines"].IsNull)
+            {
+                definition.Engines = new Engines
+                {
+                    VsCode = json["engines"]["vscode"]
+                };
+            }
+
+            if (json["scripts"] != null && !json["scripts"].IsNull)
+            {
+                definition.Scripts = new Scripts
+                {
+                    UpdateGrammar = json["scripts"]["update-grammar"]
+                };
+            }
+
+            if (json["repository"] != null && !json["repository"].IsNull)
+            {
+                definition.Repository = new Repository
+                {
+                    Type = json["repository"]["type"],
+                    Url = json["repository"]["url"]
+                };
+            }
+
+            if (json["contributes"] != null && !json["contributes"].IsNull)
+            {
+                definition.Contributes = ParseContributes(json["contributes"]);
+            }
+
+            return definition;
+        }
+
+        private static Contributes ParseContributes(JSONNode node)
+        {
+            var contributes = new Contributes();
+
+            if (node["languages"] != null && node["languages"].IsArray)
+            {
+                contributes.Languages = new List<Language>();
+                foreach (JSONNode langNode in node["languages"].Children)
+                {
+                    var language = new Language
+                    {
+                        Id = langNode["id"],
+                        ConfigurationFile = langNode["configuration"]
+                    };
+
+                    if (langNode["extensions"] != null && langNode["extensions"].IsArray)
+                    {
+                        language.Extensions = new List<string>();
+                        foreach (JSONNode ext in langNode["extensions"].Children)
+                        {
+                            language.Extensions.Add(ext.Value);
+                        }
+                    }
+
+                    if (langNode["aliases"] != null && langNode["aliases"].IsArray)
+                    {
+                        language.Aliases = new List<string>();
+                        foreach (JSONNode alias in langNode["aliases"].Children)
+                        {
+                            language.Aliases.Add(alias.Value);
+                        }
+                    }
+
+                    if (langNode["mimetypes"] != null && langNode["mimetypes"].IsArray)
+                    {
+                        language.MimeTypes = new List<string>();
+                        foreach (JSONNode mime in langNode["mimetypes"].Children)
+                        {
+                            language.MimeTypes.Add(mime.Value);
+                        }
+                    }
+
+                    contributes.Languages.Add(language);
+                }
+            }
+
+            if (node["grammars"] != null && node["grammars"].IsArray)
+            {
+                contributes.Grammars = new List<Grammar>();
+                foreach (JSONNode grammarNode in node["grammars"].Children)
+                {
+                    contributes.Grammars.Add(new Grammar
+                    {
+                        Language = grammarNode["language"],
+                        ScopeName = grammarNode["scopeName"],
+                        Path = grammarNode["path"]
+                    });
+                }
+            }
+
+            if (node["snippets"] != null && node["snippets"].IsArray)
+            {
+                contributes.Snippets = new List<Snippet>();
+                foreach (JSONNode snippetNode in node["snippets"].Children)
+                {
+                    contributes.Snippets.Add(new Snippet
+                    {
+                        Language = snippetNode["language"],
+                        Path = snippetNode["path"]
+                    });
+                }
+            }
+
+            return contributes;
+        }
     }
 }

@@ -20,9 +20,6 @@
     <EmbeddedResource Include="Resources\Grammars\**\snippets\*.code-snippets" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\TextMateSharp\TextMateSharp.csproj" />
   </ItemGroup>
   <Import Project="..\..\build\Directory.Build.props" />

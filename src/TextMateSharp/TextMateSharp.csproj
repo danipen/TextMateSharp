@@ -20,7 +20,6 @@ TextMateSharp uses a wrapper around Oniguruma regex engine.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
     <PackageReference Include="Onigwrap" Version="$(OnigwrapVersion)" />
   </ItemGroup>
   <Import Project="..\..\build\SourceLink.props" />
