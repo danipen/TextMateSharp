@@ -144,7 +144,7 @@ namespace TextMateSharp.Grammars
                     var language = new Language
                     {
                         Id = langNode["id"],
-                        ConfigurationFile = langNode["configuration"]
+                        ConfigurationFile = GetNullableString(langNode["configuration"])
                     };
 
                     if (langNode["extensions"] != null && langNode["extensions"].IsArray)
@@ -206,6 +206,19 @@ namespace TextMateSharp.Grammars
             }
 
             return contributes;
+        }
+
+        /// <summary>
+        /// Helper to convert SimpleJSON string values to null when empty.
+        /// SimpleJSON returns "" for missing keys, but we need null for proper semantics.
+        /// </summary>
+        private static string GetNullableString(JSONNode node)
+        {
+            if (node == null || node.IsNull)
+                return null;
+            
+            string value = node.Value;
+            return string.IsNullOrEmpty(value) ? null : value;
         }
     }
 }

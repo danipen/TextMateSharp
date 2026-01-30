@@ -84,7 +84,7 @@ namespace TextMateSharp.Grammars
                 {
                     foreach (var language in contributes.Languages)
                     {
-                        if (language.ConfigurationFile == null)
+                        if (string.IsNullOrEmpty(language.ConfigurationFile))
                         {
                             language.Configuration = null;
                             continue;
