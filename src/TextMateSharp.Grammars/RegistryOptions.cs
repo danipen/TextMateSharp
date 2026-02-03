@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
+
 using TextMateSharp.Grammars.Resources;
 using TextMateSharp.Internal.Grammars.Reader;
 using TextMateSharp.Internal.Themes.Reader;
@@ -73,8 +73,7 @@ namespace TextMateSharp.Grammars
             var baseDir = packageJsonFileInfo.Directory?.FullName ?? string.Empty;
             using (Stream stream = packageJsonFileInfo.OpenRead())
             {
-                var definition = JsonSerializer.Deserialize(
-                    stream, JsonSerializationContext.Default.GrammarDefinition);
+                var definition = GrammarDefinition.Parse(stream);
                 if (definition == null)
                 {
                     return;
@@ -85,7 +84,7 @@ namespace TextMateSharp.Grammars
                 {
                     foreach (var language in contributes.Languages)
                     {
-                        if (language.ConfigurationFile == null)
+                        if (string.IsNullOrEmpty(language.ConfigurationFile))
                         {
                             language.Configuration = null;
                             continue;
@@ -283,9 +282,7 @@ namespace TextMateSharp.Grammars
             {
                 using (Stream stream = ResourceLoader.OpenGrammarPackage(grammar))
                 {
-                    GrammarDefinition definition = JsonSerializer.Deserialize(
-                        stream,
-                        JsonSerializationContext.Default.GrammarDefinition);
+                    GrammarDefinition definition = GrammarDefinition.Parse(stream);
 
                     foreach (var language in definition.Contributes.Languages)
                     {
