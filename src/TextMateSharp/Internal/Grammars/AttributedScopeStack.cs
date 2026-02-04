@@ -66,7 +66,7 @@ namespace TextMateSharp.Internal.Grammars
 
         public override bool Equals(object other)
         {
-            if (other == null || (other is AttributedScopeStack))
+            if (other == null || !(other is AttributedScopeStack))
                 return false;
 
             return Equals(this, (AttributedScopeStack)other);
