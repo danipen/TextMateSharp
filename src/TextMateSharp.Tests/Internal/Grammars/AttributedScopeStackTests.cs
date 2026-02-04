@@ -17,6 +17,16 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
+        public void Equals_ShouldReturnFalseForDifferentStacks()
+        {
+            AttributedScopeStack stack1 = new AttributedScopeStack(new AttributedScopeStack(null, "source.cs", 1), "meta.test", 2);
+            AttributedScopeStack stack2 = new AttributedScopeStack(new AttributedScopeStack(null, "source.cs", 1), "meta.other", 2);
+
+            Assert.IsFalse(stack1.Equals(stack2));
+            Assert.IsFalse(stack2.Equals(stack1));
+        }
+
+        [Test]
         public void Equals_ShouldReturnFalseForDifferentType()
         {
             AttributedScopeStack stack = new AttributedScopeStack(null, "source.cs", 1);
