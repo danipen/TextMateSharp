@@ -99,8 +99,6 @@ namespace TextMateSharp.Model
                 this._cts = new CancellationTokenSource();
             }
 
-            // FIX #6 (updated): Guard Run() state transitions under a dedicated lifecycle lock
-            // to prevent check-then-act races between Run/Dispose/DisposeAfterCompletion.
             public void Run()
             {
                 CancellationToken token;
@@ -222,11 +220,9 @@ namespace TextMateSharp.Model
                 }
             }
 
-            // FIX #3: Use Interlocked.CompareExchange for atomic dispose guard.
-            // volatile bool check-then-set is not atomic - two threads can both
-            // read false and proceed, causing double-dispose of CTS and AutoResetEvent.
             public void Dispose()
             {
+                // atomic check-and-set to prevent multiple concurrent disposes (e.g. racing DisposeAfterCompletion continuations)
                 if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0)
                     return;
 
@@ -701,11 +697,6 @@ namespace TextMateSharp.Model
             }
         }
 
-        // FIX #1: Merge SetGrammar into a single lock region to eliminate the
-        // split-lock gap where concurrent SetGrammar calls could orphan threads.
-        // The old thread is stopped and disposed AFTER the lock, identical to
-        // how Stop() already works. The old thread will self-exit via the
-        // model._thread != this check in its worker loop.
         public void SetGrammar(IGrammar grammar)
         {
             if (IsDisposed)
@@ -776,13 +767,6 @@ namespace TextMateSharp.Model
             }
         }
 
-        // FIX #5: Re-check IsDisposed inside lock(listeners) to prevent adding
-        // a listener to a disposed model if Dispose() runs between the two locks.
-        // FIX #4: Handle old stopped thread returned by StartInternal - dispose
-        // it outside _lock to prevent resource leaks.
-        // FIX #7: Lock ordering is now safe - _lock is always acquired before
-        // listeners (never reversed) because RemoveModelTokensChangedListener
-        // no longer calls Stop() inside lock(listeners).
         public void AddModelTokensChangedListener(IModelTokensChangedListener listener)
         {
             if (IsDisposed)
@@ -821,10 +805,6 @@ namespace TextMateSharp.Model
             }
         }
 
-        // FIX #7: Move Stop() outside lock(listeners) to eliminate lock-order
-        // inversion. Previously: listeners -> _lock (via Stop()). Now: compute
-        // decision under lock(listeners), release, then call Stop() which takes
-        // _lock - consistent with the _lock -> listeners ordering everywhere else.
         public void RemoveModelTokensChangedListener(IModelTokensChangedListener listener)
         {
             if (IsDisposed)
@@ -858,10 +838,6 @@ namespace TextMateSharp.Model
             }
         }
 
-        // FIX #2: Use Interlocked.CompareExchange for atomic dispose guard.
-        // volatile bool check-then-set is not atomic - two threads can both
-        // read false and proceed, causing double-Stop(), double-Clear(), and
-        // double-GetLines().Dispose().
         public void Dispose()
         {
             if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0)
@@ -933,9 +909,6 @@ namespace TextMateSharp.Model
             return oldThread;
         }
 
-        // FIX #8: Re-check IsDisposed and _thread identity after callback returns
-        // and before emitting. Stop()/Dispose()/SetGrammar can run during the callback,
-        // and without the re-check, stale events can be emitted on a dead/new model state.
         private void BuildEventWithCallback(Action<ModelTokensChangedEventBuilder> callback)
         {
             if (IsDisposed)
@@ -978,10 +951,6 @@ namespace TextMateSharp.Model
             }
         }
 
-        // FIX #9: Snapshot the listener list under lock, then invoke callbacks
-        // outside the lock. Invoking arbitrary listener code under lock(listeners)
-        // creates deadlock vectors if listener code blocks on work that needs the
-        // listeners lock (or any lock in the _lock -> listeners ordering chain).
         private void Emit(ModelTokensChangedEvent e)
         {
             // Avoid possible deadlocks by not invoking listeners under lock. Invoking listeners can cause
