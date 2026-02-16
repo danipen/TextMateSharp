@@ -914,15 +914,18 @@ namespace TextMateSharp.Model
             if (IsDisposed)
                 return;
 
-            TokenizerThread thread;
+            TokenizerThread expectedThread;
+            int expectedGrammarEpoch;
 
             lock (_lock)
             {
                 if (IsDisposed)
                     return;
 
-                thread = this._thread;
-                if (thread == null || thread.IsStopped)
+                expectedThread = this._thread;
+                expectedGrammarEpoch = this._grammarEpoch;
+
+                if (expectedThread == null || expectedThread.IsStopped)
                     return;
             }
 
@@ -934,24 +937,49 @@ namespace TextMateSharp.Model
             if (IsDisposed)
                 return;
 
+            // Re-check after the callback, because Stop()/Dispose()/SetGrammar() can run concurrently.
+            // If the tokenizer thread or grammar epoch changed, the event we're about to emit may no longer
+            // match the model's current grammar context (stale publish), so drop it.
             lock (_lock)
             {
+                // If Disposed, or Stop/SetGrammar swapped out the thread while callback ran, drop the event
                 if (IsDisposed)
                     return;
 
-                // If Stop or SetGrammar swapped out the thread while callback ran, drop the event
-                if (!object.ReferenceEquals(this._thread, thread) || thread.IsStopped)
+                if (!object.ReferenceEquals(this._thread, expectedThread))
+                    return;
+
+                if (expectedThread.IsStopped)
+                    return;
+
+                if (this._grammarEpoch != expectedGrammarEpoch)
                     return;
             }
 
             ModelTokensChangedEvent e = eventBuilder.Build();
             if (e != null)
             {
-                this.Emit(e);
+                Emit(e, expectedThread, expectedGrammarEpoch);
             }
         }
 
         private void Emit(ModelTokensChangedEvent e)
+        {
+            if (e == null)
+                return;
+
+            EmitCore(e, false, null, 0);
+        }
+
+        private void Emit(ModelTokensChangedEvent e, TokenizerThread expectedThread, int expectedGrammarEpoch)
+        {
+            if (e == null)
+                return;
+
+            EmitCore(e, true, expectedThread, expectedGrammarEpoch);
+        }
+
+        private void EmitCore(ModelTokensChangedEvent e, bool requireEpochMatch, TokenizerThread expectedThread, int expectedGrammarEpoch)
         {
             // Avoid possible deadlocks by not invoking listeners under lock. Invoking listeners can cause
             // arbitrary reentrant code to run, including code that tries to acquire locks that would
@@ -971,8 +999,37 @@ namespace TextMateSharp.Model
             // Call the listeners outside the lock to avoid deadlocks. Listeners may synchronously call back into the model,
             // but they will see a consistent state because we release the lock before invoking them, and we re-check
             // IsDisposed and thread identity after the callback and before emitting.
-            foreach (IModelTokensChangedListener listener in listenerSnapshot)
+            for (int i = 0; i < listenerSnapshot.Length; i++)
             {
+                IModelTokensChangedListener listener = listenerSnapshot[i];
+                if (listener == null)
+                {
+                    continue;
+                }
+
+                if (requireEpochMatch)
+                {
+                    lock (_lock)
+                    {
+                        if (IsDisposed)
+                            return;
+
+                        if (!object.ReferenceEquals(this._thread, expectedThread))
+                            return;
+
+                        if (expectedThread != null && expectedThread.IsStopped)
+                            return;
+
+                        if (this._grammarEpoch != expectedGrammarEpoch)
+                            return;
+                    }
+                }
+                else
+                {
+                    if (IsDisposed)
+                        return;
+                }
+
                 try
                 {
                     listener.ModelTokensChanged(e);
