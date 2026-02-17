@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using TextMateSharp.Grammars;
@@ -7,8 +8,10 @@ namespace TextMateSharp.Model
     /// <summary>
     /// Represents a TextMate model that manages tokenization of a document.
     /// The model coordinates between the document content and the grammar to produce tokens.
+    /// Implementations of this interface also implement <see cref="IDisposable"/>
+    /// and must properly dispose of any resources they hold.
     /// </summary>
-    public interface ITMModel
+    public interface ITMModel : IDisposable
     {
         /// <summary>
         /// Gets the grammar currently used for tokenization.
@@ -34,11 +37,6 @@ namespace TextMateSharp.Model
         /// </summary>
         /// <param name="listener">The listener to remove.</param>
         void RemoveModelTokensChangedListener(IModelTokensChangedListener listener);
-
-        /// <summary>
-        /// Releases resources used by this model and stops background tokenization.
-        /// </summary>
-        void Dispose();
 
         /// <summary>
         /// Gets the tokens for a specific line.
