@@ -13,6 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextMateSharp.Grammars", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{FB55729C-1952-4D20-BFE7-C3202B160A0B}"
 	ProjectSection(SolutionItems) = preProject
+		.runsettings = .runsettings
 		build\Directory.Build.props = build\Directory.Build.props
 		build\SourceLink.props = build\SourceLink.props
 	EndProjectSection
