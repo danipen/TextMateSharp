@@ -9,18 +9,24 @@ namespace TextMateSharp.Model
         public TMTokenDecodeData PrevToken { get; set; }
 
         private int lastAssignedId;
-        private Dictionary<string /* scope */, int[] /* ids */ > _scopeToTokenIds;
-        private Dictionary<string /* token */, int?/* id */ > _tokenToTokenId;
-        private Dictionary<int/* id */, string /* id */ > _tokenIdToToken;
+        private readonly Dictionary<string /* scope */, int[] /* ids */ > _scopeToTokenIds;
+        private readonly Dictionary<string /* token */, int/* id */ > _tokenToTokenId;
+        private readonly List<string> _tokenIdToToken;
+        private const char ScopeSeparator = '.';
 
         public DecodeMap()
         {
-            this.PrevToken = new TMTokenDecodeData(new string[0], new Dictionary<int, Dictionary<int, bool>>());
+            this.PrevToken = new TMTokenDecodeData(Array.Empty<string>(), new Dictionary<int, Dictionary<int, bool>>());
 
             this.lastAssignedId = 0;
             this._scopeToTokenIds = new Dictionary<string, int[]>();
-            this._tokenToTokenId = new Dictionary<string, int?>();
-            this._tokenIdToToken = new Dictionary<int, string>();
+            this._tokenToTokenId = new Dictionary<string, int>();
+
+            // Index 0 is unused so tokenId can be used directly as the index
+            this._tokenIdToToken = new List<string>
+            {
+                string.Empty // placeholder for index 0
+            };
         }
 
         public int[] getTokenIds(string scope)
@@ -32,21 +38,40 @@ namespace TextMateSharp.Model
                 return tokens;
             }
 
-            string[] tmpTokens = scope.Split(new string[] { "[.]" }, StringSplitOptions.None);
+            ReadOnlySpan<char> scopeSpan = scope.AsSpan();
 
-            tokens = new int[tmpTokens.Length];
-            for (int i = 0; i < tmpTokens.Length; i++)
+            int tokenCount = 1;
+            for (int i = 0; i < scopeSpan.Length; i++)
             {
-                string token = tmpTokens[i];
-                int? tokenId;
-                this._tokenToTokenId.TryGetValue(token, out tokenId);
-                if (tokenId == null)
+                if (scopeSpan[i] == ScopeSeparator)
                 {
-                    tokenId = (++this.lastAssignedId);
-                    this._tokenToTokenId[token] = tokenId.Value;
-                    this._tokenIdToToken[tokenId.Value] = token;
+                    tokenCount++;
                 }
-                tokens[i] = tokenId.Value;
+            }
+
+            tokens = new int[tokenCount];
+
+            int tokenIndex = 0;
+            int start = 0;
+            for (int i = 0; i <= scopeSpan.Length; i++)
+            {
+                if (i == scopeSpan.Length || scopeSpan[i] == ScopeSeparator)
+                {
+                    int length = i - start;
+                    string token = scope.Substring(start, length);
+
+                    if (!this._tokenToTokenId.TryGetValue(token, out int tokenId))
+                    {
+                        tokenId = ++this.lastAssignedId;
+                        this._tokenToTokenId[token] = tokenId;
+                        this._tokenIdToToken.Add(token);
+                    }
+
+                    tokens[tokenIndex] = tokenId;
+                    tokenIndex++;
+
+                    start = i + 1;
+                }
             }
 
             this._scopeToTokenIds[scope] = tokens;
@@ -59,18 +84,18 @@ namespace TextMateSharp.Model
             bool isFirst = true;
             for (int i = 1; i <= this.lastAssignedId; i++)
             {
-                if (tokenMap.ContainsKey(i))
+                if (tokenMap.TryGetValue(i, out bool isPresent) && isPresent)
                 {
-                    if (isFirst)
+                    if (!isFirst)
                     {
-                        isFirst = false;
-                        result.Append(this._tokenIdToToken[i]);
+                        result.Append(ScopeSeparator);
                     }
                     else
                     {
-                        result.Append('.');
-                        result.Append(this._tokenIdToToken[i]);
+                        isFirst = false;
                     }
+
+                    result.Append(this._tokenIdToToken[i]);
                 }
             }
             return result.ToString();

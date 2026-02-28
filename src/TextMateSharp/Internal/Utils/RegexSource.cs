@@ -1,19 +1,26 @@
+using Onigwrap;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
-using Onigwrap;
 
 namespace TextMateSharp.Internal.Utils
 {
     public class RegexSource
     {
 
-        private static Regex CAPTURING_REGEX_SOURCE = new Regex(
+        private static readonly Regex CAPTURING_REGEX_SOURCE = new Regex(
                 "\\$(\\d+)|\\$\\{(\\d+):\\/(downcase|upcase)}");
 
         public static string EscapeRegExpCharacters(string value)
         {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
             int valueLen = value.Length;
+            if (valueLen == 0)
+            {
+                return string.Empty;
+            }
+
             var sb = new StringBuilder(valueLen);
             for (int i = 0; i < valueLen; i++)
             {
@@ -59,7 +66,7 @@ namespace TextMateSharp.Internal.Utils
             {
                 return false;
             }
-            return CAPTURING_REGEX_SOURCE.Match(regexSource).Success;
+            return CAPTURING_REGEX_SOURCE.IsMatch(regexSource);
         }
 
         public static string ReplaceCaptures(string regexSource, ReadOnlyMemory<char> captureSource, IOnigCaptureIndex[] captureIndices)
@@ -70,32 +77,42 @@ namespace TextMateSharp.Internal.Utils
 
         private static string GetReplacement(string match, ReadOnlyMemory<char> captureSource, IOnigCaptureIndex[] captureIndices)
         {
-            int index = -1;
-            string command = null;
-            int doublePointIndex = match.IndexOf(':');
+            ReadOnlySpan<char> matchSpan = match.AsSpan();
+            int doublePointIndex = matchSpan.IndexOf(':');
+
+            int index = ParseCaptureIndex(matchSpan, doublePointIndex);
+
+            ReadOnlySpan<char> commandSpan = default;
             if (doublePointIndex != -1)
             {
-                index = int.Parse(match.SubstringAtIndexes(2, doublePointIndex));
-                command = match.SubstringAtIndexes(doublePointIndex + 2, match.Length - 1);
+                int commandStart = doublePointIndex + 2;
+                int commandLength = matchSpan.Length - commandStart - 1; // exclude trailing '}'
+                if (commandLength > 0)
+                {
+                    commandSpan = matchSpan.Slice(commandStart, commandLength);
+                }
             }
-            else
-            {
-                index = int.Parse(match.SubstringAtIndexes(1, match.Length));
-            }
+
             IOnigCaptureIndex capture = captureIndices != null && captureIndices.Length > index ? captureIndices[index] : null;
             if (capture != null)
             {
                 string result = captureSource.SubstringAtIndexes(capture.Start, capture.End);
+
                 // Remove leading dots that would make the selector invalid
-                while (result.Length > 0 && result[0] == '.')
+                int start = 0;
+                while (start < result.Length && result[start] == '.')
                 {
-                    result = result.Substring(1);
+                    start++;
                 }
-                if ("downcase".Equals(command))
+                if (start != 0)
+                {
+                    result = result.Substring(start);
+                }
+                if (commandSpan.SequenceEqual("downcase".AsSpan()))
                 {
                     return result.ToLower();
                 }
-                else if ("upcase".Equals(command))
+                else if (commandSpan.SequenceEqual("upcase".AsSpan()))
                 {
                     return result.ToUpper();
                 }
@@ -108,6 +125,20 @@ namespace TextMateSharp.Internal.Utils
             {
                 return match;
             }
+        }
+
+        private static int ParseCaptureIndex(ReadOnlySpan<char> matchSpan, int doublePointIndex)
+        {
+            int start = doublePointIndex != -1 ? 2 : 1;
+            int end = doublePointIndex != -1 ? doublePointIndex : matchSpan.Length;
+
+            int value = 0;
+            for (int i = start; i < end; i++)
+            {
+                value = (value * 10) + (matchSpan[i] - '0');
+            }
+
+            return value;
         }
     }
 }

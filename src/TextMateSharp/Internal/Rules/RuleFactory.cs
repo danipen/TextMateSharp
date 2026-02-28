@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using TextMateSharp.Internal.Types;
@@ -27,48 +26,48 @@ namespace TextMateSharp.Internal.Rules
                 {
                     desc.SetId(id);
 
-                    if (desc.GetMatch() != null)
+                    string match = desc.GetMatch();
+                    if (match != null)
                     {
-                        return new MatchRule(desc.GetId(), desc.GetName(), desc.GetMatch(),
+                        return new MatchRule(desc.GetId(), desc.GetName(), match,
                                 RuleFactory.CompileCaptures(desc.GetCaptures(), helper, repository));
                     }
 
-                    if (desc.GetBegin() == null)
+                    string begin = desc.GetBegin();
+                    if (begin == null)
                     {
                         IRawRepository r = repository;
-                        if (desc.GetRepository() != null)
+                        IRawRepository descRepository = desc.GetRepository();
+                        if (descRepository != null)
                         {
-                            r = repository.Merge(desc.GetRepository());
+                            r = repository.Merge(descRepository);
                         }
                         return new IncludeOnlyRule(desc.GetId(), desc.GetName(), desc.GetContentName(),
                                 RuleFactory.CompilePatterns(desc.GetPatterns(), helper, r));
                     }
 
                     string ruleWhile = desc.GetWhile();
+                    IRawCaptures captures = desc.GetCaptures();
+                    IRawCaptures beginCaptures = desc.GetBeginCaptures() ?? captures;
+                    IRawCaptures whileCaptures = desc.GetWhileCaptures() ?? captures;
+                    IRawCaptures endCaptures = desc.GetEndCaptures() ?? captures;
+                    ICollection<IRawRule> patterns = desc.GetPatterns();
                     if (ruleWhile != null)
                     {
                         return new BeginWhileRule(
-                                desc.GetId(), desc.GetName(), desc.GetContentName(), desc.GetBegin(),
-                                RuleFactory.CompileCaptures(
-                                        desc.GetBeginCaptures() != null ? desc.GetBeginCaptures() : desc.GetCaptures(),
-                                        helper, repository),
+                                desc.GetId(), desc.GetName(), desc.GetContentName(), begin,
+                                RuleFactory.CompileCaptures(beginCaptures, helper, repository),
                                 ruleWhile,
-                                RuleFactory.CompileCaptures(
-                                        desc.GetWhileCaptures() != null ? desc.GetWhileCaptures() : desc.GetCaptures(),
-                                        helper, repository),
-                                RuleFactory.CompilePatterns(desc.GetPatterns(), helper, repository));
+                                RuleFactory.CompileCaptures(whileCaptures, helper, repository),
+                                RuleFactory.CompilePatterns(patterns, helper, repository));
                     }
 
-                    return new BeginEndRule(desc.GetId(), desc.GetName(), desc.GetContentName(), desc.GetBegin(),
-                            RuleFactory.CompileCaptures(
-                                    desc.GetBeginCaptures() != null ? desc.GetBeginCaptures() : desc.GetCaptures(),
-                                    helper, repository),
+                    return new BeginEndRule(desc.GetId(), desc.GetName(), desc.GetContentName(), begin,
+                            RuleFactory.CompileCaptures(beginCaptures, helper, repository),
                             desc.GetEnd(),
-                            RuleFactory.CompileCaptures(
-                                    desc.GetEndCaptures() != null ? desc.GetEndCaptures() : desc.GetCaptures(), helper,
-                                    repository),
+                            RuleFactory.CompileCaptures(endCaptures, helper, repository),
                             desc.IsApplyEndPatternLast(),
-                            RuleFactory.CompilePatterns(desc.GetPatterns(), helper, repository));
+                            RuleFactory.CompilePatterns(patterns, helper, repository));
                 });
             }
 
@@ -78,45 +77,44 @@ namespace TextMateSharp.Internal.Rules
         private static List<CaptureRule> CompileCaptures(IRawCaptures captures, IRuleFactoryHelper helper,
                 IRawRepository repository)
         {
-            List<CaptureRule> r = new List<CaptureRule>();
-            int numericCaptureId;
-            int maximumCaptureId;
-            int i;
-
-            if (captures != null)
+            if (captures == null)
             {
-                // Find the maximum capture id
-                maximumCaptureId = 0;
-                foreach (string captureId in captures)
-                {
-                    numericCaptureId = ParseInt(captureId);
-                    if (numericCaptureId > maximumCaptureId)
-                    {
-                        maximumCaptureId = numericCaptureId;
-                    }
-                }
+                return new List<CaptureRule>();
+            }
 
-                // Initialize result
-                for (i = 0; i <= maximumCaptureId; i++)
-                {
-                    r.Add(null);
-                }
+            int numericCaptureId;
+            int maximumCaptureId = 0;
 
-                // Fill out result
-                foreach (string captureId in captures)
+            // Find the maximum capture id
+            foreach (string captureId in captures)
+            {
+                numericCaptureId = ParseInt(captureId);
+                if (numericCaptureId > maximumCaptureId)
                 {
-                    numericCaptureId = ParseInt(captureId);
-                    RuleId retokenizeCapturedWithRuleId = null;
-                    IRawRule rule = captures.GetCapture(captureId);
-                    if (rule.GetPatterns() != null)
-                    {
-                        retokenizeCapturedWithRuleId = RuleFactory.GetCompiledRuleId(captures.GetCapture(captureId), helper,
-                                repository);
-                    }
-                    r[numericCaptureId] = RuleFactory.CreateCaptureRule(
-                        helper, rule.GetName(), rule.GetContentName(),
-                        retokenizeCapturedWithRuleId);
+                    maximumCaptureId = numericCaptureId;
                 }
+            }
+
+            // Initialize result
+            List<CaptureRule> r = new List<CaptureRule>(maximumCaptureId + 1);
+            for (int i = 0; i <= maximumCaptureId; i++)
+            {
+                r.Add(null);
+            }
+
+            // Fill out result
+            foreach (string captureId in captures)
+            {
+                numericCaptureId = ParseInt(captureId);
+                RuleId retokenizeCapturedWithRuleId = null;
+                IRawRule rule = captures.GetCapture(captureId);
+                if (rule.GetPatterns() != null)
+                {
+                    retokenizeCapturedWithRuleId = RuleFactory.GetCompiledRuleId(rule, helper, repository);
+                }
+                r[numericCaptureId] = RuleFactory.CreateCaptureRule(
+                    helper, rule.GetName(), rule.GetContentName(),
+                    retokenizeCapturedWithRuleId);
             }
 
             return r;
@@ -132,7 +130,8 @@ namespace TextMateSharp.Internal.Rules
         private static CompilePatternsResult CompilePatterns(ICollection<IRawRule> patterns, IRuleFactoryHelper helper,
             IRawRepository repository)
         {
-            List<RuleId> r = new List<RuleId>();
+            int patternCount = patterns != null ? patterns.Count : 0;
+            List<RuleId> r = new List<RuleId>(patternCount);
             RuleId patternId;
             IRawGrammar externalGrammar;
             Rule rule;
@@ -143,13 +142,14 @@ namespace TextMateSharp.Internal.Rules
                 foreach (IRawRule pattern in patterns)
                 {
                     patternId = null;
+                    string include = pattern.GetInclude();
 
-                    if (pattern.GetInclude() != null)
+                    if (include != null)
                     {
-                        if (pattern.GetInclude()[0] == '#')
+                        if (include[0] == '#')
                         {
                             // Local include found in `repository`
-                            IRawRule localIncludedRule = repository.GetProp(pattern.GetInclude().Substring(1));
+                            IRawRule localIncludedRule = repository.GetProp(include.Substring(1));
                             if (localIncludedRule != null)
                             {
                                 patternId = RuleFactory.GetCompiledRuleId(localIncludedRule, helper, repository);
@@ -161,24 +161,24 @@ namespace TextMateSharp.Internal.Rules
                                 // repository['$base'].name);
                             }
                         }
-                        else if (pattern.GetInclude().Equals("$base") || pattern.GetInclude().Equals("$self"))
+                        else if (include.Equals("$base") || include.Equals("$self"))
                         {
                             // Special include also found in `repository`
-                            patternId = RuleFactory.GetCompiledRuleId(repository.GetProp(pattern.GetInclude()), helper,
+                            patternId = RuleFactory.GetCompiledRuleId(repository.GetProp(include), helper,
                                     repository);
                         }
                         else
                         {
                             string externalGrammarName = null, externalGrammarInclude = null;
-                            int sharpIndex = pattern.GetInclude().IndexOf('#');
+                            int sharpIndex = include.IndexOf('#');
                             if (sharpIndex >= 0)
                             {
-                                externalGrammarName = pattern.GetInclude().SubstringAtIndexes(0, sharpIndex);
-                                externalGrammarInclude = pattern.GetInclude().Substring(sharpIndex + 1);
+                                externalGrammarName = include.SubstringAtIndexes(0, sharpIndex);
+                                externalGrammarInclude = include.Substring(sharpIndex + 1);
                             }
                             else
                             {
-                                externalGrammarName = pattern.GetInclude();
+                                externalGrammarName = include;
                             }
                             // External include
                             externalGrammar = helper.GetExternalGrammar(externalGrammarName, repository);
@@ -264,7 +264,7 @@ namespace TextMateSharp.Internal.Rules
                 }
             }
 
-            return new CompilePatternsResult(r, ((patterns != null ? patterns.Count : 0) != r.Count));
+            return new CompilePatternsResult(r, (patternCount != r.Count));
         }
-            }
+    }
 }
