@@ -108,11 +108,11 @@ namespace TextMateSharp.Internal.Utils
                 {
                     result = result.Substring(start);
                 }
-                if (commandSpan.SequenceEqual("downcase"))
+                if (commandSpan.SequenceEqual("downcase".AsSpan()))
                 {
                     return result.ToLower();
                 }
-                else if (commandSpan.SequenceEqual("upcase"))
+                else if (commandSpan.SequenceEqual("upcase".AsSpan()))
                 {
                     return result.ToUpper();
                 }
