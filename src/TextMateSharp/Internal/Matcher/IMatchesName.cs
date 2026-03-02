@@ -15,6 +15,9 @@ namespace TextMateSharp.Internal.Matcher
 
         public bool Match(ICollection<string> identifers, List<string> scopes)
         {
+            if (identifers == null) throw new ArgumentNullException(nameof(identifers));
+            if (scopes == null) throw new ArgumentNullException(nameof(scopes));
+
             if (scopes.Count < identifers.Count)
             {
                 return false;
@@ -36,7 +39,7 @@ namespace TextMateSharp.Internal.Matcher
             });
         }
 
-        private bool ScopesAreMatching(string thisScopeName, string scopeName)
+        private static bool ScopesAreMatching(string thisScopeName, string scopeName)
         {
             if (thisScopeName == null)
             {
@@ -47,8 +50,7 @@ namespace TextMateSharp.Internal.Matcher
                 return true;
             }
             int len = scopeName.Length;
-            return thisScopeName.Length > len && thisScopeName.SubstringAtIndexes(0, len).Equals(scopeName)
-                    && thisScopeName[len] == '.';
+            return (thisScopeName.Length > len) && (thisScopeName[len] == '.') && thisScopeName.SubstringAtIndexes(0, len).Equals(scopeName);
         }
     }
 }
