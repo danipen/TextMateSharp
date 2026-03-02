@@ -33,7 +33,7 @@ namespace TextMateSharp.Themes
 
         public static List<ThemeTrieElementRule> cloneArr(List<ThemeTrieElementRule> arr)
         {
-            List<ThemeTrieElementRule> r = new List<ThemeTrieElementRule>();
+            List<ThemeTrieElementRule> r = new List<ThemeTrieElementRule>(arr.Count);
             for (int i = 0, len = arr.Count; i < len; i++)
             {
                 r.Add(arr[i].Clone());

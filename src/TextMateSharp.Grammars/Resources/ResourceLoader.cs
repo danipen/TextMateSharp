@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 
 namespace TextMateSharp.Grammars.Resources
@@ -12,7 +11,7 @@ namespace TextMateSharp.Grammars.Resources
 
         internal static Stream OpenGrammarPackage(string grammarName)
         {
-            string grammarPackage = GrammarPrefix + grammarName.ToLowerInvariant() + "." + "package.json";
+            string grammarPackage = GrammarPrefix + grammarName.ToLowerInvariant() + ".package.json";
 
             var result = typeof(ResourceLoader).GetTypeInfo().Assembly.GetManifestResourceStream(
                 grammarPackage);
