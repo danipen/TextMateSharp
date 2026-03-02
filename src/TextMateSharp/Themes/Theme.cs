@@ -157,23 +157,20 @@ namespace TextMateSharp.Themes
             int priority,
             out IRawTheme themeInclude)
         {
-            List<ParsedThemeRule> result = new List<ParsedThemeRule>();
-
             string include = source.GetInclude();
 
             if (string.IsNullOrEmpty(include))
             {
                 themeInclude = null;
-                return result;
+                return new List<ParsedThemeRule>();
             }
 
             themeInclude = registryOptions.GetTheme(include);
 
             if (themeInclude == null)
-                return result;
+                return new List<ParsedThemeRule>();
 
             return ParseTheme(themeInclude, priority);
-
         }
 
         static void LookupThemeRules(
