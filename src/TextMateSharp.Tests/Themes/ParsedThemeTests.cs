@@ -409,7 +409,7 @@ namespace TextMateSharp.Tests.Themes
 
             // Assert
             const int expectedTotalCalls = threadCount * iterationsPerThread;
-            Assert.AreEqual(expectedTotalCalls, totalCalls, "All Match calls should have completed");
+            Assert.AreEqual(expectedTotalCalls, Volatile.Read(ref totalCalls), "All Match calls should have completed");
             Assert.AreEqual(expectedTotalCalls, allResults.Count, "Should have captured all results");
 
             // All results must be non-null (critical for the fallback logic being tested)
@@ -2575,7 +2575,7 @@ namespace TextMateSharp.Tests.Themes
             List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
 
             // Assert
-            Assert.AreEqual(2, rules.Count);
+            Assert.AreEqual(2, rules.Count, "Both rules from same entry should be created");
             Assert.AreEqual(0, rules[0].index, "Both rules from same entry should share index 0");
             Assert.AreEqual(0, rules[1].index, "Both rules from same entry should share index 0");
         }
