@@ -944,6 +944,7 @@ namespace TextMateSharp.Tests.Internal.Grammars.Parser
             // act
             List<string> keys = new List<string>();
             IEnumerable<string> enumerable = raw;
+            // don't use AddRange here, we want to test the enumerator directly
             foreach (string key in enumerable)
             {
                 keys.Add(key);
