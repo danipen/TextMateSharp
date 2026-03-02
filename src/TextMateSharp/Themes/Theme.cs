@@ -23,7 +23,7 @@ namespace TextMateSharp.Themes
             ColorMap colorMap = new ColorMap();
             var guiColorsDictionary = new Dictionary<string, string>();
 
-            var themeRuleList = ParsedTheme.ParseTheme(source, 0);
+            var themeRuleList = ParsedTheme.ParseTheme(source);
 
             ParsedTheme theme = ParsedTheme.CreateFromParsedTheme(
                 themeRuleList,
@@ -31,7 +31,7 @@ namespace TextMateSharp.Themes
 
             IRawTheme themeInclude;
             ParsedTheme include = ParsedTheme.CreateFromParsedTheme(
-                ParsedTheme.ParseInclude(source, registryOptions, 0, out themeInclude),
+                ParsedTheme.ParseInclude(source, registryOptions, out themeInclude),
                 colorMap);
 
             // First get colors from include, then try and overwrite with local colors..
@@ -122,17 +122,17 @@ namespace TextMateSharp.Themes
             return a.index.CompareTo(b.index);
         };
 
-        internal static List<ParsedThemeRule> ParseTheme(IRawTheme source, int priority)
+        internal static List<ParsedThemeRule> ParseTheme(IRawTheme source)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 
             // process theme rules in vscode-textmate format:
             // see https://github.com/microsoft/vscode-textmate/tree/main/test-cases/themes
-            LookupThemeRules(source.GetSettings(), result, priority);
+            LookupThemeRules(source.GetSettings(), result);
 
             // process theme rules in vscode format
             // see https://github.com/microsoft/vscode/tree/main/extensions/theme-defaults/themes
-            LookupThemeRules(source.GetTokenColors(), result, priority);
+            LookupThemeRules(source.GetTokenColors(), result);
 
             return result;
         }
@@ -154,7 +154,6 @@ namespace TextMateSharp.Themes
         internal static List<ParsedThemeRule> ParseInclude(
             IRawTheme source,
             IRegistryOptions registryOptions,
-            int priority,
             out IRawTheme themeInclude)
         {
             string include = source.GetInclude();
@@ -170,13 +169,12 @@ namespace TextMateSharp.Themes
             if (themeInclude == null)
                 return new List<ParsedThemeRule>();
 
-            return ParseTheme(themeInclude, priority);
+            return ParseTheme(themeInclude);
         }
 
         static void LookupThemeRules(
             ICollection<IRawThemeSetting> settings,
-            List<ParsedThemeRule> parsedThemeRules,
-            int priority)       // TODO: @danipen, 'priority' is currently unused. Is that intentional or is this a missing piece of functionality?
+            List<ParsedThemeRule> parsedThemeRules)
         {
             if (settings == null)
                 return;

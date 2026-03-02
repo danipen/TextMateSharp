@@ -24,10 +24,9 @@ namespace TextMateSharp.Tests.Themes
             Mock<IRawTheme> mockSource = new Mock<IRawTheme>();
             mockSource.Setup(s => s.GetInclude()).Returns((string)null);
             Mock<IRegistryOptions> mockRegistryOptions = new Mock<IRegistryOptions>();
-            const int priority = 5;
 
             // Act
-            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, priority, out IRawTheme themeInclude);
+            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, out IRawTheme themeInclude);
 
             // Assert
             Assert.IsNotNull(result);
@@ -43,10 +42,9 @@ namespace TextMateSharp.Tests.Themes
             Mock<IRawTheme> mockSource = new Mock<IRawTheme>();
             mockSource.Setup(s => s.GetInclude()).Returns(string.Empty);
             Mock<IRegistryOptions> mockRegistryOptions = new Mock<IRegistryOptions>();
-            const int priority = 10;
 
             // Act
-            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, priority, out IRawTheme themeInclude);
+            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, out IRawTheme themeInclude);
 
             // Assert
             Assert.IsNotNull(result);
@@ -64,10 +62,9 @@ namespace TextMateSharp.Tests.Themes
             mockSource.Setup(s => s.GetInclude()).Returns(includeString);
             Mock<IRegistryOptions> mockRegistryOptions = new Mock<IRegistryOptions>();
             mockRegistryOptions.Setup(r => r.GetTheme(includeString)).Returns((IRawTheme)null);
-            const int priority = 0;
 
             // Act
-            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, priority, out IRawTheme themeInclude);
+            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, out IRawTheme themeInclude);
 
             // Assert
             Assert.IsNotNull(result);
@@ -90,10 +87,9 @@ namespace TextMateSharp.Tests.Themes
 
             Mock<IRegistryOptions> mockRegistryOptions = new Mock<IRegistryOptions>();
             mockRegistryOptions.Setup(r => r.GetTheme(includeString)).Returns(mockIncludedTheme.Object);
-            const int priority = 1;
 
             // Act
-            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, priority, out IRawTheme themeInclude);
+            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, out IRawTheme themeInclude);
 
             // Assert
             Assert.IsNotNull(result);
@@ -141,7 +137,6 @@ namespace TextMateSharp.Tests.Themes
             List<ParsedThemeRule> result = ParsedTheme.ParseInclude(
                 mockSource.Object,
                 mockRegistryOptions.Object,
-                priority,
                 out IRawTheme themeInclude);
 
             // Assert
@@ -169,10 +164,9 @@ namespace TextMateSharp.Tests.Themes
             mockSource.Setup(s => s.GetInclude()).Returns(whitespace);
             Mock<IRegistryOptions> mockRegistryOptions = new Mock<IRegistryOptions>();
             mockRegistryOptions.Setup(r => r.GetTheme(whitespace)).Returns((IRawTheme)null);
-            const int priority = 0;
 
             // Act
-            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, priority, out IRawTheme themeInclude);
+            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, out IRawTheme themeInclude);
 
             // Assert
             Assert.IsNotNull(result);
@@ -200,10 +194,9 @@ namespace TextMateSharp.Tests.Themes
 
             Mock<IRegistryOptions> mockRegistryOptions = new Mock<IRegistryOptions>();
             mockRegistryOptions.Setup(r => r.GetTheme(includeString)).Returns(mockIncludedTheme.Object);
-            const int priority = 0;
 
             // Act
-            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, priority, out IRawTheme themeInclude);
+            List<ParsedThemeRule> result = ParsedTheme.ParseInclude(mockSource.Object, mockRegistryOptions.Object, out IRawTheme themeInclude);
 
             // Assert
             Assert.IsNotNull(result);
@@ -1189,7 +1182,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1217,7 +1210,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1245,7 +1238,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1273,7 +1266,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1301,7 +1294,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1329,7 +1322,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1357,7 +1350,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1387,7 +1380,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1418,7 +1411,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1449,7 +1442,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1480,7 +1473,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1514,7 +1507,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1542,7 +1535,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1570,7 +1563,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1601,7 +1594,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1629,7 +1622,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1660,7 +1653,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1691,7 +1684,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1740,7 +1733,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(3, rules.Count);
@@ -1772,7 +1765,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1800,7 +1793,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1830,7 +1823,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1861,7 +1854,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1896,7 +1889,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1930,7 +1923,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1961,7 +1954,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -1997,7 +1990,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2025,7 +2018,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2054,7 +2047,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2089,7 +2082,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(3, rules.Count);
@@ -2129,7 +2122,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2152,7 +2145,7 @@ namespace TextMateSharp.Tests.Themes
             mockTheme.Setup(t => t.GetTokenColors()).Returns((List<IRawThemeSetting>)null);
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(mockTheme.Object, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(mockTheme.Object);
 
             // Assert
             Assert.IsNotNull(rules);
@@ -2180,7 +2173,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count, "Should skip entry with null settings");
@@ -2207,7 +2200,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(3, rules.Count);
@@ -2238,7 +2231,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(3, rules.Count);
@@ -2266,7 +2259,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             CollectionAssert.IsEmpty(rules, "Only commas should produce no rules (empty after trim)");
@@ -2291,7 +2284,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(2, rules.Count, "Leading/trailing commas should be trimmed");
@@ -2318,7 +2311,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(2, rules.Count, "Empty segments between commas should be skipped");
@@ -2341,7 +2334,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(3, rules.Count);
@@ -2365,7 +2358,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             CollectionAssert.IsEmpty(rules, "Empty scope list should produce no rules");
@@ -2385,7 +2378,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2411,7 +2404,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2437,7 +2430,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2462,7 +2455,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2487,7 +2480,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2512,7 +2505,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2546,7 +2539,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(3, rules.Count);
@@ -2572,7 +2565,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(2, rules.Count, "Both rules from same entry should be created");
@@ -2597,7 +2590,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
@@ -2632,7 +2625,7 @@ namespace TextMateSharp.Tests.Themes
             mockTheme.Setup(t => t.GetTokenColors()).Returns(tokenColors);
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(mockTheme.Object, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(mockTheme.Object);
 
             // Assert
             Assert.AreEqual(2, rules.Count);
@@ -2664,7 +2657,7 @@ namespace TextMateSharp.Tests.Themes
             };
 
             // Act
-            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme, 0);
+            List<ParsedThemeRule> rules = ParsedTheme.ParseTheme(rawTheme);
 
             // Assert
             Assert.AreEqual(1, rules.Count);
