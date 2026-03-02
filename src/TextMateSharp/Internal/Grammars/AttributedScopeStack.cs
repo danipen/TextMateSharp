@@ -60,6 +60,13 @@ namespace TextMateSharp.Internal.Grammars
             {
                 return false;
             }
+
+            // Precomputed hash codes let us reject non-equal pairs in O(1)
+            // before walking the O(n) parent chain in StructuralEquals
+            if (a._hashCode != b._hashCode)
+            {
+                return false;
+            }
             return StructuralEquals(a, b);
         }
 
@@ -261,7 +268,7 @@ namespace TextMateSharp.Internal.Grammars
 
         private static List<string> GenerateScopes(AttributedScopeStack scopesList)
         {
-            // First pass: count depth to pre-size the array
+            // First pass: count depth to pre-size the list
             int depth = 0;
             AttributedScopeStack current = scopesList;
             while (current != null)
@@ -270,17 +277,17 @@ namespace TextMateSharp.Internal.Grammars
                 current = current.Parent;
             }
 
-            // Second pass: fill backwards directly to avoid a Reverse() call
-            string[] scopes = new string[depth];
+            // initialize exact capacity to avoid resizing
+            List<string> result = new List<string>(depth);
             current = scopesList;
-            for (int i = depth - 1; i >= 0; i--)
+            while (current != null)
             {
-                scopes[i] = current.ScopePath;
+                result.Add(current.ScopePath);
                 current = current.Parent;
             }
 
-            // Construct list from the correctly-ordered array
-            return new List<string>(scopes);
+            result.Reverse();
+            return result;
         }
     }
 }
