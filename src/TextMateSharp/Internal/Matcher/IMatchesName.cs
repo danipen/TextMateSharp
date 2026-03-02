@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Matcher
@@ -24,19 +24,30 @@ namespace TextMateSharp.Internal.Matcher
             }
 
             int lastIndex = 0;
-            return identifers.All(identifier =>
+            foreach (string identifier in identifers)
             {
+                bool found = false;
                 for (int i = lastIndex; i < scopes.Count; i++)
                 {
                     if (ScopesAreMatching(scopes[i], identifier))
                     {
-                        lastIndex++;
-                        return true;
+                        // BUG FIX: Original code used lastIndex++ which only incremented by 1 from
+                        // the previous starting position, not from the actual match position.
+                        // This caused the next search to potentially re-scan already checked scopes.
+                        // Correct behavior: Start the next search immediately after the current match
+                        lastIndex = i + 1;
+                        found = true;
+                        break;
                     }
                 }
 
-                return false;
-            });
+                if (!found)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static bool ScopesAreMatching(string thisScopeName, string scopeName)
