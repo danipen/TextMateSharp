@@ -31,10 +31,7 @@ namespace TextMateSharp.Internal.Matcher
                 {
                     if (ScopesAreMatching(scopes[i], identifier))
                     {
-                        // BUG FIX: Original code used lastIndex++ which only incremented by 1 from
-                        // the previous starting position, not from the actual match position.
-                        // This caused the next search to potentially re-scan already checked scopes.
-                        // Correct behavior: Start the next search immediately after the current match
+                        // Start the next search immediately after the current match
                         lastIndex = i + 1;
                         found = true;
                         break;
