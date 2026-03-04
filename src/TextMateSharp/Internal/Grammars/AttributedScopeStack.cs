@@ -5,7 +5,7 @@ using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class AttributedScopeStack
+    public class AttributedScopeStack : IEquatable<AttributedScopeStack>
     {
         public AttributedScopeStack Parent { get; private set; }
         public string ScopePath { get; private set; }
@@ -27,12 +27,13 @@ namespace TextMateSharp.Internal.Grammars
         {
             while (true)
             {
-                if (a == b)
+                // Use ReferenceEquals to avoid infinite recursion through operator ==
+                if (ReferenceEquals(a, b))
                 {
                     return true;
                 }
 
-                if (a == null || b == null)
+                if (a is null || b is null)
                 {
                     // End of list reached only for one
                     return false;
@@ -50,13 +51,18 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        private static bool Equals(AttributedScopeStack a, AttributedScopeStack b)
+        // Internal so StateStack can perform null-safe equality checks on
+        // ContentNameScopesList / NameScopesList without going through the
+        // instance Equals (which would throw on null receivers)
+        internal static bool Equals(AttributedScopeStack a, AttributedScopeStack b)
         {
-            if (a == b)
+            // Use ReferenceEquals to avoid infinite recursion through operator ==
+            if (ReferenceEquals(a, b))
             {
                 return true;
             }
-            if (a == null || b == null)
+
+            if (a is null || b is null)
             {
                 return false;
             }
@@ -67,9 +73,28 @@ namespace TextMateSharp.Internal.Grammars
             {
                 return false;
             }
+
             return StructuralEquals(a, b);
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="AttributedScopeStack"/> instance is equal to the current
+        /// instance.
+        /// </summary>
+        /// <param name="other">The <see cref="AttributedScopeStack"/> instance to compare with the current instance.</param>
+        /// <returns>true if the specified <see cref="AttributedScopeStack"/> is equal to the current instance; otherwise, false.</returns>
+        public bool Equals(AttributedScopeStack other)
+        {
+            return Equals(this, other);
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current instance.
+        /// </summary>
+        /// <remarks>This method overrides the base Object.Equals implementation to provide value equality
+        /// specific to AttributedScopeStack instances.</remarks>
+        /// <param name="other">The object to compare with the current instance.</param>
+        /// <returns>true if the specified object is equal to the current instance; otherwise, false.</returns>
         public override bool Equals(object other)
         {
             if (other is AttributedScopeStack attributedScopeStack)
@@ -78,31 +103,55 @@ namespace TextMateSharp.Internal.Grammars
             return false;
         }
 
+        /// <summary>
+        /// Returns a hash code for the current instance, suitable for use in hashing algorithms and data structures
+        /// such as hash tables.
+        /// </summary>
+        /// <remarks>Equal instances are guaranteed to return the same hash code. This method is typically
+        /// used to support efficient lookups in hash-based collections.</remarks>
+        /// <returns>An integer that represents the hash code for this instance.</returns>
         public override int GetHashCode()
         {
             return _hashCode;
         }
 
+        /// <summary>
+        /// Determines whether two instances of <see cref="AttributedScopeStack"/> are equal.
+        /// </summary>
+        /// <remarks>This operator uses the <see cref="Equals(AttributedScopeStack, AttributedScopeStack)"/> method to determine
+        /// equality.</remarks>
+        /// <param name="left">The first <see cref="AttributedScopeStack"/> instance to compare.</param>
+        /// <param name="right">The second <see cref="AttributedScopeStack"/> instance to compare.</param>
+        /// <returns>true if the specified instances are equal; otherwise, false.</returns>
+        public static bool operator ==(AttributedScopeStack left, AttributedScopeStack right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <summary>
+        /// Determines whether two instances of <see cref="AttributedScopeStack"/> are not equal.
+        /// </summary>
+        /// <remarks>This operator uses the <see cref="Equals(AttributedScopeStack, AttributedScopeStack)"/>
+        /// method to evaluate equality.</remarks>
+        /// <param name="left">The first <see cref="AttributedScopeStack"/> to compare.</param>
+        /// <param name="right">The second <see cref="AttributedScopeStack"/> to compare.</param>
+        /// <returns>true if the specified instances are not equal; otherwise, false.</returns>
+        public static bool operator !=(AttributedScopeStack left, AttributedScopeStack right)
+        {
+            return !Equals(left, right);
+        }
+
         private static int ComputeHashCode(AttributedScopeStack parent, string scopePath, int tokenAttributes)
         {
+            const int primeFactor = 31; // Common prime factor for multiply-accumulate hash code
+            const int seed = 17; // Common seed for hash code computation (different from primeFactor to reduce collisions)
             unchecked
             {
-                int hash = parent?._hashCode ?? 17;
-                hash = (hash * 31) + tokenAttributes;
+                int hash = parent?._hashCode ?? seed;
+                hash = (hash * primeFactor) + tokenAttributes;
 
-                int scopeHashCode;
-                if (scopePath == null)
-                {
-                    scopeHashCode = 0;
-                }
-                else
-                {
-                    scopeHashCode = StringComparer.Ordinal.GetHashCode(scopePath);
-                }
-
-                hash = (hash * 31) + scopeHashCode;
-
-                return hash;
+                var scopeHashCode = scopePath == null ? 0 : StringComparer.Ordinal.GetHashCode(scopePath);
+                return (hash * primeFactor) + scopeHashCode;
             }
         }
 
