@@ -64,7 +64,7 @@ namespace TextMateSharp.Internal.Matcher
                 return firstMatcher;
             }
 
-            List<Predicate<T>> matchers = new List<Predicate<T>>();
+            List<Predicate<T>> matchers = new List<Predicate<T>>(4);
             matchers.Add(firstMatcher);
             while (true)
             {
@@ -127,7 +127,7 @@ namespace TextMateSharp.Internal.Matcher
                 return firstMatcher;
             }
 
-            List<Predicate<T>> matchers = new List<Predicate<T>>();
+            List<Predicate<T>> matchers = new List<Predicate<T>>(4);
             matchers.Add(firstMatcher);
             matchers.Add(secondMatcher);
 
