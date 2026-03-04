@@ -150,14 +150,14 @@ namespace TextMateSharp.Internal.Grammars
                 int hash = parent?._hashCode ?? seed;
                 hash = (hash * primeFactor) + tokenAttributes;
 
-                var scopeHashCode = scopePath == null ? 0 : StringComparer.Ordinal.GetHashCode(scopePath);
+                int scopeHashCode = scopePath == null ? 0 : StringComparer.Ordinal.GetHashCode(scopePath);
                 return (hash * primeFactor) + scopeHashCode;
             }
         }
 
         static bool MatchesScope(string scope, string selector)
         {
-            if (scope == null || selector == null)
+            if (scope is null || selector is null)
             {
                 return false;
             }
@@ -177,7 +177,7 @@ namespace TextMateSharp.Internal.Grammars
 
         static bool Matches(AttributedScopeStack target, List<string> parentScopes)
         {
-            if (parentScopes == null || parentScopes.Count == 0)
+            if (parentScopes is null || parentScopes.Count == 0)
             {
                 return true;
             }
@@ -186,7 +186,8 @@ namespace TextMateSharp.Internal.Grammars
             int index = 0;
             string selector = parentScopes[index];
 
-            while (target != null)
+            // Use ReferenceEquals to bypass overloaded != operator for performance
+            while (!ReferenceEquals(target, null))
             {
                 if (MatchesScope(target.ScopePath, selector))
                 {
@@ -329,7 +330,9 @@ namespace TextMateSharp.Internal.Grammars
             // First pass: count depth to pre-size the list
             int depth = 0;
             AttributedScopeStack current = scopesList;
-            while (current != null)
+
+            // Use ReferenceEquals to bypass overloaded != operator for performance
+            while (!ReferenceEquals(current, null))
             {
                 depth++;
                 current = current.Parent;
@@ -338,7 +341,9 @@ namespace TextMateSharp.Internal.Grammars
             // initialize exact capacity to avoid resizing
             List<string> result = new List<string>(depth);
             current = scopesList;
-            while (current != null)
+
+            // Use ReferenceEquals to bypass overloaded != operator for performance
+            while (!ReferenceEquals(current, null))
             {
                 result.Add(current.ScopePath);
                 current = current.Parent;

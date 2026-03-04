@@ -35,7 +35,7 @@ namespace TextMateSharp.Grammars
         private int _enterPos;
         private int _anchorPos;
 
-        // Precomputed hash code — uses parent's cached hash to avoid O(n) recursion.
+        // Precomputed hash code - uses parent's cached hash to avoid O(n) recursion.
         // Safe as long as hash-participating fields (Depth, RuleId, EndRule, Parent,
         // ContentNameScopesList) are not mutated after construction
         private readonly int _hashCode;
@@ -51,7 +51,9 @@ namespace TextMateSharp.Grammars
             AttributedScopeStack contentNameScopesList)
         {
             Parent = parent;
-            Depth = (this.Parent != null ? this.Parent.Depth + 1 : 1);
+
+            // Use ReferenceEquals to bypass overloaded != operator for performance
+            Depth = (!ReferenceEquals(this.Parent, null) ? this.Parent.Depth + 1 : 1);
             RuleId = ruleId;
             BeginRuleCapturedEOL = beginRuleCapturedEOL;
             EndRule = endRule;
@@ -212,7 +214,7 @@ namespace TextMateSharp.Grammars
             const int primeFactor = 31; // Common prime factor for multiply-accumulate hash code
             unchecked
             {
-                int hash = (parent?._hashCode) ?? 0;
+                int hash = parent?._hashCode ?? 0;
                 hash = (hash * primeFactor) + (contentNameScopesList?.GetHashCode() ?? 0);
                 hash = (hash * primeFactor) + (endRule?.GetHashCode() ?? 0);
                 hash = (hash * primeFactor) + (ruleId?.GetHashCode() ?? 0);
@@ -223,7 +225,8 @@ namespace TextMateSharp.Grammars
         public void Reset()
         {
             StateStack el = this;
-            while (el != null)
+            // Use ReferenceEquals to bypass overloaded != operator for performance
+            while (!ReferenceEquals(el, null))
             {
                 el._enterPos = -1;
                 el._anchorPos = -1;
@@ -238,7 +241,8 @@ namespace TextMateSharp.Grammars
 
         public StateStack SafePop()
         {
-            if (this.Parent != null)
+            // Use ReferenceEquals to bypass overloaded != operator for performance
+            if (!ReferenceEquals(this.Parent, null))
             {
                 return this.Parent;
             }
@@ -360,7 +364,9 @@ namespace TextMateSharp.Grammars
             if (other is null) throw new ArgumentNullException(nameof(other));
 
             StateStack el = this;
-            while (el is not null && el._enterPos == other._enterPos)
+
+            // Use ReferenceEquals to bypass overloaded != operator for performance
+            while (!ReferenceEquals(el, null) && el._enterPos == other._enterPos)
             {
                 if (el.RuleId == other.RuleId)
                 {
