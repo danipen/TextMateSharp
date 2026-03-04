@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Grammars;
@@ -1536,6 +1537,24 @@ namespace TextMateSharp.Tests.Grammar
         #endregion Operator == and != tests
 
         #region HasSameRuleAs tests
+
+        [Test]
+        public void HasSameRuleAs_ThrowsArgumentNullException_WhenOtherIsNull()
+        {
+            // Arrange
+            StateStack stack = new StateStack(
+                null,
+                RuleId.Of(RuleIdSingleDepth),
+                EnterPosition,
+                AnchorPosition,
+                false,
+                null,
+                CreateTestScopeStack(),
+                CreateTestScopeStack());
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => stack.HasSameRuleAs(null));
+        }
 
         [Test]
         public void HasSameRuleAs_SameRuleAtTop_ReturnsTrue()
