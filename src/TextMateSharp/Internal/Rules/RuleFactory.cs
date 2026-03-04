@@ -227,26 +227,23 @@ namespace TextMateSharp.Internal.Rules
 
                         skipRule = false;
 
-                        if (rule is IncludeOnlyRule)
+                        if (rule is IncludeOnlyRule ior)
                         {
-                            IncludeOnlyRule ior = (IncludeOnlyRule)rule;
                             if (ior.HasMissingPatterns && ior.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }
                         }
-                        else if (rule is BeginEndRule)
+                        else if (rule is BeginEndRule br)
                         {
-                            BeginEndRule br = (BeginEndRule)rule;
                             if (br.HasMissingPatterns && br.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }
                         }
-                        else if (rule is BeginWhileRule)
+                        else if (rule is BeginWhileRule bwRule)
                         {
-                            BeginWhileRule br = (BeginWhileRule)rule;
-                            if (br.HasMissingPatterns && br.Patterns.Count == 0)
+                            if (bwRule.HasMissingPatterns && bwRule.Patterns.Count == 0)
                             {
                                 skipRule = true;
                             }

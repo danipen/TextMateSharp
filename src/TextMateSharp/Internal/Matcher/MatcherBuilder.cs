@@ -7,12 +7,15 @@ namespace TextMateSharp.Internal.Matcher
     public class MatcherBuilder<T>
     {
         public List<MatcherWithPriority<T>> Results;
-        private Tokenizer _tokenizer;
-        private IMatchesName<T> _matchesName;
+        private readonly Tokenizer _tokenizer;
+        private readonly IMatchesName<T> _matchesName;
         private string _token;
 
         public MatcherBuilder(string expression, IMatchesName<T> matchesName)
         {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (matchesName == null) throw new ArgumentNullException(nameof(matchesName));
+
             this.Results = new List<MatcherWithPriority<T>>();
             this._tokenizer = new Tokenizer(expression);
             this._matchesName = matchesName;
@@ -49,11 +52,22 @@ namespace TextMateSharp.Internal.Matcher
 
         private Predicate<T> ParseInnerExpression()
         {
-            List<Predicate<T>> matchers = new List<Predicate<T>>();
-            Predicate<T> matcher = ParseConjunction();
-            while (matcher != null)
+            Predicate<T> firstMatcher = ParseConjunction();
+            if (firstMatcher == null)
             {
-                matchers.Add(matcher);
+                return null;
+            }
+
+            // Fast path: single conjunction, no OR separators.
+            if (!"|".Equals(_token) && !",".Equals(_token))
+            {
+                return firstMatcher;
+            }
+
+            List<Predicate<T>> matchers = new List<Predicate<T>>(4);
+            matchers.Add(firstMatcher);
+            while (true)
+            {
                 if ("|".Equals(_token) || ",".Equals(_token))
                 {
                     do
@@ -66,14 +80,30 @@ namespace TextMateSharp.Internal.Matcher
                 {
                     break;
                 }
-                matcher = ParseConjunction();
+
+                Predicate<T> matcher = ParseConjunction();
+                if (matcher == null)
+                {
+                    break;
+                }
+
+                matchers.Add(matcher);
+                if (!"|".Equals(_token) && !",".Equals(_token))
+                {
+                    break;
+                }
+            }
+
+            if (matchers.Count == 1)
+            {
+                return matchers[0];
             }
             // some (or)
             return matcherInput =>
             {
-                foreach (Predicate<T> matcher1 in matchers)
+                for (int i = 0; i < matchers.Count; i++)
                 {
-                    if (matcher1.Invoke(matcherInput))
+                    if (matchers[i].Invoke(matcherInput))
                     {
                         return true;
                     }
@@ -84,7 +114,23 @@ namespace TextMateSharp.Internal.Matcher
 
         private Predicate<T> ParseConjunction()
         {
-            List<Predicate<T>> matchers = new List<Predicate<T>>();
+            Predicate<T> firstMatcher = ParseOperand();
+            if (firstMatcher == null)
+            {
+                return null;
+            }
+
+            // Fast path: single operand, no AND chain.
+            Predicate<T> secondMatcher = ParseOperand();
+            if (secondMatcher == null)
+            {
+                return firstMatcher;
+            }
+
+            List<Predicate<T>> matchers = new List<Predicate<T>>(4);
+            matchers.Add(firstMatcher);
+            matchers.Add(secondMatcher);
+
             Predicate<T> matcher = ParseOperand();
             while (matcher != null)
             {
@@ -94,9 +140,9 @@ namespace TextMateSharp.Internal.Matcher
             // every (and)
             return matcherInput =>
             {
-                foreach (Predicate<T> matcher1 in matchers)
+                for (int i = 0; i < matchers.Count; i++)
                 {
-                    if (!matcher1.Invoke(matcherInput))
+                    if (!matchers[i].Invoke(matcherInput))
                     {
                         return false;
                     }
@@ -132,7 +178,7 @@ namespace TextMateSharp.Internal.Matcher
             }
             if (IsIdentifier(_token))
             {
-                ICollection<string> identifiers = new List<string>();
+                List<string> identifiers = new List<string>();
                 do
                 {
                     identifiers.Add(_token);
@@ -143,7 +189,7 @@ namespace TextMateSharp.Internal.Matcher
             return null;
         }
 
-        private bool IsIdentifier(string token)
+        private static bool IsIdentifier(string token)
         {
             if (string.IsNullOrEmpty(token))
                 return false;
@@ -172,12 +218,12 @@ namespace TextMateSharp.Internal.Matcher
         {
 
             private static Regex REGEXP = new Regex("([LR]:|[\\w\\.:][\\w\\.:\\-]*|[\\,\\|\\-\\(\\)])");
-            private string _input;
+            private readonly string _input;
             Match _currentMatch;
 
             public Tokenizer(string input)
             {
-                _input = input;
+                _input = input ?? throw new ArgumentNullException(nameof(input));
             }
 
             public string Next()

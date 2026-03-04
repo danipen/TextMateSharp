@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Onigwrap;
+using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Rules
 {
@@ -67,7 +67,7 @@ namespace TextMateSharp.Internal.Rules
             {
                 if (this._cached == null)
                 {
-                    List<string> regexps = new List<string>();
+                    List<string> regexps = new List<string>(_items.Count);
                     foreach (RegExpSource regExpSource in _items)
                     {
                         regexps.Add(regExpSource.GetSource());
@@ -113,7 +113,7 @@ namespace TextMateSharp.Internal.Rules
 
         private CompiledRule ResolveAnchors(bool allowA, bool allowG)
         {
-            List<string> regexps = new List<string>();
+            List<string> regexps = new List<string>(_items.Count);
             foreach (RegExpSource regExpSource in _items)
             {
                 regexps.Add(regExpSource.ResolveAnchors(allowA, allowG));
@@ -121,14 +121,14 @@ namespace TextMateSharp.Internal.Rules
             return new CompiledRule(CreateOnigScanner(regexps.ToArray()), GetRules());
         }
 
-        private OnigScanner CreateOnigScanner(string[] regexps)
+        private static OnigScanner CreateOnigScanner(string[] regexps)
         {
             return new OnigScanner(regexps);
         }
 
         private IList<RuleId> GetRules()
         {
-            List<RuleId> ruleIds = new List<RuleId>();
+            List<RuleId> ruleIds = new List<RuleId>(_items.Count);
             foreach (RegExpSource item in this._items)
             {
                 ruleIds.Add(item.GetRuleId());

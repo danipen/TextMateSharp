@@ -74,7 +74,7 @@ namespace TextMateSharp.Themes
             List<ThemeTrieElementRule> arr;
             if ("".Equals(scope))
             {
-                arr = new List<ThemeTrieElementRule>();
+                arr = new List<ThemeTrieElementRule>(rulesWithParentScopes.Count + 1);
                 arr.Add(this.mainRule);
                 arr.AddRange(this.rulesWithParentScopes);
                 return ThemeTrieElement.SortBySpecificity(arr);
@@ -99,7 +99,7 @@ namespace TextMateSharp.Themes
                 return value.Match(tail);
             }
 
-            arr = new List<ThemeTrieElementRule>();
+            arr = new List<ThemeTrieElementRule>(rulesWithParentScopes.Count + 1);
             if (this.mainRule.foreground > 0)
                 arr.Add(this.mainRule);
             arr.AddRange(this.rulesWithParentScopes);
@@ -161,7 +161,7 @@ namespace TextMateSharp.Themes
                 if (StringUtils.StrArrCmp(rule.parentScopes, parentScopes) == 0)
                 {
                     // bingo! => we get to merge this into an existing one
-                    rule.AcceptOverwrite(rule.name,  scopeDepth, fontStyle, foreground, background);
+                    rule.AcceptOverwrite(rule.name, scopeDepth, fontStyle, foreground, background);
                     return;
                 }
             }

@@ -1,7 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
+using System.Threading;
 using TextMateSharp.Internal.Utils;
 using TextMateSharp.Registry;
 
@@ -9,10 +10,11 @@ namespace TextMateSharp.Themes
 {
     public class Theme
     {
-        private ParsedTheme _theme;
-        private ParsedTheme _include;
-        private ColorMap _colorMap;
-        private Dictionary<string, string> _guiColorDictionary;
+        private readonly ParsedTheme _theme;
+        private readonly ParsedTheme _include;
+        private readonly ColorMap _colorMap;
+        private readonly Dictionary<string, string> _guiColorDictionary;
+        private ReadOnlyDictionary<string, string> _cachedGuiColorDictionary;
 
         public static Theme CreateFromRawTheme(
             IRawTheme source,
@@ -21,15 +23,15 @@ namespace TextMateSharp.Themes
             ColorMap colorMap = new ColorMap();
             var guiColorsDictionary = new Dictionary<string, string>();
 
-            var themeRuleList = ParsedTheme.ParseTheme(source,0);
-            
+            var themeRuleList = ParsedTheme.ParseTheme(source);
+
             ParsedTheme theme = ParsedTheme.CreateFromParsedTheme(
                 themeRuleList,
                 colorMap);
 
             IRawTheme themeInclude;
             ParsedTheme include = ParsedTheme.CreateFromParsedTheme(
-                ParsedTheme.ParseInclude(source, registryOptions, 0, out themeInclude),
+                ParsedTheme.ParseInclude(source, registryOptions, out themeInclude),
                 colorMap);
 
             // First get colors from include, then try and overwrite with local colors..
@@ -43,7 +45,7 @@ namespace TextMateSharp.Themes
             return new Theme(colorMap, theme, include, guiColorsDictionary);
         }
 
-        Theme(ColorMap colorMap, ParsedTheme theme, ParsedTheme include, Dictionary<string,string> guiColorDictionary)
+        Theme(ColorMap colorMap, ParsedTheme theme, ParsedTheme include, Dictionary<string, string> guiColorDictionary)
         {
             _colorMap = colorMap;
             _theme = theme;
@@ -66,7 +68,15 @@ namespace TextMateSharp.Themes
 
         public ReadOnlyDictionary<string, string> GetGuiColorDictionary()
         {
-            return new ReadOnlyDictionary<string, string>(this._guiColorDictionary);
+            ReadOnlyDictionary<string, string> result = Volatile.Read(ref this._cachedGuiColorDictionary);
+            if (result == null)
+            {
+                ReadOnlyDictionary<string, string> candidate = new ReadOnlyDictionary<string, string>(this._guiColorDictionary);
+                result = Interlocked.CompareExchange(ref this._cachedGuiColorDictionary, candidate, null)
+                         ?? candidate;
+            }
+
+            return result;
         }
 
         public ICollection<string> GetColorMap()
@@ -92,27 +102,42 @@ namespace TextMateSharp.Themes
 
     class ParsedTheme
     {
-        private ThemeTrieElement _root;
-        private ThemeTrieElementRule _defaults;
+        private readonly ThemeTrieElement _root;
+        private readonly ThemeTrieElementRule _defaults;
 
-        private Dictionary<string /* scopeName */, List<ThemeTrieElementRule>> _cachedMatchRoot;
+        private readonly ConcurrentDictionary<string /* scopeName */, List<ThemeTrieElementRule>> _cachedMatchRoot;
+        private const char SpaceChar = ' ';
 
-        internal static List<ParsedThemeRule> ParseTheme(IRawTheme source, int priority)
+        // Static sort comparison to avoid delegate allocation per sort call
+        private static readonly Comparison<ParsedThemeRule> _themeRuleComparison = (a, b) =>
+        {
+            int r = StringUtils.StrCmp(a.scope, b.scope);
+            if (r != 0)
+                return r;
+
+            r = StringUtils.StrArrCmp(a.parentScopes, b.parentScopes);
+            if (r != 0)
+                return r;
+
+            return a.index.CompareTo(b.index);
+        };
+
+        internal static List<ParsedThemeRule> ParseTheme(IRawTheme source)
         {
             List<ParsedThemeRule> result = new List<ParsedThemeRule>();
 
             // process theme rules in vscode-textmate format:
             // see https://github.com/microsoft/vscode-textmate/tree/main/test-cases/themes
-            LookupThemeRules(source.GetSettings(), result, priority);
+            LookupThemeRules(source.GetSettings(), result);
 
             // process theme rules in vscode format
             // see https://github.com/microsoft/vscode/tree/main/extensions/theme-defaults/themes
-            LookupThemeRules(source.GetTokenColors(), result, priority);
+            LookupThemeRules(source.GetTokenColors(), result);
 
             return result;
         }
 
-        internal static void ParsedGuiColors(IRawTheme source, Dictionary<string,string> colorDictionary)
+        internal static void ParsedGuiColors(IRawTheme source, Dictionary<string, string> colorDictionary)
         {
             var colors = source.GetGuiColors();
             if (colors == null)
@@ -129,32 +154,27 @@ namespace TextMateSharp.Themes
         internal static List<ParsedThemeRule> ParseInclude(
             IRawTheme source,
             IRegistryOptions registryOptions,
-            int priority,
             out IRawTheme themeInclude)
         {
-            List<ParsedThemeRule> result = new List<ParsedThemeRule>();
-
             string include = source.GetInclude();
 
             if (string.IsNullOrEmpty(include))
             {
                 themeInclude = null;
-                return result;
+                return new List<ParsedThemeRule>();
             }
 
             themeInclude = registryOptions.GetTheme(include);
 
             if (themeInclude == null)
-                return result;
+                return new List<ParsedThemeRule>();
 
-            return ParseTheme(themeInclude, priority);
-
+            return ParseTheme(themeInclude);
         }
 
         static void LookupThemeRules(
             ICollection<IRawThemeSetting> settings,
-            List<ParsedThemeRule> parsedThemeRules,
-            int priority)
+            List<ParsedThemeRule> parsedThemeRules)
         {
             if (settings == null)
                 return;
@@ -168,83 +188,207 @@ namespace TextMateSharp.Themes
                 }
 
                 object settingScope = entry.GetScope();
-                List<string> scopes = new List<string>();
-                if (settingScope is string)
+                List<string> scopes;
+                const char separator = ',';
+                if (settingScope is string scopeStr)
                 {
-                    string scope = (string)settingScope;
                     // remove leading and trailing commas
-                    scope = scope.Trim(',');
-                    scopes = new List<string>(scope.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries));
+                    ReadOnlySpan<char> trimmedScope = scopeStr.AsSpan().Trim(separator);
+
+                    if (trimmedScope.Length == 0)
+                    {
+                        // Matches original behavior: String.Split with RemoveEmptyEntries on an empty
+                        // string returns an empty array, so no scopes are produced and no rules are
+                        // generated for this entry
+                        scopes = new List<string>();
+                    }
+                    else
+                    {
+                        // Count commas to pre-size list and avoid over-allocation
+                        int commaCount = 0;
+                        for (int k = 0; k < trimmedScope.Length; k++)
+                        {
+                            if (trimmedScope[k] == separator)
+                                commaCount++;
+                        }
+
+                        scopes = new List<string>(commaCount + 1);
+
+                        // Span-based split avoids intermediate string[] allocation from String.Split
+                        while (trimmedScope.Length > 0)
+                        {
+                            int commaIndex = trimmedScope.IndexOf(separator);
+                            if (commaIndex < 0)
+                            {
+                                // ToString() allocates the final string required by ParsedThemeRule.
+                                // This allocation is necessary as ParsedThemeRule stores string fields.
+                                scopes.Add(trimmedScope.ToString());
+                                break;
+                            }
+
+                            ReadOnlySpan<char> segment = trimmedScope.Slice(0, commaIndex);
+                            if (segment.Length > 0)
+                                // ToString() allocates the final string required by ParsedThemeRule.
+                                // This allocation is necessary as ParsedThemeRule stores string fields.
+                                scopes.Add(segment.ToString());
+
+                            trimmedScope = trimmedScope.Slice(commaIndex + 1);
+                        }
+                    }
                 }
-                else if (settingScope is IList<object>)
+                else if (settingScope is IList<object> scopeList)
                 {
-                    scopes = new List<string>(((IList<object>)settingScope).Cast<string>());
+                    // Direct cast avoids LINQ Cast<string>() iterator/IEnumerable allocation
+                    scopes = new List<string>(scopeList.Count);
+                    for (int k = 0; k < scopeList.Count; k++)
+                    {
+                        scopes.Add((string)scopeList[k]);
+                    }
                 }
                 else
                 {
-                    scopes.Add("");
+                    scopes = new List<string>(1);
+                    scopes.Add(string.Empty);
                 }
 
                 FontStyle fontStyle = FontStyle.NotSet;
                 object settingsFontStyle = entry.GetSetting().GetFontStyle();
-                if (settingsFontStyle is string)
+                if (settingsFontStyle is string fontStyleStr)
                 {
-                    fontStyle = FontStyle.None;
-
-                    string[] segments = ((string)settingsFontStyle).Split(new[] { " " }, StringSplitOptions.None);
-                    foreach (string segment in segments)
-                    {
-                        switch (segment)
-                        {
-                            case "italic":
-                                fontStyle |= FontStyle.Italic;
-                                break;
-                            case "bold":
-                                fontStyle |= FontStyle.Bold;
-                                break;
-                            case "underline":
-                                fontStyle |= FontStyle.Underline;
-                                break;
-                            case "strikethrough":
-                                fontStyle |= FontStyle.Strikethrough;
-                                break;
-                        }
-                    }
+                    // Span-based parsing avoids string[] allocation from String.Split.
+                    // Uses SequenceEqual for allocation-free keyword matching.
+                    fontStyle = ParseFontStyle(fontStyleStr.AsSpan());
                 }
 
                 string foreground = null;
                 object settingsForeground = entry.GetSetting().GetForeground();
-                if (settingsForeground is string && StringUtils.IsValidHexColor((string)settingsForeground))
+                if (settingsForeground is string fgStr && StringUtils.IsValidHexColor(fgStr))
                 {
-                    foreground = (string)settingsForeground;
+                    foreground = fgStr;
                 }
 
                 string background = null;
                 object settingsBackground = entry.GetSetting().GetBackground();
-                if (settingsBackground is string && StringUtils.IsValidHexColor((string)settingsBackground))
+                if (settingsBackground is string bgStr && StringUtils.IsValidHexColor(bgStr))
                 {
-                    background = (string)settingsBackground;
+                    background = bgStr;
                 }
                 for (int j = 0, lenJ = scopes.Count; j < lenJ; j++)
                 {
                     string _scope = scopes[j].Trim();
 
-                    List<string> segments = new List<string>(_scope.Split(new[] { " " }, StringSplitOptions.None));
+                    // Extract scope (last segment) and parentScopes (all segments reversed)
+                    // in a single method call, eliminating redundant string scans from the
+                    // previous LastIndexOf + Substring + BuildReversedSegments approach.
+                    ExtractScopeAndParents(_scope, out string scope, out List<string> parentScopes);
 
-                    string scope = segments[segments.Count - 1];
-                    List<string> parentScopes = null;
-                    if (segments.Count > 1)
-                    {
-                        parentScopes = new List<string>(segments);
-                        parentScopes.Reverse();
-                    }
-                    var name = entry.GetName();
+                    string name = entry.GetName();
 
                     ParsedThemeRule t = new ParsedThemeRule(name, scope, parentScopes, i, fontStyle, foreground, background);
                     parsedThemeRules.Add(t);
                 }
                 i++;
             }
+        }
+
+        /// <summary>
+        /// Parses a space-delimited font style string (e.g. "italic bold") into a <see cref="FontStyle"/>
+        /// flags value without allocating a string[] from String.Split.
+        /// Uses <see cref="MemoryExtensions.SequenceEqual{T}(ReadOnlySpan{char}, ReadOnlySpan{char})"/> for allocation-free keyword matching.
+        /// SequenceEqual checks length first internally, so no manual length pre-check is needed.
+        /// </summary>
+        private static FontStyle ParseFontStyle(ReadOnlySpan<char> value)
+        {
+            FontStyle fontStyle = FontStyle.None;
+            while (value.Length > 0)
+            {
+                int spaceIndex = value.IndexOf(SpaceChar);
+                ReadOnlySpan<char> segment;
+
+                if (spaceIndex < 0)
+                {
+                    segment = value;
+                    value = ReadOnlySpan<char>.Empty;
+                }
+                else
+                {
+                    segment = value.Slice(0, spaceIndex);
+                    value = value.Slice(spaceIndex + 1);
+                }
+
+                if (segment.SequenceEqual("italic".AsSpan()))
+                    fontStyle |= FontStyle.Italic;
+                else if (segment.SequenceEqual("bold".AsSpan()))
+                    fontStyle |= FontStyle.Bold;
+                else if (segment.SequenceEqual("underline".AsSpan()))
+                    fontStyle |= FontStyle.Underline;
+                else if (segment.SequenceEqual("strikethrough".AsSpan()))
+                    fontStyle |= FontStyle.Strikethrough;
+            }
+
+            return fontStyle;
+        }
+
+        /// <summary>
+        /// Extracts the scope (last segment) and parentScopes (all segments in reverse order)
+        /// from a space-delimited scope string using two linear passes over the input.
+        /// The first pass counts segments and enables a fast path for single-segment scopes;
+        /// the second pass walks backward once to extract the scope and parent scopes in reverse order.
+        /// This replaces the previous three-step approach (LastIndexOf + Substring + BuildReversedSegments),
+        /// which scanned the string 3 times and allocated an extra Substring for the scope.
+        /// 
+        /// Note: Substring allocations are necessary here because ParsedThemeRule and ThemeTrieElement
+        /// store and operate on string fields. While ReadOnlySpan is used for parsing efficiency,
+        /// the final strings must be allocated for storage in the theme data structures.
+        /// Further allocation reduction would require architectural changes to use ReadOnlyMemory&lt;char&gt;
+        /// or string pooling throughout the theme infrastructure.
+        /// </summary>
+        /// <param name="value">The space-delimited scope string (e.g. "text.html.basic source.js").</param>
+        /// <param name="scope">The last segment (e.g. "source.js").</param>
+        /// <param name="parentScopes">All segments in reverse order, or null if single-segment.</param>
+        private static void ExtractScopeAndParents(string value, out string scope, out List<string> parentScopes)
+        {
+            ReadOnlySpan<char> span = value.AsSpan();
+
+            // Count segments with a single forward pass
+            int segmentCount = 1;
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (span[i] == SpaceChar)
+                    segmentCount++;
+            }
+
+            // Fast path: single-segment scope (most common case) avoids all further work
+            if (segmentCount == 1)
+            {
+                scope = value;
+                parentScopes = null;
+                return;
+            }
+
+            parentScopes = new List<string>(segmentCount);
+
+            // Walk backwards through the span to build the reversed segment list.
+            // The first segment encountered (rightmost in original string) is the scope.
+            int end = span.Length;
+            scope = null;
+
+            for (int i = span.Length - 1; i >= 0; i--)
+            {
+                if (span[i] == SpaceChar)
+                {
+                    // Substring allocates a new string. This is necessary because downstream
+                    // consumers (ParsedThemeRule, ThemeTrieElement) store and operate on strings
+                    string segment = value.Substring(i + 1, end - i - 1);
+                    scope ??= segment;
+                    parentScopes.Add(segment);
+                    end = i;
+                }
+            }
+
+            // Add first (leftmost) segment. Substring allocation is necessary for storage
+            string firstSegment = value.Substring(0, end);
+            parentScopes.Add(firstSegment);
         }
 
         public static ParsedTheme CreateFromParsedTheme(
@@ -262,29 +406,20 @@ namespace TextMateSharp.Themes
             ColorMap colorMap)
         {
             // Sort rules lexicographically, and then by index if necessary
-            parsedThemeRules.Sort((a, b) =>
-            {
-                int r = StringUtils.StrCmp(a.scope, b.scope);
-                if (r != 0)
-                {
-                    return r;
-                }
-                r = StringUtils.StrArrCmp(a.parentScopes, b.parentScopes);
-                if (r != 0)
-                {
-                    return r;
-                }
-                return a.index.CompareTo(b.index);
-            });
+            parsedThemeRules.Sort(_themeRuleComparison);
 
             // Determine defaults
             FontStyle defaultFontStyle = FontStyle.None;
             string defaultForeground = "#000000";
             string defaultBackground = "#ffffff";
-            while (parsedThemeRules.Count >= 1 && "".Equals(parsedThemeRules[0].scope))
+
+            // Use an index cursor instead of RemoveAt(0) which is O(n) due to array shifting
+            int startIndex = 0;
+            while (startIndex < parsedThemeRules.Count && string.IsNullOrEmpty(parsedThemeRules[startIndex].scope))
             {
-                ParsedThemeRule incomingDefaults = parsedThemeRules[0];
-                parsedThemeRules.RemoveAt(0); // shift();
+                ParsedThemeRule incomingDefaults = parsedThemeRules[startIndex];
+                startIndex++;
+
                 if (incomingDefaults.fontStyle != FontStyle.NotSet)
                 {
                     defaultFontStyle = incomingDefaults.fontStyle;
@@ -303,8 +438,11 @@ namespace TextMateSharp.Themes
 
             ThemeTrieElement root = new ThemeTrieElement(new ThemeTrieElementRule(string.Empty, 0, null, FontStyle.NotSet, 0, 0),
                     new List<ThemeTrieElementRule>());
-            foreach (ParsedThemeRule rule in parsedThemeRules)
+
+            // Iterate from startIndex to skip already-processed default rules
+            for (int i = startIndex; i < parsedThemeRules.Count; i++)
             {
+                ParsedThemeRule rule = parsedThemeRules[i];
                 root.Insert(rule.name, 0, rule.scope, rule.parentScopes, rule.fontStyle, colorMap.GetId(rule.foreground),
                         colorMap.GetId(rule.background));
             }
@@ -315,20 +453,33 @@ namespace TextMateSharp.Themes
         {
             this._root = root;
             this._defaults = defaults;
-            _cachedMatchRoot = new Dictionary<string, List<ThemeTrieElementRule>>();
+            this._cachedMatchRoot = new ConcurrentDictionary<string, List<ThemeTrieElementRule>>();
         }
 
         internal List<ThemeTrieElementRule> Match(string scopeName)
         {
-            lock (this._cachedMatchRoot)
+            if (scopeName == null) throw new ArgumentNullException(nameof(scopeName));
+
+            // TryGetValue + TryAdd pattern avoids the Func<> delegate allocation that
+            // ConcurrentDictionary.GetOrAdd(key, factory) would incur on every call
+            // (even on cache hits) due to the lambda capturing 'this'.
+            if (!this._cachedMatchRoot.TryGetValue(scopeName, out List<ThemeTrieElementRule> value))
             {
-                if (!_cachedMatchRoot.TryGetValue(scopeName, out List<ThemeTrieElementRule> value))
+                // Compute the value locally, then attempt to cache it. If another thread
+                // wins the race to add the value for this scopeName, read back the value
+                // that actually ended up in the cache to ensure consistency.
+                value = this._root.Match(scopeName);
+                if (!this._cachedMatchRoot.TryAdd(scopeName, value))
                 {
-                    value = this._root.Match(scopeName);
-                    this._cachedMatchRoot[scopeName] = value;
+                    if (!this._cachedMatchRoot.TryGetValue(scopeName, out value))
+                    {
+                        // In the unlikely event the key was removed between TryAdd and TryGetValue,
+                        // recompute to ensure a non-null result is always returned
+                        value = this._root.Match(scopeName);
+                    }
                 }
-                return value;
             }
+            return value;
         }
 
         internal ThemeTrieElementRule GetDefaults()

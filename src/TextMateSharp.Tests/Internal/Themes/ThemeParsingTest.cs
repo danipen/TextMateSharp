@@ -23,7 +23,7 @@ namespace TextMateSharp.Tests.Internal.Themes
             StreamReader reader = new StreamReader(memoryStream);
             var theme = ThemeReader.ReadThemeSync(reader);
 
-            var actualThemeRules = ParsedTheme.ParseTheme(theme, 0);
+            var actualThemeRules = ParsedTheme.ParseTheme(theme);
 
             var expectedThemeRules = new ParsedThemeRule[] {
                 new ParsedThemeRule("", "", null, 0, FontStyle.NotSet, "#F8F8F2", "#272822"),

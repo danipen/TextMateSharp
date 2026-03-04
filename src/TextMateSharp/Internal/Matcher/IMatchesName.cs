@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Matcher
@@ -15,28 +15,39 @@ namespace TextMateSharp.Internal.Matcher
 
         public bool Match(ICollection<string> identifers, List<string> scopes)
         {
+            if (identifers == null) throw new ArgumentNullException(nameof(identifers));
+            if (scopes == null) throw new ArgumentNullException(nameof(scopes));
+
             if (scopes.Count < identifers.Count)
             {
                 return false;
             }
 
             int lastIndex = 0;
-            return identifers.All(identifier =>
+            foreach (string identifier in identifers)
             {
+                bool found = false;
                 for (int i = lastIndex; i < scopes.Count; i++)
                 {
                     if (ScopesAreMatching(scopes[i], identifier))
                     {
-                        lastIndex++;
-                        return true;
+                        // Start the next search immediately after the current match
+                        lastIndex = i + 1;
+                        found = true;
+                        break;
                     }
                 }
 
-                return false;
-            });
+                if (!found)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        private bool ScopesAreMatching(string thisScopeName, string scopeName)
+        private static bool ScopesAreMatching(string thisScopeName, string scopeName)
         {
             if (thisScopeName == null)
             {
@@ -47,8 +58,7 @@ namespace TextMateSharp.Internal.Matcher
                 return true;
             }
             int len = scopeName.Length;
-            return thisScopeName.Length > len && thisScopeName.SubstringAtIndexes(0, len).Equals(scopeName)
-                    && thisScopeName[len] == '.';
+            return (thisScopeName.Length > len) && (thisScopeName[len] == '.') && thisScopeName.SubstringAtIndexes(0, len).Equals(scopeName);
         }
     }
 }

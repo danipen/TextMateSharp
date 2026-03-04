@@ -1,11 +1,8 @@
-﻿using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 using System.Collections.Generic;
 
-using TextMateSharp.Internal.Matcher;
-
-namespace TextMateSharp.Tests.Internal.MatcherTest
+namespace TextMateSharp.Tests.Internal.Matcher
 {
     [TestFixture]
     internal class MatcherTests
@@ -37,7 +34,7 @@ namespace TextMateSharp.Tests.Internal.MatcherTest
         [TestCase("foo bar - (yo | man)", new string[] { "foo", "bar", "yo" }, false)]
         public void Matcher_Should_Work(string expression, string[] input, bool expectedResult)
         {
-            var matchers = Matcher.CreateMatchers(expression);
+            var matchers = TextMateSharp.Internal.Matcher.Matcher.CreateMatchers(expression);
             bool actualResult = false;
             foreach (var item in matchers)
             {

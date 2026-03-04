@@ -4,7 +4,6 @@ using System.Linq;
 
 using TextMateSharp.Internal.Rules;
 using TextMateSharp.Internal.Types;
-using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Grammars.Parser
 {
@@ -112,14 +111,14 @@ namespace TextMateSharp.Internal.Grammars.Parser
         private void UpdateCaptures(string name)
         {
             object captures = TryGetObject<object>(name);
-            if (captures is IList)
+            if (captures is IList capturesList)
             {
                 Raw rawCaptures = new Raw();
                 int i = 0;
-                foreach (object capture in (IList)captures)
+                foreach (object capture in capturesList)
                 {
                     i++;
-                    rawCaptures[i + ""] = capture;
+                    rawCaptures[i.ToString()] = capture;
                 }
                 this[name] = rawCaptures;
             }
@@ -220,13 +219,13 @@ namespace TextMateSharp.Internal.Grammars.Parser
             {
                 return false;
             }
-            if (applyEndPatternLast is bool)
+            if (applyEndPatternLast is bool applyEndPatternLastBool)
             {
-                return (bool)applyEndPatternLast;
+                return applyEndPatternLastBool;
             }
-            if (applyEndPatternLast is int)
+            if (applyEndPatternLast is int applyEndPatternLastInt)
             {
-                return ((int)applyEndPatternLast) == 1;
+                return applyEndPatternLastInt == 1;
             }
             return false;
         }
@@ -245,21 +244,27 @@ namespace TextMateSharp.Internal.Grammars.Parser
         {
             if (fileTypes == null)
             {
-                List<string> list = new List<string>();
+                List<string> list;
                 ICollection unparsedFileTypes = TryGetObject<ICollection>(FILE_TYPES);
                 if (unparsedFileTypes != null)
                 {
+                    list = new List<string>(unparsedFileTypes.Count);
                     foreach (object o in unparsedFileTypes)
                     {
                         string str = o.ToString();
                         // #202
-                        if (str.StartsWith("."))
+                        if (!string.IsNullOrEmpty(str) && str[0] == '.')
                         {
                             str = str.Substring(1);
                         }
                         list.Add(str);
                     }
                 }
+                else
+                {
+                    list = new List<string>();
+                }
+
                 fileTypes = list;
             }
             return fileTypes;
@@ -282,9 +287,8 @@ namespace TextMateSharp.Internal.Grammars.Parser
 
         public object Clone(object value)
         {
-            if (value is Raw)
+            if (value is Raw rawToClone)
             {
-                Raw rawToClone = (Raw)value;
                 Raw raw = new Raw();
 
                 foreach (string key in rawToClone.Keys)
@@ -293,12 +297,12 @@ namespace TextMateSharp.Internal.Grammars.Parser
                 }
                 return raw;
             }
-            else if (value is IList)
+            else if (value is IList list)
             {
-                List<object> result = new List<object>();
-                foreach (object obj in (IList)value)
+                List<object> result = new List<object>(list.Count);
+                for (int i = 0; i < list.Count; i++)
                 {
-                    result.Add(Clone(obj));
+                    result.Add(Clone(list[i]));
                 }
                 return result;
             }
@@ -322,9 +326,9 @@ namespace TextMateSharp.Internal.Grammars.Parser
             return Keys.GetEnumerator();
         }
 
-        Dictionary<string, T> ConvertToDictionary<T>(Raw raw)
+        static Dictionary<string, T> ConvertToDictionary<T>(Raw raw)
         {
-            Dictionary<string, T> result = new Dictionary<string, T>();
+            Dictionary<string, T> result = new Dictionary<string, T>(raw.Keys.Count);
 
             foreach (string key in raw.Keys)
                 result.Add(key, (T)raw[key]);

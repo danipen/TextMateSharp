@@ -1,9 +1,8 @@
+using Onigwrap;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using Onigwrap;
-
 using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Rules
@@ -121,12 +120,13 @@ namespace TextMateSharp.Internal.Rules
 
         public string ResolveBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
         {
-            List<string> capturedValues = new List<string>();
+            List<string> capturedValues = new List<string>(captureIndices.Length);
 
             try
             {
-                foreach (IOnigCaptureIndex captureIndex in captureIndices)
+                for (int i = 0; i < captureIndices.Length; i++)
                 {
+                    IOnigCaptureIndex captureIndex = captureIndices[i];
                     capturedValues.Add(lineText.SubstringAtIndexes(
                         captureIndex.Start,
                         captureIndex.End));
@@ -180,16 +180,16 @@ namespace TextMateSharp.Internal.Rules
                     case '(':
                     case ')':
                     case '#':
-                    /* escaping white space chars is actually not necessary:
-                    case ' ':
-                    case '\t':
-                    case '\n':
-                    case '\f':
-                    case '\r':
-                    case 0x0B: // vertical tab \v
-                    */
-                    sb.Append('\\');
-                    break;
+                        /* escaping white space chars is actually not necessary:
+                        case ' ':
+                        case '\t':
+                        case '\n':
+                        case '\f':
+                        case '\r':
+                        case 0x0B: // vertical tab \v
+                        */
+                        sb.Append('\\');
+                        break;
                 }
                 sb.Append(ch);
             }

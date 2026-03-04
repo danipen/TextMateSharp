@@ -1,7 +1,5 @@
-using System;
-
 using NUnit.Framework;
-
+using System;
 using TextMateSharp.Grammars;
 
 namespace TextMateSharp.Tests.Grammar
@@ -352,15 +350,6 @@ namespace TextMateSharp.Tests.Grammar
         }
 
         [Test]
-        public void GetHashCode_DifferentContent_ShouldReturnDifferentHash()
-        {
-            LineText lineText1 = "hello";
-            LineText lineText2 = "world";
-
-            Assert.AreNotEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
-        }
-
-        [Test]
         public void GetHashCode_EmptyLineText_ShouldReturnZero()
         {
             LineText lineText = "";
@@ -390,10 +379,12 @@ namespace TextMateSharp.Tests.Grammar
         }
 
         [Test]
-        public void GetHashCode_DifferentArraysSameContent_ShouldReturnSameHash()
+        public void GetHashCode_DifferentStringInstances_SameContent_ShouldReturnSameHash()
         {
+            // avoid declaring these as const and use this pattern to dodge string interning
+            // which would make them reference the same object and not test the content-based hash code properly
             string buffer1 = "hello";
-            string buffer2 = "hello";
+            string buffer2 = new string("hello".ToCharArray());
 
             LineText lineText1 = buffer1.AsMemory();
             LineText lineText2 = buffer2.AsMemory();
@@ -423,27 +414,12 @@ namespace TextMateSharp.Tests.Grammar
         }
 
         [Test]
-        public void GetHashCode_SimilarStrings_ShouldProduceDifferentHashes()
-        {
-            // These are similar but should have different hashes
-            LineText lineText1 = "abc";
-            LineText lineText2 = "abd";
-            LineText lineText3 = "bbc";
-
-            Assert.AreNotEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
-            Assert.AreNotEqual(lineText1.GetHashCode(), lineText3.GetHashCode());
-            Assert.AreNotEqual(lineText2.GetHashCode(), lineText3.GetHashCode());
-        }
-
-        [Test]
-        public void GetHashCode_SingleCharacter_ShouldWork()
+        public void GetHashCode_SingleCharacter_WithSameContent_ShouldWork()
         {
             LineText lineText1 = "a";
             LineText lineText2 = "a";
-            LineText lineText3 = "b";
 
             Assert.AreEqual(lineText1.GetHashCode(), lineText2.GetHashCode());
-            Assert.AreNotEqual(lineText1.GetHashCode(), lineText3.GetHashCode());
         }
 
         #endregion

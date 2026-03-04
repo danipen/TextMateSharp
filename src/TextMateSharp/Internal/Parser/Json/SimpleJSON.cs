@@ -871,10 +871,8 @@ namespace SimpleJSON
             {
                 if (value == null)
                     value = JSONNull.CreateOrGet();
-                if (m_Dict.ContainsKey(aKey))
-                    m_Dict[aKey] = value;
-                else
-                    m_Dict.Add(aKey, value);
+
+                m_Dict[aKey] = value;
             }
         }
 
@@ -909,10 +907,7 @@ namespace SimpleJSON
 
             if (aKey != null)
             {
-                if (m_Dict.ContainsKey(aKey))
-                    m_Dict[aKey] = aItem;
-                else
-                    m_Dict.Add(aKey, aItem);
+                m_Dict[aKey] = aItem;
             }
             else
                 m_Dict.Add(Guid.NewGuid().ToString(), aItem);
@@ -920,9 +915,8 @@ namespace SimpleJSON
 
         public override JSONNode Remove(string aKey)
         {
-            if (!m_Dict.ContainsKey(aKey))
+            if (!m_Dict.TryGetValue(aKey, out var tmp))
                 return null;
-            JSONNode tmp = m_Dict[aKey];
             m_Dict.Remove(aKey);
             return tmp;
         }
@@ -938,16 +932,22 @@ namespace SimpleJSON
 
         public override JSONNode Remove(JSONNode aNode)
         {
-            try
+            string keyToRemove = null;
+            foreach (var pair in m_Dict)
             {
-                var item = m_Dict.Where(k => k.Value == aNode).First();
-                m_Dict.Remove(item.Key);
+                if (pair.Value == aNode)
+                {
+                    keyToRemove = pair.Key;
+                    break;
+                }
+            }
+
+            if (keyToRemove != null)
+            {
+                m_Dict.Remove(keyToRemove);
                 return aNode;
             }
-            catch
-            {
-                return null;
-            }
+            return null;
         }
 
         public override void Clear()
