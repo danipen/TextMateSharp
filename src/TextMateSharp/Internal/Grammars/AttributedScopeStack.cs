@@ -315,6 +315,15 @@ namespace TextMateSharp.Internal.Grammars
             return _cachedScopeNames;
         }
 
+        /// <summary>
+        /// Returns a string representation of this scope stack, with scope names separated by spaces.
+        /// </summary>
+        /// <returns>A space-separated string of scope names from root to leaf.</returns>
+        public override string ToString()
+        {
+            return string.Join(" ", GetScopeNames());
+        }
+
         private static List<string> GenerateScopes(AttributedScopeStack scopesList)
         {
             // First pass: count depth to pre-size the list
