@@ -207,7 +207,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
-        public void Equals_NullScopePathInOneStack_NotEqual()
+        public void Equals_NullScopePathInOneStack_ReturnsFalse()
         {
             // arrange
             AttributedScopeStack left = CreateStack((null, 1), ("b", 2));
@@ -218,6 +218,53 @@ namespace TextMateSharp.Tests.Internal.Grammars
 
             // assert
             Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void Equals_IsReflexive()
+        {
+            // arrange
+            AttributedScopeStack stack = CreateStack(("a", 1), ("b", 2));
+
+            // act
+            bool result = stack.Equals((object)stack);
+
+            // assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void Equals_IsSymmetric()
+        {
+            // arrange
+            AttributedScopeStack left = CreateStack(("a", 1), ("b", 2));
+            AttributedScopeStack right = CreateStack(("a", 1), ("b", 2));
+
+            // act
+            bool leftEqualsRight = left.Equals((object)right);
+            bool rightEqualsLeft = right.Equals((object)left);
+
+            // assert
+            Assert.IsTrue(leftEqualsRight);
+            Assert.IsTrue(rightEqualsLeft);
+        }
+
+        [Test]
+        public void Equals_EquivalentDeepStacks_ReturnsTrue()
+        {
+            // arrange
+            const int depth = 50;
+            AttributedScopeStack left = null;
+            AttributedScopeStack right = null;
+
+            for (int i = 0; i < depth; i++)
+            {
+                left = new AttributedScopeStack(left, "s" + i, i);
+                right = new AttributedScopeStack(right, "s" + i, i);
+            }
+
+            // act & assert
+            Assert.IsTrue(left!.Equals(right));
         }
 
         [Test]
@@ -460,6 +507,22 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
+        public void GetHashCode_EqualObjects_ReturnSameValue()
+        {
+            // arrange
+            AttributedScopeStack left = CreateStack(("a", 1), ("b", 2));
+            AttributedScopeStack right = CreateStack(("a", 1), ("b", 2));
+
+            // act
+            int leftHash = left.GetHashCode();
+            int rightHash = right.GetHashCode();
+
+            // assert
+            Assert.IsTrue(left.Equals(right));
+            Assert.AreEqual(leftHash, rightHash);
+        }
+
+        [Test]
         public void GetHashCode_WhenStacksAreEqual_ReturnsSameValue()
         {
             // arrange
@@ -588,6 +651,35 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         [Test]
+        public void IEquatable_IsReflexive()
+        {
+            // arrange
+            AttributedScopeStack stack = CreateStack(("a", 1), ("b", 2));
+
+            // act
+            bool result = stack.Equals(stack);
+
+            // assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void IEquatable_IsSymmetric()
+        {
+            // arrange
+            AttributedScopeStack left = CreateStack(("a", 1));
+            AttributedScopeStack right = CreateStack(("a", 1));
+
+            // act
+            bool leftEqualsRight = left.Equals(right);
+            bool rightEqualsLeft = right.Equals(left);
+
+            // assert
+            Assert.IsTrue(leftEqualsRight);
+            Assert.IsTrue(rightEqualsLeft);
+        }
+
+        [Test]
         public void IEquatable_Equals_UsedByEqualityComparerDefault()
         {
             // arrange
@@ -604,6 +696,42 @@ namespace TextMateSharp.Tests.Internal.Grammars
         #endregion IEquatable<AttributedScopeStack> tests
 
         #region Operator == and != tests
+
+        [Test]
+        public void OperatorEquals_IsReflexive()
+        {
+            // arrange
+            AttributedScopeStack stack = CreateStack(("a", 1));
+
+            // act & assert
+#pragma warning disable CS1718
+            Assert.IsTrue(stack == stack);
+#pragma warning restore CS1718
+        }
+
+        [Test]
+        public void OperatorEquals_IsSymmetric()
+        {
+            // arrange
+            AttributedScopeStack left = CreateStack(("a", 1));
+            AttributedScopeStack right = CreateStack(("a", 1));
+
+            // act & assert
+            Assert.IsTrue(left == right);
+            Assert.IsTrue(right == left);
+        }
+
+        [Test]
+        public void OperatorNotEquals_IsSymmetric()
+        {
+            // arrange
+            AttributedScopeStack left = CreateStack(("a", 1));
+            AttributedScopeStack right = CreateStack(("a", 1));
+
+            // act & assert
+            Assert.IsFalse(left != right);
+            Assert.IsFalse(right != left);
+        }
 
         [Test]
         public void OperatorEquals_StructurallyEqualStacks_ReturnsTrue()
@@ -1503,6 +1631,101 @@ namespace TextMateSharp.Tests.Internal.Grammars
         }
 
         #endregion PushAttributed tests
+
+        #region ToString tests
+
+        [Test]
+        public void ToString_SingleDepthStack_ReturnsFormattedString()
+        {
+            // arrange
+            AttributedScopeStack stack = new AttributedScopeStack(null, "source.cs", 1);
+
+            // act
+            string result = stack.ToString();
+
+            // assert
+            Assert.AreEqual("source.cs", result);
+        }
+
+        [Test]
+        public void ToString_MultiDepthStack_ReturnsSpaceSeparatedScopes()
+        {
+            // arrange
+            AttributedScopeStack stack = CreateStack(("source.cs", 1), ("meta.test", 2));
+
+            // act
+            string result = stack.ToString();
+
+            // assert
+            Assert.AreEqual("source.cs meta.test", result);
+        }
+
+        [Test]
+        public void ToString_ThreeDepthStack_ReturnsCorrectOrder()
+        {
+            // arrange
+            AttributedScopeStack stack = CreateStack(("a", 1), ("b", 2), ("c", 3));
+
+            // act
+            string result = stack.ToString();
+
+            // assert
+            Assert.AreEqual("a b c", result);
+        }
+
+        [Test]
+        public void ToString_CalledMultipleTimes_ReturnsSameResult()
+        {
+            // arrange
+            AttributedScopeStack stack = CreateStack(("a", 1), ("b", 2));
+
+            // act
+            string result1 = stack.ToString();
+            string result2 = stack.ToString();
+            string result3 = stack.ToString();
+
+            // assert
+            Assert.AreEqual(result1, result2);
+            Assert.AreEqual(result2, result3);
+            Assert.AreEqual("a b", result1);
+        }
+
+        [Test]
+        public void ToString_BoundaryVeryLargeDepth_ReturnsCorrectFormat()
+        {
+            // arrange
+            const int veryLargeDepth = 100;
+            AttributedScopeStack current = null;
+            for (int i = 0; i < veryLargeDepth; i++)
+            {
+                current = new AttributedScopeStack(current, "s" + i, i);
+            }
+
+            // act
+            string result = current!.ToString();
+
+            // assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.StartsWith("s0 "));
+            Assert.IsTrue(result.EndsWith(" s99"));
+            Assert.AreEqual(100, result.Split(' ').Length); // 100 scopes
+        }
+
+        [Test]
+        public void ToString_WithNullScopePath_IncludesEmptyString()
+        {
+            // arrange
+            AttributedScopeStack stack = CreateStack(("a", 1), (null, 2), ("c", 3));
+
+            // act
+            string result = stack.ToString();
+
+            // assert
+            // null scope path should appear as empty string in output
+            Assert.AreEqual("a  c", result); // note: two spaces (empty string between)
+        }
+
+        #endregion ToString tests
 
         #region Helpers
 
