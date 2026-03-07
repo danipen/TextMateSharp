@@ -1549,7 +1549,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             AttributedScopeStack stack = CreateStack(("a", 1), ("b", 2));
 
             // act
-            AttributedScopeStack result = stack.PushAtributed(null, null);
+            AttributedScopeStack result = stack.PushAttributed(null, null);
 
             // assert
             Assert.AreSame(stack, result);
@@ -1562,7 +1562,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             AttributedScopeStack stack = CreateStack(("a", 1));
 
             // act/assert
-            Assert.Throws<ArgumentNullException>(() => stack.PushAtributed("b", null));
+            Assert.Throws<ArgumentNullException>(() => stack.PushAttributed("b", null));
         }
 
         [Test]
@@ -1572,7 +1572,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             AttributedScopeStack stack = CreateStack(("a", 1));
 
             // act/assert
-            Assert.Throws<ArgumentNullException>(() => stack.PushAtributed("b c", null));
+            Assert.Throws<ArgumentNullException>(() => stack.PushAttributed("b c", null));
         }
 
         [Test]
@@ -1582,7 +1582,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             AttributedScopeStack stack = CreateStack(("a", 1));
 
             // act/assert
-            Assert.Throws<ArgumentNullException>(() => stack.PushAtributed("", null));
+            Assert.Throws<ArgumentNullException>(() => stack.PushAttributed("", null));
         }
 
         [Test]
@@ -1593,7 +1593,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             AttributedScopeStack initial = new AttributedScopeStack(null, "root", 0);
 
             // Act
-            AttributedScopeStack result = initial.PushAtributed("a b ", grammar);
+            AttributedScopeStack result = initial.PushAttributed("a b ", grammar);
             List<string> scopes = result.GetScopeNames();
 
             // Assert
@@ -1608,7 +1608,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             AttributedScopeStack initial = new AttributedScopeStack(null, "root", 0);
 
             // Act
-            AttributedScopeStack result = initial.PushAtributed("a b", grammar);
+            AttributedScopeStack result = initial.PushAttributed("a b", grammar);
             List<string> scopes = result.GetScopeNames();
 
             // Assert
@@ -1624,7 +1624,7 @@ namespace TextMateSharp.Tests.Internal.Grammars
             const string scopePath = "single.scope";
 
             // Act
-            AttributedScopeStack result = initial.PushAtributed(scopePath, grammar);
+            AttributedScopeStack result = initial.PushAttributed(scopePath, grammar);
 
             // Assert
             Assert.AreSame(scopePath, result.ScopePath);

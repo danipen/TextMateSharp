@@ -1,8 +1,7 @@
+using Onigwrap;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Onigwrap;
-
 using TextMateSharp.Grammars;
 using TextMateSharp.Internal.Matcher;
 using TextMateSharp.Internal.Rules;
@@ -12,16 +11,16 @@ namespace TextMateSharp.Internal.Grammars
 {
     class LineTokenizer
     {
-        private Grammar _grammar;
-        private ReadOnlyMemory<char> _lineText;
+        private readonly Grammar _grammar;
+        private readonly ReadOnlyMemory<char> _lineText;
         private bool _isFirstLine;
         private int _linePos;
         private StateStack _stack;
-        private LineTokens _lineTokens;
+        private readonly LineTokens _lineTokens;
         private int _anchorPosition = -1;
         private bool _stop;
-        private Stopwatch _stopwatch = new Stopwatch();
-        private int _lineLength;
+        private readonly Stopwatch _stopwatch = new Stopwatch();
+        private readonly int _lineLength;
         private readonly List<LocalStackElement> _localStackBuffer = new List<LocalStackElement>();
         private readonly List<WhileStack> _whileRulesBuffer = new List<WhileStack>();
 
@@ -126,7 +125,7 @@ namespace TextMateSharp.Internal.Grammars
                 StateStack beforePush = _stack;
                 // push it on the stack rule
                 string scopeName = rule.GetName(_lineText, captureIndices);
-                AttributedScopeStack nameScopesList = _stack.ContentNameScopesList.PushAtributed(
+                AttributedScopeStack nameScopesList = _stack.ContentNameScopesList.PushAttributed(
                     scopeName,
                     _grammar);
 
@@ -158,7 +157,7 @@ namespace TextMateSharp.Internal.Grammars
                         _lineText,
                         captureIndices);
 
-                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAtributed(
+                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAttributed(
                         contentName,
                         _grammar);
 
@@ -201,7 +200,7 @@ namespace TextMateSharp.Internal.Grammars
                     _anchorPosition = captureIndices[0].End;
 
                     string contentName = pushedRule.GetContentName(_lineText, captureIndices);
-                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAtributed(contentName, _grammar);
+                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAttributed(contentName, _grammar);
                     _stack = _stack.WithContentNameScopesList(contentNameScopesList);
 
                     if (pushedRule.WhileHasBackReferences)
@@ -445,9 +444,9 @@ namespace TextMateSharp.Internal.Grammars
                 {
                     // the capture requires additional matching
                     string scopeName = captureRule.GetName(lineText, captureIndices);
-                    AttributedScopeStack nameScopesList = stack.ContentNameScopesList.PushAtributed(scopeName, grammar);
+                    AttributedScopeStack nameScopesList = stack.ContentNameScopesList.PushAttributed(scopeName, grammar);
                     string contentName = captureRule.GetContentName(lineText, captureIndices);
-                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAtributed(contentName, grammar);
+                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAttributed(contentName, grammar);
 
                     // the capture requires additional matching
                     StateStack stackClone = stack.Push(
@@ -472,7 +471,7 @@ namespace TextMateSharp.Internal.Grammars
                     // push
                     AttributedScopeStack baseElement = localStack.Count == 0 ? stack.ContentNameScopesList :
                         localStack[localStack.Count - 1].Scopes;
-                    AttributedScopeStack captureRuleScopesList = baseElement.PushAtributed(captureRuleScopeName, grammar);
+                    AttributedScopeStack captureRuleScopesList = baseElement.PushAttributed(captureRuleScopeName, grammar);
                     localStack.Add(new LocalStackElement(captureRuleScopesList, captureIndex.End));
                 }
             }
