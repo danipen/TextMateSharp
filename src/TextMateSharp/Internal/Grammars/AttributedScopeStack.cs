@@ -290,7 +290,7 @@ namespace TextMateSharp.Internal.Grammars
             return new AttributedScopeStack(target, scope, metadata);
         }
 
-        public AttributedScopeStack PushAtributed(string scopePath, Grammar grammar)
+        public AttributedScopeStack PushAttributed(string scopePath, Grammar grammar)
         {
             if (scopePath == null)
             {
