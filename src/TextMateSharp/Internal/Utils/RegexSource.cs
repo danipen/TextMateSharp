@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace TextMateSharp.Internal.Utils
 {
-    public class RegexSource
+    public static class RegexSource
     {
 
         private static readonly Regex CAPTURING_REGEX_SOURCE = new Regex(

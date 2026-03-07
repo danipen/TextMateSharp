@@ -2,12 +2,12 @@
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class TokenizeStringResult
+    internal class TokenizeStringResult
     {
-        public StateStack Stack { get; private set; }
-        public bool StoppedEarly { get; private set; }
+        internal StateStack Stack { get; private set; }
+        internal bool StoppedEarly { get; private set; }
 
-        public TokenizeStringResult(StateStack stack, bool stoppedEarly)
+        internal TokenizeStringResult(StateStack stack, bool stoppedEarly)
         {
             this.Stack = stack;
             this.StoppedEarly = stoppedEarly;

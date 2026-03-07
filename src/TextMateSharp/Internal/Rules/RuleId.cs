@@ -2,7 +2,7 @@
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class RuleId
+    public sealed class RuleId //: IEquatable<RuleId>
     {
         public static RuleId NO_RULE = new RuleId(0);
 
