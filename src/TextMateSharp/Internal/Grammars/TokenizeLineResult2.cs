@@ -2,7 +2,7 @@ using TextMateSharp.Grammars;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    internal class TokenizeLineResult2 : ITokenizeLineResult2
+    internal sealed class TokenizeLineResult2 : ITokenizeLineResult2
     {
         public int[] Tokens { get; private set; }
         public IStateStack RuleStack { get; private set; }
