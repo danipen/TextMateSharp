@@ -1,13 +1,14 @@
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using Perfolizer.Metrology;
 using System;
 using System.Collections.Generic;
 using System.IO;
-
-using BenchmarkDotNet.Attributes;
-
 using TextMateSharp.Grammars;
 
 namespace TextMateSharp.Benchmarks
 {
+    [Config(typeof(CustomBenchmarksConfig))]
     [MemoryDiagnoser]
     public class BigFileTokenizationBenchmark
     {
@@ -20,10 +21,10 @@ namespace TextMateSharp.Benchmarks
             // Walk up directories to find the solution root
             string? dir = AppDomain.CurrentDomain.BaseDirectory;
             string bigFilePath = "";
-            
+
             while (dir != null)
             {
-                string candidate = Path.Combine(dir, "src", "TextMateSharp.Demo", 
+                string candidate = Path.Combine(dir, "src", "TextMateSharp.Demo",
                     "testdata", "samplefiles", "bigfile.cs");
                 if (File.Exists(candidate))
                 {
@@ -48,7 +49,7 @@ namespace TextMateSharp.Benchmarks
             RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
             Registry.Registry registry = new Registry.Registry(options);
             _grammar = registry.LoadGrammar("source.cs");
-            
+
             if (_grammar == null)
             {
                 throw new InvalidOperationException("Failed to load C# grammar");
@@ -92,6 +93,15 @@ namespace TextMateSharp.Benchmarks
             if (lineStart < content.Length)
             {
                 yield return (lineStart, content.Length - lineStart);
+            }
+        }
+
+        public class CustomBenchmarksConfig : ManualConfig
+        {
+            public CustomBenchmarksConfig()
+            {
+                // Use the default summary style but with size unit in kilobytes so we can measure even small differences in memory usage
+                SummaryStyle = BenchmarkDotNet.Reports.SummaryStyle.Default.WithSizeUnit(SizeUnit.KB);
             }
         }
     }
