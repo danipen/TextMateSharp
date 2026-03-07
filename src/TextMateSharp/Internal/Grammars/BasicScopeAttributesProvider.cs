@@ -7,21 +7,21 @@ using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class BasicScopeAttributesProvider
+    internal sealed class BasicScopeAttributesProvider
     {
 
         private static BasicScopeAttributes _NULL_SCOPE_METADATA = new BasicScopeAttributes(0, 0, null);
 
         private static Regex STANDARD_TOKEN_TYPE_REGEXP = new Regex("\\b(comment|string|regex|meta\\.embedded)\\b");
 
-        private int _initialLanguage;
-        private IThemeProvider _themeProvider;
-        private Dictionary<string, BasicScopeAttributes> _cache = new Dictionary<string, BasicScopeAttributes>();
+        private readonly int _initialLanguage;
+        private readonly IThemeProvider _themeProvider;
+        private readonly Dictionary<string, BasicScopeAttributes> _cache = new Dictionary<string, BasicScopeAttributes>();
         private BasicScopeAttributes _defaultAttributes;
-        private Dictionary<string, int> _embeddedLanguages;
-        private Regex _embeddedLanguagesRegex;
+        private readonly Dictionary<string, int> _embeddedLanguages;
+        private readonly Regex _embeddedLanguagesRegex;
 
-        public BasicScopeAttributesProvider(int initialLanguage, IThemeProvider themeProvider,
+        internal BasicScopeAttributesProvider(int initialLanguage, IThemeProvider themeProvider,
             Dictionary<string, int> embeddedLanguages)
         {
             this._initialLanguage = initialLanguage;
@@ -72,12 +72,12 @@ namespace TextMateSharp.Internal.Grammars
                 new List<ThemeTrieElementRule>() { this._themeProvider.GetDefaults() });
         }
 
-        public BasicScopeAttributes GetDefaultAttributes()
+        internal BasicScopeAttributes GetDefaultAttributes()
         {
             return this._defaultAttributes;
         }
 
-        public BasicScopeAttributes GetBasicScopeAttributes(string scopeName)
+        internal BasicScopeAttributes GetBasicScopeAttributes(string scopeName)
         {
             if (scopeName == null)
             {
