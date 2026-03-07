@@ -2,14 +2,14 @@
 {
     public static class OptionalStandardTokenType
     {
-        public static int Other = StandardTokenType.Other;
-        public static int Comment = StandardTokenType.Comment;
-        public static int String = StandardTokenType.String;
-        public static int RegEx = StandardTokenType.RegEx;
+        public static readonly int Other = StandardTokenType.Other;
+        public static readonly int Comment = StandardTokenType.Comment;
+        public static readonly int String = StandardTokenType.String;
+        public static readonly int RegEx = StandardTokenType.RegEx;
 
         /**
         ** Indicates that no token type is set.
         **/
-        public static int NotSet = 8;
+        public static readonly int NotSet = 8;
     }
 }

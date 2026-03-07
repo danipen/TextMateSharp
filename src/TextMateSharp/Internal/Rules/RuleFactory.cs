@@ -5,7 +5,7 @@ using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class RuleFactory
+    public static class RuleFactory
     {
         public static CaptureRule CreateCaptureRule(IRuleFactoryHelper helper, string name, string contentName,
                 RuleId retokenizeCapturedWithRuleId)

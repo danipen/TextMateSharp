@@ -10,20 +10,20 @@ using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class Grammar : IGrammar, IRuleFactoryHelper
+    public sealed class Grammar : IGrammar, IRuleFactoryHelper
     {
-        private string _rootScopeName;
+        private readonly string _rootScopeName;
         private RuleId _rootId;
         private int _lastRuleId;
         private volatile bool _isCompiling;
-        private Dictionary<RuleId, Rule> _ruleId2desc;
-        private Dictionary<string, IRawGrammar> _includedGrammars;
-        private IGrammarRepository _grammarRepository;
-        private IRawGrammar _rawGrammar;
+        private readonly Dictionary<RuleId, Rule> _ruleId2desc;
+        private readonly Dictionary<string, IRawGrammar> _includedGrammars;
+        private readonly IGrammarRepository _grammarRepository;
+        private readonly IRawGrammar _rawGrammar;
         private List<Injection> _injections;
-        private BasicScopeAttributesProvider _basicScopeAttributesProvider;
-        private List<TokenTypeMatcher> _tokenTypeMatchers;
-        private BalancedBracketSelectors _balancedBracketSelectors;
+        private readonly BasicScopeAttributesProvider _basicScopeAttributesProvider;
+        private readonly List<TokenTypeMatcher> _tokenTypeMatchers;
+        private readonly BalancedBracketSelectors _balancedBracketSelectors;
 
         public Grammar(
             string scopeName,
@@ -53,14 +53,14 @@ namespace TextMateSharp.Internal.Grammars
             this._basicScopeAttributesProvider.OnDidChangeTheme();
         }
 
-        public BasicScopeAttributes GetMetadataForScope(string scope)
+        internal BasicScopeAttributes GetMetadataForScope(string scope)
         {
             return this._basicScopeAttributesProvider.GetBasicScopeAttributes(scope);
         }
 
         public bool IsCompiling => _isCompiling;
 
-        public List<Injection> GetInjections()
+        internal List<Injection> GetInjections()
         {
             if (this._injections == null)
             {
@@ -118,7 +118,7 @@ namespace TextMateSharp.Internal.Grammars
             return this._injections;
         }
 
-        private void CollectInjections(List<Injection> result, string selector, IRawRule rule,
+        private static void CollectInjections(List<Injection> result, string selector, IRawRule rule,
                 IRuleFactoryHelper ruleFactoryHelper, IRawGrammar grammar)
         {
             var matchers = Matcher.Matcher.CreateMatchers(selector);
@@ -173,7 +173,7 @@ namespace TextMateSharp.Internal.Grammars
             return null;
         }
 
-        private IRawGrammar InitGrammar(IRawGrammar grammar, IRawRule ruleBase)
+        private static IRawGrammar InitGrammar(IRawGrammar grammar, IRawRule ruleBase)
         {
             grammar = grammar.Clone();
             if (grammar.GetRepository() == null)
@@ -271,7 +271,7 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             int lineLength = effectiveLineText.Length;
-            LineTokens lineTokens = new LineTokens(emitBinaryTokens, effectiveLineText, _tokenTypeMatchers,
+            LineTokens lineTokens = new LineTokens(emitBinaryTokens, _tokenTypeMatchers,
                 _balancedBracketSelectors);
             TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, effectiveLineText, isFirstLine, 0,
                 prevState,
@@ -301,13 +301,12 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        private List<TokenTypeMatcher> GenerateTokenTypeMatchers(Dictionary<string, int> tokenTypes)
+        private static List<TokenTypeMatcher> GenerateTokenTypeMatchers(Dictionary<string, int> tokenTypes)
         {
-            var result = new List<TokenTypeMatcher>();
-
             if (tokenTypes == null)
-                return result;
+                return new List<TokenTypeMatcher>();
 
+            var result = new List<TokenTypeMatcher>(tokenTypes.Keys.Count);
             foreach (var selector in tokenTypes.Keys)
             {
                 foreach (var matcher in Matcher.Matcher.CreateMatchers(selector))
@@ -336,7 +335,7 @@ namespace TextMateSharp.Internal.Grammars
 
         class GrammarRepository : IGrammarRepository
         {
-            private Grammar _grammar;
+            private readonly Grammar _grammar;
             internal GrammarRepository(Grammar grammar)
             {
                 _grammar = grammar;

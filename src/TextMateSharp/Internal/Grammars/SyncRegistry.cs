@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using TextMateSharp.Grammars;
@@ -11,9 +10,9 @@ namespace TextMateSharp.Internal.Grammars
 {
     public class SyncRegistry : IGrammarRepository, IThemeProvider
     {
-        private Dictionary<string, IGrammar> _grammars;
-        private Dictionary<string, IRawGrammar> _rawGrammars;
-        private Dictionary<string, ICollection<string>> _injectionGrammars;
+        private readonly Dictionary<string, IGrammar> _grammars;
+        private readonly Dictionary<string, IRawGrammar> _rawGrammars;
+        private readonly Dictionary<string, ICollection<string>> _injectionGrammars;
         private Theme _theme;
 
         public SyncRegistry(Theme theme)

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    internal class TokenTypeMatcher
+    internal sealed class TokenTypeMatcher
     {
-        public int Type { get; }
-        public Predicate<List<string>> Matcher { get; }
+        internal int Type { get; }
+        internal Predicate<List<string>> Matcher { get; }
 
-        public TokenTypeMatcher(int type, Predicate<List<string>> matcher)
+        internal TokenTypeMatcher(int type, Predicate<List<string>> matcher)
         {
             Type = type;
             Matcher = matcher;
