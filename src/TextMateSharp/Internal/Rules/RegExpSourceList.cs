@@ -3,49 +3,41 @@ using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class RegExpSourceList
+    public sealed class RegExpSourceList
     {
-        private class RegExpSourceListAnchorCache
+        private sealed class RegExpSourceListAnchorCache
         {
 
-            public CompiledRule A0_G0;
-            public CompiledRule A0_G1;
-            public CompiledRule A1_G0;
-            public CompiledRule A1_G1;
+            internal CompiledRule A0_G0;
+            internal CompiledRule A0_G1;
+            internal CompiledRule A1_G0;
+            internal CompiledRule A1_G1;
 
         }
 
-        private List<RegExpSource> _items;
+        private readonly List<RegExpSource> _items = new List<RegExpSource>();
         private bool _hasAnchors;
         private CompiledRule _cached;
-        private RegExpSourceListAnchorCache _anchorCache;
+        private readonly RegExpSourceListAnchorCache _anchorCache = new RegExpSourceListAnchorCache();
 
-        public RegExpSourceList()
-        {
-            this._items = new List<RegExpSource>();
-            this._hasAnchors = false;
-            this._cached = null;
-            this._anchorCache = new RegExpSourceListAnchorCache();
-        }
-
-        public void Push(RegExpSource item)
+        internal void Push(RegExpSource item)
         {
             this._items.Add(item);
             this._hasAnchors = this._hasAnchors ? this._hasAnchors : item.HasAnchor();
         }
 
-        public void UnShift(RegExpSource item)
+        internal void UnShift(RegExpSource item)
         {
             this._items.Insert(0, item);
             this._hasAnchors = this._hasAnchors ? this._hasAnchors : item.HasAnchor();
         }
 
-        public int Length()
+        internal int Length()
         {
             return this._items.Count;
         }
 
-        public void SetSource(int index, string newSource)
+        internal void SetSource(int index, string newSource)
         {
             RegExpSource r = this._items[index];
             if (!r.GetSource().Equals(newSource))
@@ -61,7 +53,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public CompiledRule Compile(bool allowA, bool allowG)
+        internal CompiledRule Compile(bool allowA, bool allowG)
         {
             if (!this._hasAnchors)
             {

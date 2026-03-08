@@ -7,7 +7,7 @@ namespace TextMateSharp.Internal.Rules
 {
     public static class RuleFactory
     {
-        public static CaptureRule CreateCaptureRule(IRuleFactoryHelper helper, string name, string contentName,
+        private static CaptureRule CreateCaptureRule(IRuleFactoryHelper helper, string name, string contentName,
                 RuleId retokenizeCapturedWithRuleId)
         {
             return (CaptureRule)helper.RegisterRule(id => new CaptureRule(id, name, contentName, retokenizeCapturedWithRuleId));

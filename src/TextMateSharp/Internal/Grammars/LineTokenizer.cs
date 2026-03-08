@@ -203,7 +203,7 @@ namespace TextMateSharp.Internal.Grammars
                     if (beginWhileRule.WhileHasBackReferences)
                     {
                         _stack = _stack.WithEndRule(
-                                beginWhileRule.getWhileWithResolvedBackReferences(_lineText, captureIndices));
+                                beginWhileRule.GetWhileWithResolvedBackReferences(_lineText, captureIndices));
                     }
 
                     if (!hasAdvanced && beforePush.HasSameRuleAs(_stack))
