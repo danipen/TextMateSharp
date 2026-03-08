@@ -1,23 +1,23 @@
+using Onigwrap;
 using System;
 using System.Collections.Generic;
-using Onigwrap;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class BeginEndRule : Rule
+    public sealed class BeginEndRule : Rule
     {
         public List<CaptureRule> BeginCaptures { get; private set; }
         public bool EndHasBackReferences { get; private set; }
         public List<CaptureRule> EndCaptures { get; private set; }
-        public bool ApplyEndPatternLast { get; private set; }
-        public bool HasMissingPatterns { get; private set; }
-        public IList<RuleId> Patterns { get; private set; }
+        private bool ApplyEndPatternLast { get; }
+        internal bool HasMissingPatterns { get; private set; }
+        internal IList<RuleId> Patterns { get; private set; }
 
-        private RegExpSource _begin;
-        private RegExpSource _end;
+        private readonly RegExpSource _begin;
+        private readonly RegExpSource _end;
         private RegExpSourceList _cachedCompiledPatterns;
 
-        public BeginEndRule(RuleId id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
+        internal BeginEndRule(RuleId id, string name, string contentName, string begin, List<CaptureRule> beginCaptures,
             string end, List<CaptureRule> endCaptures, bool applyEndPatternLast, CompilePatternsResult patterns)
             : base(id, name, contentName)
         {

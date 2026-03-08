@@ -7,24 +7,24 @@ using TextMateSharp.Internal.Utils;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class RegExpSource
+    internal sealed class RegExpSource
     {
 
-        private static Regex HAS_BACK_REFERENCES = new Regex("\\\\(\\d+)");
-        private static Regex BACK_REFERENCING_END = new Regex("\\\\(\\d+)");
+        private static readonly Regex HAS_BACK_REFERENCES = new Regex("\\\\(\\d+)");
+        private static readonly Regex BACK_REFERENCING_END = new Regex("\\\\(\\d+)");
 
-        private RuleId _ruleId;
+        private readonly RuleId _ruleId;
         private bool _hasAnchor;
-        private bool _hasBackReferences;
+        private readonly bool _hasBackReferences;
         private RegExpSourceAnchorCache _anchorCache;
         private string _source;
 
-        public RegExpSource(string regExpSource, RuleId ruleId) :
+        internal RegExpSource(string regExpSource, RuleId ruleId) :
             this(regExpSource, ruleId, true)
         {
         }
 
-        public RegExpSource(string regExpSource, RuleId ruleId, bool handleAnchors)
+        internal RegExpSource(string regExpSource, RuleId ruleId, bool handleAnchors)
         {
             if (handleAnchors)
             {
@@ -45,12 +45,12 @@ namespace TextMateSharp.Internal.Rules
             this._hasBackReferences = HAS_BACK_REFERENCES.Match(this._source).Success;
         }
 
-        public RegExpSource Clone()
+        internal RegExpSource Clone()
         {
             return new RegExpSource(this._source, this._ruleId, true);
         }
 
-        public void SetSource(string newSource)
+        internal void SetSource(string newSource)
         {
             if (this._source.Equals(newSource))
             {
@@ -118,7 +118,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        public string ResolveBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
+        internal string ResolveBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
         {
             List<string> capturedValues = new List<string>(captureIndices.Length);
 
@@ -154,7 +154,7 @@ namespace TextMateSharp.Internal.Rules
             return lineText.Span.ToString();
         }
 
-        private string EscapeRegExpCharacters(string value)
+        private static string EscapeRegExpCharacters(string value)
         {
             int valueLen = value.Length;
             var sb = new StringBuilder(valueLen);
@@ -257,7 +257,7 @@ namespace TextMateSharp.Internal.Rules
                 A1_G1_result.ToString());
         }
 
-        public string ResolveAnchors(bool allowA, bool allowG)
+        internal string ResolveAnchors(bool allowA, bool allowG)
         {
             if (!this._hasAnchor)
                 return this._source;
@@ -276,22 +276,22 @@ namespace TextMateSharp.Internal.Rules
             return this._anchorCache.A0_G0;
         }
 
-        public bool HasAnchor()
+        internal bool HasAnchor()
         {
             return this._hasAnchor;
         }
 
-        public string GetSource()
+        internal string GetSource()
         {
             return this._source;
         }
 
-        public RuleId GetRuleId()
+        internal RuleId GetRuleId()
         {
             return this._ruleId;
         }
 
-        public bool HasBackReferences()
+        internal bool HasBackReferences()
         {
             return this._hasBackReferences;
         }

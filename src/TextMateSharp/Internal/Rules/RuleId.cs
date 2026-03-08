@@ -4,17 +4,17 @@ namespace TextMateSharp.Internal.Rules
 {
     public sealed class RuleId
     {
-        public static RuleId NO_RULE = new RuleId(0);
+        public static readonly RuleId NO_RULE = new RuleId(0);
 
         /**
          * This is a special constant to indicate that the end regexp matched.
          */
-        public static RuleId END_RULE = new RuleId(-1);
+        public static readonly RuleId END_RULE = new RuleId(-1);
 
         /**
          * This is a special constant to indicate that the while regexp matched.
          */
-        public static RuleId WHILE_RULE = new RuleId(-2);
+        public static readonly RuleId WHILE_RULE = new RuleId(-2);
 
         public static RuleId Of(int id)
         {
@@ -23,7 +23,7 @@ namespace TextMateSharp.Internal.Rules
             return new RuleId(id);
         }
 
-        public int Id;
+        public int Id { get; }
 
         private RuleId(int id)
         {

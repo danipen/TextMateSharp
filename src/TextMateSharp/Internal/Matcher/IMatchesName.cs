@@ -9,7 +9,7 @@ namespace TextMateSharp.Internal.Matcher
         bool Match(ICollection<string> names, T scopes);
     }
 
-    public class NameMatcher : IMatchesName<List<string>>
+    public sealed class NameMatcher : IMatchesName<List<string>>
     {
         public static IMatchesName<List<string>> Default = new NameMatcher();
 

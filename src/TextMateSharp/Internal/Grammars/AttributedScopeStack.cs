@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
-
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class AttributedScopeStack : IEquatable<AttributedScopeStack>
+    internal sealed class AttributedScopeStack : IEquatable<AttributedScopeStack>
     {
-        public AttributedScopeStack Parent { get; private set; }
-        public string ScopePath { get; private set; }
-        public int TokenAttributes { get; private set; }
+        internal AttributedScopeStack Parent { get; private set; }
+        internal string ScopePath { get; private set; }
+        internal int TokenAttributes { get; private set; }
         private List<string> _cachedScopeNames;
 
         // Precomputed, per-node hash code (persistent structure => safe as long as instances are immutable)
         private readonly int _hashCode;
 
-        public AttributedScopeStack(AttributedScopeStack parent, string scopePath, int tokenAttributes)
+        internal AttributedScopeStack(AttributedScopeStack parent, string scopePath, int tokenAttributes)
         {
             Parent = parent;
             ScopePath = scopePath;

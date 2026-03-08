@@ -2,14 +2,14 @@ using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class IncludeOnlyRule : Rule
+    internal sealed class IncludeOnlyRule : Rule
     {
-        public bool HasMissingPatterns { get; private set; }
-        public IList<RuleId> Patterns { get; private set; }
+        internal bool HasMissingPatterns { get; private set; }
+        internal IList<RuleId> Patterns { get; private set; }
 
         private RegExpSourceList _cachedCompiledPatterns;
 
-        public IncludeOnlyRule(RuleId id, string name, string contentName, CompilePatternsResult patterns) : base(id, name, contentName)
+        internal IncludeOnlyRule(RuleId id, string name, string contentName, CompilePatternsResult patterns) : base(id, name, contentName)
         {
             Patterns = patterns.Patterns;
             HasMissingPatterns = patterns.HasMissingPatterns;

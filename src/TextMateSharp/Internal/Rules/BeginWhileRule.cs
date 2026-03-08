@@ -1,23 +1,23 @@
+using Onigwrap;
 using System;
 using System.Collections.Generic;
-using Onigwrap;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class BeginWhileRule : Rule
+    public sealed class BeginWhileRule : Rule
     {
         public List<CaptureRule> BeginCaptures { get; private set; }
         public List<CaptureRule> WhileCaptures { get; private set; }
         public bool WhileHasBackReferences { get; private set; }
-        public bool HasMissingPatterns { get; private set; }
-        public IList<RuleId>Patterns { get; private set; }
+        internal bool HasMissingPatterns { get; private set; }
+        internal IList<RuleId> Patterns { get; private set; }
 
-        private RegExpSource _begin;
-        private RegExpSource _while;
+        private readonly RegExpSource _begin;
+        private readonly RegExpSource _while;
         private RegExpSourceList _cachedCompiledPatterns;
         private RegExpSourceList _cachedCompiledWhilePatterns;
 
-        public BeginWhileRule(RuleId id, string name, string contentName, string begin,
+        internal BeginWhileRule(RuleId id, string name, string contentName, string begin,
                 List<CaptureRule> beginCaptures, string whileStr, List<CaptureRule> whileCaptures,
                 CompilePatternsResult patterns) : base(id, name, contentName)
         {
@@ -34,7 +34,7 @@ namespace TextMateSharp.Internal.Rules
             _cachedCompiledWhilePatterns = null;
         }
 
-        public string getWhileWithResolvedBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
+        public string GetWhileWithResolvedBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
         {
             return this._while.ResolveBackReferences(lineText, captureIndices);
         }

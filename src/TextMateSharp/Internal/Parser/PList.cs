@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -55,7 +54,7 @@ namespace TextMateSharp.Internal.Parser
         public void EndElement(string tagName)
         {
             object value = null;
-            string text = this.text.ToString();
+            string t = this.text.ToString();
             if ("key".Equals(tagName))
             {
                 if (currObject == null || currObject.IsValueAsArray())
@@ -63,7 +62,7 @@ namespace TextMateSharp.Internal.Parser
                     errors.Add("key can only be used inside an open dict element");
                     return;
                 }
-                currObject.SetLastKey(text);
+                currObject.SetLastKey(t);
                 return;
             }
             else if ("dict".Equals(tagName) || "array".Equals(tagName))
@@ -78,7 +77,7 @@ namespace TextMateSharp.Internal.Parser
             }
             else if ("string".Equals(tagName) || "data".Equals(tagName))
             {
-                value = text;
+                value = t;
             }
             else if ("date".Equals(tagName))
             {
@@ -86,27 +85,21 @@ namespace TextMateSharp.Internal.Parser
             }
             else if ("integer".Equals(tagName))
             {
-                try
+                if (!int.TryParse(t, out int i))
                 {
-                    value = int.Parse(text);
-                }
-                catch (Exception)
-                {
-                    errors.Add(text + " is not a integer");
+                    errors.Add(t + " is not an integer");
                     return;
                 }
+                value = i;
             }
             else if ("real".Equals(tagName))
             {
-                try
+                if (!float.TryParse(t, out float f))
                 {
-                    value = float.Parse(text);
-                }
-                catch (Exception)
-                {
-                    errors.Add(text + " is not a float");
+                    errors.Add(t + " is not a float");
                     return;
                 }
+                value = f;
             }
             else if ("true".Equals(tagName))
             {
