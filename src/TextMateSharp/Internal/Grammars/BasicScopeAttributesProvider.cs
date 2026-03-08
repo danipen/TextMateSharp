@@ -58,7 +58,7 @@ namespace TextMateSharp.Internal.Grammars
                 reversedScopes.Reverse();
                 this._embeddedLanguagesRegex = new Regex(
                     "^((" +
-                    string.Join(")|(", escapedScopes) +
+                    string.Join(")|(", reversedScopes) +
                     "))($|\\.)");
             }
         }
