@@ -5,7 +5,7 @@ using TextMateSharp.Internal.Types;
 
 namespace TextMateSharp.Internal.Grammars.Reader
 {
-    public class GrammarReader
+    public static class GrammarReader
     {
         public static IRawGrammar ReadGrammarSync(StreamReader reader)
         {

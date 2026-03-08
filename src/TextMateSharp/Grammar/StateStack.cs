@@ -12,9 +12,9 @@ namespace TextMateSharp.Grammars
         string EndRule { get; }
     }
 
-    public class StateStack : IStateStack, IEquatable<StateStack>
+    public sealed class StateStack : IStateStack, IEquatable<StateStack>
     {
-        public static StateStack NULL = new StateStack(
+        public static readonly StateStack NULL = new StateStack(
             null,
             RuleId.NO_RULE,
             0,
@@ -28,9 +28,9 @@ namespace TextMateSharp.Grammars
         public int Depth { get; private set; }
         public RuleId RuleId { get; private set; }
         public string EndRule { get; private set; }
-        public AttributedScopeStack NameScopesList { get; private set; }
-        public AttributedScopeStack ContentNameScopesList { get; private set; }
-        public bool BeginRuleCapturedEOL { get; private set; }
+        internal AttributedScopeStack NameScopesList { get; private set; }
+        internal AttributedScopeStack ContentNameScopesList { get; private set; }
+        internal bool BeginRuleCapturedEOL { get; private set; }
 
         private int _enterPos;
         private int _anchorPos;
@@ -40,7 +40,7 @@ namespace TextMateSharp.Grammars
         // ContentNameScopesList) are not mutated after construction
         private readonly int _hashCode;
 
-        public StateStack(
+        internal StateStack(
             StateStack parent,
             RuleId ruleId,
             int enterPos,
@@ -249,7 +249,7 @@ namespace TextMateSharp.Grammars
             return this;
         }
 
-        public StateStack Push(
+        internal StateStack Push(
             RuleId ruleId,
             int enterPos,
             int anchorPos,
@@ -316,7 +316,7 @@ namespace TextMateSharp.Grammars
             return builder.ToString();
         }
 
-        public StateStack WithContentNameScopesList(AttributedScopeStack contentNameScopesList)
+        internal StateStack WithContentNameScopesList(AttributedScopeStack contentNameScopesList)
         {
             // Null-safe comparison matching Java upstream's Objects.equals() pattern
             if (AttributedScopeStack.Equals(this.ContentNameScopesList, contentNameScopesList))

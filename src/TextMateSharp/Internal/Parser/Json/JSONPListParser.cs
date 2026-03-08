@@ -1,6 +1,5 @@
-using System.IO;
-
 using SimpleJSON;
+using System.IO;
 
 namespace TextMateSharp.Internal.Parser.Json
 {
@@ -25,7 +24,7 @@ namespace TextMateSharp.Internal.Parser.Json
             return pList.GetResult();
         }
 
-        private void ProcessNode(JSONNode node, PList<T> pList)
+        private static void ProcessNode(JSONNode node, PList<T> pList)
         {
             if (node == null)
                 return;
@@ -53,18 +52,6 @@ namespace TextMateSharp.Internal.Parser.Json
                 pList.EndElement("dict");
             }
             else if (node.IsString)
-            {
-                pList.StartElement("string");
-                pList.AddString(node.Value);
-                pList.EndElement("string");
-            }
-            else if (node.IsNumber)
-            {
-                pList.StartElement("string");
-                pList.AddString(node.Value);
-                pList.EndElement("string");
-            }
-            else if (node.IsBoolean)
             {
                 pList.StartElement("string");
                 pList.AddString(node.Value);

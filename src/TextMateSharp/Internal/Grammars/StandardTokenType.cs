@@ -1,10 +1,10 @@
 namespace TextMateSharp.Internal.Grammars
 {
-    public class StandardTokenType
+    internal static class StandardTokenType
     {
-        public const int Other = 0;
-        public const int Comment = 1;
-        public const int String = 2;
-        public const int RegEx = 3;
+        internal const int Other = 0;
+        internal const int Comment = 1;
+        internal const int String = 2;
+        internal const int RegEx = 3;
     }
 }

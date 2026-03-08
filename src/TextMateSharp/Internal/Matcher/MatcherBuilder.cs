@@ -4,14 +4,14 @@ using System.Text.RegularExpressions;
 
 namespace TextMateSharp.Internal.Matcher
 {
-    public class MatcherBuilder<T>
+    internal sealed class MatcherBuilder<T>
     {
-        public List<MatcherWithPriority<T>> Results;
+        internal List<MatcherWithPriority<T>> Results { get; }
         private readonly Tokenizer _tokenizer;
         private readonly IMatchesName<T> _matchesName;
         private string _token;
 
-        public MatcherBuilder(string expression, IMatchesName<T> matchesName)
+        internal MatcherBuilder(string expression, IMatchesName<T> matchesName)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (matchesName == null) throw new ArgumentNullException(nameof(matchesName));
@@ -217,7 +217,7 @@ namespace TextMateSharp.Internal.Matcher
         class Tokenizer
         {
 
-            private static Regex REGEXP = new Regex("([LR]:|[\\w\\.:][\\w\\.:\\-]*|[\\,\\|\\-\\(\\)])");
+            private static readonly Regex REGEXP = new Regex("([LR]:|[\\w\\.:][\\w\\.:\\-]*|[\\,\\|\\-\\(\\)])");
             private readonly string _input;
             Match _currentMatch;
 

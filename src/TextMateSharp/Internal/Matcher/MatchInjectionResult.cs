@@ -6,7 +6,7 @@ namespace TextMateSharp.Internal.Matcher
 {
     internal class MatchInjectionsResult : MatchResult
     {
-        public bool IsPriorityMatch { get; private set; }
+        internal bool IsPriorityMatch { get; private set; }
 
         internal MatchInjectionsResult(
             IOnigCaptureIndex[] captureIndexes,

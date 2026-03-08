@@ -1,35 +1,30 @@
-using System;
 using System.Collections.Generic;
 using TextMateSharp.Grammars;
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    internal class LineTokens
+    internal sealed class LineTokens
     {
-        private ReadOnlyMemory<char> _lineText;
-
         // used only if `_emitBinaryTokens` is false.
-        private List<IToken> _tokens;
+        private readonly List<IToken> _tokens;
 
-        private bool _emitBinaryTokens;
+        private readonly bool _emitBinaryTokens;
 
         // used only if `_emitBinaryTokens` is true.
-        private List<int> binaryTokens;
+        private readonly List<int> binaryTokens;
 
         private int _lastTokenEndIndex = 0;
-        private List<TokenTypeMatcher> _tokenTypeOverrides;
-        
-        private BalancedBracketSelectors _balancedBracketSelectors;
+        private readonly List<TokenTypeMatcher> _tokenTypeOverrides;
+
+        private readonly BalancedBracketSelectors _balancedBracketSelectors;
 
         internal LineTokens(
             bool emitBinaryTokens,
-            ReadOnlyMemory<char> lineText,
             List<TokenTypeMatcher> tokenTypeOverrides,
             BalancedBracketSelectors balancedBracketSelectors)
         {
             this._emitBinaryTokens = emitBinaryTokens;
-            this._lineText = lineText;
             if (this._emitBinaryTokens)
             {
                 this._tokens = null;
@@ -44,12 +39,12 @@ namespace TextMateSharp.Internal.Grammars
             this._balancedBracketSelectors = balancedBracketSelectors;
         }
 
-        public void Produce(StateStack stack, int endIndex)
+        internal void Produce(StateStack stack, int endIndex)
         {
             this.ProduceFromScopes(stack.ContentNameScopesList, endIndex);
         }
 
-        public void ProduceFromScopes(AttributedScopeStack scopesList, int endIndex)
+        internal void ProduceFromScopes(AttributedScopeStack scopesList, int endIndex)
         {
             if (this._lastTokenEndIndex >= endIndex)
             {
@@ -129,7 +124,7 @@ namespace TextMateSharp.Internal.Grammars
         }
 
 
-        public IToken[] GetResult(StateStack stack, int lineLength)
+        internal IToken[] GetResult(StateStack stack, int lineLength)
         {
             if (this._tokens.Count != 0 && this._tokens[this._tokens.Count - 1].StartIndex == lineLength - 1)
             {
@@ -147,7 +142,7 @@ namespace TextMateSharp.Internal.Grammars
             return this._tokens.ToArray();
         }
 
-        public int[] GetBinaryResult(StateStack stack, int lineLength)
+        internal int[] GetBinaryResult(StateStack stack, int lineLength)
         {
             if (this.binaryTokens.Count != 0 && this.binaryTokens[this.binaryTokens.Count - 2] == lineLength - 1)
             {
