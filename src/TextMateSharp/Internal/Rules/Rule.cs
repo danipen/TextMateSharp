@@ -1,5 +1,5 @@
-using System;
 using Onigwrap;
+using System;
 
 using TextMateSharp.Internal.Utils;
 
@@ -7,15 +7,15 @@ namespace TextMateSharp.Internal.Rules
 {
     public abstract class Rule
     {
-        public RuleId Id { get; private set; }
+        internal RuleId Id { get; private set; }
 
-        private bool _nameIsCapturing;
-        private string _name;
+        private readonly bool _nameIsCapturing;
+        private readonly string _name;
 
-        private bool _contentNameIsCapturing;
-        private string _contentName;
+        private readonly bool _contentNameIsCapturing;
+        private readonly string _contentName;
 
-        public Rule(RuleId id, string name, string contentName)
+        protected Rule(RuleId id, string name, string contentName)
         {
             Id = id;
 

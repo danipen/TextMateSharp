@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    public class BalancedBracketSelectors
+    public sealed class BalancedBracketSelectors
     {
-        private Predicate<List<string>>[] _balancedBracketScopes;
-        private Predicate<List<string>>[] _unbalancedBracketScopes;
+        private readonly Predicate<List<string>>[] _balancedBracketScopes;
+        private readonly Predicate<List<string>>[] _unbalancedBracketScopes;
 
         private bool _allowAny = false;
 
@@ -18,17 +18,17 @@ namespace TextMateSharp.Internal.Grammars
             _unbalancedBracketScopes = CreateUnbalancedBracketScopes(unbalancedBracketScopes);
         }
 
-        public bool MatchesAlways()
+        internal bool MatchesAlways()
         {
             return _allowAny && _unbalancedBracketScopes.Length == 0;
         }
 
-        public bool MatchesNever()
+        internal bool MatchesNever()
         {
             return !_allowAny && _balancedBracketScopes.Length == 0;
         }
 
-        public bool Match(List<string> scopes)
+        internal bool Match(List<string> scopes)
         {
             foreach (var excluder in _unbalancedBracketScopes)
             {

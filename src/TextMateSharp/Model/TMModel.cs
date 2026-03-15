@@ -838,22 +838,64 @@ namespace TextMateSharp.Model
             }
         }
 
+        /// <summary>
+        /// Releases all resources used by the current instance of the class.
+        /// </summary>
+        /// <remarks>This method should be called when the object is no longer needed to free up
+        /// resources. It is safe to call this method multiple times. After calling this method,
+        /// the object should not be used.</remarks>
         public void Dispose()
         {
-            if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0)
-                return;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            // Stop first (acquires _lock internally) without holding listeners. This preserves the global
-            // lock ordering _lock -> listeners used elsewhere (e.g. in AddModelTokensChangedListener) and
-            // avoids any lock inversion between _lock and listeners.
-            Stop();
-
-            lock (listeners)
+        /// <summary>
+        /// Releases the resources used by the object, enforcing a one-time dispose guard and optionally
+        /// disposing managed resources based on the <paramref name="isDisposing"/> flag.
+        /// </summary>
+        /// <remarks>
+        /// This method ensures that the dispose logic runs only once, regardless of the value of
+        /// <paramref name="isDisposing"/>, preventing potential issues with multiple calls. When
+        /// <paramref name="isDisposing"/> is <see langword="true"/>, it disposes of managed resources in
+        /// addition to any unmanaged resources. When <see langword="false"/>, only unmanaged cleanup would be
+        /// performed (although this implementation currently has no unmanaged resources to release). It is intended
+        /// to be overridden in derived classes to provide custom disposal logic following the same pattern.
+        /// </remarks>
+        /// <param name="isDisposing">
+        /// Indicates whether the method was invoked via an explicit call to <see cref="Dispose()"/> or from a
+        /// finalizer/indirect path. If <see langword="true"/>, the method may dispose of both managed and unmanaged
+        /// resources; if <see langword="false"/>, it should only dispose of unmanaged resources.
+        /// </param>
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (isDisposing)
             {
-                listeners.Clear();
-            }
+                // Dispose managed resources
+                // DESIGN NOTE: The Interlocked.CompareExchange guard is intentionally placed inside the
+                // isDisposing branch, not at the top of this method. Because TMModel is abstract, a derived
+                // class may introduce a finalizer that calls Dispose(false). If the guard were at the top,
+                // a finalizer-first invocation would set the flag and block a subsequent Dispose(true) call,
+                // preventing managed resource cleanup. Placing the guard here ensures that managed disposal
+                // runs exactly once while leaving the unmanaged branch (currently empty) unaffected by the
+                // managed-disposal flag. If unmanaged resources are ever added, a separate guard should be
+                // introduced for that branch.
+                if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0)
+                    return;
 
-            GetLines().Dispose();
+                // Stop first (acquires _lock internally) without holding listeners. This preserves the global
+                // lock ordering _lock -> listeners used elsewhere (e.g. in AddModelTokensChangedListener) and
+                // avoids any lock inversion between _lock and listeners.
+                Stop();
+
+                lock (listeners)
+                {
+                    listeners.Clear();
+                }
+
+                GetLines().Dispose();
+            }
+            // Free unmanaged resources (none currently)
         }
 
         private void Stop()

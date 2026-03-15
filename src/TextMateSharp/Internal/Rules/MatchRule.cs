@@ -2,14 +2,14 @@ using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Rules
 {
-    public class MatchRule : Rule
+    public sealed class MatchRule : Rule
     {
         public List<CaptureRule> Captures { get; private set; }
 
-        private RegExpSource _match;
+        private readonly RegExpSource _match;
         private RegExpSourceList _cachedCompiledPatterns;
 
-        public MatchRule(RuleId id, string name, string match, List<CaptureRule> captures) : base(id, name, null)
+        internal MatchRule(RuleId id, string name, string match, List<CaptureRule> captures) : base(id, name, null)
         {
             this._match = new RegExpSource(match, this.Id);
             this.Captures = captures;

@@ -1,8 +1,8 @@
 ﻿namespace TextMateSharp.Grammars
 {
-    internal class GrammarNames
+    internal static class GrammarNames
     {
-        internal static string[] SupportedGrammars = new string[] {
+        internal static readonly string[] SupportedGrammars = new string[] {
             "Asciidoc",
             "Bat",
             "Clojure",
