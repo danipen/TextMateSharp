@@ -1,0 +1,17 @@
+{
+	"registrations": [
+		{
+			"component": {
+				"type": "git",
+				"git": {
+					"name": "Universal-Assembly-Syntax-Highlighting",
+					"repositoryUrl": "https://github.com/haxo-games/Universal-Assembly-Syntax-Highlighting"
+				}
+			},
+			"license": "MIT",
+			"description": "The files syntaxes/x86asm.tmLanguage.json were derived from asm.tmLanguage.json in https://github.com/haxo-games/Universal-Assembly-Syntax-Highlighting.",
+			"version": "1.0.0"
+		}
+	],
+	"version": 1
+}

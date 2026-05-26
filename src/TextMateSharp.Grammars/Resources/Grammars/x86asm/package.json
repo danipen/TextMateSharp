@@ -1,0 +1,38 @@
+{
+  "name": "x86asm",
+  "displayName": "%displayName%",
+  "description": "%description%",
+  "version": "1.0.0",
+  "publisher": "RysteQ",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.20.0"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "x86asm",
+        "aliases": [
+          "x86 Assembly",
+          "x86",
+          "Assembly"
+        ],
+        "extensions": [
+          ".asm"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "x86asm",
+        "scopeName": "source.x86asm",
+        "path": "./syntaxes/x86asm.tmLanguage.json"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/vscode.git"
+  }
+}
