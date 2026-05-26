@@ -51,6 +51,7 @@
             "TypescriptBasics",
             "Typst",
             "VB",
+            "x86Asm",
             "XML",
             "YAML"
         };
