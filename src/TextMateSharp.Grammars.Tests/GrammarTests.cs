@@ -12,7 +12,7 @@ namespace TextMateSharp.Grammars.Tests
         {
             RegistryOptions options = new RegistryOptions(ThemeName.Light);
 
-            Assert.That(options.GetAvailableLanguages().Count, Is.EqualTo(63));
+            Assert.That(options.GetAvailableLanguages().Count, Is.EqualTo(64));
         }
 
         [Test]
