@@ -263,8 +263,11 @@ namespace TextMateSharp.Tests.Model
                 grammar.IsCompiling = true;
                 tmModel.SetGrammar(grammar);
 
-                // let the tokenizer thread see IsCompiling and go to sleep
-                Thread.Sleep(300);
+                // wait until the tokenizer thread has checked IsCompiling twice: the first
+                // wait consumes the signal from SetGrammar, the second one blocks
+                Assert.IsTrue(
+                    SpinWait.SpinUntil(() => grammar.CompilingChecks >= 2, 3000),
+                    "The tokenizer thread did not check IsCompiling.");
 
                 // the compilation ends; nobody invalidates any line
                 grammar.IsCompiling = false;
@@ -272,6 +275,43 @@ namespace TextMateSharp.Tests.Model
                 bool tokenized = SpinWait.SpinUntil(() => tmModel.GetLineTokens(0) != null, 3000);
 
                 Assert.IsTrue(tokenized, "Line 0 was never tokenized after the grammar finished compiling.");
+            }
+            finally
+            {
+                tmModel.Dispose();
+            }
+        }
+
+        [Test]
+        public void TMModel_ForceTokenization_Should_Tokenize_Lines_Skipped_While_Grammar_Is_Compiling()
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var x = 1;", "if (x) { return 42; }" });
+            TMModel tmModel = new TMModel(modelLines);
+
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+            Registry.Registry registry = new Registry.Registry(options);
+            CompilingGrammar grammar = new CompilingGrammar(registry.LoadGrammar("source.js"));
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                tmModel.SetGrammar(grammar);
+
+                Assert.IsTrue(
+                    SpinWait.SpinUntil(() => !modelLines.Get(0).IsInvalid && !modelLines.Get(1).IsInvalid, 3000),
+                    "The lines were not tokenized initially.");
+
+                // the line is invalid but not queued, so only ForceTokenization can tokenize it
+                modelLines.Get(1).IsInvalid = true;
+
+                grammar.IsCompiling = true;
+                tmModel.ForceTokenization(1);
+                grammar.IsCompiling = false;
+
+                bool tokenized = SpinWait.SpinUntil(() => !modelLines.Get(1).IsInvalid, 3000);
+
+                Assert.IsTrue(tokenized, "The line skipped by ForceTokenization while compiling was never tokenized.");
             }
             finally
             {
@@ -350,6 +390,7 @@ namespace TextMateSharp.Tests.Model
         {
             private readonly IGrammar _grammar;
             private volatile bool _isCompiling;
+            private int _compilingChecks;
 
             internal CompilingGrammar(IGrammar grammar)
             {
@@ -358,8 +399,20 @@ namespace TextMateSharp.Tests.Model
 
             public bool IsCompiling
             {
-                get { return _isCompiling; }
+                get
+                {
+                    bool isCompiling = _isCompiling;
+                    if (isCompiling)
+                        Interlocked.Increment(ref _compilingChecks);
+                    return isCompiling;
+                }
                 set { _isCompiling = value; }
+            }
+
+            // Number of times IsCompiling was read while true
+            internal int CompilingChecks
+            {
+                get { return Volatile.Read(ref _compilingChecks); }
             }
 
             public string GetName() => _grammar.GetName();
