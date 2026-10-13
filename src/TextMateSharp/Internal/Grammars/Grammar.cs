@@ -16,6 +16,7 @@ namespace TextMateSharp.Internal.Grammars
         private RuleId _rootId;
         private int _lastRuleId;
         private volatile bool _isCompiling;
+        private readonly object _tokenizeLock = new object();
         private readonly Dictionary<RuleId, Rule> _ruleId2desc;
         private readonly Dictionary<string, IRawGrammar> _includedGrammars;
         private readonly IGrammarRepository _grammarRepository;
@@ -221,6 +222,17 @@ namespace TextMateSharp.Internal.Grammars
         }
 
         private object Tokenize(ReadOnlyMemory<char> lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
+        {
+            // The grammar is compiled lazily on first use, and its rules cache and mutate their
+            // compiled patterns while tokenizing, so tokenizing is serialized per grammar instance.
+            // This lets the same grammar be shared by several threads (e.g. several editors).
+            lock (_tokenizeLock)
+            {
+                return TokenizeCore(lineText, prevState, emitBinaryTokens, timeLimit);
+            }
+        }
+
+        private object TokenizeCore(ReadOnlyMemory<char> lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
         {
             if (this._rootId == null)
             {
