@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 
 using NUnit.Framework;
 using TextMateSharp.Grammars;
@@ -17,6 +18,69 @@ namespace TextMateSharp.Tests.Internal.Grammars
 {
     class GrammarTests
     {
+        [Test]
+        public void Concurrent_First_Tokenization_Should_Compile_Grammar_Once_And_Generate_Same_Tokens()
+        {
+            const string line = "using System; class Foo { int Bar() { return 42; } }";
+            const int ThreadCount = 8;
+            const int Iterations = 20;
+
+            string expected = TokensToString(
+                new Registry.Registry(new TestRegistry()).LoadGrammar("source.cs").TokenizeLine(line));
+
+            for (int iteration = 0; iteration < Iterations; iteration++)
+            {
+                // a fresh grammar per iteration, so it is not compiled yet
+                IGrammar grammar = new Registry.Registry(new TestRegistry()).LoadGrammar("source.cs");
+
+                string[] results = new string[ThreadCount];
+                Exception[] errors = new Exception[ThreadCount];
+
+                using (Barrier barrier = new Barrier(ThreadCount))
+                {
+                    Thread[] threads = new Thread[ThreadCount];
+                    for (int i = 0; i < ThreadCount; i++)
+                    {
+                        int index = i;
+                        threads[i] = new Thread(() =>
+                        {
+                            try
+                            {
+                                barrier.SignalAndWait();
+                                results[index] = TokensToString(grammar.TokenizeLine(line));
+                            }
+                            catch (Exception e)
+                            {
+                                errors[index] = e;
+                            }
+                        });
+                        threads[i].Start();
+                    }
+
+                    foreach (Thread thread in threads)
+                        thread.Join();
+                }
+
+                for (int i = 0; i < ThreadCount; i++)
+                {
+                    Assert.IsNull(errors[i], $"Iteration {iteration}, thread {i} threw: {errors[i]}");
+                    Assert.AreEqual(expected, results[i], $"Iteration {iteration}, thread {i} generated different tokens");
+                }
+            }
+        }
+
+        static string TokensToString(ITokenizeLineResult result)
+        {
+            if (result == null)
+                return "<null>";
+
+            List<string> tokens = new List<string>();
+            foreach (IToken token in result.Tokens)
+                tokens.Add($"{token.StartIndex}-{token.EndIndex}:{string.Join(" ", token.Scopes)}");
+
+            return string.Join("|", tokens);
+        }
+
         [Test]
         public void Parse_Using_Statement_Should_Generate_Tokens()
         {
