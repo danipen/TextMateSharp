@@ -43,6 +43,7 @@ namespace TextMateSharp.Model
     public class TMModel : ITMModel
     {
         private const int MAX_LEN_TO_TOKENIZE = 10000;
+        private static readonly TimeSpan GrammarCompilingPollInterval = TimeSpan.FromMilliseconds(10);
         private IGrammar _grammar;
         private readonly List<IModelTokensChangedListener> listeners;
         private Tokenizer _tokenizer;
@@ -362,7 +363,9 @@ namespace TextMateSharp.Model
                         {
                             try
                             {
-                                WaitHandle.WaitAny(waitHandles);
+                                // The grammar may be compiled by another thread, which does not
+                                // signal us when it finishes, so poll instead of waiting forever.
+                                WaitHandle.WaitAny(waitHandles, GrammarCompilingPollInterval);
                             }
                             catch (ObjectDisposedException)
                             {
@@ -552,8 +555,9 @@ namespace TextMateSharp.Model
                 {
                     if (grammar != null && grammar.IsCompiling)
                     {
-                        lineIndex++;
-                        continue;
+                        // Re-queue the line so it is tokenized once the compilation ends.
+                        model.InvalidateLine(lineIndex);
+                        return nextInvalidLineIndex;
                     }
 
                     int endStateIndex = lineIndex + 1;
