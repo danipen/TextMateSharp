@@ -1,6 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -243,6 +244,41 @@ namespace TextMateSharp.Tests.Model
             }
         }
 
+        [Test]
+        public void TMModel_Should_Tokenize_Lines_After_Grammar_Finishes_Compiling_On_Another_Thread()
+        {
+            // https://github.com/danipen/TextMateSharp/issues/131
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var x = 1;", "if (x) { return 42; }" });
+            TMModel tmModel = new TMModel(modelLines);
+
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+            Registry.Registry registry = new Registry.Registry(options);
+            CompilingGrammar grammar = new CompilingGrammar(registry.LoadGrammar("source.js"));
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                // another thread is compiling the grammar when the model starts tokenizing
+                grammar.IsCompiling = true;
+                tmModel.SetGrammar(grammar);
+
+                // let the tokenizer thread see IsCompiling and go to sleep
+                Thread.Sleep(300);
+
+                // the compilation ends; nobody invalidates any line
+                grammar.IsCompiling = false;
+
+                bool tokenized = SpinWait.SpinUntil(() => tmModel.GetLineTokens(0) != null, 3000);
+
+                Assert.IsTrue(tokenized, "Line 0 was never tokenized after the grammar finished compiling.");
+            }
+            finally
+            {
+                tmModel.Dispose();
+            }
+        }
+
         private static bool IsRangeValid(ModelTokensChangedEvent e, int fromLine, int toLine)
         {
             if (e.Ranges.Count != 1)
@@ -308,6 +344,31 @@ namespace TextMateSharp.Tests.Model
                     _sawClear.TrySetResult(true);
                 }
             }
+        }
+
+        sealed class CompilingGrammar : IGrammar
+        {
+            private readonly IGrammar _grammar;
+            private volatile bool _isCompiling;
+
+            internal CompilingGrammar(IGrammar grammar)
+            {
+                _grammar = grammar;
+            }
+
+            public bool IsCompiling
+            {
+                get { return _isCompiling; }
+                set { _isCompiling = value; }
+            }
+
+            public string GetName() => _grammar.GetName();
+            public string GetScopeName() => _grammar.GetScopeName();
+            public ICollection<string> GetFileTypes() => _grammar.GetFileTypes();
+            public ITokenizeLineResult TokenizeLine(LineText lineText) => _grammar.TokenizeLine(lineText);
+            public ITokenizeLineResult TokenizeLine(LineText lineText, IStateStack prevState, TimeSpan timeLimit) => _grammar.TokenizeLine(lineText, prevState, timeLimit);
+            public ITokenizeLineResult2 TokenizeLine2(LineText lineText) => _grammar.TokenizeLine2(lineText);
+            public ITokenizeLineResult2 TokenizeLine2(LineText lineText, IStateStack prevState, TimeSpan timeLimit) => _grammar.TokenizeLine2(lineText, prevState, timeLimit);
         }
 
         class ModelLinesMock : AbstractLineList
