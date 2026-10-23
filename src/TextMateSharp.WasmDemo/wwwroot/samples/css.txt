@@ -1,0 +1,10 @@
+:root { --accent: #0078d4; }
+
+.card > h2::after {
+  content: " →";
+  color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .card { padding: 8px 12px; border-radius: 4px !important; }
+}

@@ -1,0 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Demo;
+
+/// <summary>A person, with a computed property.</summary>
+public sealed record Person(string Name, int Age)
+{
+    public bool IsAdult => Age >= 18;
+}
+
+public static class Program
+{
+    private const string Greeting = "Hello";
+
+    public static async Task<int> Main(string[] args)
+    {
+        var people = new List<Person> { new("Ada", 36), new("Linus", 12) };
+        foreach (var person in people.Where(p => p.IsAdult))
+        {
+            Console.WriteLine($"{Greeting}, {person.Name}! You are {person.Age}.");
+        }
+
+        await Task.Delay(TimeSpan.FromMilliseconds(10)); // pretend to work
+        return args.Length > 0 ? 1 : 0;
+    }
+}

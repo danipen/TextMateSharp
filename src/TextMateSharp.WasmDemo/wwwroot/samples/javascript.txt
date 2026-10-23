@@ -1,0 +1,13 @@
+// Highlighting updates as you type.
+export async function load(url, { retries = 3 } = {}) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const response = await fetch(url);
+    if (response.ok) {
+      return response.json();
+    }
+    console.warn(`attempt ${attempt} failed: ${response.status}`);
+  }
+  throw new Error(`failed after ${retries} tries`);
+}
+
+const squares = [1, 2, 3].map(n => n ** 2);

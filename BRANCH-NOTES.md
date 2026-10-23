@@ -131,3 +131,11 @@ workload) loading the bundled C# grammar and tokenizing four lines, run in Chrom
   ([screenshot](docs/wasm/wasm-gregsex.jpg));
 - upstream e0db45b with Onigwrap: builds, then `System.DllNotFoundException: libonigwrap` at the first grammar load
   ([screenshot](docs/wasm/wasm-onigwrap.jpg)).
+
+`src/TextMateSharp.WasmDemo` is that as a sample in the repository: an editor with every bundled grammar (63) and theme
+(21) in drop-downs, re-highlighted as you type, served by `dotnet run` (the SDK's WebAssembly dev server, no Node.js).
+In Chrome 152: C# with Dark+ (first highlight 689 ms, grammar load included; a live edit 36 ms for 31 lines), Rust
+with Monokai, HTML with embedded CSS on Light+ (first highlight 2.1 s, loading three grammars):
+[C#](docs/wasm/editor-csharp-darkplus.jpg), [live edit](docs/wasm/editor-csharp-live-edit.jpg),
+[Rust](docs/wasm/editor-rust-monokai.jpg), [HTML](docs/wasm/editor-html-lightplus.jpg).
+
