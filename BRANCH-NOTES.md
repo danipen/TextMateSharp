@@ -95,3 +95,28 @@ Allocations are unchanged from T5. The T5 column was measured on an idle machine
 source, so its higher numbers here are host conditions, not the package. The scanner-level replay agrees: html
 6.55 ms against 7.00 ms for fb11695f.
 
+
+## For the pull request body
+
+Include both benchmarks, upstream (Onigwrap 1.0.11) against this branch (GregsEx 0.1.0-preview.24), measured
+2026-10-23 on an Apple M4 Pro with .NET 10, BenchmarkDotNet:
+
+`BigFileTokenizationBenchmark` (TextMateSharp's own: `bigfile.cs`, 133,439 lines, C# grammar):
+
+| | Onigwrap | GregsEx |
+| --- | ---: | ---: |
+| Mean | 4.885 s | 1.737 s |
+| Allocated | 510 MB | 137 MB |
+| Gen0 / Gen1 | 62,000 / 5,000 | 16,000 / 0 |
+
+`DocsHeavyTokenizationBenchmark` (40 docs-heavy fences per language, tm-grammars 1.32.22, mean per operation):
+
+| Language | Onigwrap | GregsEx |
+| --- | ---: | ---: |
+| bash | 14.72 ms | 2.14 ms |
+| ts | 48.06 ms | 10.39 ms |
+| js | 91.92 ms | 15.55 ms |
+| html | 9.21 ms | 2.36 ms |
+| json | 1.99 ms | 0.55 ms |
+| yaml | 15.56 ms | 1.70 ms |
+| csharp | 89.03 ms | 18.06 ms |
