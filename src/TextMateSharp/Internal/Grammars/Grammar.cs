@@ -221,6 +221,8 @@ namespace TextMateSharp.Internal.Grammars
             return (ITokenizeLineResult2)Tokenize(lineText.Memory, (StateStack)prevState, true, timeLimit);
         }
 
+        private AttributedScopeStack _rootScopes;
+
         private object Tokenize(ReadOnlyMemory<char> lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
         {
             // The grammar is compiled lazily on first use, and its rules cache and mutate their
@@ -255,7 +257,14 @@ namespace TextMateSharp.Internal.Grammars
                 BasicScopeAttributes rawRootMetadata = this._basicScopeAttributesProvider.GetBasicScopeAttributes(rootScopeName);
                 int rootMetadata = AttributedScopeStack.MergeAttributes(defaultMetadata, null, rawRootMetadata);
 
-                AttributedScopeStack scopeList = new AttributedScopeStack(null, rootScopeName, rootMetadata);
+                // One root scope node per grammar and attributes: the scope nodes pushed under it are reused across
+                // documents (AttributedScopeStack caches its children).
+                AttributedScopeStack scopeList = _rootScopes;
+                if (scopeList == null || scopeList.TokenAttributes != rootMetadata || !string.Equals(scopeList.ScopePath, rootScopeName, StringComparison.Ordinal))
+                {
+                    scopeList = new AttributedScopeStack(null, rootScopeName, rootMetadata);
+                    _rootScopes = scopeList;
+                }
 
                 prevState = new StateStack(null, this._rootId, -1, -1, false, null, scopeList, scopeList);
             }

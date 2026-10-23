@@ -47,7 +47,7 @@ namespace TextMateSharp.Benchmarks
                     bench.Setup();
                     double best = double.MaxValue;
                     long allocated = 0;
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0, n = int.Parse(Environment.GetEnvironmentVariable("TM_ITER") ?? "20"); i < n; i++)
                     {
                         long before = GC.GetAllocatedBytesForCurrentThread();
                         var sw = System.Diagnostics.Stopwatch.StartNew();
