@@ -224,23 +224,22 @@ namespace TextMateSharp.Internal.Grammars
 
         private AttributedScopeStack _rootScopes;
 
-        // Capture pools by tokenizer nesting depth; tokenizing is serialized per grammar.
-        private readonly List<OnigCapturePool> _capturePools = new List<OnigCapturePool>();
-        private int _captureDepth;
+        // Line tokenizers by nesting depth (capture retokenization nests), reused for every line: tokenizing is
+        // serialized per grammar.
+        private readonly List<LineTokenizer> _tokenizers = new List<LineTokenizer>();
+        private int _tokenizerDepth;
 
-        internal OnigCapturePool EnterCapturePool()
+        internal LineTokenizer EnterTokenizer()
         {
-            if (_captureDepth == _capturePools.Count)
+            if (_tokenizerDepth == _tokenizers.Count)
             {
-                _capturePools.Add(new OnigCapturePool());
+                _tokenizers.Add(new LineTokenizer());
             }
 
-            OnigCapturePool pool = _capturePools[_captureDepth++];
-            pool.Reset();
-            return pool;
+            return _tokenizers[_tokenizerDepth++];
         }
 
-        internal void ExitCapturePool() => _captureDepth--;
+        internal void ExitTokenizer() => _tokenizerDepth--;
 
         private object Tokenize(ReadOnlyMemory<char> lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
         {

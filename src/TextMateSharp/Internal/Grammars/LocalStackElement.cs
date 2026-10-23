@@ -1,9 +1,9 @@
 namespace TextMateSharp.Internal.Grammars
 {
-    class LocalStackElement
+    readonly struct LocalStackElement
     {
-        internal AttributedScopeStack Scopes { get; private set; }
-        internal int EndPos { get; private set; }
+        internal AttributedScopeStack Scopes { get; }
+        internal int EndPos { get; }
 
         internal LocalStackElement(AttributedScopeStack scopes, int endPos)
         {

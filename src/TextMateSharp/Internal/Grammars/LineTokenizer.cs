@@ -11,23 +11,22 @@ namespace TextMateSharp.Internal.Grammars
 {
     internal sealed class LineTokenizer
     {
-        private readonly Grammar _grammar;
-        private readonly ReadOnlyMemory<char> _lineText;
+        // A grammar keeps one tokenizer per nesting depth (capture retokenization nests) and reuses it for every line,
+        // with its buffers and capture pool: tokenizing is serialized per grammar.
+        private Grammar _grammar;
+        private ReadOnlyMemory<char> _lineText;
         private bool _isFirstLine;
         private int _linePos;
         private StateStack _stack;
-        private readonly LineTokens _lineTokens;
+        private LineTokens _lineTokens;
         private int _anchorPosition = -1;
         private bool _stop;
-        private readonly Stopwatch _stopwatch = new Stopwatch();
-        private readonly int _lineLength;
+        private int _lineLength;
         private readonly List<LocalStackElement> _localStackBuffer = new List<LocalStackElement>();
         private readonly List<WhileStack> _whileRulesBuffer = new List<WhileStack>();
-        // The captures of this tokenizer's current scan, from the grammar's pool for this nesting depth: nested tokenizers
-        // (capture retokenization) use the next depth's.
-        private OnigCapturePool _capturePool;
+        private readonly OnigCapturePool _capturePool = new OnigCapturePool();
 
-        private LineTokenizer(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos, StateStack stack,
+        private void Start(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos, StateStack stack,
                 LineTokens lineTokens)
         {
             this._grammar = grammar;
@@ -37,6 +36,19 @@ namespace TextMateSharp.Internal.Grammars
             this._linePos = linePos;
             this._stack = stack;
             this._lineTokens = lineTokens;
+            this._anchorPosition = -1;
+            this._stop = false;
+            this._capturePool.Reset();
+        }
+
+        private void Finish()
+        {
+            // Keep no line, stack or tokens alive between lines.
+            this._lineText = default;
+            this._stack = null;
+            this._lineTokens = null;
+            this._localStackBuffer.Clear();
+            this._whileRulesBuffer.Clear();
         }
 
         private TokenizeStringResult Scan(bool checkWhileConditions, TimeSpan timeLimit)
@@ -53,10 +65,10 @@ namespace TextMateSharp.Internal.Grammars
                 _anchorPosition = whileCheckResult.AnchorPosition;
             }
 
-            _stopwatch.Restart();
+            long started = Stopwatch.GetTimestamp();
             while (!_stop)
             {
-                if (_stopwatch.Elapsed > timeLimit)
+                if (Stopwatch.GetElapsedTime(started) > timeLimit)
                 {
                     return new TokenizeStringResult(_stack, true);
                 }
@@ -540,15 +552,16 @@ namespace TextMateSharp.Internal.Grammars
         internal static TokenizeStringResult TokenizeString(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos,
                 StateStack stack, LineTokens lineTokens, bool checkWhileConditions, TimeSpan timeLimit)
         {
-            var tokenizer = new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens);
-            tokenizer._capturePool = grammar.EnterCapturePool();
+            LineTokenizer tokenizer = grammar.EnterTokenizer();
+            tokenizer.Start(grammar, lineText, isFirstLine, linePos, stack, lineTokens);
             try
             {
                 return tokenizer.Scan(checkWhileConditions, timeLimit);
             }
             finally
             {
-                grammar.ExitCapturePool();
+                tokenizer.Finish();
+                grammar.ExitTokenizer();
             }
         }
 
@@ -564,12 +577,12 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        sealed class WhileCheckResult
+        readonly struct WhileCheckResult
         {
-            internal StateStack Stack { get; private set; }
-            internal int LinePos { get; private set; }
-            internal int AnchorPosition { get; private set; }
-            internal bool IsFirstLine { get; private set; }
+            internal StateStack Stack { get; }
+            internal int LinePos { get; }
+            internal int AnchorPosition { get; }
+            internal bool IsFirstLine { get; }
 
             internal WhileCheckResult(StateStack stack, int linePos, int anchorPosition, bool isFirstLine)
             {
