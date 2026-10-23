@@ -120,3 +120,14 @@ Include both benchmarks, upstream (Onigwrap 1.0.11) against this branch (GregsEx
 | json | 1.99 ms | 0.55 ms |
 | yaml | 15.56 ms | 1.70 ms |
 | csharp | 89.03 ms | 18.06 ms |
+
+### WebAssembly
+
+Onigwrap 1.0.11 ships `libonigwrap` for win, linux (glibc, musl, bionic), osx and maccatalyst only, so upstream
+TextMateSharp cannot run on `browser-wasm`. A `Microsoft.NET.Sdk.WebAssembly` app (.NET 10, interpreter, no wasm
+workload) loading the bundled C# grammar and tokenizing four lines, run in Chrome 152 and under Node 24:
+
+- this branch (GregsEx 0.1.0-preview.24): `OS: Browser, RID: browser-wasm`, 44 tokens, the same scopes as on desktop
+  ([screenshot](docs/wasm/wasm-gregsex.jpg));
+- upstream e0db45b with Onigwrap: builds, then `System.DllNotFoundException: libonigwrap` at the first grammar load
+  ([screenshot](docs/wasm/wasm-onigwrap.jpg)).
