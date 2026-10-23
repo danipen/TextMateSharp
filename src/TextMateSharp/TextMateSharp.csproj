@@ -22,7 +22,9 @@ TextMateSharp uses a wrapper around Oniguruma regex engine.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(GregsExProject)" />
+    <!-- The GregsEx project while developing; with GregsExVersion set (packaging for a feed), the GregsEx package. -->
+    <ProjectReference Include="$(GregsExProject)" Condition="'$(GregsExVersion)' == ''" />
+    <PackageReference Include="GregsEx" Version="$(GregsExVersion)" Condition="'$(GregsExVersion)' != ''" />
   </ItemGroup>
   <Import Project="..\..\build\SourceLink.props" />
   <Import Project="..\..\build\Directory.Build.props" />
