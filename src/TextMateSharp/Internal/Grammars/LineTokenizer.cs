@@ -504,27 +504,25 @@ namespace TextMateSharp.Internal.Grammars
                 WhileStack whileRule = whileRules[i];
                 CompiledRule ruleScanner = whileRule.Rule.CompileWhile(whileRule.Stack.EndRule, isFirstLine,
                         anchorPosition == linePos);
-                IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
-
-                if (r != null)
+                if (ruleScanner.Scanner.FindNextMatch(lineText, linePos, _capturePool, out int whileIndex, out OnigCaptureIndex[] whileCaptures))
                 {
-                    RuleId matchedRuleId = ruleScanner.Rules[r.GetIndex()];
+                    RuleId matchedRuleId = ruleScanner.Rules[whileIndex];
                     if (RuleId.WHILE_RULE.NotEquals(matchedRuleId))
                     {
                         // we shouldn't end up here
                         stack = whileRule.Stack.Pop();
                         break;
                     }
-                    if (r.GetCaptureIndices() != null && r.GetCaptureIndices().Length > 0)
+                    if (whileCaptures.Length > 0)
                     {
-                        lineTokens.Produce(whileRule.Stack, r.GetCaptureIndices()[0].Start);
+                        lineTokens.Produce(whileRule.Stack, whileCaptures[0].Start);
                         HandleCaptures(grammar, lineText, isFirstLine, whileRule.Stack, lineTokens,
-                                whileRule.Rule.WhileCaptures, r.GetCaptureIndices());
-                        lineTokens.Produce(whileRule.Stack, r.GetCaptureIndices()[0].End);
-                        anchorPosition = r.GetCaptureIndices()[0].End;
-                        if (r.GetCaptureIndices()[0].End > linePos)
+                                whileRule.Rule.WhileCaptures, whileCaptures);
+                        lineTokens.Produce(whileRule.Stack, whileCaptures[0].End);
+                        anchorPosition = whileCaptures[0].End;
+                        if (whileCaptures[0].End > linePos)
                         {
-                            linePos = r.GetCaptureIndices()[0].End;
+                            linePos = whileCaptures[0].End;
                             isFirstLine = false;
                         }
                     }

@@ -32,15 +32,18 @@ namespace TextMateSharp.Internal.Oniguruma
     // all available again. Not thread-safe.
     public sealed class OnigCapturePool
     {
-        private readonly System.Collections.Generic.List<OnigCaptureIndex[]>[] _byLength = new System.Collections.Generic.List<OnigCaptureIndex[]>[64];
-        private readonly int[] _used = new int[64];
+        private System.Collections.Generic.List<OnigCaptureIndex[]>[] _byLength = new System.Collections.Generic.List<OnigCaptureIndex[]>[16];
+        private int[] _used = new int[16];
         private readonly System.Collections.Generic.List<int> _touched = new System.Collections.Generic.List<int>();
 
         public OnigCaptureIndex[] Rent(int length)
         {
             if (length >= _byLength.Length)
             {
-                return new OnigCaptureIndex[length];
+                // Grammars such as C#'s have patterns with a hundred groups and more.
+                int size = Math.Max(length + 1, 2 * _byLength.Length);
+                Array.Resize(ref _byLength, size);
+                Array.Resize(ref _used, size);
             }
 
             var arrays = _byLength[length] ??= new System.Collections.Generic.List<OnigCaptureIndex[]>();
