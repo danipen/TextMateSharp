@@ -15,15 +15,6 @@ namespace TextMateSharp.Benchmarks
                 return;
             }
 
-            if (args.Length > 1 && args[0] == "--profile")
-            {
-                var b = new DocsHeavyTokenizationBenchmark { Language = args[1] };
-                b.Setup();
-                foreach (var x in System.Linq.Enumerable.Take(System.Linq.Enumerable.OrderByDescending(TextMateSharp.Internal.Oniguruma.OnigScanner.Profile, x => x.Value[0]), 15))
-                    Console.WriteLine($"{x.Value[0] / 20.0 / System.Diagnostics.Stopwatch.Frequency * 1000,8:F2} ms {x.Value[1],7} calls  {x.Key.Substring(0, Math.Min(150, x.Key.Length))}");
-                return;
-            }
-
             if (args.Length > 1 && args[0] == "--trace")
             {
                 // Records the scanner calls of tokenizing the benchmark fences, per language.
@@ -61,9 +52,7 @@ namespace TextMateSharp.Benchmarks
                         bench.TokenizeFences();
                         best = Math.Min(best, sw.Elapsed.TotalMilliseconds);
                     }
-                    long s0 = TextMateSharp.Internal.Oniguruma.OnigScanner.Scanners, p0 = TextMateSharp.Internal.Oniguruma.OnigScanner.Patterns;
-                    bench.TokenizeFences();
-                    Console.WriteLine($"{language,-8} {best,8:F2} ms  {TextMateSharp.Internal.Oniguruma.OnigScanner.Scanners - s0} scanners, {TextMateSharp.Internal.Oniguruma.OnigScanner.Patterns - p0} patterns compiled per iteration");
+                    Console.WriteLine($"{language,-8} {best,8:F2} ms");
                 }
                 return;
             }
