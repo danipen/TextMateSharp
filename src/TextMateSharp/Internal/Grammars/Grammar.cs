@@ -270,12 +270,9 @@ namespace TextMateSharp.Internal.Grammars
             ReadOnlyMemory<char> effectiveLineText;
             if (lineText.Length == 0 || lineText.Span[lineText.Length - 1] != '\n')
             {
-                // Only add \n if the passed lineText didn't have it.
-                // We need to allocate a new buffer with the newline
-                char[] buffer = new char[lineText.Length + 1];
-                lineText.Span.CopyTo(buffer);
-                buffer[lineText.Length] = '\n';
-                effectiveLineText = buffer.AsMemory();
+                // Only add \n if the passed lineText didn't have it. The copy is a string, not an array: the scanners
+                // reuse each regex's last result only for immutable (string-backed) text.
+                effectiveLineText = string.Concat(lineText.Span, "\n".AsSpan()).AsMemory();
             }
             else
             {
