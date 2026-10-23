@@ -23,6 +23,9 @@ namespace TextMateSharp.Internal.Grammars
         private readonly int _lineLength;
         private readonly List<LocalStackElement> _localStackBuffer = new List<LocalStackElement>();
         private readonly List<WhileStack> _whileRulesBuffer = new List<WhileStack>();
+        // The captures of this tokenizer's current scan, from the grammar's pool for this nesting depth: nested tokenizers
+        // (capture retokenization) use the next depth's.
+        private OnigCapturePool _capturePool;
 
         private LineTokenizer(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos, StateStack stack,
                 LineTokens lineTokens)
@@ -65,6 +68,7 @@ namespace TextMateSharp.Internal.Grammars
 
         private void ScanNext()
         {
+            _capturePool.Reset();
             MatchResult r = MatchRuleOrInjections(_grammar, _lineText, _isFirstLine, _linePos, _stack, _anchorPosition);
 
             if (r == null)
@@ -251,7 +255,7 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        private static MatchResult MatchRule(Grammar grammar, ReadOnlyMemory<char> lineText, in bool isFirstLine, in int linePos,
+        private MatchResult MatchRule(Grammar grammar, ReadOnlyMemory<char> lineText, in bool isFirstLine, in int linePos,
                 StateStack stack, in int anchorPosition)
         {
             Rule rule = stack.GetRule(grammar);
@@ -264,13 +268,9 @@ namespace TextMateSharp.Internal.Grammars
             if (ruleScanner == null)
                 return null;
 
-            IOnigNextMatchResult r = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
-
-            if (r != null)
+            if (ruleScanner.Scanner.FindNextMatch(lineText, linePos, _capturePool, out int index, out OnigCaptureIndex[] captures))
             {
-                return new MatchResult(
-                    r.GetCaptureIndices(),
-                    ruleScanner.Rules[r.GetIndex()]);
+                return new MatchResult(captures, ruleScanner.Rules[index]);
             }
             return null;
         }
@@ -338,14 +338,12 @@ namespace TextMateSharp.Internal.Grammars
 
                 CompiledRule ruleScanner = grammar.GetRule(injection.RuleId).Compile(grammar, null, isFirstLine,
                         linePos == anchorPosition);
-                IOnigNextMatchResult matchResult = ruleScanner.Scanner.FindNextMatchSync(lineText, linePos);
-
-                if (matchResult == null)
+                if (!ruleScanner.Scanner.FindNextMatch(lineText, linePos, _capturePool, out int matchIndex, out OnigCaptureIndex[] matchCaptures))
                 {
                     continue;
                 }
 
-                int matchRating = matchResult.GetCaptureIndices()[0].Start;
+                int matchRating = matchCaptures[0].Start;
 
                 if (matchRating > bestMatchRating)
                 {
@@ -355,8 +353,8 @@ namespace TextMateSharp.Internal.Grammars
                 }
 
                 bestMatchRating = matchRating;
-                bestMatchCaptureIndices = matchResult.GetCaptureIndices();
-                bestMatchRuleId = ruleScanner.Rules[matchResult.GetIndex()];
+                bestMatchCaptureIndices = matchCaptures;
+                bestMatchRuleId = ruleScanner.Rules[matchIndex];
                 bestMatchResultPriority = injection.Priority;
 
                 if (bestMatchRating == linePos)
@@ -544,7 +542,16 @@ namespace TextMateSharp.Internal.Grammars
         internal static TokenizeStringResult TokenizeString(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, int linePos,
                 StateStack stack, LineTokens lineTokens, bool checkWhileConditions, TimeSpan timeLimit)
         {
-            return new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens).Scan(checkWhileConditions, timeLimit);
+            var tokenizer = new LineTokenizer(grammar, lineText, isFirstLine, linePos, stack, lineTokens);
+            tokenizer._capturePool = grammar.EnterCapturePool();
+            try
+            {
+                return tokenizer.Scan(checkWhileConditions, timeLimit);
+            }
+            finally
+            {
+                grammar.ExitCapturePool();
+            }
         }
 
         sealed class WhileStack

@@ -28,6 +28,45 @@ namespace TextMateSharp.Internal.Oniguruma
         public override string ToString() => $"{{\"index\": {Index}, \"start\": {Start}, \"end\": {End}, \"length\": {Length}}}";
     }
 
+    // Capture arrays reused across the searches of one tokenizer: Rent hands out exact-length arrays, Reset makes them
+    // all available again. Not thread-safe.
+    public sealed class OnigCapturePool
+    {
+        private readonly System.Collections.Generic.List<OnigCaptureIndex[]>[] _byLength = new System.Collections.Generic.List<OnigCaptureIndex[]>[64];
+        private readonly int[] _used = new int[64];
+        private readonly System.Collections.Generic.List<int> _touched = new System.Collections.Generic.List<int>();
+
+        public OnigCaptureIndex[] Rent(int length)
+        {
+            if (length >= _byLength.Length)
+            {
+                return new OnigCaptureIndex[length];
+            }
+
+            var arrays = _byLength[length] ??= new System.Collections.Generic.List<OnigCaptureIndex[]>();
+            if (_used[length] == 0)
+            {
+                _touched.Add(length);
+            }
+
+            if (_used[length] == arrays.Count)
+            {
+                arrays.Add(new OnigCaptureIndex[length]);
+            }
+
+            return arrays[_used[length]++];
+        }
+
+        public void Reset()
+        {
+            foreach (int length in _touched)
+            {
+                _used[length] = 0;
+            }
+            _touched.Clear();
+        }
+    }
+
     public interface IOnigNextMatchResult
     {
         int GetIndex();
@@ -118,6 +157,36 @@ namespace TextMateSharp.Internal.Oniguruma
             }
 
             return new OnigNextMatchResult(index, indices);
+        }
+
+        // Finds the next match into an array rented from pool: valid until pool.Reset().
+        public bool FindNextMatch(ReadOnlyMemory<char> source, int charOffset, OnigCapturePool pool, out int index, out OnigCaptureIndex[] captureIndices)
+        {
+            if (TraceCalls != null)
+            {
+                Record(source, charOffset);
+            }
+
+            bool found = _scanner.FindNextMatch(source, charOffset, out index);
+            if (_invalidIndex >= 0 && (!found || index > _invalidIndex || _scanner.Captures[0].Index > charOffset))
+            {
+                throw new ArgumentException($"Invalid regular expression: {_invalidSource}");
+            }
+
+            if (!found)
+            {
+                captureIndices = null;
+                return false;
+            }
+
+            var captures = _scanner.Captures;
+            captureIndices = pool.Rent(captures.Length);
+            for (int i = 0; i < captures.Length; i++)
+            {
+                RegexCapture c = captures[i];
+                captureIndices[i] = c.Participated ? new OnigCaptureIndex(i, c.Index, c.Index + c.Length) : new OnigCaptureIndex(i, 0, 0);
+            }
+            return true;
         }
 
         // Onigwrap's UnicodeCharEscape: \x followed by 2 to 8 hex digits becomes \x{...} (Oniguruma reads \xHH as an

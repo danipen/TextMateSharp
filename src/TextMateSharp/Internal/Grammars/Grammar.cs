@@ -1,3 +1,4 @@
+using TextMateSharp.Internal.Oniguruma;
 using System;
 using System.Collections.Generic;
 
@@ -222,6 +223,24 @@ namespace TextMateSharp.Internal.Grammars
         }
 
         private AttributedScopeStack _rootScopes;
+
+        // Capture pools by tokenizer nesting depth; tokenizing is serialized per grammar.
+        private readonly List<OnigCapturePool> _capturePools = new List<OnigCapturePool>();
+        private int _captureDepth;
+
+        internal OnigCapturePool EnterCapturePool()
+        {
+            if (_captureDepth == _capturePools.Count)
+            {
+                _capturePools.Add(new OnigCapturePool());
+            }
+
+            OnigCapturePool pool = _capturePools[_captureDepth++];
+            pool.Reset();
+            return pool;
+        }
+
+        internal void ExitCapturePool() => _captureDepth--;
 
         private object Tokenize(ReadOnlyMemory<char> lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
         {
