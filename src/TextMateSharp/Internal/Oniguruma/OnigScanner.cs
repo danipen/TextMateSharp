@@ -28,6 +28,13 @@ namespace TextMateSharp.Internal.Oniguruma
     // when the search reaches it.
     public class OnigScanner
     {
+        // Grammars hold patterns far longer than GregsEx's default ceiling (objective-c's platform list is 282k units):
+        // Oniguruma's own parse depth limit, and room for those.
+        private static readonly OnigurumaCompileOptions Options = new OnigurumaCompileOptions(
+            new RegexCompileLimits(maxPatternUnits: 1 << 22, maxNestingDepth: 4096, maxInstructions: 1 << 24,
+                maxClassRanges: 1 << 20, maxCaptureGroups: 32767, maxCompileWork: 1L << 32, maxPlanBytes: 1L << 30,
+                maxCompileMemoryBytes: 1L << 30));
+
         private readonly OnigurumaScanner _scanner;
         // The first invalid regex and its source, or -1.
         private readonly int _invalidIndex = -1;
@@ -47,7 +54,7 @@ namespace TextMateSharp.Internal.Oniguruma
             for (int i = 0; i < regexps.Length; i++)
             {
                 string source = Preprocess(regexps[i]);
-                if (!OnigurumaPattern.TryParse(source, RegexProfiles.OnigurumaTextMate, out var pattern, out _))
+                if (!OnigurumaPattern.TryParse(source, RegexProfiles.OnigurumaTextMate, out var pattern, out _, Options))
                 {
                     if (_invalidIndex < 0)
                     {
