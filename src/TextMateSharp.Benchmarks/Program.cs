@@ -46,13 +46,16 @@ namespace TextMateSharp.Benchmarks
                     bench.Language = language;
                     bench.Setup();
                     double best = double.MaxValue;
+                    long allocated = 0;
                     for (int i = 0; i < 20; i++)
                     {
+                        long before = GC.GetAllocatedBytesForCurrentThread();
                         var sw = System.Diagnostics.Stopwatch.StartNew();
                         bench.TokenizeFences();
                         best = Math.Min(best, sw.Elapsed.TotalMilliseconds);
+                        allocated = GC.GetAllocatedBytesForCurrentThread() - before;
                     }
-                    Console.WriteLine($"{language,-8} {best,8:F2} ms");
+                    Console.WriteLine($"{language,-8} {best,8:F2} ms {allocated / 1024.0,10:F0} KB");
                 }
                 return;
             }
