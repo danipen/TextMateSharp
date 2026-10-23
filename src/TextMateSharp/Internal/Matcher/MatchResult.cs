@@ -1,4 +1,4 @@
-﻿using Onigwrap;
+﻿using TextMateSharp.Internal.Oniguruma;
 
 using TextMateSharp.Internal.Rules;
 

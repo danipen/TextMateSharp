@@ -4,5 +4,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <SystemTextJsonVersion>8.0.5</SystemTextJsonVersion>
     <OnigwrapVersion>1.0.11</OnigwrapVersion>
+    <GregsExProject Condition="'$(GregsExProject)' == ''">$(MSBuildThisFileDirectory)../../gregsex/.claude/worktrees/friendly-zhukovsky-03b73e/src/GregsEx/GregsEx.csproj</GregsExProject>
   </PropertyGroup>
 </Project>

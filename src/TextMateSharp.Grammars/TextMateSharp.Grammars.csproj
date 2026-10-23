@@ -3,7 +3,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <OutputType>Library</OutputType>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>True</IsPackable>
     <Description>A set of grammars and Themes that can be used by TextMateSharp</Description>
     <PackageProjectUrl>https://github.com/danipen/TextMateSharp</PackageProjectUrl>
@@ -11,6 +11,7 @@
     <Company />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <SignAssembly>True</SignAssembly>
+    <NoWarn>$(NoWarn);CS8002</NoWarn>
     <AssemblyOriginatorKeyFile>..\TextMateSharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 

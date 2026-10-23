@@ -1,6 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Onigwrap;
+using TextMateSharp.Internal.Oniguruma;
 using System;
 using System.Text;
 using TextMateSharp.Internal.Utils;

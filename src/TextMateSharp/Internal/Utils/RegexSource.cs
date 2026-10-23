@@ -1,4 +1,4 @@
-using Onigwrap;
+using TextMateSharp.Internal.Oniguruma;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
