@@ -2,8 +2,10 @@
 
 TextMateSharp (github.com/danipen/TextMateSharp at e0db45b) with GregsEx's Oniguruma flavor in place of Onigwrap, and
 allocation and caching changes in the tokenizer. Targets net10.0 (GregsEx is .NET 10, NativeAOT compatible).
-GregsEx comes from `../gregsex/.claude/worktrees/friendly-zhukovsky-03b73e` (`GregsExProject`), or from a package with
-`-p:GregsExVersion=<version>`.
+GregsEx comes from the preview package `GregsEx 0.1.0-preview.24` on feedz.io (`NuGet.config`,
+`build/Directory.Build.props`; github.com/sebastienros/gregsex main at ba36f798, the Oniguruma flavor PR), another
+version with `-p:GregsExVersion=<version>`, or a checkout with `-p:UseGregsExProject=true -p:GregsExProject=<csproj>`.
+Built against a preview, the package is itself a prerelease (`VersionSuffix` gregsex).
 
 Every change keeps the tokens of all 2,800 docs-heavy fences byte-identical to upstream with Onigwrap
 (`TextMateSharp.Benchmarks --dump`, SHA-256 `42477AF3...695474`) and the tests green: 818 TextMateSharp tests (6
@@ -21,6 +23,7 @@ TextMateSharp.Grammars tests.
 | 479d237 | T2: capture indices are one struct array per match instead of an array and an object per group. |
 | c26b84f | T3: `AttributedScopeStack` caches its children (validated against the grammar's cached scope attributes, which a theme change replaces), and `Grammar` its root, so scope nodes and their scope-name lists are reused across lines and documents. |
 | 1cf7406, 2dd04ae | T4: capture arrays are rented from pools owned per grammar and tokenizer nesting depth (capture retokenization nests), for any group count, while conditions included. |
+| (next) | GregsEx 0.1.0-preview.24 from feedz.io by default. |
 | da44d46 | T5: one `LineTokenizer` per grammar and depth, reused for every line with its buffers; struct `LocalStackElement`, `TokenizeStringResult` and `WhileCheckResult`; a timestamp instead of a `Stopwatch` per line. |
 
 GregsEx side, found by these suites: `OnigurumaScanner` does not reuse cached results of patterns using `\G` (a result
@@ -69,3 +72,26 @@ T4 is shown with the pools for any group count (2dd04ae); its first version (1cf
 Douze (docs-heavy, 4,000 pages, NativeAOT, macOS, 3 interleaved runs): 3.31 to 4.04 s wall and 30.4 s CPU with
 TextMateSharp 2.0.4, 1.22 to 1.74 s wall and 10.9 s CPU with this branch (da44d46 packaged as 2.0.5-gregsex.1);
 `_site` byte-identical (4,002 files).
+
+### GregsEx 0.1.0-preview.24 (feedz.io)
+
+The package adds GregsEx's follow sets through subexpression calls, vectorized give-back and the required-literal
+start bound, and per-search work budgets with cancellation and timeouts. Same benchmark, two runs on the same day
+(Apple M4 Pro, load average about 4 from other processes): tokens still byte-identical (`--dump` SHA-256
+`42477AF3...695474`), 818 + 16 tests passing, the same 6 skips.
+
+| Language | T5 (GregsEx fb11695f) | preview.24, run 1 | preview.24, run 2 |
+| --- | ---: | ---: | ---: |
+| bash | 2.43 ms | 2.14 ms | 2.18 ms |
+| ts | 10.14 ms | 10.39 ms | 11.03 ms |
+| js | 15.86 ms | 15.55 ms | 15.88 ms |
+| html | 1.88 ms | 2.36 ms | 2.39 ms |
+| json | 0.51 ms | 0.55 ms | 0.56 ms |
+| yaml | 1.98 ms | 1.70 ms | 1.94 ms |
+| csharp | 26.64 ms | 18.06 ms | 18.53 ms |
+
+Allocations are unchanged from T5. The T5 column was measured on an idle machine; in a back-to-back A/B in this session
+(project references, both builds under the same load), html took 3.00 ms with fb11695f and 2.44 ms with preview.24's
+source, so its higher numbers here are host conditions, not the package. The scanner-level replay agrees: html
+6.55 ms against 7.00 ms for fb11695f.
+
