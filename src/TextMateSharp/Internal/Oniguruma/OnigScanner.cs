@@ -33,8 +33,15 @@ namespace TextMateSharp.Internal.Oniguruma
         private readonly int _invalidIndex = -1;
         private readonly string _invalidSource;
 
+        public static long Scanners, Patterns;
+        // Trace recording (benchmark fixtures): scanner pattern lists, lines, and (scanner, line, position) calls.
+        public static System.Collections.Generic.List<string[]> TraceScanners;
+        public static System.Collections.Generic.Dictionary<string, int> TraceLines;
+        public static System.Collections.Generic.List<int[]> TraceCalls;
+        private int _traceId = -1;
         public OnigScanner(string[] regexps)
         {
+            Scanners++; Patterns += regexps.Length;
             var patterns = new OnigurumaPattern[regexps.Length];
             for (int i = 0; i < regexps.Length; i++)
             {
@@ -54,6 +61,7 @@ namespace TextMateSharp.Internal.Oniguruma
             }
 
             _scanner = new OnigurumaScanner(patterns);
+            _sources = regexps;
         }
 
         public IOnigNextMatchResult FindNextMatchSync(string source, in int charOffset)
@@ -61,8 +69,28 @@ namespace TextMateSharp.Internal.Oniguruma
             return FindNextMatchSync(source.AsMemory(), charOffset);
         }
 
+        public static readonly System.Collections.Concurrent.ConcurrentDictionary<string, long[]> Profile = new();
+        private readonly string[] _sources;
         public IOnigNextMatchResult FindNextMatchSync(ReadOnlyMemory<char> source, in int charOffset)
         {
+            if (TraceCalls != null)
+            {
+                if (_traceId < 0) { _traceId = TraceScanners.Count; TraceScanners.Add(_sources); }
+                string text = source.ToString();
+                if (!TraceLines.TryGetValue(text, out int lineId)) { lineId = TraceLines.Count; TraceLines[text] = lineId; }
+                TraceCalls.Add(new[] { _traceId, lineId, charOffset });
+            }
+            if (Environment.GetEnvironmentVariable("ONIG_PROFILE") != null)
+            {
+                for (int i = 0; i < _sources.Length; i++)
+                {
+                    var ws = _scanner.Patterns[i].CreateWorkspace();
+                    var t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+                    for (int k = 0; k < 20; k++) ws.IsMatch(source.Span, charOffset);
+                    var e = Profile.GetOrAdd(_sources[i], _ => new long[2]);
+                    e[0] += System.Diagnostics.Stopwatch.GetTimestamp() - t0; e[1]++;
+                }
+            }
             bool found = _scanner.FindNextMatch(source, charOffset, out int index);
             if (_invalidIndex >= 0 && (!found || index > _invalidIndex || _scanner.Captures[0].Index > charOffset))
             {

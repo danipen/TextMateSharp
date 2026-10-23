@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\**\*.json" />
+    <EmbeddedResource Include="Resources\**\*.json" Exclude="Resources\vscode-textmate\**" />
+    <None Include="Resources\vscode-textmate\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
