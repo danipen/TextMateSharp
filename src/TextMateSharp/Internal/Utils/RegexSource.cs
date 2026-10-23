@@ -69,13 +69,13 @@ namespace TextMateSharp.Internal.Utils
             return CAPTURING_REGEX_SOURCE.IsMatch(regexSource);
         }
 
-        public static string ReplaceCaptures(string regexSource, ReadOnlyMemory<char> captureSource, IOnigCaptureIndex[] captureIndices)
+        public static string ReplaceCaptures(string regexSource, ReadOnlyMemory<char> captureSource, OnigCaptureIndex[] captureIndices)
         {
             return CAPTURING_REGEX_SOURCE.Replace(
                 regexSource, m => GetReplacement(m.Value, captureSource, captureIndices));
         }
 
-        private static string GetReplacement(string match, ReadOnlyMemory<char> captureSource, IOnigCaptureIndex[] captureIndices)
+        private static string GetReplacement(string match, ReadOnlyMemory<char> captureSource, OnigCaptureIndex[] captureIndices)
         {
             ReadOnlySpan<char> matchSpan = match.AsSpan();
             int doublePointIndex = matchSpan.IndexOf(':');
@@ -93,8 +93,8 @@ namespace TextMateSharp.Internal.Utils
                 }
             }
 
-            IOnigCaptureIndex capture = captureIndices != null && captureIndices.Length > index ? captureIndices[index] : null;
-            if (capture != null)
+            OnigCaptureIndex capture = captureIndices != null && captureIndices.Length > index ? captureIndices[index] : default;
+            if (capture.IsDefined)
             {
                 string result = captureSource.SubstringAtIndexes(capture.Start, capture.End);
 

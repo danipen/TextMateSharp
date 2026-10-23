@@ -4,22 +4,35 @@ using GregsEx;
 
 namespace TextMateSharp.Internal.Oniguruma
 {
-    public interface IOnigCaptureIndex
+    // A capture of a match: one array of these per match. The default value is no capture.
+    public readonly struct OnigCaptureIndex
     {
-        int Index { get; }
+        public OnigCaptureIndex(int index, int start, int end)
+        {
+            Index = index;
+            Start = start;
+            End = end;
+            IsDefined = true;
+        }
 
-        int Start { get; }
+        public int Index { get; }
 
-        int End { get; }
+        public int Start { get; }
 
-        int Length { get; }
+        public int End { get; }
+
+        public int Length => End - Start;
+
+        public bool IsDefined { get; }
+
+        public override string ToString() => $"{{\"index\": {Index}, \"start\": {Start}, \"end\": {End}, \"length\": {Length}}}";
     }
 
     public interface IOnigNextMatchResult
     {
         int GetIndex();
 
-        IOnigCaptureIndex[] GetCaptureIndices();
+        OnigCaptureIndex[] GetCaptureIndices();
     }
 
     // Searches the regexes of a rule from one position with GregsEx's Oniguruma flavor, with the semantics of
@@ -97,7 +110,7 @@ namespace TextMateSharp.Internal.Oniguruma
             }
 
             var captures = _scanner.Captures;
-            var indices = new IOnigCaptureIndex[captures.Length];
+            var indices = new OnigCaptureIndex[captures.Length];
             for (int i = 0; i < captures.Length; i++)
             {
                 RegexCapture c = captures[i];
@@ -166,9 +179,9 @@ namespace TextMateSharp.Internal.Oniguruma
         private sealed class OnigNextMatchResult : IOnigNextMatchResult
         {
             private readonly int _index;
-            private readonly IOnigCaptureIndex[] _captureIndices;
+            private readonly OnigCaptureIndex[] _captureIndices;
 
-            internal OnigNextMatchResult(int index, IOnigCaptureIndex[] captureIndices)
+            internal OnigNextMatchResult(int index, OnigCaptureIndex[] captureIndices)
             {
                 _index = index;
                 _captureIndices = captureIndices;
@@ -176,24 +189,7 @@ namespace TextMateSharp.Internal.Oniguruma
 
             public int GetIndex() => _index;
 
-            public IOnigCaptureIndex[] GetCaptureIndices() => _captureIndices;
-        }
-
-        private sealed class OnigCaptureIndex : IOnigCaptureIndex
-        {
-            public int Index { get; }
-            public int Start { get; }
-            public int End { get; }
-            public int Length => End - Start;
-
-            internal OnigCaptureIndex(int index, int start, int end)
-            {
-                Index = index;
-                Start = start;
-                End = end;
-            }
-
-            public override string ToString() => $"{{\"index\": {Index}, \"start\": {Start}, \"end\": {End}, \"length\": {Length}}}";
+            public OnigCaptureIndex[] GetCaptureIndices() => _captureIndices;
         }
     }
 }

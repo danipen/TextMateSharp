@@ -75,7 +75,7 @@ namespace TextMateSharp.Internal.Grammars
                 return;
             }
 
-            IOnigCaptureIndex[] captureIndices = r.CaptureIndexes;
+            OnigCaptureIndex[] captureIndices = r.CaptureIndexes;
             RuleId matchedRuleId = r.MatchedRuleId;
 
             bool hasAdvanced = captureIndices != null && captureIndices.Length > 0
@@ -322,7 +322,7 @@ namespace TextMateSharp.Internal.Grammars
         {
             // The lower the better
             int bestMatchRating = int.MaxValue;
-            IOnigCaptureIndex[] bestMatchCaptureIndices = null;
+            OnigCaptureIndex[] bestMatchCaptureIndices = null;
             RuleId bestMatchRuleId = null;
             int bestMatchResultPriority = 0;
 
@@ -369,7 +369,7 @@ namespace TextMateSharp.Internal.Grammars
             if (bestMatchCaptureIndices != null)
             {
                 RuleId matchedRuleId = bestMatchRuleId;
-                IOnigCaptureIndex[] matchCaptureIndices = bestMatchCaptureIndices;
+                OnigCaptureIndex[] matchCaptureIndices = bestMatchCaptureIndices;
                 bool isPriorityMatch = bestMatchResultPriority == -1;
 
                 return new MatchInjectionsResult(
@@ -382,7 +382,7 @@ namespace TextMateSharp.Internal.Grammars
         }
 
         private void HandleCaptures(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, StateStack stack,
-                LineTokens lineTokens, List<CaptureRule> captures, IOnigCaptureIndex[] captureIndices)
+                LineTokens lineTokens, List<CaptureRule> captures, OnigCaptureIndex[] captureIndices)
         {
             if (captures.Count == 0)
             {
@@ -393,7 +393,7 @@ namespace TextMateSharp.Internal.Grammars
             _localStackBuffer.Clear();
             var localStack = _localStackBuffer;
             int maxEnd = captureIndices[0].End;
-            IOnigCaptureIndex captureIndex;
+            OnigCaptureIndex captureIndex;
 
             for (int i = 0; i < len; i++)
             {

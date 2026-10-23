@@ -34,7 +34,7 @@ namespace TextMateSharp.Internal.Rules
             _cachedCompiledPatterns = null;
         }
 
-        public string GetEndWithResolvedBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
+        public string GetEndWithResolvedBackReferences(ReadOnlyMemory<char> lineText, OnigCaptureIndex[] captureIndices)
         {
             return this._end.ResolveBackReferences(lineText, captureIndices);
         }

@@ -1,4 +1,4 @@
-﻿using TextMateSharp.Internal.Oniguruma;
+using TextMateSharp.Internal.Oniguruma;
 
 using TextMateSharp.Internal.Rules;
 
@@ -9,7 +9,7 @@ namespace TextMateSharp.Internal.Matcher
         internal bool IsPriorityMatch { get; private set; }
 
         internal MatchInjectionsResult(
-            IOnigCaptureIndex[] captureIndexes,
+            OnigCaptureIndex[] captureIndexes,
             RuleId matchedRuleId,
             bool isPriorityMatch) : base(captureIndexes, matchedRuleId)
         {
