@@ -2,8 +2,8 @@
 
 TextMateSharp (github.com/danipen/TextMateSharp at e0db45b) with GregsEx's Oniguruma flavor in place of Onigwrap, and
 allocation and caching changes in the tokenizer. Targets net10.0 (GregsEx is .NET 10, NativeAOT compatible).
-GregsEx comes from nuget.org (`GregsEx 0.3.0`, `build/Directory.Build.props`), another version with
-`-p:GregsExVersion=<version>`, or a checkout with `-p:UseGregsExProject=true -p:GregsExProject=<csproj>`. GregsEx 0.3.0
+GregsEx comes from nuget.org (`GregsEx 0.3.1`, `build/Directory.Build.props`), another version with
+`-p:GregsExVersion=<version>`, or a checkout with `-p:UseGregsExProject=true -p:GregsExProject=<csproj>`. GregsEx 0.3.x
 ships netstandard2.0, net8.0 and net10.0 assets, so the projects keep upstream's target frameworks: TextMateSharp and
 TextMateSharp.Grammars netstandard2.0, the tests and demo net8.0, the benchmarks net8.0 and net10.0, the WebAssembly
 demo net10.0. Two APIs the branch had used are missing on netstandard2.0: `string.Concat(ReadOnlySpan<char>, ...)`
@@ -27,7 +27,8 @@ TextMateSharp.Grammars tests.
 | c26b84f | T3: `AttributedScopeStack` caches its children (validated against the grammar's cached scope attributes, which a theme change replaces), and `Grammar` its root, so scope nodes and their scope-name lists are reused across lines and documents. |
 | 1cf7406, 2dd04ae | T4: capture arrays are rented from pools owned per grammar and tokenizer nesting depth (capture retokenization nests), for any group count, while conditions included. |
 | b11b862 | GregsEx 0.1.0-preview.24 from feedz.io by default. |
-| (next) | GregsEx 0.3.0 from nuget.org, upstream target frameworks restored (netstandard2.0), feedz.io source removed; WebAssembly demo samples for all 63 grammars. |
+| (next) | GregsEx 0.3.1: its source generator's attribute types are embedded, which removes the CS0436 warnings in TextMateSharp.Tests (it sees TextMateSharp.Grammars' internals); the build is warning-free. |
+| 32f0522 | GregsEx 0.3.0 from nuget.org, upstream target frameworks restored (netstandard2.0), feedz.io source removed; WebAssembly demo samples for all 63 grammars. |
 | da44d46 | T5: one `LineTokenizer` per grammar and depth, reused for every line with its buffers; struct `LocalStackElement`, `TokenizeStringResult` and `WhileCheckResult`; a timestamp instead of a `Stopwatch` per line. |
 
 GregsEx side, found by these suites: `OnigurumaScanner` does not reuse cached results of patterns using `\G` (a result
@@ -103,7 +104,8 @@ source, so its higher numbers here are host conditions, not the package. The sca
 ## For the pull request body
 
 Include both benchmarks, upstream (Onigwrap 1.0.11) against this branch (GregsEx 0.3.0), BenchmarkDotNet 0.15.8 default
-job, Apple M4 Pro, macOS 15.8.1, 2026-10-24, on .NET 8.0.x and 10.0.x (load average about 4 from other processes;
+job, Apple M4 Pro, macOS 15.8.1, 2026-10-24, on .NET 8.0.x and 10.0.x (measured with 0.3.0; 0.3.1 changes only the
+source generator, and tokens are identical) (load average about 4 from other processes;
 errors are under 1.5% of the mean). Tokens are byte-identical to Onigwrap's on both runtimes (`--dump` SHA-256
 `42477AF3...695474`); tests: 818 passed and 6 skipped (known differences, failing identically with Onigwrap), 16
 TextMateSharp.Grammars tests passed, on net8.0.

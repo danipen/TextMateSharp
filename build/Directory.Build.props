@@ -5,7 +5,7 @@
     <SystemTextJsonVersion>8.0.5</SystemTextJsonVersion>
     <OnigwrapVersion>1.0.11</OnigwrapVersion>
     <!-- GregsEx from nuget.org; -p:UseGregsExProject=true builds against GregsExProject. -->
-    <GregsExVersion Condition="'$(GregsExVersion)' == '' and '$(UseGregsExProject)' != 'true'">0.3.0</GregsExVersion>
+    <GregsExVersion Condition="'$(GregsExVersion)' == '' and '$(UseGregsExProject)' != 'true'">0.3.1</GregsExVersion>
     <GregsExProject Condition="'$(GregsExProject)' == ''">$(MSBuildThisFileDirectory)../../gregsex/.claude/worktrees/friendly-zhukovsky-03b73e/src/GregsEx/GregsEx.csproj</GregsExProject>
   </PropertyGroup>
 </Project>
