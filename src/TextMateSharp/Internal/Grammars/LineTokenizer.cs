@@ -111,23 +111,25 @@ namespace TextMateSharp.Internal.Grammars
                  */
 
                 _lineTokens.Produce(_stack, captureIndices[0].Start);
-                _stack = _stack.WithContentNameScopesList(_stack.NameScopesList);
-                HandleCaptures(_grammar, _lineText, _isFirstLine, _stack, _lineTokens, poppedRule.EndCaptures, captureIndices);
-                _lineTokens.Produce(_stack, captureIndices[0].End);
+                // The rule's state with its name scopes as content, created only if a capture or the endless loop
+                // check needs it.
+                var popped = new CaptureState(_stack, _stack.NameScopesList);
+                HandleCaptures(_grammar, _lineText, _isFirstLine, ref popped, _lineTokens, poppedRule.EndCaptures, captureIndices);
+                _lineTokens.ProduceFromScopes(popped.ContentNameScopesList, captureIndices[0].End);
 
                 // pop
-                StateStack popped = _stack;
+                _anchorPosition = _stack.GetAnchorPos();
+                int poppedEnterPos = _stack.GetEnterPos();
                 _stack = _stack.Pop();
-                _anchorPosition = popped.GetAnchorPos();
 
-                if (!hasAdvanced && popped.GetEnterPos() == _linePos)
+                if (!hasAdvanced && poppedEnterPos == _linePos)
                 {
                     // Grammar pushed & popped a rule without advancing
                     System.Diagnostics.Debug.WriteLine("[1] - Grammar is in an endless loop - Grammar pushed & popped a rule without advancing");
                     // See https://github.com/Microsoft/vscode-textmate/issues/12
                     // Let's assume this was a mistake by the grammar author and the
                     // intent was to continue in this state
-                    _stack = popped;
+                    _stack = popped.Get();
 
                     _lineTokens.Produce(_stack, _lineLength);
                     _stop = true;
@@ -148,22 +150,18 @@ namespace TextMateSharp.Internal.Grammars
                     scopeName,
                     _grammar);
 
-                _stack = _stack.Push(
-                    matchedRuleId,
-                    _linePos,
-                    _anchorPosition,
-                    captureIndices[0].End == _lineText.Length,
-                    null,
-                    nameScopesList,
-                    nameScopesList);
+                // The pushed rule, created only for a begin rule (it stays on the stack) or if a capture needs it.
+                var pushed = new CaptureState(_stack, matchedRuleId, _linePos, _anchorPosition,
+                    captureIndices[0].End == _lineText.Length, nameScopesList);
 
                 if (rule is BeginEndRule beginEndRule)
                 {
+                    _stack = pushed.Get();
                     HandleCaptures(
                         _grammar,
                         _lineText,
                         _isFirstLine,
-                        _stack,
+                        ref pushed,
                         _lineTokens,
                         beginEndRule.BeginCaptures,
                         captureIndices);
@@ -204,11 +202,12 @@ namespace TextMateSharp.Internal.Grammars
                     // console.log(' pushing ' + pushedRule.debugName);
                     // }
 
+                    _stack = pushed.Get();
                     HandleCaptures(
                         _grammar,
                         _lineText,
                         _isFirstLine,
-                        _stack,
+                        ref pushed,
                         _lineTokens,
                         beginWhileRule.BeginCaptures,
                         captureIndices);
@@ -243,12 +242,11 @@ namespace TextMateSharp.Internal.Grammars
                     // matchingRule.debugMatchRegExp);
                     // }
 
-                    HandleCaptures(_grammar, _lineText, _isFirstLine, _stack, _lineTokens, matchingRule.Captures,
+                    HandleCaptures(_grammar, _lineText, _isFirstLine, ref pushed, _lineTokens, matchingRule.Captures,
                             captureIndices);
-                    _lineTokens.Produce(_stack, captureIndices[0].End);
+                    _lineTokens.ProduceFromScopes(pushed.ContentNameScopesList, captureIndices[0].End);
 
-                    // pop rule immediately since it is a MatchRule
-                    _stack = _stack.Pop();
+                    // pop rule immediately since it is a MatchRule: the stack is the one before the push
 
                     if (!hasAdvanced)
                     {
@@ -394,7 +392,7 @@ namespace TextMateSharp.Internal.Grammars
             return null;
         }
 
-        private void HandleCaptures(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, StateStack stack,
+        private void HandleCaptures(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, ref CaptureState stack,
                 LineTokens lineTokens, List<CaptureRule> captures, OnigCaptureIndex[] captureIndices)
         {
             if (captures.Count == 0)
@@ -447,7 +445,7 @@ namespace TextMateSharp.Internal.Grammars
                 }
                 else
                 {
-                    lineTokens.Produce(stack, captureIndex.Start);
+                    lineTokens.ProduceFromScopes(stack.ContentNameScopesList, captureIndex.Start);
                 }
 
                 if (captureRule.RetokenizeCapturedWithRuleId != null)
@@ -459,7 +457,7 @@ namespace TextMateSharp.Internal.Grammars
                     AttributedScopeStack contentNameScopesList = nameScopesList.PushAttributed(contentName, grammar);
 
                     // the capture requires additional matching
-                    StateStack stackClone = stack.Push(
+                    StateStack stackClone = stack.Get().Push(
                         captureRule.RetokenizeCapturedWithRuleId,
                         captureIndex.Start,
                         -1,
@@ -531,7 +529,8 @@ namespace TextMateSharp.Internal.Grammars
                     if (whileCaptures.Length > 0)
                     {
                         lineTokens.Produce(whileRule.Stack, whileCaptures[0].Start);
-                        HandleCaptures(grammar, lineText, isFirstLine, whileRule.Stack, lineTokens,
+                        var whileState = new CaptureState(whileRule.Stack);
+                        HandleCaptures(grammar, lineText, isFirstLine, ref whileState, lineTokens,
                                 whileRule.Rule.WhileCaptures, whileCaptures);
                         lineTokens.Produce(whileRule.Stack, whileCaptures[0].End);
                         anchorPosition = whileCaptures[0].End;
@@ -568,15 +567,85 @@ namespace TextMateSharp.Internal.Grammars
             }
         }
 
-        sealed class WhileStack
+        readonly struct WhileStack
         {
-            internal StateStack Stack { get; private set; }
-            internal BeginWhileRule Rule { get; private set; }
+            internal StateStack Stack { get; }
+            internal BeginWhileRule Rule { get; }
 
             internal WhileStack(StateStack stack, BeginWhileRule rule)
             {
                 Stack = stack;
                 Rule = rule;
+            }
+        }
+
+        // A state for the captures of a match: an existing state, or one pushed (or with other content scopes)
+        // that is only created when needed, as match rules pop right away.
+        struct CaptureState
+        {
+            private readonly StateStack _parent;
+            private readonly RuleId _ruleId;
+            private readonly int _enterPos;
+            private readonly int _anchorPos;
+            private readonly bool _beginRuleCapturedEOL;
+            private readonly string _endRule;
+            private readonly AttributedScopeStack _nameScopesList;
+            private StateStack _stack;
+
+            internal CaptureState(StateStack stack)
+            {
+                _stack = stack;
+                _parent = null;
+                _ruleId = null;
+                _enterPos = 0;
+                _anchorPos = 0;
+                _beginRuleCapturedEOL = false;
+                _endRule = null;
+                _nameScopesList = null;
+                ContentNameScopesList = stack.ContentNameScopesList;
+            }
+
+            // A push on parent with the same name and content scopes.
+            internal CaptureState(StateStack parent, RuleId ruleId, int enterPos, int anchorPos, bool beginRuleCapturedEOL,
+                AttributedScopeStack nameScopesList)
+            {
+                _stack = null;
+                _parent = parent;
+                _ruleId = ruleId;
+                _enterPos = enterPos;
+                _anchorPos = anchorPos;
+                _beginRuleCapturedEOL = beginRuleCapturedEOL;
+                _endRule = null;
+                _nameScopesList = nameScopesList;
+                ContentNameScopesList = nameScopesList;
+            }
+
+            // stack.WithContentNameScopesList(contentNameScopesList).
+            internal CaptureState(StateStack stack, AttributedScopeStack contentNameScopesList)
+            {
+                if (AttributedScopeStack.Equals(stack.ContentNameScopesList, contentNameScopesList))
+                {
+                    this = new CaptureState(stack);
+                    return;
+                }
+
+                _stack = null;
+                _parent = stack.Parent;
+                _ruleId = stack.RuleId;
+                _enterPos = stack.GetEnterPos();
+                _anchorPos = stack.GetAnchorPos();
+                _beginRuleCapturedEOL = stack.BeginRuleCapturedEOL;
+                _endRule = stack.EndRule;
+                _nameScopesList = stack.NameScopesList;
+                ContentNameScopesList = contentNameScopesList;
+            }
+
+            internal AttributedScopeStack ContentNameScopesList { get; }
+
+            internal StateStack Get()
+            {
+                return _stack ??= _parent.Push(_ruleId, _enterPos, _anchorPos, _beginRuleCapturedEOL, _endRule,
+                    _nameScopesList, ContentNameScopesList);
             }
         }
 
