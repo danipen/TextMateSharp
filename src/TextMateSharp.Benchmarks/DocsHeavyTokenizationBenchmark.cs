@@ -14,10 +14,9 @@ using TextMateSharp.Themes;
 
 namespace TextMateSharp.Benchmarks
 {
-    // Tokenizes the code fences of Douze's docs-heavy scenario (bench/ssg-comparison/scenarios/docs-heavy/generate.mjs)
-    // with the tm-grammars 1.32.22 grammars Douze bundles, line by line as Douze does (lines without their newline).
-    // TEXTMATE_DIR is the extracted textmate.zip (manifest.json, grammars/), DOCS_FENCES the fences JSON
-    // ({ "ts": ["fence", ...], ... }).
+    // Tokenizes the code fences of documentation pages, as a static site generator highlights them: line by line,
+    // without the newline, with the tm-grammars 1.32.22 grammars. TEXTMATE_DIR holds those grammars (manifest.json,
+    // grammars/), DOCS_FENCES the fences per language as JSON ({ "ts": ["fence", ...], ... }).
     [MemoryDiagnoser]
     [ShortRunJob]
     public class DocsHeavyTokenizationBenchmark

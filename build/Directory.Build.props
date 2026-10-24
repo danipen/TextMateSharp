@@ -3,7 +3,6 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <SystemTextJsonVersion>8.0.5</SystemTextJsonVersion>
-    <!-- GregsEx from nuget.org; -p:UseGregsExProject=true -p:GregsExProject=<path to GregsEx.csproj> builds against a checkout. -->
-    <GregsExVersion Condition="'$(GregsExVersion)' == '' and '$(UseGregsExProject)' != 'true'">0.3.1</GregsExVersion>
+    <GregsExVersion>0.3.1</GregsExVersion>
   </PropertyGroup>
 </Project>
