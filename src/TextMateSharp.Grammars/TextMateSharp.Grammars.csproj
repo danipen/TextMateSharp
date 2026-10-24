@@ -11,7 +11,6 @@
     <Company />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <SignAssembly>True</SignAssembly>
-    <NoWarn>$(NoWarn);CS8002</NoWarn>
     <AssemblyOriginatorKeyFile>..\TextMateSharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
