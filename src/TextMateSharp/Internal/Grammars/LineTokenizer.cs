@@ -150,24 +150,16 @@ namespace TextMateSharp.Internal.Grammars
                     scopeName,
                     _grammar);
 
-                // The pushed rule, created only for a begin rule (it stays on the stack) or if a capture needs it.
+                // The pushed rule, created only if a capture needs it: a match rule pops right away, and a begin rule
+                // pushes its final state (with its content scopes and resolved end) once.
+                int anchorPositionBeforePush = _anchorPosition;
                 var pushed = new CaptureState(_stack, matchedRuleId, _linePos, _anchorPosition,
                     captureIndices[0].End == _lineText.Length, nameScopesList);
 
                 if (rule is BeginEndRule beginEndRule)
                 {
-                    _stack = pushed.Get();
-                    HandleCaptures(
-                        _grammar,
-                        _lineText,
-                        _isFirstLine,
-                        ref pushed,
-                        _lineTokens,
-                        beginEndRule.BeginCaptures,
-                        captureIndices);
-                    _lineTokens.Produce(_stack, captureIndices[0].End);
-                    _anchorPosition = captureIndices[0].End;
-
+                    // The content scopes and end depend only on the begin match: resolved first, so that the state is
+                    // pushed once when the captures' state is the final one.
                     string contentName = beginEndRule.GetContentName(
                         _lineText,
                         captureIndices);
@@ -176,15 +168,25 @@ namespace TextMateSharp.Internal.Grammars
                         contentName,
                         _grammar);
 
-                    _stack = _stack.WithContentNameScopesList(contentNameScopesList);
+                    string endRule = beginEndRule.EndHasBackReferences
+                        ? beginEndRule.GetEndWithResolvedBackReferences(_lineText, captureIndices)
+                        : null;
 
-                    if (beginEndRule.EndHasBackReferences)
-                    {
-                        _stack = _stack.WithEndRule(
-                            beginEndRule.GetEndWithResolvedBackReferences(
-                                _lineText,
-                                captureIndices));
-                    }
+                    StateStack final = ReferenceEquals(contentNameScopesList, nameScopesList) && endRule == null ? pushed.Get() : null;
+
+                    HandleCaptures(
+                        _grammar,
+                        _lineText,
+                        _isFirstLine,
+                        ref pushed,
+                        _lineTokens,
+                        beginEndRule.BeginCaptures,
+                        captureIndices);
+                    _lineTokens.ProduceFromScopes(nameScopesList, captureIndices[0].End);
+                    _anchorPosition = captureIndices[0].End;
+
+                    _stack = final ?? beforePush.Push(matchedRuleId, _linePos, anchorPositionBeforePush,
+                        captureIndices[0].End == _lineText.Length, endRule, nameScopesList, contentNameScopesList);
 
                     if (!hasAdvanced && beforePush.HasSameRuleAs(_stack))
                     {
@@ -202,7 +204,15 @@ namespace TextMateSharp.Internal.Grammars
                     // console.log(' pushing ' + pushedRule.debugName);
                     // }
 
-                    _stack = pushed.Get();
+                    string contentName = beginWhileRule.GetContentName(_lineText, captureIndices);
+                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAttributed(contentName, _grammar);
+
+                    string whileRule = beginWhileRule.WhileHasBackReferences
+                        ? beginWhileRule.GetWhileWithResolvedBackReferences(_lineText, captureIndices)
+                        : null;
+
+                    StateStack final = ReferenceEquals(contentNameScopesList, nameScopesList) && whileRule == null ? pushed.Get() : null;
+
                     HandleCaptures(
                         _grammar,
                         _lineText,
@@ -211,18 +221,11 @@ namespace TextMateSharp.Internal.Grammars
                         _lineTokens,
                         beginWhileRule.BeginCaptures,
                         captureIndices);
-                    _lineTokens.Produce(_stack, captureIndices[0].End);
+                    _lineTokens.ProduceFromScopes(nameScopesList, captureIndices[0].End);
                     _anchorPosition = captureIndices[0].End;
 
-                    string contentName = beginWhileRule.GetContentName(_lineText, captureIndices);
-                    AttributedScopeStack contentNameScopesList = nameScopesList.PushAttributed(contentName, _grammar);
-                    _stack = _stack.WithContentNameScopesList(contentNameScopesList);
-
-                    if (beginWhileRule.WhileHasBackReferences)
-                    {
-                        _stack = _stack.WithEndRule(
-                                beginWhileRule.GetWhileWithResolvedBackReferences(_lineText, captureIndices));
-                    }
+                    _stack = final ?? beforePush.Push(matchedRuleId, _linePos, anchorPositionBeforePush,
+                        captureIndices[0].End == _lineText.Length, whileRule, nameScopesList, contentNameScopesList);
 
                     if (!hasAdvanced && beforePush.HasSameRuleAs(_stack))
                     {
