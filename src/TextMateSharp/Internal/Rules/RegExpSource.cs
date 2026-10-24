@@ -161,6 +161,22 @@ namespace TextMateSharp.Internal.Rules
             for (int i = 0; i < valueLen; i++)
             {
                 char ch = value[i];
+                if (char.IsSurrogate(ch))
+                {
+                    if (char.IsHighSurrogate(ch) && i + 1 < valueLen && char.IsLowSurrogate(value[i + 1]))
+                    {
+                        sb.Append(ch).Append(value[++i]);
+                    }
+                    else
+                    {
+                        // A lone surrogate is invalid in an Oniguruma pattern, which then fails to compile. vscode-textmate
+                        // pastes it too, but vscode-oniguruma converts the pattern and the line to UTF-8, which turns it
+                        // into U+FFFD on both sides; match either.
+                        sb.Append(@"(?:\p{Cs}|\x{FFFD})");
+                    }
+                    continue;
+                }
+
                 switch (ch)
                 {
                     case '-':
