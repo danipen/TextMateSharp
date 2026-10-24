@@ -140,7 +140,7 @@ namespace TextMateSharp.Internal.Rules
                         continue;
                     }
 
-                    builder ??= new StringBuilder(source.Length + 16);
+                    builder ??= StringBuilderCache.Acquire(source.Length + 16);
                     builder.Append(source, copied, i - copied);
                     if (TryParseIndex(source, i + 1, digits, out int index) && index < captureIndices.Length)
                     {
@@ -157,7 +157,7 @@ namespace TextMateSharp.Internal.Rules
                 }
 
                 builder.Append(source, copied, source.Length - copied);
-                return builder.ToString();
+                return StringBuilderCache.GetStringAndRelease(builder);
             }
             catch (Exception ex)
             {

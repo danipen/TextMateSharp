@@ -1,5 +1,6 @@
 using TextMateSharp.Internal.Oniguruma;
 using System;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -96,9 +97,9 @@ namespace TextMateSharp.Internal.Utils
                     continue;
                 }
 
-                builder ??= new StringBuilder(regexSource.Length + 16);
+                builder ??= StringBuilderCache.Acquire(regexSource.Length + 16);
                 builder.Append(regexSource, copied, i - copied);
-                builder.Append(GetReplacement(regexSource.AsSpan(i, end - i), captureSource, captureIndices));
+                AppendReplacement(builder, regexSource.AsSpan(i, end - i), captureSource, captureIndices);
                 copied = end;
                 i = end - 1;
             }
@@ -109,7 +110,7 @@ namespace TextMateSharp.Internal.Utils
             }
 
             builder.Append(regexSource, copied, regexSource.Length - copied);
-            return builder.ToString();
+            return StringBuilderCache.GetStringAndRelease(builder);
         }
 
         // The end of the CAPTURING_REGEX_SOURCE match at the '$' at start, or -1.
@@ -162,7 +163,7 @@ namespace TextMateSharp.Internal.Utils
             return end - start;
         }
 
-        private static string GetReplacement(ReadOnlySpan<char> matchSpan, ReadOnlyMemory<char> captureSource, OnigCaptureIndex[] captureIndices)
+        private static void AppendReplacement(StringBuilder builder, ReadOnlySpan<char> matchSpan, ReadOnlyMemory<char> captureSource, OnigCaptureIndex[] captureIndices)
         {
             int doublePointIndex = matchSpan.IndexOf(':');
 
@@ -180,36 +181,47 @@ namespace TextMateSharp.Internal.Utils
             }
 
             OnigCaptureIndex capture = captureIndices != null && captureIndices.Length > index ? captureIndices[index] : default;
-            if (capture.IsDefined)
+            if (!capture.IsDefined)
             {
-                string result = captureSource.SubstringAtIndexes(capture.Start, capture.End);
+                AppendSpan(builder, matchSpan);
+                return;
+            }
 
-                // Remove leading dots that would make the selector invalid
-                int start = 0;
-                while (start < result.Length && result[start] == '.')
-                {
-                    start++;
-                }
-                if (start != 0)
-                {
-                    result = result.Substring(start);
-                }
-                if (commandSpan.SequenceEqual("downcase".AsSpan()))
-                {
-                    return result.ToLower();
-                }
-                else if (commandSpan.SequenceEqual("upcase".AsSpan()))
-                {
-                    return result.ToUpper();
-                }
-                else
-                {
-                    return result;
-                }
+            if (capture.Start < 0) throw new ArgumentOutOfRangeException(nameof(captureIndices));
+            if (capture.End > captureSource.Length) throw new ArgumentOutOfRangeException(nameof(captureIndices));
+            if (capture.Start > capture.End) throw new ArgumentOutOfRangeException(nameof(captureIndices));
+
+            // Remove leading dots that would make the selector invalid
+            int start = capture.Start;
+            while (start < capture.End && captureSource.Span[start] == '.')
+            {
+                start++;
+            }
+            ReadOnlyMemory<char> result = captureSource.Slice(start, capture.End - start);
+
+            if (commandSpan.SequenceEqual("downcase".AsSpan()))
+            {
+                builder.Append(result.Span.ToString().ToLower());
+            }
+            else if (commandSpan.SequenceEqual("upcase".AsSpan()))
+            {
+                builder.Append(result.Span.ToString().ToUpper());
+            }
+            else if (MemoryMarshal.TryGetString(result, out string text, out int textStart, out int textLength))
+            {
+                builder.Append(text, textStart, textLength);
             }
             else
             {
-                return matchSpan.ToString();
+                AppendSpan(builder, result.Span);
+            }
+        }
+
+        private static void AppendSpan(StringBuilder builder, ReadOnlySpan<char> span)
+        {
+            for (int i = 0; i < span.Length; i++)
+            {
+                builder.Append(span[i]);
             }
         }
 
