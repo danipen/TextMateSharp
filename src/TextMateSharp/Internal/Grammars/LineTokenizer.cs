@@ -86,7 +86,7 @@ namespace TextMateSharp.Internal.Grammars
             _capturePool.Reset();
             MatchResult r = MatchRuleOrInjections(_grammar, _lineText, _isFirstLine, _linePos, _stack, _anchorPosition);
 
-            if (r == null)
+            if (!r.IsMatch)
             {
                 // No match
                 _lineTokens.Produce(_stack, _lineLength);
@@ -277,18 +277,18 @@ namespace TextMateSharp.Internal.Grammars
             Rule rule = stack.GetRule(grammar);
 
             if (rule == null)
-                return null;
+                return default;
 
             CompiledRule ruleScanner = rule.Compile(grammar, stack.EndRule, isFirstLine, linePos == anchorPosition);
 
             if (ruleScanner == null)
-                return null;
+                return default;
 
             if (ruleScanner.Scanner.FindNextMatch(lineText, linePos, _capturePool, out int index, out OnigCaptureIndex[] captures))
             {
                 return new MatchResult(captures, ruleScanner.Rules[index]);
             }
-            return null;
+            return default;
         }
 
         private MatchResult MatchRuleOrInjections(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine,
@@ -305,15 +305,15 @@ namespace TextMateSharp.Internal.Grammars
                 return matchResult;
             }
 
-            MatchInjectionsResult injectionResult = MatchInjections(injections, grammar, lineText, isFirstLine, linePos,
+            MatchResult injectionResult = MatchInjections(injections, grammar, lineText, isFirstLine, linePos,
                     stack, anchorPosition);
-            if (injectionResult == null)
+            if (!injectionResult.IsMatch)
             {
                 // No injections matched => early return
                 return matchResult;
             }
 
-            if (matchResult == null)
+            if (!matchResult.IsMatch)
             {
                 // Only injections matched => early return
                 return injectionResult;
@@ -333,7 +333,7 @@ namespace TextMateSharp.Internal.Grammars
             return matchResult;
         }
 
-        private MatchInjectionsResult MatchInjections(List<Injection> injections, Grammar grammar, ReadOnlyMemory<char> lineText,
+        private MatchResult MatchInjections(List<Injection> injections, Grammar grammar, ReadOnlyMemory<char> lineText,
                 bool isFirstLine, in int linePos, StateStack stack, in int anchorPosition)
         {
             // The lower the better
@@ -386,13 +386,13 @@ namespace TextMateSharp.Internal.Grammars
                 OnigCaptureIndex[] matchCaptureIndices = bestMatchCaptureIndices;
                 bool isPriorityMatch = bestMatchResultPriority == -1;
 
-                return new MatchInjectionsResult(
+                return new MatchResult(
                     matchCaptureIndices,
                     matchedRuleId,
                     isPriorityMatch);
             }
 
-            return null;
+            return default;
         }
 
         private void HandleCaptures(Grammar grammar, ReadOnlyMemory<char> lineText, bool isFirstLine, ref CaptureState stack,
