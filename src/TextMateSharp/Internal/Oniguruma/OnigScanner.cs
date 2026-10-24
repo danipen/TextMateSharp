@@ -95,13 +95,6 @@ namespace TextMateSharp.Internal.Oniguruma
         private readonly int _invalidIndex = -1;
         private readonly string _invalidSource;
 
-        // Trace recording for benchmark fixtures (TextMateSharp.Benchmarks --trace): scanner pattern lists, lines and
-        // (scanner, line, position) calls. Null outside a recording.
-        public static System.Collections.Generic.List<string[]> TraceScanners;
-        public static System.Collections.Generic.Dictionary<string, int> TraceLines;
-        public static System.Collections.Generic.List<int[]> TraceCalls;
-        private int _traceId = -1;
-        private readonly string[] _sources;
 
         public OnigScanner(string[] regexps)
         {
@@ -124,7 +117,6 @@ namespace TextMateSharp.Internal.Oniguruma
             }
 
             _scanner = new OnigurumaScanner(patterns);
-            _sources = regexps;
         }
 
         public IOnigNextMatchResult FindNextMatchSync(string source, in int charOffset)
@@ -134,11 +126,6 @@ namespace TextMateSharp.Internal.Oniguruma
 
         public IOnigNextMatchResult FindNextMatchSync(ReadOnlyMemory<char> source, in int charOffset)
         {
-            if (TraceCalls != null)
-            {
-                Record(source, charOffset);
-            }
-
             bool found = _scanner.FindNextMatch(source, charOffset, out int index);
             if (_invalidIndex >= 0 && (!found || index > _invalidIndex || _scanner.Captures[0].Index > charOffset))
             {
@@ -165,11 +152,6 @@ namespace TextMateSharp.Internal.Oniguruma
         // Finds the next match into an array rented from pool: valid until pool.Reset().
         public bool FindNextMatch(ReadOnlyMemory<char> source, int charOffset, OnigCapturePool pool, out int index, out OnigCaptureIndex[] captureIndices)
         {
-            if (TraceCalls != null)
-            {
-                Record(source, charOffset);
-            }
-
             bool found = _scanner.FindNextMatch(source, charOffset, out index);
             if (_invalidIndex >= 0 && (!found || index > _invalidIndex || _scanner.Captures[0].Index > charOffset))
             {
@@ -226,24 +208,6 @@ namespace TextMateSharp.Internal.Oniguruma
             }
 
             return builder.ToString().Replace("\\x{7fffffff}", "\\x{7ffff}");
-        }
-
-        private void Record(ReadOnlyMemory<char> source, int charOffset)
-        {
-            if (_traceId < 0)
-            {
-                _traceId = TraceScanners.Count;
-                TraceScanners.Add(_sources);
-            }
-
-            string text = source.ToString();
-            if (!TraceLines.TryGetValue(text, out int lineId))
-            {
-                lineId = TraceLines.Count;
-                TraceLines[text] = lineId;
-            }
-
-            TraceCalls.Add(new[] { _traceId, lineId, charOffset });
         }
 
         private static bool IsHex(char c) => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
