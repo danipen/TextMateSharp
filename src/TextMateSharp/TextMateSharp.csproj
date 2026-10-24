@@ -5,7 +5,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>True</IsPackable>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <!-- GregsEx is not strong-named. -->
     <NoWarn>$(NoWarn);CS8002</NoWarn>
     <Description>An interpreter for grammar files as defined by TextMate. TextMate grammars use the oniguruma dialect (https://github.com/kkos/oniguruma). Supports loading grammar files only from JSON format. Cross - grammar injections are currently not supported.
@@ -22,7 +22,7 @@ TextMateSharp uses a wrapper around Oniguruma regex engine.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- The GregsEx package (GregsExVersion, build/Directory.Build.props), or the GregsEx project with UseGregsExProject. -->
+    <!-- The GregsEx package (GregsExVersion, build/Directory.Build.props), or a GregsEx checkout with UseGregsExProject and GregsExProject. -->
     <ProjectReference Include="$(GregsExProject)" Condition="'$(GregsExVersion)' == ''" />
     <PackageReference Include="GregsEx" Version="$(GregsExVersion)" Condition="'$(GregsExVersion)' != ''" />
   </ItemGroup>
