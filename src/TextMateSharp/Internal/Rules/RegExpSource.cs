@@ -11,7 +11,6 @@ namespace TextMateSharp.Internal.Rules
     {
 
         private static readonly Regex HAS_BACK_REFERENCES = new Regex("\\\\(\\d+)");
-        private static readonly Regex BACK_REFERENCING_END = new Regex("\\\\(\\d+)");
 
         private readonly RuleId _ruleId;
         private bool _hasAnchor;
@@ -120,31 +119,45 @@ namespace TextMateSharp.Internal.Rules
 
         internal string ResolveBackReferences(ReadOnlyMemory<char> lineText, OnigCaptureIndex[] captureIndices)
         {
-            List<string> capturedValues = new List<string>(captureIndices.Length);
-
             try
             {
-                for (int i = 0; i < captureIndices.Length; i++)
+                // The replacement of \\(\d+), without a regex or a string per capture: each backslash followed by
+                // digits is replaced by that capture, escaped (by nothing if there is no such capture or the number
+                // is not an int).
+                string source = this._source;
+                StringBuilder builder = null;
+                int copied = 0;
+                for (int i = source.IndexOf('\\'); i >= 0 && i < source.Length; i++)
                 {
-                    OnigCaptureIndex captureIndex = captureIndices[i];
-                    capturedValues.Add(lineText.SubstringAtIndexes(
-                        captureIndex.Start,
-                        captureIndex.End));
+                    if (source[i] != '\\')
+                    {
+                        continue;
+                    }
+
+                    int digits = RegexSource.CountDigits(source, i + 1);
+                    if (digits == 0)
+                    {
+                        continue;
+                    }
+
+                    builder ??= new StringBuilder(source.Length + 16);
+                    builder.Append(source, copied, i - copied);
+                    if (TryParseIndex(source, i + 1, digits, out int index) && index < captureIndices.Length)
+                    {
+                        OnigCaptureIndex captureIndex = captureIndices[index];
+                        AppendEscaped(builder, lineText.Span.Slice(captureIndex.Start, captureIndex.End - captureIndex.Start));
+                    }
+                    copied = i + 1 + digits;
+                    i = copied - 1;
                 }
 
-                return BACK_REFERENCING_END.Replace(this._source, m =>
+                if (builder == null)
                 {
-                    try
-                    {
-                        string value = m.Value;
-                        int index = int.Parse(m.Value.SubstringAtIndexes(1, value.Length));
-                        return EscapeRegExpCharacters(capturedValues.Count > index ? capturedValues[index] : "");
-                    }
-                    catch (Exception)
-                    {
-                        return "";
-                    }
-                });
+                    return source;
+                }
+
+                builder.Append(source, copied, source.Length - copied);
+                return builder.ToString();
             }
             catch (Exception ex)
             {
@@ -154,11 +167,32 @@ namespace TextMateSharp.Internal.Rules
             return lineText.Span.ToString();
         }
 
-        private static string EscapeRegExpCharacters(string value)
+        // int.Parse of ASCII digits: false for other digits or an overflow.
+        private static bool TryParseIndex(string source, int start, int length, out int value)
         {
-            int valueLen = value.Length;
-            var sb = new StringBuilder(valueLen);
-            for (int i = 0; i < valueLen; i++)
+            long result = 0;
+            for (int i = start; i < start + length; i++)
+            {
+                char ch = source[i];
+                if (ch < '0' || ch > '9')
+                {
+                    value = 0;
+                    return false;
+                }
+                result = (result * 10) + (ch - '0');
+                if (result > int.MaxValue)
+                {
+                    value = 0;
+                    return false;
+                }
+            }
+            value = (int)result;
+            return true;
+        }
+
+        private static void AppendEscaped(StringBuilder builder, ReadOnlySpan<char> value)
+        {
+            for (int i = 0; i < value.Length; i++)
             {
                 char ch = value[i];
                 switch (ch)
@@ -188,12 +222,11 @@ namespace TextMateSharp.Internal.Rules
                         case '\r':
                         case 0x0B: // vertical tab \v
                         */
-                        sb.Append('\\');
+                        builder.Append('\\');
                         break;
                 }
-                sb.Append(ch);
+                builder.Append(ch);
             }
-            return sb.ToString();
         }
 
         private RegExpSourceAnchorCache BuildAnchorCache()
