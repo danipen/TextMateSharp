@@ -1,0 +1,11 @@
+let people = (
+  (name: "Ada", age: 36),
+  (name: "Linus", age: 12),
+)
+
+let adults = people.filter(p => p.age >= 18)
+for person in adults {
+  [Hello, #person.name!]
+}
+
+let squares = range(1, 4).map(n => calc.pow(n, 2)) // (1, 4, 9)

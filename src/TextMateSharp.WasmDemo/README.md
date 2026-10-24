@@ -13,7 +13,7 @@ is needed. `dotnet publish` writes a static site to `bin/Release/net10.0/publish
 
 How it works: `Program.cs` exports `Highlighter` methods to JavaScript (`[JSExport]`); `wwwroot/main.js` lays a
 transparent `<textarea>` over a `<pre>` and fills the `<pre>` with the spans `Highlighter.Highlight` returns, colored
-by the theme. `wwwroot/samples` holds a starting snippet per language id; other languages start empty.
+by the theme. `wwwroot/samples` holds a starting snippet per language id (`<id>.txt`, one for every bundled grammar); a language without one starts empty.
 
 This needs a regex engine without native code: TextMateSharp's Onigwrap binding has no `browser-wasm` library
 (`System.DllNotFoundException: libonigwrap`), while GregsEx's Oniguruma flavor is managed.

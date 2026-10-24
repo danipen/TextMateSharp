@@ -65,10 +65,13 @@ namespace TextMateSharp.Internal.Grammars
                 _anchorPosition = whileCheckResult.AnchorPosition;
             }
 
+            // The time limit as a Stopwatch timestamp, read once per line rather than as a TimeSpan per scan.
             long started = Stopwatch.GetTimestamp();
+            double limitTicks = timeLimit.TotalSeconds * Stopwatch.Frequency;
+            long deadline = limitTicks >= long.MaxValue - started ? long.MaxValue : started + (long)limitTicks;
             while (!_stop)
             {
-                if (Stopwatch.GetElapsedTime(started) > timeLimit)
+                if (Stopwatch.GetTimestamp() > deadline)
                 {
                     return new TokenizeStringResult(_stack, true);
                 }

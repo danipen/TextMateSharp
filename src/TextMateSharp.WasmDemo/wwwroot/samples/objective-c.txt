@@ -1,0 +1,21 @@
+#import <Foundation/Foundation.h>
+
+@interface Person : NSObject
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic) NSInteger age;
+- (BOOL)isAdult;
+@end
+
+@implementation Person
+- (BOOL)isAdult { return self.age >= 18; }
+@end
+
+int main(int argc, const char *argv[]) {
+    @autoreleasepool {
+        Person *ada = [Person new];
+        ada.name = @"Ada";
+        ada.age = 36;
+        if ([ada isAdult]) NSLog(@"Hello, %@!", ada.name);
+    }
+    return 0;
+}

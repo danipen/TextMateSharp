@@ -1,0 +1,22 @@
+@page "/people"
+@using Demo.Models
+
+<h1>People</h1>
+
+@if (People is null)
+{
+    <p><em>Loading…</em></p>
+}
+else
+{
+    <ul>
+        @foreach (var person in People.Where(p => p.IsAdult))
+        {
+            <li>@person.Name (@person.Age)</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Person>? People = [new("Ada", 36), new("Linus", 12)];
+}

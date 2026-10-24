@@ -299,7 +299,11 @@ namespace TextMateSharp.Internal.Grammars
             {
                 // Only add \n if the passed lineText didn't have it. The copy is a string, not an array: the scanners
                 // reuse each regex's last result only for immutable (string-backed) text.
+#if NETSTANDARD2_0
+                effectiveLineText = (lineText.ToString() + "\n").AsMemory();
+#else
                 effectiveLineText = string.Concat(lineText.Span, "\n".AsSpan()).AsMemory();
+#endif
             }
             else
             {

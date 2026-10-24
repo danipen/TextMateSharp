@@ -1,0 +1,17 @@
+import Foundation
+
+struct Person {
+    let name: String
+    let age: Int
+    var isAdult: Bool { age >= 18 }
+}
+
+let people = [Person(name: "Ada", age: 36), Person(name: "Linus", age: 12)]
+for person in people where person.isAdult {
+    print("Hello, \(person.name)!") // greet
+}
+
+func load(_ url: URL) async throws -> Data {
+    let (data, _) = try await URLSession.shared.data(from: url)
+    return data
+}

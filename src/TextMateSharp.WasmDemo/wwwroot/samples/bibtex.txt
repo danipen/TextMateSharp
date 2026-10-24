@@ -1,0 +1,13 @@
+@article{lovelace1843,
+  author  = {Ada Lovelace},
+  title   = {Notes on the Analytical Engine},
+  journal = {Scientific Memoirs},
+  year    = {1843},
+  volume  = {3},
+  pages   = {666--731}
+}
+
+@misc{textmatesharp,
+  title = {TextMateSharp},
+  howpublished = {\url{https://github.com/danipen/TextMateSharp}}
+}

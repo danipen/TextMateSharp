@@ -27,9 +27,10 @@ function render() {
 }
 
 async function loadSample() {
-  const id = language.selectedOptions[0].dataset.id;
-  const response = await fetch(`samples/${id}.txt`);
+  const option = language.selectedOptions[0];
+  const response = await fetch(`samples/${option.dataset.id}.txt`);
   code.value = response.ok ? await response.text() : '';
+  code.placeholder = `Type ${option.text} here`;
   render();
 }
 

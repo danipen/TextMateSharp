@@ -2,10 +2,13 @@
 
 TextMateSharp (github.com/danipen/TextMateSharp at e0db45b) with GregsEx's Oniguruma flavor in place of Onigwrap, and
 allocation and caching changes in the tokenizer. Targets net10.0 (GregsEx is .NET 10, NativeAOT compatible).
-GregsEx comes from the preview package `GregsEx 0.1.0-preview.24` on feedz.io (`NuGet.config`,
-`build/Directory.Build.props`; github.com/sebastienros/gregsex main at ba36f798, the Oniguruma flavor PR), another
-version with `-p:GregsExVersion=<version>`, or a checkout with `-p:UseGregsExProject=true -p:GregsExProject=<csproj>`.
-Built against a preview, the package is itself a prerelease (`VersionSuffix` gregsex).
+GregsEx comes from nuget.org (`GregsEx 0.3.0`, `build/Directory.Build.props`), another version with
+`-p:GregsExVersion=<version>`, or a checkout with `-p:UseGregsExProject=true -p:GregsExProject=<csproj>`. GregsEx 0.3.0
+ships netstandard2.0, net8.0 and net10.0 assets, so the projects keep upstream's target frameworks: TextMateSharp and
+TextMateSharp.Grammars netstandard2.0, the tests and demo net8.0, the benchmarks net8.0 and net10.0, the WebAssembly
+demo net10.0. Two APIs the branch had used are missing on netstandard2.0: `string.Concat(ReadOnlySpan<char>, ...)`
+(a string concatenation there) and `Stopwatch.GetElapsedTime` (the time limit is now one Stopwatch deadline per line,
+on every target).
 
 Every change keeps the tokens of all 2,800 docs-heavy fences byte-identical to upstream with Onigwrap
 (`TextMateSharp.Benchmarks --dump`, SHA-256 `42477AF3...695474`) and the tests green: 818 TextMateSharp tests (6
@@ -23,7 +26,8 @@ TextMateSharp.Grammars tests.
 | 479d237 | T2: capture indices are one struct array per match instead of an array and an object per group. |
 | c26b84f | T3: `AttributedScopeStack` caches its children (validated against the grammar's cached scope attributes, which a theme change replaces), and `Grammar` its root, so scope nodes and their scope-name lists are reused across lines and documents. |
 | 1cf7406, 2dd04ae | T4: capture arrays are rented from pools owned per grammar and tokenizer nesting depth (capture retokenization nests), for any group count, while conditions included. |
-| (next) | GregsEx 0.1.0-preview.24 from feedz.io by default. |
+| b11b862 | GregsEx 0.1.0-preview.24 from feedz.io by default. |
+| (next) | GregsEx 0.3.0 from nuget.org, upstream target frameworks restored (netstandard2.0), feedz.io source removed; WebAssembly demo samples for all 63 grammars. |
 | da44d46 | T5: one `LineTokenizer` per grammar and depth, reused for every line with its buffers; struct `LocalStackElement`, `TokenizeStringResult` and `WhileCheckResult`; a timestamp instead of a `Stopwatch` per line. |
 
 GregsEx side, found by these suites: `OnigurumaScanner` does not reuse cached results of patterns using `\G` (a result
@@ -98,28 +102,34 @@ source, so its higher numbers here are host conditions, not the package. The sca
 
 ## For the pull request body
 
-Include both benchmarks, upstream (Onigwrap 1.0.11) against this branch (GregsEx 0.1.0-preview.24), measured
-2026-10-23 on an Apple M4 Pro with .NET 10, BenchmarkDotNet:
+Include both benchmarks, upstream (Onigwrap 1.0.11) against this branch (GregsEx 0.3.0), BenchmarkDotNet 0.15.8 default
+job, Apple M4 Pro, macOS 15.8.1, 2026-10-24, on .NET 8.0.x and 10.0.x (load average about 4 from other processes;
+errors are under 1.5% of the mean). Tokens are byte-identical to Onigwrap's on both runtimes (`--dump` SHA-256
+`42477AF3...695474`); tests: 818 passed and 6 skipped (known differences, failing identically with Onigwrap), 16
+TextMateSharp.Grammars tests passed, on net8.0.
 
 `BigFileTokenizationBenchmark` (TextMateSharp's own: `bigfile.cs`, 133,439 lines, C# grammar):
 
-| | Onigwrap | GregsEx |
-| --- | ---: | ---: |
-| Mean | 4.885 s | 1.737 s |
-| Allocated | 510 MB | 137 MB |
-| Gen0 / Gen1 | 62,000 / 5,000 | 16,000 / 0 |
+| Runtime | Onigwrap | GregsEx | Speedup | Allocated (Onigwrap → GregsEx) |
+| --- | ---: | ---: | ---: | ---: |
+| .NET 10.0 | 4.795 s | 1.713 s | 2.8x | 510 MB → 137 MB |
+| .NET 8.0 | 4.801 s | 1.800 s | 2.7x | 533 MB → 156 MB |
 
 `DocsHeavyTokenizationBenchmark` (40 docs-heavy fences per language, tm-grammars 1.32.22, mean per operation):
 
-| Language | Onigwrap | GregsEx |
-| --- | ---: | ---: |
-| bash | 14.72 ms | 2.14 ms |
-| ts | 48.06 ms | 10.39 ms |
-| js | 91.92 ms | 15.55 ms |
-| html | 9.21 ms | 2.36 ms |
-| json | 1.99 ms | 0.55 ms |
-| yaml | 15.56 ms | 1.70 ms |
-| csharp | 89.03 ms | 18.06 ms |
+| Language | Onigwrap .NET 10 | GregsEx .NET 10 | Onigwrap .NET 8 | GregsEx .NET 8 |
+| --- | ---: | ---: | ---: | ---: |
+| bash | 15.05 ms | 2.17 ms | 15.41 ms | 2.57 ms |
+| ts | 48.67 ms | 10.25 ms | 49.78 ms | 10.98 ms |
+| js | 93.24 ms | 15.85 ms | 95.31 ms | 16.80 ms |
+| html | 9.43 ms | 2.16 ms | 9.86 ms | 2.24 ms |
+| json | 1.99 ms | 0.54 ms | 2.11 ms | 0.55 ms |
+| yaml | 15.93 ms | 1.66 ms | 16.22 ms | 1.69 ms |
+| csharp | 91.58 ms | 18.08 ms | 93.13 ms | 18.51 ms |
+
+Also: the WebAssembly proof below, a demo screenshot (`docs/wasm/editor-jsonc-darkplus.jpg` or the C# one), and the
+issues it fixes in danipen/TextMateSharp: `Fixes #88` (MAUI on macOS arm64 cannot load libonigwrap), and #57
+(WebAssembly: the missing native asset is fixed; the Avalonia hang with threads reported there may be separate).
 
 ### WebAssembly
 

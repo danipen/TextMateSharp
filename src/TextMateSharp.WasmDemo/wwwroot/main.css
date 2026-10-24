@@ -9,4 +9,5 @@ select { margin-left: 6px; background: #313131; color: #cccccc; border: 1px soli
   font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre; tab-size: 4; }
 .editor pre { color: var(--fg); pointer-events: none; }
 .editor textarea { background: transparent; color: transparent; caret-color: var(--fg); resize: none; outline: none; }
+.editor textarea::placeholder { color: var(--fg); opacity: 0.5; }
 footer { padding: 0 16px 10px; color: #9d9d9d; font-size: 12px; }

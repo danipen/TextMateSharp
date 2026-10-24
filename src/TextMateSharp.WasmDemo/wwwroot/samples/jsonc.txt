@@ -1,0 +1,11 @@
+{
+  // Editor settings, with comments
+  "editor.fontSize": 14,
+  "editor.tabSize": 4,
+  /* Highlighting */
+  "workbench.colorTheme": "Default Dark+",
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true, // trailing commas are allowed
+  },
+}

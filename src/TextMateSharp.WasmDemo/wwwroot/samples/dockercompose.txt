@@ -1,0 +1,15 @@
+services:
+  demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - THEME=DarkPlus
+    depends_on:
+      - cache
+    restart: unless-stopped
+
+  cache:
+    image: redis:7-alpine # in-memory cache

@@ -1,0 +1,18 @@
+module Demo
+
+open System
+
+type Person = { Name: string; Age: int }
+
+let isAdult person = person.Age >= 18
+
+let greet people =
+    people
+    |> List.filter isAdult
+    |> List.map (fun p -> sprintf "Hello, %s!" p.Name)
+
+[<EntryPoint>]
+let main argv =
+    let people = [ { Name = "Ada"; Age = 36 }; { Name = "Linus"; Age = 12 } ]
+    greet people |> List.iter (printfn "%s") // print each
+    if argv.Length > 0 then 1 else 0

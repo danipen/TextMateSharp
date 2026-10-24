@@ -1,0 +1,5 @@
+2026-10-23 18:52:01.123 INFO  Starting TextMateSharp demo
+2026-10-23 18:52:01.456 DEBUG Loading grammar source.cs
+2026-10-23 18:52:02.010 WARN  Grammar cache miss for text.html.derivative
+2026-10-23 18:52:02.789 ERROR Failed to load theme 'Unknown': FileNotFoundException
+2026-10-23 18:52:03.000 INFO  Highlighted 241 tokens in 36.0 ms

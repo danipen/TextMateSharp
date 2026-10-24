@@ -1,0 +1,14 @@
+class Person
+  attr_reader :name, :age
+
+  def initialize(name, age)
+    @name, @age = name, age
+  end
+
+  def adult? = age >= 18
+end
+
+people = [Person.new("Ada", 36), Person.new("Linus", 12)]
+people.select(&:adult?).each { |p| puts "Hello, #{p.name}!" } # greet
+
+squares = (1..3).map { _1**2 }
