@@ -1,0 +1,12 @@
+# Build output
+bin/
+obj/
+*.nupkg
+
+# IDEs
+.vs/
+.idea/
+*.user
+
+# Keep this one
+!keep.me

@@ -10,6 +10,7 @@ namespace TextMateSharp.Internal.Grammars
         internal string ScopePath { get; private set; }
         internal int TokenAttributes { get; private set; }
         private List<string> _cachedScopeNames;
+        private Dictionary<string, (BasicScopeAttributes Raw, AttributedScopeStack Child)> _children;
 
         // Precomputed, per-node hash code (persistent structure => safe as long as instances are immutable)
         private readonly int _hashCode;
@@ -285,8 +286,20 @@ namespace TextMateSharp.Internal.Grammars
         private static AttributedScopeStack PushSingleScope(AttributedScopeStack target, Grammar grammar, string scope)
         {
             BasicScopeAttributes rawMetadata = grammar.GetMetadataForScope(scope);
+
+            // The child for a scope depends only on this node and the scope's attributes, which the grammar caches
+            // until a theme change replaces them: reuse it while they are the same object. Nodes are pushed under the
+            // tokenizing grammar's lock.
+            Dictionary<string, (BasicScopeAttributes Raw, AttributedScopeStack Child)> children = target._children;
+            if (children != null && children.TryGetValue(scope, out var cached) && ReferenceEquals(cached.Raw, rawMetadata))
+            {
+                return cached.Child;
+            }
+
             int metadata = AttributedScopeStack.MergeAttributes(target.TokenAttributes, target, rawMetadata);
-            return new AttributedScopeStack(target, scope, metadata);
+            var child = new AttributedScopeStack(target, scope, metadata);
+            (target._children ??= new Dictionary<string, (BasicScopeAttributes, AttributedScopeStack)>(StringComparer.Ordinal))[scope] = (rawMetadata, child);
+            return child;
         }
 
         public AttributedScopeStack PushAttributed(string scopePath, Grammar grammar)

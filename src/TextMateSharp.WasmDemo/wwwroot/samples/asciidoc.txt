@@ -1,0 +1,16 @@
+= TextMateSharp
+:toc:
+
+== Getting started
+
+Highlight *TextMate grammars* in _.NET_, now on WebAssembly.
+
+[source,csharp]
+----
+var grammar = registry.LoadGrammar("source.cs");
+----
+
+NOTE: No native code is needed.
+
+* Grammars
+* Themes

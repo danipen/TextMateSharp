@@ -1,0 +1,16 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\title{TextMateSharp on WebAssembly}
+\author{Demo}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Highlighting with \textbf{TextMate grammars}: % a comment
+\begin{equation}
+  E = mc^2 \quad \text{and} \quad \sum_{i=1}^{n} i = \frac{n(n+1)}{2}
+\end{equation}
+
+\end{document}

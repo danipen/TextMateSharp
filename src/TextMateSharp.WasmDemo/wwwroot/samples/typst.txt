@@ -1,0 +1,14 @@
+#set page(width: 12cm, height: auto)
+#set text(font: "New Computer Modern")
+
+= TextMateSharp on WebAssembly
+
+Highlighting *TextMate grammars* in _.NET_.
+
+#let greet(name) = [Hello, #name!]
+#greet("world")
+
+$ sum_(i=1)^n i = (n(n+1)) / 2 $
+
+- Grammars
+- Themes // a comment

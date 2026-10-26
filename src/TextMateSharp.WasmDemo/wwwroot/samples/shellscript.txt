@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+name="${1:-world}"
+for i in 1 2 3; do
+  echo "Hello, $name ($i)"
+done
+
+if [[ -f ./build.sh ]]; then
+  ./build.sh --release > build.log 2>&1 || echo "build failed" >&2
+fi

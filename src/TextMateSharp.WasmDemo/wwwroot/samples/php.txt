@@ -1,0 +1,16 @@
+<?php
+declare(strict_types=1);
+
+namespace Demo;
+
+final class Person
+{
+    public function __construct(public readonly string $name, public readonly int $age) {}
+
+    public function isAdult(): bool { return $this->age >= 18; }
+}
+
+$people = [new Person('Ada', 36), new Person('Linus', 12)];
+foreach (array_filter($people, fn(Person $p) => $p->isAdult()) as $person) {
+    echo "Hello, {$person->name}!\n"; // greet
+}

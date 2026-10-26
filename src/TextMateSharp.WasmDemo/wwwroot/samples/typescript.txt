@@ -1,0 +1,16 @@
+interface Shape {
+  readonly kind: "circle" | "square";
+  area(): number;
+}
+
+class Circle implements Shape {
+  readonly kind = "circle" as const;
+  constructor(private radius: number) {}
+  area(): number { return Math.PI * this.radius ** 2; }
+}
+
+function largest<T extends Shape>(shapes: T[]): T | undefined {
+  return shapes.reduce<T | undefined>((best, s) => (!best || s.area() > best.area() ? s : best), undefined);
+}
+
+export const result = largest([new Circle(1), new Circle(2)]);

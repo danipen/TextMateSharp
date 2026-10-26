@@ -1,0 +1,12 @@
+doctype html
+html(lang="en")
+  head
+    title= pageTitle
+  body
+    h1.title Hello, #{name}!
+    ul
+      each person in people
+        li(class=person.adult ? 'adult' : '')= person.name
+    if !people.length
+      p No one here.
+    //- a comment

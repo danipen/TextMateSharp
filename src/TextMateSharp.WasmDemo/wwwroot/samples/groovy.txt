@@ -1,0 +1,14 @@
+import groovy.transform.Canonical
+
+@Canonical
+class Person {
+    String name
+    int age
+
+    boolean isAdult() { age >= 18 }
+}
+
+def people = [new Person('Ada', 36), new Person('Linus', 12)]
+people.findAll { it.adult }.each { println "Hello, ${it.name}!" }
+
+def squares = (1..3).collect { it ** 2 } // [1, 4, 9]

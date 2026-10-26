@@ -1,6 +1,5 @@
-﻿using Moq;
 using NUnit.Framework;
-using Onigwrap;
+using TextMateSharp.Internal.Oniguruma;
 using System;
 using System.Text;
 using TextMateSharp.Internal.Utils;
@@ -293,7 +292,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "Hello $1 $2";
             ReadOnlyMemory<char> captureSource = "alpha beta".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 10),
                 CreateCapture(0, 5),
@@ -313,7 +312,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "Value ${1:/upcase} ${2:/downcase}";
             ReadOnlyMemory<char> captureSource = "MiXeD CaSe".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 10),
                 CreateCapture(0, 5),
@@ -333,7 +332,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "start $0 end";
             ReadOnlyMemory<char> captureSource = "alpha".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 5)
             ];
@@ -351,7 +350,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $0 $99";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices = new IOnigCaptureIndex[100];
+            OnigCaptureIndex[] captureIndices = new OnigCaptureIndex[100];
             captureIndices[0] = CreateCapture(0, 1);
             captureIndices[99] = CreateCapture(0, 3);
 
@@ -368,7 +367,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $98";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices = new IOnigCaptureIndex[99];
+            OnigCaptureIndex[] captureIndices = new OnigCaptureIndex[99];
 
             // act
             string result = RegexSource.ReplaceCaptures(regexSource, captureSource, captureIndices);
@@ -383,7 +382,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $98";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices = new IOnigCaptureIndex[98];
+            OnigCaptureIndex[] captureIndices = new OnigCaptureIndex[98];
 
             // act
             string result = RegexSource.ReplaceCaptures(regexSource, captureSource, captureIndices);
@@ -398,7 +397,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $100";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices = new IOnigCaptureIndex[100];
+            OnigCaptureIndex[] captureIndices = new OnigCaptureIndex[100];
 
             // act
             string result = RegexSource.ReplaceCaptures(regexSource, captureSource, captureIndices);
@@ -413,7 +412,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices = new IOnigCaptureIndex[2];
+            OnigCaptureIndex[] captureIndices = new OnigCaptureIndex[2];
 
             // act
             string result = RegexSource.ReplaceCaptures(regexSource, captureSource, captureIndices);
@@ -428,7 +427,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value ${0:/upcase}";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 3)
             ];
@@ -446,7 +445,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "prefix $1";
             ReadOnlyMemory<char> captureSource = ".Foo".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 4),
                 CreateCapture(0, 4)
@@ -465,7 +464,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "prefix $1";
             ReadOnlyMemory<char> captureSource = "...Foo".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 6),
                 CreateCapture(0, 6)
@@ -484,7 +483,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "prefix $1";
             ReadOnlyMemory<char> captureSource = "...".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 3),
                 CreateCapture(0, 3)
@@ -503,7 +502,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "x$1y";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 3),
                 CreateCapture(1, 1)
@@ -536,9 +535,9 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
-                null,
+                default,
                 CreateCapture(0, 0)
             ];
 
@@ -556,9 +555,9 @@ namespace TextMateSharp.Tests.Internal.Utils
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
             int end = captureSource.Length;
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
-                null,
+                default,
                 CreateCapture(end, end)
             ];
 
@@ -575,7 +574,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "start $2 end";
             ReadOnlyMemory<char> captureSource = "alpha".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 5),
                 CreateCapture(0, 5)
@@ -626,10 +625,10 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "alpha".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 5),
-                null
+                default
             ];
 
             // act
@@ -659,7 +658,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "alpha".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 5),
                 CreateCapture(-1, 2)
@@ -676,7 +675,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "alpha".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 5),
                 CreateCapture(0, 6)
@@ -693,7 +692,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "alpha".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 5),
                 CreateCapture(4, 2)
@@ -721,7 +720,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $0";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices = new IOnigCaptureIndex[1];
+            OnigCaptureIndex[] captureIndices = new OnigCaptureIndex[1];
 
             // act
             string result = RegexSource.ReplaceCaptures(regexSource, captureSource, captureIndices);
@@ -750,9 +749,9 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = ReadOnlyMemory<char>.Empty;
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
-                null,
+                default,
                 CreateCapture(0, 0)
             ];
 
@@ -770,9 +769,9 @@ namespace TextMateSharp.Tests.Internal.Utils
             const string regexSource = "value $1";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
             int captureEndIndex = captureSource.Length;
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
-                null,
+                default,
                 CreateCapture(0, captureEndIndex)
             ];
 
@@ -789,7 +788,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $0";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 3)
             ];
@@ -821,7 +820,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             // arrange
             const string regexSource = "value $2";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices = new IOnigCaptureIndex[3];
+            OnigCaptureIndex[] captureIndices = new OnigCaptureIndex[3];
 
             // act
             string result = RegexSource.ReplaceCaptures(regexSource, captureSource, captureIndices);
@@ -837,7 +836,7 @@ namespace TextMateSharp.Tests.Internal.Utils
             string index = int.MaxValue.ToString();
             string regexSource = $"value ${index}";
             ReadOnlyMemory<char> captureSource = "abc".AsMemory();
-            IOnigCaptureIndex[] captureIndices =
+            OnigCaptureIndex[] captureIndices =
             [
                 CreateCapture(0, 3)
             ];
@@ -851,13 +850,9 @@ namespace TextMateSharp.Tests.Internal.Utils
 
         #endregion ReplaceCaptures Tests
 
-        private static IOnigCaptureIndex CreateCapture(int start, int end)
+        private static OnigCaptureIndex CreateCapture(int start, int end)
         {
-            Mock<IOnigCaptureIndex> capture = new Mock<IOnigCaptureIndex>();
-            capture.SetupGet(c => c.Start).Returns(start);
-            capture.SetupGet(c => c.End).Returns(end);
-            capture.SetupGet(c => c.Length).Returns(end - start);
-            return capture.Object;
+            return new OnigCaptureIndex(0, start, end);
         }
     }
 }

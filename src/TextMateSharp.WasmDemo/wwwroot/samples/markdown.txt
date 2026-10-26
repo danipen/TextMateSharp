@@ -1,0 +1,12 @@
+# TextMateSharp
+
+Highlighting **TextMate grammars** in .NET, now on *WebAssembly*.
+
+- Grammars from [tm-grammars](https://github.com/shikijs/textmate-grammars-themes)
+- Themes from VS Code
+
+```csharp
+var grammar = registry.LoadGrammar("source.cs");
+```
+
+> No native code needed.
