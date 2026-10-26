@@ -3,6 +3,6 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <SystemTextJsonVersion>8.0.5</SystemTextJsonVersion>
-    <GregsExVersion>0.4.3</GregsExVersion>
+    <GregsExVersion>0.5.2</GregsExVersion>
   </PropertyGroup>
 </Project>
