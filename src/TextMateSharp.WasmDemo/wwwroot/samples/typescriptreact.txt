@@ -1,0 +1,13 @@
+import { useState } from 'react';
+
+interface CounterProps { start?: number; label: string; }
+
+export function Counter({ start = 0, label }: CounterProps) {
+  const [count, setCount] = useState<number>(start);
+  return (
+    <div className="counter">
+      <p>{label}: {count}</p>
+      <button onClick={() => setCount(c => c + 1)}>Click me</button>
+    </div>
+  );
+}

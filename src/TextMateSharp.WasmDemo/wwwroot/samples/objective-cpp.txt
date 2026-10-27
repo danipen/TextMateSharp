@@ -1,0 +1,22 @@
+#import <Foundation/Foundation.h>
+#include <vector>
+#include <string>
+
+@interface Greeter : NSObject
+- (void)greet:(const std::vector<std::string> &)names;
+@end
+
+@implementation Greeter
+- (void)greet:(const std::vector<std::string> &)names {
+    for (const auto &name : names) {
+        NSLog(@"Hello, %s!", name.c_str());
+    }
+}
+@end
+
+int main() {
+    @autoreleasepool {
+        [[Greeter new] greet:{"Ada", "Linus"}];
+    }
+    return 0;
+}

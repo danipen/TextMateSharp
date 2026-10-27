@@ -1,0 +1,9 @@
+diff --git a/src/TextMateSharp/TextMateSharp.csproj b/src/TextMateSharp/TextMateSharp.csproj
+index abd8983..ead2471 100644
+--- a/src/TextMateSharp/TextMateSharp.csproj
++++ b/src/TextMateSharp/TextMateSharp.csproj
+@@ -22,7 +22,7 @@
+   <ItemGroup>
+-    <PackageReference Include="Onigwrap" Version="1.0.11" />
++    <PackageReference Include="GregsEx" Version="0.3.0" />
+   </ItemGroup>

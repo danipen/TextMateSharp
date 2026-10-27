@@ -7,12 +7,12 @@ namespace TextMateSharp.Internal.Grammars
     internal sealed class LineTokens
     {
         // used only if `_emitBinaryTokens` is false.
-        private readonly List<IToken> _tokens;
+        private List<IToken> _tokens;
 
         private readonly bool _emitBinaryTokens;
 
         // used only if `_emitBinaryTokens` is true.
-        private readonly List<int> binaryTokens;
+        private List<int> binaryTokens;
 
         private int _lastTokenEndIndex = 0;
         private readonly List<TokenTypeMatcher> _tokenTypeOverrides;
@@ -37,6 +37,29 @@ namespace TextMateSharp.Internal.Grammars
             }
             this._tokenTypeOverrides = tokenTypeOverrides;
             this._balancedBracketSelectors = balancedBracketSelectors;
+        }
+
+        // A grammar reuses its line tokens for every line: keeps the lists unless a long line grew them.
+        internal void Reset()
+        {
+            const int MaxRetainedCapacity = 1024;
+            this._lastTokenEndIndex = 0;
+            if (this._emitBinaryTokens)
+            {
+                if (this.binaryTokens.Capacity > 2 * MaxRetainedCapacity)
+                {
+                    this.binaryTokens = new List<int>();
+                }
+                this.binaryTokens.Clear();
+            }
+            else
+            {
+                if (this._tokens.Capacity > MaxRetainedCapacity)
+                {
+                    this._tokens = new List<IToken>();
+                }
+                this._tokens.Clear();
+            }
         }
 
         internal void Produce(StateStack stack, int endIndex)
@@ -158,13 +181,7 @@ namespace TextMateSharp.Internal.Grammars
                 this.binaryTokens[this.binaryTokens.Count - 2] = 0;
             }
 
-            int[] result = new int[this.binaryTokens.Count];
-            for (int i = 0, len = this.binaryTokens.Count; i < len; i++)
-            {
-                result[i] = this.binaryTokens[i];
-            }
-
-            return result;
+            return this.binaryTokens.ToArray();
         }
     }
 }

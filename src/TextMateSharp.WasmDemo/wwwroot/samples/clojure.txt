@@ -1,0 +1,14 @@
+(ns demo.core
+  (:require [clojure.string :as str]))
+
+(defn greet
+  "Greets each name."
+  [names]
+  (map #(str "Hello, " (str/capitalize %) "!") names))
+
+(def people {:ada 36 :linus 12})
+
+(defn -main [& args]
+  (doseq [line (greet ["ada" "linus"])]
+    (println line))
+  (println (filter (fn [[_ age]] (>= age 18)) people)))

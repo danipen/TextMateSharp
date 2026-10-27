@@ -1,0 +1,11 @@
+# Application settings
+app.name=TextMateSharp Demo
+app.version=1.0
+
+highlighting.theme=DarkPlus
+highlighting.grammars=csharp, javascript, json
+highlighting.enabled=true
+
+# A value spanning lines
+greeting=Hello, \
+    world!

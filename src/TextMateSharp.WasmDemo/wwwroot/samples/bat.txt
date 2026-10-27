@@ -1,0 +1,17 @@
+@echo off
+setlocal enabledelayedexpansion
+
+set NAME=%~1
+if "%NAME%"=="" set NAME=world
+
+for %%i in (1 2 3) do (
+    echo Hello, %NAME% (%%i)
+)
+
+rem Build and report
+dotnet build -c Release || goto :error
+exit /b 0
+
+:error
+echo Build failed with %errorlevel%
+exit /b 1

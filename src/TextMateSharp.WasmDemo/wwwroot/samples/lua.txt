@@ -1,0 +1,13 @@
+local Person = {}
+Person.__index = Person
+
+function Person.new(name, age)
+  return setmetatable({ name = name, age = age }, Person)
+end
+
+function Person:isAdult() return self.age >= 18 end
+
+local people = { Person.new("Ada", 36), Person.new("Linus", 12) }
+for _, p in ipairs(people) do
+  if p:isAdult() then print("Hello, " .. p.name .. "!") end -- greet
+end

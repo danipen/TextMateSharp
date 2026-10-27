@@ -1,0 +1,11 @@
+people <- data.frame(name = c("Ada", "Linus"), age = c(36, 12))
+
+is_adult <- function(age) age >= 18
+
+adults <- subset(people, is_adult(age))
+for (name in adults$name) {
+  cat(sprintf("Hello, %s!\n", name))  # greet
+}
+
+squares <- sapply(1:3, function(n) n^2)
+summary(lm(age ~ nchar(name), data = people))

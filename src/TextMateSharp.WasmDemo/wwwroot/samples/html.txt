@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hello</title>
+  <style>
+    body { font-family: system-ui, sans-serif; color: #333; }
+  </style>
+</head>
+<body>
+  <h1 class="title">Hello, <em>world</em>!</h1>
+  <button onclick="alert('clicked')">Click me</button>
+  <!-- a comment -->
+</body>
+</html>

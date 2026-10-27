@@ -1,4 +1,4 @@
-using Onigwrap;
+using TextMateSharp.Internal.Oniguruma;
 using System;
 
 using TextMateSharp.Internal.Utils;
@@ -25,7 +25,7 @@ namespace TextMateSharp.Internal.Rules
             _contentNameIsCapturing = RegexSource.HasCaptures(this._contentName);
         }
 
-        public string GetName(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
+        public string GetName(ReadOnlyMemory<char> lineText, OnigCaptureIndex[] captureIndices)
         {
             if (!this._nameIsCapturing)
             {
@@ -35,7 +35,7 @@ namespace TextMateSharp.Internal.Rules
             return RegexSource.ReplaceCaptures(this._name, lineText, captureIndices);
         }
 
-        public string GetContentName(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
+        public string GetContentName(ReadOnlyMemory<char> lineText, OnigCaptureIndex[] captureIndices)
         {
             if (!this._contentNameIsCapturing)
             {

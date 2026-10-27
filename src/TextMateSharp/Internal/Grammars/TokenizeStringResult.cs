@@ -1,11 +1,11 @@
-﻿using TextMateSharp.Grammars;
+using TextMateSharp.Grammars;
 
 namespace TextMateSharp.Internal.Grammars
 {
-    internal class TokenizeStringResult
+    internal readonly struct TokenizeStringResult
     {
-        internal StateStack Stack { get; private set; }
-        internal bool StoppedEarly { get; private set; }
+        internal StateStack Stack { get; }
+        internal bool StoppedEarly { get; }
 
         internal TokenizeStringResult(StateStack stack, bool stoppedEarly)
         {

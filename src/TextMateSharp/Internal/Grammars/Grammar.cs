@@ -1,3 +1,4 @@
+using TextMateSharp.Internal.Oniguruma;
 using System;
 using System.Collections.Generic;
 
@@ -221,6 +222,27 @@ namespace TextMateSharp.Internal.Grammars
             return (ITokenizeLineResult2)Tokenize(lineText.Memory, (StateStack)prevState, true, timeLimit);
         }
 
+        private AttributedScopeStack _rootScopes;
+
+        // Line tokenizers by nesting depth (capture retokenization nests), reused for every line: tokenizing is
+        // serialized per grammar.
+        private readonly List<LineTokenizer> _tokenizers = new List<LineTokenizer>();
+        private int _tokenizerDepth;
+        private LineTokens _lineTokens;
+        private LineTokens _binaryLineTokens;
+
+        internal LineTokenizer EnterTokenizer()
+        {
+            if (_tokenizerDepth == _tokenizers.Count)
+            {
+                _tokenizers.Add(new LineTokenizer());
+            }
+
+            return _tokenizers[_tokenizerDepth++];
+        }
+
+        internal void ExitTokenizer() => _tokenizerDepth--;
+
         private object Tokenize(ReadOnlyMemory<char> lineText, StateStack prevState, bool emitBinaryTokens, TimeSpan timeLimit)
         {
             // The grammar is compiled lazily on first use, and its rules cache and mutate their
@@ -255,7 +277,14 @@ namespace TextMateSharp.Internal.Grammars
                 BasicScopeAttributes rawRootMetadata = this._basicScopeAttributesProvider.GetBasicScopeAttributes(rootScopeName);
                 int rootMetadata = AttributedScopeStack.MergeAttributes(defaultMetadata, null, rawRootMetadata);
 
-                AttributedScopeStack scopeList = new AttributedScopeStack(null, rootScopeName, rootMetadata);
+                // One root scope node per grammar and attributes: the scope nodes pushed under it are reused across
+                // documents (AttributedScopeStack caches its children).
+                AttributedScopeStack scopeList = _rootScopes;
+                if (scopeList == null || scopeList.TokenAttributes != rootMetadata || !string.Equals(scopeList.ScopePath, rootScopeName, StringComparison.Ordinal))
+                {
+                    scopeList = new AttributedScopeStack(null, rootScopeName, rootMetadata);
+                    _rootScopes = scopeList;
+                }
 
                 prevState = new StateStack(null, this._rootId, -1, -1, false, null, scopeList, scopeList);
             }
@@ -270,12 +299,13 @@ namespace TextMateSharp.Internal.Grammars
             ReadOnlyMemory<char> effectiveLineText;
             if (lineText.Length == 0 || lineText.Span[lineText.Length - 1] != '\n')
             {
-                // Only add \n if the passed lineText didn't have it.
-                // We need to allocate a new buffer with the newline
-                char[] buffer = new char[lineText.Length + 1];
-                lineText.Span.CopyTo(buffer);
-                buffer[lineText.Length] = '\n';
-                effectiveLineText = buffer.AsMemory();
+                // Only add \n if the passed lineText didn't have it. The copy is a string, not an array: the scanners
+                // reuse each regex's last result only for immutable (string-backed) text.
+#if NETSTANDARD2_0
+                effectiveLineText = (lineText.ToString() + "\n").AsMemory();
+#else
+                effectiveLineText = string.Concat(lineText.Span, "\n".AsSpan()).AsMemory();
+#endif
             }
             else
             {
@@ -283,8 +313,11 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             int lineLength = effectiveLineText.Length;
-            LineTokens lineTokens = new LineTokens(emitBinaryTokens, _tokenTypeMatchers,
-                _balancedBracketSelectors);
+            // One line tokens per kind, reused for every line: tokenizing is serialized per grammar.
+            LineTokens lineTokens = emitBinaryTokens
+                ? _binaryLineTokens ??= new LineTokens(true, _tokenTypeMatchers, _balancedBracketSelectors)
+                : _lineTokens ??= new LineTokens(false, _tokenTypeMatchers, _balancedBracketSelectors);
+            lineTokens.Reset();
             TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, effectiveLineText, isFirstLine, 0,
                 prevState,
                 lineTokens, true, timeLimit);

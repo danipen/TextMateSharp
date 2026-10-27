@@ -79,6 +79,35 @@ namespace TextMateSharp.Benchmarks
             return totalTokens;
         }
 
+        // Tokenizes bigfile.cs as the benchmark does and returns the SHA-256 of the tokens (offsets, scopes and metadata).
+        public static string Dump()
+        {
+            var benchmark = new BigFileTokenizationBenchmark();
+            benchmark.Setup();
+            using var sha = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA256);
+            IStateStack? ruleStack = null;
+            var text = new System.Text.StringBuilder();
+            foreach (var lineRange in GetLineRanges(benchmark._content))
+            {
+                ReadOnlyMemory<char> line = benchmark._content.AsMemory(lineRange.Start, lineRange.Length);
+                ITokenizeLineResult result = benchmark._grammar.TokenizeLine(line, ruleStack, TimeSpan.MaxValue);
+                ITokenizeLineResult2 binary = benchmark._grammar.TokenizeLine2(line, ruleStack, TimeSpan.MaxValue);
+                ruleStack = result.RuleStack;
+                text.Clear();
+                foreach (IToken token in result.Tokens)
+                {
+                    text.Append(token.StartIndex).Append('-').Append(token.EndIndex).Append(' ').Append(string.Join(" ", token.Scopes)).Append('\n');
+                }
+                foreach (int value in binary.Tokens)
+                {
+                    text.Append(value).Append(' ');
+                }
+                text.Append('\n');
+                sha.AppendData(System.Text.Encoding.UTF8.GetBytes(text.ToString()));
+            }
+            return Convert.ToHexString(sha.GetHashAndReset());
+        }
+
         static IEnumerable<(int Start, int Length)> GetLineRanges(string content)
         {
             int lineStart = 0;
