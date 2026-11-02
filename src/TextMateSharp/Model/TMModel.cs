@@ -563,20 +563,11 @@ namespace TextMateSharp.Model
                     int endStateIndex = lineIndex + 1;
                     LineTokens r = null;
                     LineText text = default;
-                    ModelLine modelLine = lines.Get(lineIndex);
-
-                    if (modelLine == null)
-                    {
-                        lineIndex++;
-                        continue;
-                    }
-
+                    ModelLine modelLine = null;
                     TMState startingState = null;
+                    int lineVersion = 0;
                     try
                     {
-                        text = lines.GetLineTextIncludingTerminators(lineIndex);
-                        // Tokenize only the first X characters
-
                         lock (model._lock)
                         {
                             // If the model was disposed/stopped or grammar swapped while we were preparing work,
@@ -589,9 +580,24 @@ namespace TextMateSharp.Model
                                 return nextInvalidLineIndex;
                             }
 
+                            // Under the lock, so a wait for it does not fall between this lookup and the text read
+                            modelLine = lines.Get(lineIndex);
+
+                            if (modelLine == null)
+                            {
+                                lineIndex++;
+                                continue;
+                            }
+
                             startingState = modelLine.State;
+
+                            // Before the text is read, so an edit in between is seen as one
+                            lineVersion = modelLine.Version;
                         }
 
+                        text = lines.GetLineTextIncludingTerminators(lineIndex);
+
+                        // Tokenize only the first X characters
                         r = tokenizer.Tokenize(text, startingState, 0, MAX_LEN_TO_TOKENIZE, stopLineTokenizationAfter);
                     }
                     catch (Exception e)
@@ -640,9 +646,22 @@ namespace TextMateSharp.Model
                             return nextInvalidLineIndex;
                         }
 
+                        // The line was invalidated after this run started, so these tokens may be for older text
+                        bool isOutdated = modelLine.Version != lineVersion;
+
+                        if (isOutdated && !modelLine.IsInvalid)
+                        {
+                            // A run that started after that invalidation has already stored its result
+                            lineIndex++;
+                            continue;
+                        }
+
                         modelLine.Tokens = r.Tokens;
                         eventBuilder.registerChangedTokens(lineIndex + 1);
-                        modelLine.IsInvalid = false;
+
+                        // An outdated line stays invalid, so the entry its invalidation queued is not dropped
+                        if (!isOutdated)
+                            modelLine.IsInvalid = false;
 
                         if (endStateIndex < lines.GetNumberOfLines())
                         {
@@ -1215,6 +1234,7 @@ namespace TextMateSharp.Model
                     return;
 
                 line.IsInvalid = true;
+                line.Version++;
                 this._invalidLines.Enqueue(lineIndex);
                 thread = _thread;
             }
@@ -1243,6 +1263,7 @@ namespace TextMateSharp.Model
                         if (line != null)
                         {
                             line.IsInvalid = true;
+                            line.Version++;
                             this._invalidLines.Enqueue(i);
                         }
                     }
