@@ -12,7 +12,9 @@ An interpreter for grammar files as defined by TextMate. TextMate grammars use t
 
 TextMateSharp is a port of [microsoft/vscode-textmate](https://github.com/microsoft/vscode-textmate) that brings TextMate grammars to the .NET ecosystem. The implementation is based on the Java port [eclipse/tm4e](https://github.com/eclipse/tm4e).
 
-TextMateSharp uses a [wrapper](https://github.com/aikawayataro/Onigwrap) via [NuGet packages](https://www.nuget.org/packages/Onigwrap) around the [Oniguruma](https://github.com/kkos/oniguruma) regex engine. Thanks [@aikawayataro](https://github.com/aikawayataro) for your contribution.
+Starting with 3.0, TextMateSharp uses [GregsEx](https://github.com/sebastienros/gregsex), a fully managed implementation of the [Oniguruma](https://github.com/kkos/oniguruma) regex engine. There is no native dependency, so TextMateSharp runs wherever .NET runs, including WebAssembly. Thanks [@sebastienros](https://github.com/sebastienros) for your contribution.
+
+Versions 1.x and 2.x use [Onigwrap](https://github.com/aikawayataro/Onigwrap), a native wrapper around Oniguruma distributed via [NuGet packages](https://www.nuget.org/packages/Onigwrap). Thanks [@aikawayataro](https://github.com/aikawayataro) for your contribution. The 2.x line is maintained in the [`release/2.x`](https://github.com/danipen/TextMateSharp/tree/release/2.x) branch.
 
 TextMateSharp is used by [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit).
 
