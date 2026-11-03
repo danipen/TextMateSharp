@@ -126,7 +126,7 @@ namespace TextMateSharp.Model
                     _task = Task.Factory.StartNew(
                         () => ThreadWorker(token),
                         token,
-                        TaskCreationOptions.DenyChildAttach,
+                        TaskCreationOptions.DenyChildAttach | TaskCreationOptions.LongRunning,
                         TaskScheduler.Default);
                 }
             }

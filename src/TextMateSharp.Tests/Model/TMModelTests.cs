@@ -151,6 +151,39 @@ namespace TextMateSharp.Tests.Model
         }
 
         [Test]
+        public async Task TMModel_Tokenizer_Thread_Should_Not_Hold_A_Thread_Pool_Thread()
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var x = 1;" });
+            TMModel tmModel = new TMModel(modelLines);
+
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+            Registry.Registry registry = new Registry.Registry(options);
+
+            TaskCompletionSource<bool> onPoolThread = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            Mock<IModelTokensChangedListener> listener = new Mock<IModelTokensChangedListener>();
+            listener
+                .Setup(l => l.ModelTokensChanged(It.IsAny<ModelTokensChangedEvent>()))
+                .Callback(() => onPoolThread.TrySetResult(Thread.CurrentThread.IsThreadPoolThread));
+
+            tmModel.AddModelTokensChangedListener(listener.Object);
+
+            try
+            {
+                tmModel.SetGrammar(registry.LoadGrammar("source.js"));
+
+                Task completed = await Task.WhenAny(onPoolThread.Task, Task.Delay(5000));
+
+                Assert.AreSame(onPoolThread.Task, completed, "The line was not tokenized.");
+                Assert.IsFalse(await onPoolThread.Task);
+            }
+            finally
+            {
+                tmModel.Dispose();
+            }
+        }
+
+        [Test]
         public async Task TMModel_Should_Stop_Emitting_After_Last_Listener_Removed()
         {
             // arrange
