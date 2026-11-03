@@ -1,0 +1,12 @@
+; Application settings
+[general]
+name = TextMateSharp Demo
+version = 1.0
+
+[highlighting]
+theme = DarkPlus
+grammars = csharp, javascript, json
+enabled = true
+
+[paths]
+output = ./bin/Release

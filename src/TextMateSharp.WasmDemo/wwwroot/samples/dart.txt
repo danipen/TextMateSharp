@@ -1,0 +1,17 @@
+import 'dart:async';
+
+class Person {
+  final String name;
+  final int age;
+  const Person(this.name, this.age);
+
+  bool get isAdult => age >= 18;
+}
+
+Future<void> main() async {
+  final people = [const Person('Ada', 36), const Person('Linus', 12)];
+  for (final person in people.where((p) => p.isAdult)) {
+    print('Hello, ${person.name}!');
+  }
+  await Future.delayed(const Duration(milliseconds: 10)); // pretend to work
+}

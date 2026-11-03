@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TextMateSharp on WebAssembly</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <header>
+    <h1>TextMateSharp on WebAssembly</h1>
+    <label>Grammar <select id="language"></select></label>
+    <label>Theme <select id="theme"></select></label>
+  </header>
+  <main class="editor">
+    <pre id="view" aria-hidden="true"></pre>
+    <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code"></textarea>
+  </main>
+  <footer id="status">Loading .NET…</footer>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

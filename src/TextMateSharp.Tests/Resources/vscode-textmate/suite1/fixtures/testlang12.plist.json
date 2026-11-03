@@ -1,0 +1,20 @@
+{
+ "fileTypes": [
+  "testlang"
+ ],
+ "name": "testlang",
+ "patterns": [
+  {
+   "include": "#indentedVerbatimOp"
+  }
+ ],
+ "repository": {
+  "indentedVerbatimOp": {
+   "begin": "^([ \\t]*)(?=(.*?)\\|$)",
+   "end": "^(?!\\1[ \\t])(?=[ \\t]*\\S)",
+   "name": "string.unquoted.verbatim.youki"
+  }
+ },
+ "scopeName": "text.testlang",
+ "uuid": "159375af-d9b4-448c-a9da-d235eadf3556"
+}

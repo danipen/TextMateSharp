@@ -1,0 +1,13 @@
+#!/usr/bin/env raku
+class Person {
+    has Str $.name;
+    has Int $.age;
+    method is-adult { $!age >= 18 }
+}
+
+my @people = Person.new(:name<Ada>, :age(36)), Person.new(:name<Linus>, :age(12));
+for @people.grep(*.is-adult) -> $p {
+    say "Hello, {$p.name}!";   # greet
+}
+
+say (1..3).map(* ** 2);

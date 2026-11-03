@@ -1,4 +1,4 @@
-using Onigwrap;
+using TextMateSharp.Internal.Oniguruma;
 using System.Collections.Generic;
 
 namespace TextMateSharp.Internal.Rules

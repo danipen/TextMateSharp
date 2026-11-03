@@ -1,0 +1,17 @@
+use std::collections::HashMap;
+
+#[derive(Debug, Clone)]
+struct Word<'a> { text: &'a str, count: usize }
+
+fn count_words(text: &str) -> HashMap<&str, usize> {
+    let mut counts = HashMap::new();
+    for word in text.split_whitespace() {
+        *counts.entry(word).or_insert(0) += 1;
+    }
+    counts
+}
+
+fn main() {
+    let counts = count_words("the quick brown fox jumps over the lazy dog");
+    println!("{:?}", counts.get("the"));
+}

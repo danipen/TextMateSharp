@@ -1,0 +1,10 @@
+% A TeX macro file
+\def\greet#1{Hello, #1!}
+\newcount\total
+\total=0
+\loop
+  \advance\total by 1
+\ifnum\total<3 \repeat
+
+\greet{world} The total is \the\total.
+\bye

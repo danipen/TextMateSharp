@@ -1,0 +1,16 @@
+from dataclasses import dataclass
+
+
+@dataclass
+class Point:
+    x: float
+    y: float
+
+    def distance(self, other: "Point") -> float:
+        """Euclidean distance."""
+        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
+
+
+if __name__ == "__main__":
+    points = [Point(0, 0), Point(3, 4)]
+    print(f"distance: {points[0].distance(points[1]):.2f}")

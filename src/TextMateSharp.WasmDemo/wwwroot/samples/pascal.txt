@@ -1,0 +1,21 @@
+program Demo;
+
+type
+  TPerson = record
+    Name: string;
+    Age: Integer;
+  end;
+
+function IsAdult(const P: TPerson): Boolean;
+begin
+  Result := P.Age >= 18;
+end;
+
+var
+  Ada: TPerson;
+begin
+  Ada.Name := 'Ada';
+  Ada.Age := 36;
+  if IsAdult(Ada) then
+    WriteLn('Hello, ', Ada.Name, '!'); { greet }
+end.

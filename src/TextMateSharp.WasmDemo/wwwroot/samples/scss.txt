@@ -1,0 +1,14 @@
+$accent: #0078d4;
+$radius: 4px;
+
+@mixin rounded($r: $radius) { border-radius: $r; }
+
+.card {
+  @include rounded;
+  padding: 8px 12px;
+  > h2 {
+    color: darken($accent, 10%);
+    &:hover { color: $accent; }
+  }
+  @media (max-width: 600px) { padding: 4px; }
+}

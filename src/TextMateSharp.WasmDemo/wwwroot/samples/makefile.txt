@@ -1,0 +1,17 @@
+CC ?= cc
+CFLAGS := -O2 -Wall
+SOURCES := $(wildcard src/*.c)
+OBJECTS := $(SOURCES:.c=.o)
+
+.PHONY: all clean
+
+all: demo
+
+demo: $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f demo $(OBJECTS)  # remove build output

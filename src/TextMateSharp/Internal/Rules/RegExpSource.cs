@@ -1,4 +1,4 @@
-using Onigwrap;
+using TextMateSharp.Internal.Oniguruma;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -118,7 +118,7 @@ namespace TextMateSharp.Internal.Rules
             }
         }
 
-        internal string ResolveBackReferences(ReadOnlyMemory<char> lineText, IOnigCaptureIndex[] captureIndices)
+        internal string ResolveBackReferences(ReadOnlyMemory<char> lineText, OnigCaptureIndex[] captureIndices)
         {
             List<string> capturedValues = new List<string>(captureIndices.Length);
 
@@ -126,7 +126,7 @@ namespace TextMateSharp.Internal.Rules
             {
                 for (int i = 0; i < captureIndices.Length; i++)
                 {
-                    IOnigCaptureIndex captureIndex = captureIndices[i];
+                    OnigCaptureIndex captureIndex = captureIndices[i];
                     capturedValues.Add(lineText.SubstringAtIndexes(
                         captureIndex.Start,
                         captureIndex.End));

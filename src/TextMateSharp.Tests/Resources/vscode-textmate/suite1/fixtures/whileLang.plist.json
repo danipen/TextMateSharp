@@ -1,0 +1,63 @@
+{
+ "fileTypes": [
+  "whileLang"
+ ],
+ "name": "whileLang",
+ "patterns": [
+  {
+   "include": "#alist"
+  },
+  {
+   "include": "#blist"
+  }
+ ],
+ "repository": {
+  "number": {
+   "match": "[0-9]",
+   "name": "number"
+  },
+  "letter": {
+   "match": "x",
+   "name": "letter"
+  },
+  "alist": {
+   "begin": "A",
+   "patterns": [
+    {
+     "include": "#alist"
+    },
+    {
+     "include": "#blist"
+    },
+    {
+     "include": "#letter"
+    }
+   ],
+   "name": "alist",
+   "while": "a"
+  },
+  "blist": {
+   "begin": "B",
+   "patterns": [
+    {
+     "include": "#alist"
+    },
+    {
+     "include": "#blist"
+    },
+    {
+     "include": "#number"
+    }
+   ],
+   "name": "blist",
+   "whileCaptures": {
+    "2": {
+     "name": "bstart"
+    }
+   },
+   "while": "(^|\\G)(b)"
+  }
+ },
+ "scopeName": "text.whileLang",
+ "uuid": "159375af-d9b4-448c-a9da-d235eadf3556"
+}

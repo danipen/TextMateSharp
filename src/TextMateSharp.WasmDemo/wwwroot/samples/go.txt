@@ -1,0 +1,18 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+type Greeter struct{ Name string }
+
+func (g Greeter) Greet() string {
+	return fmt.Sprintf("Hello, %s!", strings.ToUpper(g.Name))
+}
+
+func main() {
+	for _, name := range []string{"ada", "linus"} {
+		fmt.Println(Greeter{Name: name}.Greet())
+	}
+}

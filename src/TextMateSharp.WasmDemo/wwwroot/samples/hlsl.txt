@@ -1,0 +1,22 @@
+cbuffer PerFrame : register(b0)
+{
+    float4x4 viewProjection;
+    float3 lightDirection;
+};
+
+struct VSInput  { float3 position : POSITION; float3 normal : NORMAL; };
+struct PSInput  { float4 position : SV_POSITION; float3 normal : NORMAL; };
+
+PSInput VSMain(VSInput input)
+{
+    PSInput output;
+    output.position = mul(float4(input.position, 1.0f), viewProjection);
+    output.normal = input.normal;
+    return output;
+}
+
+float4 PSMain(PSInput input) : SV_TARGET
+{
+    float light = saturate(dot(normalize(input.normal), -lightDirection));
+    return float4(light.xxx, 1.0f);
+}

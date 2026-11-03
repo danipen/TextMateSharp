@@ -1,0 +1,21 @@
+Imports System.Linq
+
+Public Class Person
+    Public Property Name As String
+    Public Property Age As Integer
+
+    Public ReadOnly Property IsAdult As Boolean
+        Get
+            Return Age >= 18
+        End Get
+    End Property
+End Class
+
+Module Program
+    Sub Main(args As String())
+        Dim people = {New Person With {.Name = "Ada", .Age = 36}, New Person With {.Name = "Linus", .Age = 12}}
+        For Each p In people.Where(Function(x) x.IsAdult)
+            Console.WriteLine($"Hello, {p.Name}!") ' greet
+        Next
+    End Sub
+End Module

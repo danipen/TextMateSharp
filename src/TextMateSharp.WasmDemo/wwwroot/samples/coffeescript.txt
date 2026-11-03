@@ -1,0 +1,13 @@
+# Fetch with retries
+load = (url, retries = 3) ->
+  for attempt in [1..retries]
+    response = await fetch url
+    return response.json() if response.ok
+    console.warn "attempt #{attempt} failed"
+  throw new Error "failed after #{retries} tries"
+
+class Person
+  constructor: (@name, @age) ->
+  isAdult: -> @age >= 18
+
+squares = (n * n for n in [1, 2, 3])

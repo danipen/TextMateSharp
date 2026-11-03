@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_NAMES 8
+
+typedef struct {
+    const char *name;
+    int age;
+} person;
+
+static int is_adult(const person *p) { return p->age >= 18; }
+
+int main(int argc, char **argv) {
+    person people[] = { { "Ada", 36 }, { "Linus", 12 } };
+    for (size_t i = 0; i < sizeof people / sizeof *people; i++) {
+        if (is_adult(&people[i])) printf("Hello, %s!\n", people[i].name);
+    }
+    return argc > 1 ? EXIT_FAILURE : EXIT_SUCCESS; /* done */
+}

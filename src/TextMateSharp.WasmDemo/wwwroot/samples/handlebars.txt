@@ -1,0 +1,14 @@
+<div class="people">
+  {{#if title}}
+    <h1>{{title}}</h1>
+  {{/if}}
+  <ul>
+    {{#each people}}
+      <li class="{{#if adult}}adult{{/if}}">{{name}} ({{age}})</li>
+    {{else}}
+      <li>No one here.</li>
+    {{/each}}
+  </ul>
+  {{!-- a comment --}}
+  {{> footer year=2026}}
+</div>

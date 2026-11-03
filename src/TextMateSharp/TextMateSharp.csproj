@@ -20,7 +20,7 @@ TextMateSharp uses a wrapper around Oniguruma regex engine.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Onigwrap" Version="$(OnigwrapVersion)" />
+    <PackageReference Include="GregsEx" Version="$(GregsExVersion)" />
   </ItemGroup>
   <Import Project="..\..\build\SourceLink.props" />
   <Import Project="..\..\build\Directory.Build.props" />

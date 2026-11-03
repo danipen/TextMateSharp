@@ -1,0 +1,7 @@
+{
+  "name": "textmatesharp-wasm-demo",
+  "runtime": { "dotnet": "10.0", "target": "browser-wasm" },
+  "grammars": ["csharp", "javascript", "json", "yaml"],
+  "native": false,
+  "version": 1.5
+}

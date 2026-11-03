@@ -1,7 +1,6 @@
-using Moq;
 using NUnit.Framework;
-using Onigwrap;
 using System;
+using TextMateSharp.Internal.Oniguruma;
 using TextMateSharp.Internal.Rules;
 
 namespace TextMateSharp.Tests.Internal.Rules
@@ -45,21 +44,17 @@ namespace TextMateSharp.Tests.Internal.Rules
             Assert.IsNotNull(scanner.FindNextMatchSync("�", 0));
         }
 
-        private static string Resolve(string source, string line, params IOnigCaptureIndex[] captures)
+        private static string Resolve(string source, string line, params OnigCaptureIndex[] captures)
         {
-            IOnigCaptureIndex[] all = new IOnigCaptureIndex[captures.Length + 1];
+            OnigCaptureIndex[] all = new OnigCaptureIndex[captures.Length + 1];
             all[0] = CreateCapture(0, line.Length);
             captures.CopyTo(all, 1);
             return new RegExpSource(source, RuleId.Of(1)).ResolveBackReferences(line.AsMemory(), all);
         }
 
-        private static IOnigCaptureIndex CreateCapture(int start, int end)
+        private static OnigCaptureIndex CreateCapture(int start, int end)
         {
-            Mock<IOnigCaptureIndex> capture = new Mock<IOnigCaptureIndex>();
-            capture.SetupGet(c => c.Start).Returns(start);
-            capture.SetupGet(c => c.End).Returns(end);
-            capture.SetupGet(c => c.Length).Returns(end - start);
-            return capture.Object;
+            return new OnigCaptureIndex(0, start, end);
         }
     }
 }

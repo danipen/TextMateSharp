@@ -1,0 +1,15 @@
+param([string]$Name = 'world')
+
+function Get-Greeting {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$Who)
+    "Hello, $Who!"
+}
+
+1..3 | ForEach-Object {
+    Write-Host (Get-Greeting -Who "$Name ($_)")
+}
+
+if (Test-Path ./build.ps1) {
+    & ./build.ps1 -Configuration Release  # build
+}

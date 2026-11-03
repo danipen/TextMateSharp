@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my %people = (Ada => 36, Linus => 12);
+
+sub is_adult { my ($age) = @_; return $age >= 18; }
+
+for my $name (sort keys %people) {
+    next unless is_adult($people{$name});
+    print "Hello, $name!\n";   # greet
+}
+
+my @squares = map { $_ ** 2 } 1 .. 3;
+print join(', ', @squares), "\n" if @squares =~ /\d/;

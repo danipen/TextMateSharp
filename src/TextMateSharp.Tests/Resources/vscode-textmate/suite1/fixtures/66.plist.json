@@ -1,0 +1,13 @@
+{
+ "scopeName": "text.test",
+ "patterns": [
+  {
+   "begin": "^.",
+   "name": "comment"
+  },
+  {
+   "begin": ".+",
+   "name": "string"
+  }
+ ]
+}

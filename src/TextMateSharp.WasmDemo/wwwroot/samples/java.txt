@@ -1,0 +1,14 @@
+import java.util.List;
+import java.util.stream.Collectors;
+
+public final class Main {
+    @FunctionalInterface
+    interface Transform { String apply(String s); }
+
+    public static void main(String[] args) {
+        List<String> names = List.of("ada", "linus");
+        Transform upper = String::toUpperCase;
+        String joined = names.stream().map(upper::apply).collect(Collectors.joining(", "));
+        System.out.println("Hello, " + joined + "!"); // greet
+    }
+}
