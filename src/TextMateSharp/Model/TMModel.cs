@@ -50,6 +50,8 @@ namespace TextMateSharp.Model
         private TokenizerThread _thread;
         private readonly IModelLines _lines;
         private readonly Queue<int> _invalidLines = new Queue<int>();
+        // Queued lines whose entry resumes a walk that paused at the end of its time slice
+        private readonly HashSet<int> _walkResumeLines = new HashSet<int>();
         private readonly object _lock = new object();
         private int _isDisposedFlag; // atomic disposed state (0 = not disposed, 1 = disposed)
         private int _grammarEpoch;
@@ -406,6 +408,13 @@ namespace TextMateSharp.Model
 
                             ModelLine modelLine = lines.Get(toProcess);
                             isInvalid = modelLine != null && modelLine.IsInvalid;
+
+                            // A forced range tokenized the line this walk paused on, and the walk owes the lines below it
+                            if (model._walkResumeLines.Remove(toProcess) && !isInvalid)
+                            {
+                                toProcess = model.FindLineToTokenize(toProcess + 1);
+                                isInvalid = toProcess != -1;
+                            }
                         }
 
                         if (!isInvalid)
@@ -495,7 +504,7 @@ namespace TextMateSharp.Model
                         if (elapsedTime > MAX_ALLOWED_TIME)
                         {
                             // Stop if MAX_ALLOWED_TIME is reached
-                            model.InvalidateLine(lineIndex);
+                            model.InvalidateLine(lineIndex, resumesWalk: true);
                             return;
                         }
                         // Compute how many characters will be tokenized for this line
@@ -514,7 +523,7 @@ namespace TextMateSharp.Model
                             if (elapsedTime + currentEstimatedTimeToTokenize > MAX_ALLOWED_TIME)
                             {
                                 // Tokenizing this line will go above MAX_ALLOWED_TIME
-                                model.InvalidateLine(lineIndex);
+                                model.InvalidateLine(lineIndex, resumesWalk: true);
                                 return;
                             }
                         }
@@ -761,6 +770,7 @@ namespace TextMateSharp.Model
                 this._grammar = grammar;
                 _lines.ForEach((line) => line.ResetTokenizationState());
                 _invalidLines.Clear();
+                _walkResumeLines.Clear();
 
                 if (grammar != null)
                 {
@@ -1234,6 +1244,11 @@ namespace TextMateSharp.Model
 
         public void InvalidateLine(int lineIndex)
         {
+            InvalidateLine(lineIndex, resumesWalk: false);
+        }
+
+        private void InvalidateLine(int lineIndex, bool resumesWalk)
+        {
             if (IsDisposed)
                 return;
 
@@ -1250,10 +1265,27 @@ namespace TextMateSharp.Model
                 line.IsInvalid = true;
                 line.Version++;
                 this._invalidLines.Enqueue(lineIndex);
+                if (resumesWalk)
+                    this._walkResumeLines.Add(lineIndex);
                 thread = _thread;
             }
 
             thread?.Signal();
+        }
+
+        // The first line from lineIndex on that is invalid or has no tokens, or -1. Call under _lock.
+        // A grammar change leaves lines without tokens but not marked invalid.
+        private int FindLineToTokenize(int lineIndex)
+        {
+            int lineCount = _lines.GetNumberOfLines();
+            for (int i = lineIndex; i < lineCount; i++)
+            {
+                ModelLine line = _lines.Get(i);
+                if (line != null && (line.IsInvalid || line.Tokens == null))
+                    return i;
+            }
+
+            return -1;
         }
 
         public void InvalidateLineRange(int iniLineIndex, int endLineIndex)
