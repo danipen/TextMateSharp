@@ -1,11 +1,15 @@
 name: Publish NuGet package
 
 on:
-  create:
+  push:
     tags:
       - v*
 jobs:
   build:
+
+    permissions:
+      contents: read
+      id-token: write  # required for nuget.org Trusted Publishing (OIDC)
 
     env:
       BUILD_CONFIG: 'Release'
@@ -35,5 +39,11 @@ jobs:
     - name: Run tests
       run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
 
+    - name: NuGet login (OIDC -> short-lived API key)
+      uses: NuGet/login@v1
+      id: nuget_login
+      with:
+        user: danipen
+
     - name: Publish
-      run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{steps.nuget_login.outputs.NUGET_API_KEY}} --skip-duplicate
