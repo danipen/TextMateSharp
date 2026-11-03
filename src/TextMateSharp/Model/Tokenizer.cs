@@ -8,7 +8,7 @@ namespace TextMateSharp.Model
     public class Tokenizer : ITokenizationSupport
     {
         private IGrammar _grammar;
-        private DecodeMap _decodeMap;
+        private readonly DecodeMap _decodeMap;
 
         public Tokenizer(IGrammar grammar)
         {
@@ -48,13 +48,22 @@ namespace TextMateSharp.Model
             {
                 IToken token = tmResultTokens[tokenIndex];
                 int tokenStartIndex = token.StartIndex;
-                string tokenType = DecodeTextMateToken(this._decodeMap, token.Scopes);
+                // Read outside the lock: IToken is an interface, so its getter may take locks of its own
+                List<string> scopes = token.Scopes;
+
+                // Grammar locks TokenizeLine but not this decode, and TMModel's thread and
+                // ForceTokenization share one Tokenizer
+                string tokenType;
+                lock (this._decodeMap)
+                {
+                    tokenType = DecodeTextMateToken(this._decodeMap, scopes);
+                }
 
                 // do not push a new token if the type is exactly the same (also
                 // helps with ligatures)
                 if (!tokenType.Equals(lastTokenType))
                 {
-                    tokens.Add(new TMToken(tokenStartIndex + offsetDelta, token.Scopes));
+                    tokens.Add(new TMToken(tokenStartIndex + offsetDelta, scopes));
                     lastTokenType = tokenType;
                 }
             }
