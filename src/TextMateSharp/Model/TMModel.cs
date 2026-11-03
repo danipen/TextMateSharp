@@ -687,7 +687,9 @@ namespace TextMateSharp.Model
                             {
                                 // The end state of this line remains the same
                                 nextInvalidLineIndex = lineIndex + 1;
-                                while (nextInvalidLineIndex < lines.GetNumberOfLines())
+                                // A forced range discards the returned index, so its walk stops at the end of the range
+                                while (nextInvalidLineIndex < lines.GetNumberOfLines()
+                                    && (!isForced || nextInvalidLineIndex <= endLineIndex))
                                 {
                                     bool isLastLine = nextInvalidLineIndex + 1 >= lines.GetNumberOfLines();
                                     ModelLine nextLine = lines.Get(nextInvalidLineIndex);

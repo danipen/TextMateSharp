@@ -356,6 +356,125 @@ namespace TextMateSharp.Tests.Model
         }
 
         [Test]
+        public void TMModel_ForceTokenization_Cost_Should_Not_Depend_On_The_Lines_Below_Its_Range()
+        {
+            Assert.AreEqual(
+                CountLineReadsOfForcedFirstLine(200),
+                CountLineReadsOfForcedFirstLine(2000));
+        }
+
+        [Test]
+        public void TMModel_ForceTokenization_Should_Tokenize_Only_Invalid_Lines_Inside_Its_Range()
+        {
+            string[] lines = Enumerable.Repeat("var x = 1;", 10).ToArray();
+            ModelLinesMock modelLines = new ModelLinesMock(lines);
+            TMModel tmModel = new TMModel(modelLines);
+
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+            Registry.Registry registry = new Registry.Registry(options);
+            CountingGrammar grammar = new CountingGrammar(registry.LoadGrammar("source.js"));
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                tmModel.SetGrammar(grammar);
+                WaitUntilEveryLineIsValid(modelLines, lines.Length);
+
+                // the line is invalid but not queued, so only ForceTokenization can tokenize it
+                modelLines.Get(2).IsInvalid = true;
+
+                grammar.CountCallsOnThisThread();
+                tmModel.ForceTokenization(0, 3);
+
+                Assert.IsFalse(modelLines.Get(2).IsInvalid);
+                // line 0, which is always tokenized, and line 2, but not the valid lines 1 and 3
+                Assert.AreEqual(2, grammar.Calls);
+            }
+            finally
+            {
+                tmModel.Dispose();
+            }
+        }
+
+        [Test]
+        public void TMModel_Tokenizer_Thread_Should_Not_Retokenize_Valid_Lines_After_An_Unchanged_End_State()
+        {
+            string[] lines = Enumerable.Repeat("var x = 1;", 10).ToArray();
+            ModelLinesMock modelLines = new ModelLinesMock(lines);
+            TMModel tmModel = new TMModel(modelLines);
+
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+            Registry.Registry registry = new Registry.Registry(options);
+            CountingGrammar grammar = new CountingGrammar(registry.LoadGrammar("source.js"));
+
+            BlockingCollection<ModelTokensChangedEvent> events = new BlockingCollection<ModelTokensChangedEvent>();
+            Mock<IModelTokensChangedListener> listener = new Mock<IModelTokensChangedListener>();
+            listener
+                .Setup(l => l.ModelTokensChanged(It.IsAny<ModelTokensChangedEvent>()))
+                .Callback<ModelTokensChangedEvent>(e => events.Add(e));
+
+            tmModel.AddModelTokensChangedListener(listener.Object);
+
+            try
+            {
+                tmModel.SetGrammar(grammar);
+
+                // the event that reaches the last line ends the first walk, and nothing is queued after it
+                bool settled = false;
+                while (!settled && events.TryTake(out ModelTokensChangedEvent e, 10000))
+                    settled = e.Ranges.Any(r => r.ToLineNumber == lines.Length);
+                Assert.IsTrue(settled, "The lines were not tokenized.");
+
+                grammar.CountCallsOnAnyThread();
+                tmModel.InvalidateLine(0);
+
+                Assert.IsTrue(events.TryTake(out _, 5000), "The line was not tokenized.");
+                // line 0 ends in the state line 1 starts with, so the walk finds nothing else to tokenize
+                Assert.AreEqual(1, grammar.Calls);
+            }
+            finally
+            {
+                tmModel.Dispose();
+            }
+        }
+
+        private static int CountLineReadsOfForcedFirstLine(int lineCount)
+        {
+            string[] lines = Enumerable.Repeat("var x = 1;", lineCount).ToArray();
+            CountingModelLines modelLines = new CountingModelLines(lines);
+            TMModel tmModel = new TMModel(modelLines);
+
+            RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
+            Registry.Registry registry = new Registry.Registry(options);
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(lineCount));
+
+            try
+            {
+                tmModel.SetGrammar(registry.LoadGrammar("source.js"));
+                WaitUntilEveryLineIsValid(modelLines, lineCount);
+
+                modelLines.CountReadsOnThisThread();
+                tmModel.ForceTokenization(0);
+
+                return modelLines.Reads;
+            }
+            finally
+            {
+                tmModel.Dispose();
+            }
+        }
+
+        private static void WaitUntilEveryLineIsValid(ModelLinesMock modelLines, int lineCount)
+        {
+            bool valid = SpinWait.SpinUntil(
+                () => Enumerable.Range(0, lineCount).All(i => !modelLines.Get(i).IsInvalid), 10000);
+
+            Assert.IsTrue(valid, "The lines were not tokenized.");
+        }
+
+        [Test]
         public void TMModel_Should_Retokenize_A_Line_Edited_While_It_Is_Being_Tokenized([Values] bool invalidateAsRange)
         {
             ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var x = 1;", "var y = 2;" });
@@ -1045,6 +1164,78 @@ namespace TextMateSharp.Tests.Model
                     Interlocked.Increment(ref _clearEventCount);
                     _sawClear.TrySetResult(true);
                 }
+            }
+        }
+
+        sealed class CountingGrammar : IGrammar
+        {
+            private readonly IGrammar _grammar;
+            private int _threadId;
+
+            internal CountingGrammar(IGrammar grammar)
+            {
+                _grammar = grammar;
+            }
+
+            internal int Calls { get; private set; }
+
+            // Tokenizer thread calls are not counted: only the forced range is under test
+            internal void CountCallsOnThisThread()
+            {
+                Calls = 0;
+                Volatile.Write(ref _threadId, Environment.CurrentManagedThreadId);
+            }
+
+            internal void CountCallsOnAnyThread()
+            {
+                Calls = 0;
+                Volatile.Write(ref _threadId, AnyThread);
+            }
+
+            private const int AnyThread = -1;
+
+            public bool IsCompiling => _grammar.IsCompiling;
+            public string GetName() => _grammar.GetName();
+            public string GetScopeName() => _grammar.GetScopeName();
+            public ICollection<string> GetFileTypes() => _grammar.GetFileTypes();
+            public ITokenizeLineResult TokenizeLine(LineText lineText) => _grammar.TokenizeLine(lineText);
+            public ITokenizeLineResult2 TokenizeLine2(LineText lineText) => _grammar.TokenizeLine2(lineText);
+            public ITokenizeLineResult2 TokenizeLine2(LineText lineText, IStateStack prevState, TimeSpan timeLimit) => _grammar.TokenizeLine2(lineText, prevState, timeLimit);
+
+            public ITokenizeLineResult TokenizeLine(LineText lineText, IStateStack prevState, TimeSpan timeLimit)
+            {
+                int threadId = Volatile.Read(ref _threadId);
+                if (threadId == AnyThread || threadId == Environment.CurrentManagedThreadId)
+                    Calls++;
+
+                return _grammar.TokenizeLine(lineText, prevState, timeLimit);
+            }
+        }
+
+        // Re-implements IModelLines so TMModel's line reads reach the counter; AbstractLineList.Get is not virtual
+        sealed class CountingModelLines : ModelLinesMock, IModelLines
+        {
+            private int _threadId;
+
+            internal CountingModelLines(string[] lines) : base(lines)
+            {
+            }
+
+            internal int Reads { get; private set; }
+
+            // Tokenizer thread reads are not counted: only the forced range is under test
+            internal void CountReadsOnThisThread()
+            {
+                Reads = 0;
+                Volatile.Write(ref _threadId, Environment.CurrentManagedThreadId);
+            }
+
+            ModelLine IModelLines.Get(int index)
+            {
+                if (Environment.CurrentManagedThreadId == Volatile.Read(ref _threadId))
+                    Reads++;
+
+                return Get(index);
             }
         }
 
