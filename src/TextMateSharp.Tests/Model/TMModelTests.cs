@@ -830,6 +830,63 @@ namespace TextMateSharp.Tests.Model
             }
         }
 
+        [Test]
+        public void TMModel_Should_Resume_A_Walk_Whose_Paused_Line_A_Forced_Range_Tokenized([Values] bool afterAnotherGrammar, [Values(1, 2)] int forcedEndLine)
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "/* open", "var b;", "var c;", "var d;", "var e;", "var f;", "var x6;" });
+            TMModel tmModel = new TMModel(modelLines);
+            IGrammar source = LoadJavaScriptGrammar();
+            HoldingGrammar grammar = new HoldingGrammar(source);
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                // a grammar change leaves every line without tokens but not marked invalid
+                if (afterAnotherGrammar)
+                {
+                    tmModel.SetGrammar(source);
+                    WaitUntilAllTokenized(tmModel, modelLines);
+                }
+
+                // the walk is held on line 0 past its time slice, so it pauses on line 1
+                grammar.HoldNextTokenize();
+                tmModel.SetGrammar(grammar);
+                Assert.IsTrue(grammar.WaitUntilHeld(), "The tokenizer thread did not tokenize line 0.");
+
+                // an entry queued ahead of the pause keeps the tokenizer thread busy
+                grammar.HoldTokenizeOf("var x6;");
+                tmModel.InvalidateLine(6);
+                Stopwatch held = Stopwatch.StartNew();
+                while (held.ElapsedMilliseconds <= 20)
+                    Thread.Sleep(1);
+                grammar.Release();
+                Assert.IsTrue(grammar.WaitUntilHeld(), "The tokenizer thread did not tokenize line 6.");
+                // a walk that had not paused would have tokenized line 1 on its way to line 6
+                Assert.IsNull(tmModel.GetLineTokens(1), "The walk did not pause on line 1.");
+                Assert.IsTrue(tmModel.IsLineInvalid(1));
+
+                // a forced range tokenizes the paused line, alone or with the one below, before the walk resumes
+                tmModel.ForceTokenization(1, forcedEndLine);
+                Assert.IsFalse(tmModel.IsLineInvalid(1));
+                grammar.Release();
+
+                string[] expected = ExpectedTokensOfLines(source, "/* open", "var b;", "var c;", "var d;", "var e;", "var f;", "var x6;");
+                StringAssert.Contains("comment.block.js", expected[6]);
+                for (int i = 0; i < expected.Length; i++)
+                {
+                    int line = i;
+                    Assert.IsTrue(SpinWait.SpinUntil(() => tmModel.GetLineTokens(line) != null, 3000), $"Line {line} was never tokenized.");
+                    AssertSettlesOn(tmModel, line, expected[line]);
+                }
+            }
+            finally
+            {
+                grammar.Release();
+                tmModel.Dispose();
+            }
+        }
+
         private static IGrammar LoadJavaScriptGrammar()
         {
             RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
