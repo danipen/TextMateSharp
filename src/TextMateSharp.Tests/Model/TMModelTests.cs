@@ -1,6 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -616,6 +617,219 @@ namespace TextMateSharp.Tests.Model
             }
         }
 
+        [Test]
+        public void TMModel_Should_Not_Let_A_Run_On_An_Older_Start_State_Replace_The_Newer_Result()
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var a;", "var b;", "var c;", "var d;" });
+            TMModel tmModel = new TMModel(modelLines);
+            IGrammar source = LoadJavaScriptGrammar();
+            HoldingGrammar grammar = new HoldingGrammar(source);
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                tmModel.SetGrammar(grammar);
+                WaitUntilAllTokenized(tmModel, modelLines);
+
+                // the tokenizer thread starts on line 1 outside any comment
+                grammar.HoldNextTokenize();
+                modelLines.SetLine(1, "var bb;");
+                tmModel.InvalidateLine(1);
+                Assert.IsTrue(grammar.WaitUntilHeld(), "The tokenizer thread did not tokenize the line.");
+
+                // line 0 opens a comment, and this thread tokenizes both lines from the new state
+                modelLines.SetLine(0, "/* open");
+                tmModel.InvalidateLine(0);
+                tmModel.ForceTokenization(0, 1);
+
+                string[] expected = ExpectedTokensOfLines(source, "/* open", "var bb;", "var c;", "var d;");
+                StringAssert.Contains("comment.block.js", expected[1]);
+                Assert.AreEqual(expected[1], Describe(tmModel.GetLineTokens(1)));
+
+                // only the tokenizer thread clears line 3, and it does so after the held run ends
+                tmModel.InvalidateLine(3);
+                grammar.Release();
+                Assert.IsTrue(
+                    SpinWait.SpinUntil(() => !tmModel.IsLineInvalid(3), 3000),
+                    "The held run did not end.");
+
+                AssertSettlesOn(tmModel, 1, expected[1]);
+                AssertSettlesOn(tmModel, 2, expected[2]);
+                AssertSettlesOn(tmModel, 3, expected[3]);
+            }
+            finally
+            {
+                grammar.Release();
+                tmModel.Dispose();
+            }
+        }
+
+        [Test]
+        public void TMModel_Should_Not_Let_A_Forced_Run_On_An_Older_Start_State_Replace_The_Newer_Result()
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var a;", "var b;", "var c;" });
+            TMModel tmModel = new TMModel(modelLines);
+            IGrammar source = LoadJavaScriptGrammar();
+            HoldingGrammar grammar = new HoldingGrammar(source);
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                tmModel.SetGrammar(grammar);
+                WaitUntilAllTokenized(tmModel, modelLines);
+
+                grammar.HoldNextTokenize();
+                Task forced = Task.Run(() => tmModel.ForceTokenization(1, 1));
+                Assert.IsTrue(grammar.WaitUntilHeld(), "ForceTokenization did not tokenize the line.");
+
+                // the tokenizer thread walks down from line 0 while the forced run is held on line 1
+                string[] expected = ExpectedTokensOfLines(source, "/* open", "var b;", "var c;");
+                modelLines.SetLine(0, "/* open");
+                tmModel.InvalidateLine(0);
+                Assert.IsTrue(
+                    SpinWait.SpinUntil(() => Describe(tmModel.GetLineTokens(2)) == expected[2], 3000),
+                    "The tokenizer thread did not walk down the lines.");
+
+                grammar.Release();
+                Assert.IsTrue(forced.Wait(3000), "ForceTokenization did not return.");
+
+                AssertSettlesOn(tmModel, 1, expected[1]);
+                AssertSettlesOn(tmModel, 2, expected[2]);
+            }
+            finally
+            {
+                grammar.Release();
+                tmModel.Dispose();
+            }
+        }
+
+        [Test]
+        public void TMModel_Should_Keep_The_Result_Of_A_Run_Whose_Start_State_Changed_And_Came_Back()
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var a;", "var b;", "var c;", "var d;" });
+            TMModel tmModel = new TMModel(modelLines);
+            IGrammar source = LoadJavaScriptGrammar();
+            HoldingGrammar grammar = new HoldingGrammar(source);
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                tmModel.SetGrammar(grammar);
+                WaitUntilAllTokenized(tmModel, modelLines);
+
+                grammar.HoldNextTokenize();
+                modelLines.SetLine(1, "var bb;");
+                tmModel.InvalidateLine(1);
+                Assert.IsTrue(grammar.WaitUntilHeld(), "The tokenizer thread did not tokenize the line.");
+
+                // line 1's start state leaves and comes back as a new object equal to the one the held run used
+                modelLines.SetLine(0, "/* open");
+                tmModel.ForceTokenization(0, 1);
+                modelLines.SetLine(0, "var a;");
+                tmModel.ForceTokenization(0, 1);
+
+                int callsBefore = grammar.CallsFor("var bb;");
+
+                // the held run's walk ends at the last line; a second barrier queued after it waits out any re-run of line 1
+                tmModel.InvalidateLine(3);
+                grammar.Release();
+                Assert.IsTrue(
+                    SpinWait.SpinUntil(() => !tmModel.IsLineInvalid(3), 3000),
+                    "The held run did not end.");
+                tmModel.InvalidateLine(3);
+                Assert.IsTrue(
+                    SpinWait.SpinUntil(() => !tmModel.IsLineInvalid(3), 3000),
+                    "The tokenizer thread did not reach the last line.");
+
+                Assert.AreEqual(callsBefore, grammar.CallsFor("var bb;"), "A result for the current start state was tokenized again.");
+                Assert.AreEqual(ExpectedTokens(source, "var bb;"), Describe(tmModel.GetLineTokens(1)));
+                Assert.IsFalse(tmModel.IsLineInvalid(1));
+            }
+            finally
+            {
+                grammar.Release();
+                tmModel.Dispose();
+            }
+        }
+
+        // A whitespace-only next line has a single token
+        [TestCase("var b;")]
+        [TestCase("   ")]
+        public void TMModel_Should_Retokenize_The_Line_After_A_Forced_Range_When_Its_Start_State_Changes(string nextLine)
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "var a;", nextLine, "var c;", "var d;" });
+            TMModel tmModel = new TMModel(modelLines);
+            IGrammar source = LoadJavaScriptGrammar();
+            HoldingGrammar grammar = new HoldingGrammar(source);
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                tmModel.SetGrammar(grammar);
+                WaitUntilAllTokenized(tmModel, modelLines);
+
+                // the tokenizer thread is busy, so this thread tokenizes line 0 before its queue entry is reached
+                grammar.HoldNextTokenize();
+                modelLines.SetLine(3, "var dd;");
+                tmModel.InvalidateLine(3);
+                Assert.IsTrue(grammar.WaitUntilHeld(), "The tokenizer thread did not tokenize the line.");
+
+                modelLines.SetLine(0, "/* open");
+                tmModel.InvalidateLine(0);
+                tmModel.ForceTokenization(0, 0);
+                grammar.Release();
+
+                string[] expected = ExpectedTokensOfLines(source, "/* open", nextLine, "var c;", "var dd;");
+                AssertSettlesOn(tmModel, 1, expected[1]);
+                AssertSettlesOn(tmModel, 2, expected[2]);
+                AssertSettlesOn(tmModel, 3, expected[3]);
+            }
+            finally
+            {
+                grammar.Release();
+                tmModel.Dispose();
+            }
+        }
+
+        [Test]
+        public void TMModel_Should_Tokenize_A_Line_Without_Tokens_When_Its_Start_State_Moves_During_Its_First_Run()
+        {
+            ModelLinesMock modelLines = new ModelLinesMock(new string[] { "/* open", "var b;", "var c;" });
+            TMModel tmModel = new TMModel(modelLines);
+            IGrammar source = LoadJavaScriptGrammar();
+            HoldingGrammar grammar = new HoldingGrammar(source);
+
+            tmModel.AddModelTokensChangedListener(new ModelTokensChangedListenerMock(modelLines.GetNumberOfLines()));
+
+            try
+            {
+                // the first walk reaches line 1 with line 0's comment still open
+                grammar.HoldTokenizeOf("var b;");
+                tmModel.SetGrammar(grammar);
+                Assert.IsTrue(grammar.WaitUntilHeld(), "The tokenizer thread did not reach the line.");
+                Assert.IsNull(tmModel.GetLineTokens(1));
+
+                // the comment closes, and a forced range that ends above line 1 moves its start state
+                modelLines.SetLine(0, "/* closed */");
+                tmModel.InvalidateLine(0);
+                tmModel.ForceTokenization(0, 0);
+                grammar.Release();
+
+                string[] expected = ExpectedTokensOfLines(source, "/* closed */", "var b;", "var c;");
+                AssertSettlesOn(tmModel, 1, expected[1]);
+                AssertSettlesOn(tmModel, 2, expected[2]);
+            }
+            finally
+            {
+                grammar.Release();
+                tmModel.Dispose();
+            }
+        }
+
         private static IGrammar LoadJavaScriptGrammar()
         {
             RegistryOptions options = new RegistryOptions(ThemeName.DarkPlus);
@@ -627,6 +841,13 @@ namespace TextMateSharp.Tests.Model
         {
             Assert.IsTrue(
                 SpinWait.SpinUntil(() => !modelLines.Get(0).IsInvalid && !modelLines.Get(1).IsInvalid, 3000),
+                "The lines were not tokenized initially.");
+        }
+
+        private static void WaitUntilAllTokenized(TMModel tmModel, ModelLinesMock modelLines)
+        {
+            Assert.IsTrue(
+                SpinWait.SpinUntil(() => Enumerable.Range(0, modelLines.GetNumberOfLines()).All(i => !tmModel.IsLineInvalid(i)), 3000),
                 "The lines were not tokenized initially.");
         }
 
@@ -646,6 +867,23 @@ namespace TextMateSharp.Tests.Model
             Tokenizer tokenizer = new Tokenizer(grammar);
             LineTokens result = tokenizer.Tokenize(text + Environment.NewLine, tokenizer.GetInitialState(), TimeSpan.FromSeconds(3));
             return Describe(result.Tokens);
+        }
+
+        // The tokens of consecutive lines, each starting from the end state of the one before
+        private static string[] ExpectedTokensOfLines(IGrammar grammar, params string[] lines)
+        {
+            Tokenizer tokenizer = new Tokenizer(grammar);
+            TMState state = tokenizer.GetInitialState();
+            string[] expected = new string[lines.Length];
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                LineTokens result = tokenizer.Tokenize(lines[i] + Environment.NewLine, state, TimeSpan.FromSeconds(3));
+                expected[i] = Describe(result.Tokens);
+                state = result.EndState;
+            }
+
+            return expected;
         }
 
         private static string Describe(List<TMToken> tokens)
@@ -764,7 +1002,9 @@ namespace TextMateSharp.Tests.Model
             private readonly IGrammar _grammar;
             private readonly SemaphoreSlim _held = new SemaphoreSlim(0);
             private readonly SemaphoreSlim _released = new SemaphoreSlim(0);
+            private readonly ConcurrentDictionary<string, int> _calls = new ConcurrentDictionary<string, int>();
             private int _holdNext;
+            private string _holdText;
 
             // Runs on the reading thread, on every read of IsCompiling
             internal Action OnIsCompilingRead;
@@ -779,6 +1019,11 @@ namespace TextMateSharp.Tests.Model
                 Volatile.Write(ref _holdNext, 1);
             }
 
+            internal void HoldTokenizeOf(string text)
+            {
+                Volatile.Write(ref _holdText, text);
+            }
+
             internal bool WaitUntilHeld()
             {
                 return _held.Wait(3000);
@@ -789,10 +1034,19 @@ namespace TextMateSharp.Tests.Model
                 _released.Release();
             }
 
+            internal int CallsFor(string text)
+            {
+                return _calls.TryGetValue(text, out int calls) ? calls : 0;
+            }
+
             public ITokenizeLineResult TokenizeLine(LineText lineText, IStateStack prevState, TimeSpan timeLimit)
             {
                 ITokenizeLineResult result = _grammar.TokenizeLine(lineText, prevState, timeLimit);
-                if (Interlocked.Exchange(ref _holdNext, 0) == 1)
+                string text = lineText.Memory.ToString().TrimEnd();
+                _calls.AddOrUpdate(text, 1, (_, calls) => calls + 1);
+                string holdText = Volatile.Read(ref _holdText);
+                bool holdThisText = holdText == text && Interlocked.CompareExchange(ref _holdText, null, holdText) == holdText;
+                if (Interlocked.Exchange(ref _holdNext, 0) == 1 || holdThisText)
                 {
                     _held.Release();
                     _released.Wait(10000);

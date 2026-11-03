@@ -519,14 +519,14 @@ namespace TextMateSharp.Model
                             }
                         }
 
-                        lineIndex = this.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex) + 1;
+                        lineIndex = this.UpdateTokensInRange(eventBuilder, lineIndex, lineIndex, isForced: false) + 1;
                         tokenizedChars += currentCharsToTokenize;
                     }
                 });
             }
 
             public int UpdateTokensInRange(ModelTokensChangedEventBuilder eventBuilder, int startIndex,
-                int endLineIndex)
+                int endLineIndex, bool isForced)
             {
                 // Snapshot _grammar, _tokenizer, and _lines so we have consistent
                 // references. SetGrammar can null _grammar/_tokenizer on the UI
@@ -656,6 +656,14 @@ namespace TextMateSharp.Model
                             continue;
                         }
 
+                        if (!isOutdated && !object.Equals(modelLine.State, startingState))
+                        {
+                            // Another run moved this line's start state, so these tokens answer the old one
+                            model.InvalidateLine(lineIndex);
+                            lineIndex++;
+                            continue;
+                        }
+
                         modelLine.Tokens = r.Tokens;
                         eventBuilder.registerChangedTokens(lineIndex + 1);
 
@@ -690,6 +698,12 @@ namespace TextMateSharp.Model
                             else if (endStateLine != null)
                             {
                                 endStateLine.State = r.EndState;
+
+                                // This thread walks on to that line, but a forced range can end here with nothing queued for it.
+                                // A line without tokens is left to the walk that has not reached it yet.
+                                if (isForced && lineIndex == endLineIndex && endStateLine.Tokens != null)
+                                    model.InvalidateLine(endStateIndex);
+
                                 lineIndex++;
                             }
                             else
@@ -1144,7 +1158,7 @@ namespace TextMateSharp.Model
 
             BuildEventWithCallback(eventBuilder =>
             {
-                tokenizerThread.UpdateTokensInRange(eventBuilder, clampedStartLineIndex, clampedEndLineIndex);
+                tokenizerThread.UpdateTokensInRange(eventBuilder, clampedStartLineIndex, clampedEndLineIndex, isForced: true);
             });
         }
 
