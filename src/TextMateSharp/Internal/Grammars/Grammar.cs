@@ -228,6 +228,8 @@ namespace TextMateSharp.Internal.Grammars
         // serialized per grammar.
         private readonly List<LineTokenizer> _tokenizers = new List<LineTokenizer>();
         private int _tokenizerDepth;
+        private LineTokens _lineTokens;
+        private LineTokens _binaryLineTokens;
 
         internal LineTokenizer EnterTokenizer()
         {
@@ -311,8 +313,11 @@ namespace TextMateSharp.Internal.Grammars
             }
 
             int lineLength = effectiveLineText.Length;
-            LineTokens lineTokens = new LineTokens(emitBinaryTokens, _tokenTypeMatchers,
-                _balancedBracketSelectors);
+            // One line tokens per kind, reused for every line: tokenizing is serialized per grammar.
+            LineTokens lineTokens = emitBinaryTokens
+                ? _binaryLineTokens ??= new LineTokens(true, _tokenTypeMatchers, _balancedBracketSelectors)
+                : _lineTokens ??= new LineTokens(false, _tokenTypeMatchers, _balancedBracketSelectors);
+            lineTokens.Reset();
             TokenizeStringResult tokenizeResult = LineTokenizer.TokenizeString(this, effectiveLineText, isFirstLine, 0,
                 prevState,
                 lineTokens, true, timeLimit);
