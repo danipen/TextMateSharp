@@ -36,7 +36,7 @@ namespace TextMateSharp.Markdown.Tests
 
             Assert.AreEqual("language-" + language, (string)code.Attribute("class"));
             Assert.IsTrue(code.Elements("span").Any(), "Supported code should contain highlighted spans.");
-            Assert.AreEqual("\n" + source + "\n", code.Value.Replace("\r\n", "\n"));
+            Assert.AreEqual(source + "\n", code.Value.Replace("\r\n", "\n"));
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace TextMateSharp.Markdown.Tests
             var code = XElement.Parse(html, LoadOptions.PreserveWhitespace).Element("code");
 
             Assert.IsFalse(code.Descendants("script").Any());
-            Assert.AreEqual("\n" + source + "\n", code.Value.Replace("\r\n", "\n"));
+            Assert.AreEqual(source + "\n", code.Value.Replace("\r\n", "\n"));
         }
 
         [TestCase("var first = 1;\n\nvar second = 2;")]
@@ -86,7 +86,7 @@ namespace TextMateSharp.Markdown.Tests
             var html = Markdig.Markdown.ToHtml("```csharp\n" + source + "\n```", _pipeline);
 
             Assert.AreEqual(
-                "\n" + source + "\n",
+                source + "\n",
                 XElement.Parse(html, LoadOptions.PreserveWhitespace).Element("code").Value.Replace("\r\n", "\n"));
         }
 
@@ -133,7 +133,7 @@ namespace TextMateSharp.Markdown.Tests
 
             Assert.AreEqual("language-csharp", (string)code.Attribute("class"));
             Assert.IsFalse(code.Elements().Any());
-            Assert.AreEqual("\n", code.Value.Replace("\r\n", "\n"));
+            Assert.AreEqual(string.Empty, code.Value);
         }
 
         [Test]
