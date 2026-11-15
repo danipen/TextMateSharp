@@ -1,0 +1,29 @@
+﻿@page
+@using Markdig
+@inject MarkdownPipeline markdownPipeline
+@{
+    var content = """
+                  # Hello world! :D
+                  This is example Markdown content.
+
+                  Here is some C# code:
+                  ```csharp
+                  Console.WriteLine("Hello world" + 42);
+                  ```
+                  
+                  Here is some JavaScript:
+                  ```javascript
+                  const result = await loadSomeData();
+                  console.log('Hello world! ' + result); 
+                  ```
+                  """;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TextMateSharp Markdown Example</title>
+</head>
+<body>
+    @Html.Raw(Markdown.ToHtml(content, markdownPipeline))
+</body>
+</html>

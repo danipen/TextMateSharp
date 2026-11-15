@@ -10,13 +10,16 @@ namespace TextMateSharp.Html;
 /// </summary>
 internal static class TextWriterExtensions
 {
-	/// <summary>
-	/// Write the specified <see cref="IToken"/> to the <see cref="TextWriter"/>.
-	/// </summary>
-	public static void Write(this TextWriter writer, IToken token, string line)
+	extension(TextWriter writer)
 	{
-		var start = Math.Min(token.StartIndex, line.Length);
-		var end = Math.Min(token.EndIndex, line.Length);
-		HtmlEncoder.Default.Encode(writer, line, start, end - start);
+		/// <summary>
+		/// Write the specified <see cref="IToken"/> to the <see cref="TextWriter"/>.
+		/// </summary>
+		public void Write(IToken token, string line)
+		{
+			var start = Math.Min(token.StartIndex, line.Length);
+			var end = Math.Min(token.EndIndex, line.Length);
+			HtmlEncoder.Default.Encode(writer, line, start, end - start);
+		}
 	}
 }
