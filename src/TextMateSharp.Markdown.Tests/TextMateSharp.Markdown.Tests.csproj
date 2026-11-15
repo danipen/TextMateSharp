@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+        <TargetFramework>net10.0</TargetFramework>
         <IsPackable>False</IsPackable>
         <SignAssembly>True</SignAssembly>
         <LangVersion>14.0</LangVersion>
@@ -18,5 +18,9 @@
 
     <ItemGroup>
         <PackageReference Include="Moq" Version="4.18.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TextMateSharp.Markdown\TextMateSharp.Markdown.csproj" />
     </ItemGroup>
 </Project>

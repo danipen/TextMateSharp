@@ -68,8 +68,9 @@ public class TextMateSharpCodeBlockRenderer(
 		
 			foreach (var token in tokenized.Tokens)
 			{
-				htmlTokenRenderer.Write(token, slice.Text, renderer.Writer);
+				htmlTokenRenderer.Write(token, lineText, renderer.Writer);
 			}
+			renderer.WriteLine();
 		}
 
 		renderer.WriteLine("</code></pre>");
@@ -77,11 +78,16 @@ public class TextMateSharpCodeBlockRenderer(
 
 	private bool TryGetGrammar(string languageId, out IGrammar grammar)
 	{
-		grammar = _grammarByLanguage.GetOrAdd(languageId, _ =>
+		if (!_grammarByLanguage.TryGetValue(languageId, out grammar))
 		{
-			var scope = registryOptions.GetScopeByLanguageId(languageId);
-			return scope is null ? null : registry.LoadGrammar(scope);
-		});
+			grammar = _grammarByLanguage.GetOrAdd(languageId, LoadGrammar);
+		}
 		return grammar != null;
+	}
+
+	private IGrammar LoadGrammar(string languageId)
+	{
+		var scope = registryOptions.GetScopeByLanguageId(languageId);
+		return scope is null ? null : registry.LoadGrammar(scope);
 	}
 }

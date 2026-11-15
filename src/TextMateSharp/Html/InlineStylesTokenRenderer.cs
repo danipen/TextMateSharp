@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using TextMateSharp.Grammars;
 using TextMateSharp.Themes;
@@ -12,7 +13,7 @@ public class InlineStylesTokenRenderer(Theme theme) : IHtmlTokenRenderer
 	private const int NoColor = -1;
 	
 	/// <inheritdoc/>
-	public void Write(IToken token, string line, TextWriter writer)
+	public void Write(IToken token, ReadOnlyMemory<char> line, TextWriter writer)
 	{
 		var styles = ResolvedStyles.Create(token, theme);
 		var isStyled = !styles.IsEmpty;

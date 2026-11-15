@@ -1,6 +1,8 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Encodings.Web;
 using TextMateSharp.Html;
 using TextMateSharp.Internal.Grammars;
 using TextMateSharp.Internal.Themes;
@@ -24,7 +26,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(7, 12, ["source.test"]);
             using var writer = new StringWriter();
 
-            renderer.Write(token, "before <&\"> after", writer);
+            renderer.Write(token, "before <&\"> after".AsMemory(), writer);
 
             Assert.AreEqual(
                 "<span style=\"color:#123456;background-color:#ABCDEF;" +
@@ -39,7 +41,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 4, []);
             using var writer = new StringWriter();
 
-            renderer.Write(token, "<&\">", writer);
+            renderer.Write(token, "<&\">".AsMemory(), writer);
 
             Assert.AreEqual("&lt;&amp;&quot;&gt;", writer.ToString());
         }
@@ -53,7 +55,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 4, ["source.test"]);
             using var writer = new StringWriter();
 
-            renderer.Write(token, "text", writer);
+            renderer.Write(token, "text".AsMemory(), writer);
 
             Assert.AreEqual(
                 "<span style=\"color:#123456;background-color:#ABCDEF;\">text</span>",
@@ -92,7 +94,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 4, ["source.test", "keyword.test"]);
             using var writer = new StringWriter();
 
-            renderer.Write(token, "text", writer);
+            renderer.Write(token, "text".AsMemory(), writer);
 
             Assert.AreEqual(
                 "<span style=\"color:#FEDCBA;background-color:#ABCDEF;font-style:italic;\">text</span>",
@@ -105,8 +107,8 @@ namespace TextMateSharp.Tests.Html
             var renderer = new InlineStylesTokenRenderer(CreateTheme("bold"));
             using var writer = new StringWriter();
 
-            renderer.Write(new Token(0, 1, ["source.test"]), "a&", writer);
-            renderer.Write(new Token(1, 2, []), "a&", writer);
+            renderer.Write(new Token(0, 1, ["source.test"]), "a&".AsMemory(), writer);
+            renderer.Write(new Token(1, 2, []), "a&".AsMemory(), writer);
 
             Assert.AreEqual(
                 "<span style=\"color:#123456;background-color:#ABCDEF;font-weight:bold;\">a</span>&amp;",
@@ -120,7 +122,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 1, []);
             using var writer = new StringWriter();
 
-            renderer.Write(token, "", writer);
+            renderer.Write(token, ReadOnlyMemory<char>.Empty, writer);
 
             Assert.AreEqual("", writer.ToString());
         }
@@ -134,9 +136,89 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(start, end, new List<string>());
             using var writer = new StringWriter();
 
-            renderer.Write(token, "abc", writer);
+            renderer.Write(token, "abc".AsMemory(), writer);
 
             Assert.AreEqual(expected, writer.ToString());
+        }
+
+        [TestCase(0, 4, "&lt;&amp;&quot;&gt;")]
+        [TestCase(1, 3, "&amp;&quot;")]
+        [TestCase(1, 100, "&amp;&quot;&gt;")]
+        [TestCase(100, 101, "")]
+        public void Write_LineSlice_UsesRelativeTokenIndicesAndClampsToSliceLength(
+            int start, int end, string expected)
+        {
+            IHtmlTokenRenderer renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var token = new Token(start, end, []);
+            using var writer = new StringWriter();
+
+            renderer.Write(token, "prefix <&\"> suffix".AsMemory(7, 4), writer);
+
+            Assert.AreEqual(expected, writer.ToString());
+        }
+
+        [Test]
+        public void Write_LineSliceToEnd_UsesRemainingString()
+        {
+            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var token = new Token(0, 100, []);
+            using var writer = new StringWriter();
+
+            renderer.Write(token, "prefix <&".AsMemory(7), writer);
+
+            Assert.AreEqual("&lt;&amp;", writer.ToString());
+        }
+
+        [Test]
+        public void Write_EmptyLineSlice_DoesNotWriteSurroundingText()
+        {
+            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var token = new Token(0, 1, []);
+            using var writer = new StringWriter();
+
+            renderer.Write(token, "prefix suffix".AsMemory(7, 0), writer);
+
+            Assert.AreEqual("", writer.ToString());
+        }
+
+        [Test]
+        public void Write_StyledLineSlice_WritesStylesAndEscapesOnlySlice()
+        {
+            var renderer = new InlineStylesTokenRenderer(CreateTheme("bold"));
+            var token = new Token(0, 100, ["source.test"]);
+            using var writer = new StringWriter();
+
+            renderer.Write(token, "prefix <& suffix".AsMemory(7, 2), writer);
+
+            Assert.AreEqual(
+                "<span style=\"color:#123456;background-color:#ABCDEF;font-weight:bold;\">&lt;&amp;</span>",
+                writer.ToString());
+        }
+
+        [Test]
+        public void Write_ArrayBackedSlice_UsesRelativeIndicesAndEscapesText()
+        {
+            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var token = new Token(1, 100, []);
+            var source = "prefix <&\"> suffix".ToCharArray();
+            using var writer = new StringWriter();
+
+            renderer.Write(token, source.AsMemory(7, 4), writer);
+
+            Assert.AreEqual("&amp;&quot;&gt;", writer.ToString());
+        }
+
+        [Test]
+        public void Write_ArrayBackedLongToken_EncodesAcrossBufferBoundaries()
+        {
+            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var source = new string('<', 600) + "\U0001F600\uD800";
+            var token = new Token(0, source.Length, []);
+            using var writer = new StringWriter();
+
+            renderer.Write(token, source.ToCharArray().AsMemory(), writer);
+
+            Assert.AreEqual(HtmlEncoder.Default.Encode(source), writer.ToString());
         }
 
         private static Theme CreateTheme(string fontStyle)
