@@ -71,24 +71,10 @@ namespace TextMateSharp
                         int startIndex = Math.Min(token.StartIndex, lineRange.Length);
                         int endIndex = Math.Min(token.EndIndex, lineRange.Length);
 
-                        int foreground = -1;
-                        int background = -1;
-                        FontStyle fontStyle = FontStyle.NotSet;
-
-                        foreach (var themeRule in theme.Match(token.Scopes))
-                        {
-                            if (foreground == -1 && themeRule.foreground > 0)
-                                foreground = themeRule.foreground;
-
-                            if (background == -1 && themeRule.background > 0)
-                                background = themeRule.background;
-
-                            if (fontStyle == FontStyle.NotSet && themeRule.fontStyle > 0)
-                                fontStyle = themeRule.fontStyle;
-                        }
+                        var styles = ResolvedStyles.Create(token, theme);
 
                         ReadOnlySpan<char> tokenSpan = lineMemory.Span.Slice(startIndex, endIndex - startIndex);
-                        WriteToken(tokenSpan, foreground, background, fontStyle, theme);
+                        WriteToken(tokenSpan, styles, theme);
 
                         if (tokenSpan.IndexOf('\n') != -1)
                             needsLineBreak = false;
@@ -118,18 +104,18 @@ namespace TextMateSharp
             }
         }
 
-        static void WriteToken(ReadOnlySpan<char> text, int foreground, int background, FontStyle fontStyle, Theme theme)
+        static void WriteToken(ReadOnlySpan<char> text, ResolvedStyles styles, Theme theme)
         {
-            if (foreground == -1)
+            if (styles.ForegroundColor == ResolvedStyles.NoColor)
             {
                 Console.Out.Write(text);
                 return;
             }
 
-            Decoration decoration = GetDecoration(fontStyle);
+            Decoration decoration = GetDecoration(styles.FontStyle);
 
-            Color backgroundColor = GetColor(background, theme);
-            Color foregroundColor = GetColor(foreground, theme);
+            Color backgroundColor = GetColor(styles.BackgroundColor, theme);
+            Color foregroundColor = GetColor(styles.ForegroundColor, theme);
 
             Style style = new Style(foregroundColor, backgroundColor, decoration);
             string textStr = text.ToString();
