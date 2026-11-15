@@ -41,6 +41,9 @@ public class TextMateSharpCodeBlockRenderer(
 		guiColors.TryGetValue("editor.foreground", out var foregroundColor);
 
 		renderer.EnsureLine();
+		// `<pre><code class="language-...">` is the markup recommended in the HTML spec:
+		// https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
+		// TODO(daniel15) This should be generalized and moved to TextMateSharp.Html namespace.
 		renderer.Write("<pre style=\"");
 		if (backgroundColor is not null)
 		{
@@ -55,7 +58,7 @@ public class TextMateSharpCodeBlockRenderer(
 		}
 		renderer.Write("\"><code class=\"language-");
 		renderer.WriteEscape(languageId);
-		renderer.WriteLine("\">");
+		renderer.Write("\">");
 
 		IStateStack state = null;
 		for (var i = 0; i < fenced.Lines.Count; i++)
