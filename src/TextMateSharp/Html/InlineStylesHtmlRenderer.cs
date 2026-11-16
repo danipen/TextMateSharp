@@ -13,7 +13,14 @@ namespace TextMateSharp.Html;
 public class InlineStylesHtmlRenderer(Theme theme) : IHtmlRenderer
 {
 	/// <inheritdoc/>
-	public void WriteHeader(TextWriter writer, string languageId)
+	public void Write(TextWriter writer, string languageId, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines)
+	{
+		WriteHeader(writer, languageId);
+		WriteLines(writer, lines);
+		WriteFooter(writer);
+	}
+	
+	private void WriteHeader(TextWriter writer, string languageId)
 	{
 		var guiColors = theme.GetGuiColorDictionary();
 		guiColors.TryGetValue("editor.background", out var backgroundColor);
@@ -39,13 +46,11 @@ public class InlineStylesHtmlRenderer(Theme theme) : IHtmlRenderer
 		writer.Write("\">");
 	}
 
-	/// <inheritdoc/>
-	public void WriteFooter(TextWriter writer)
+	private void WriteFooter(TextWriter writer)
 	{
 		writer.WriteLine("</code></pre>");
 	}
 	
-	/// <inheritdoc/>
 	public void WriteLines(TextWriter writer, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines)
 	{
 		ResolvedStyles? currentStyles = null;

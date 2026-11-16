@@ -11,17 +11,11 @@ namespace TextMateSharp.Html;
 public interface IHtmlRenderer
 {
 	/// <summary>
-	/// Writes the starting &lt;pre tag for an HTML code block.
+	/// Writes the specified tokenized code lines as HTML.
 	/// </summary>
-	public void WriteHeader(TextWriter writer, string languageId);
-
-	/// <summary>
-	/// Writes the ending tag for an HTML code block;
-	/// </summary>
-	public void WriteFooter(TextWriter writer);
-	
-	/// <summary>
-	/// Writes tokenized code lines, including styling markup.
-	/// </summary>
-	public void WriteLines(TextWriter writer, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines);
+	public void Write(
+		TextWriter writer,
+		string languageId,
+		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
+	);
 }

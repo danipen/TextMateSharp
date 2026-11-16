@@ -194,13 +194,12 @@ namespace TextMateSharp.Markdown.Tests
             renderer.ObjectRenderers.Remove(renderer.ObjectRenderers.FindExact<CodeBlockRenderer>());
             renderer.ObjectRenderers.Add(new TextMateSharpCodeBlockRenderer(
                 registry, options, new CodeBlockRenderer(), tokenRenderer.Object));
-            tokenRenderer.Setup(r => r.WriteHeader(writer, "csharp"));
-            tokenRenderer.Setup(r => r.WriteFooter(writer));
-            tokenRenderer.Setup(r => r.WriteLines(
+            tokenRenderer.Setup(r => r.Write(
                 writer,
+                "csharp",
                 It.IsAny<IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>())
             )
-                .Callback<TextWriter, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>((output, lines) =>
+                .Callback<TextWriter, string, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>((output, languageId, lines) =>
                 {
                     var line = lines.Single();
                     Assert.AreEqual(markdown.AsMemory(10, source.Length), line.Line);
@@ -215,8 +214,11 @@ namespace TextMateSharp.Markdown.Tests
             renderer.Render(Markdig.Markdown.Parse(markdown));
 
             Assert.AreEqual(source + writer.NewLine, writer.ToString());
-            tokenRenderer.Verify(r => r.WriteLines(writer,
-                It.IsAny<IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>()), Times.Once());
+            tokenRenderer.Verify(r => r.Write(
+                writer,
+                "csharp",
+                It.IsAny<IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>()), Times.Once()
+            );
         }
 
         [Test]

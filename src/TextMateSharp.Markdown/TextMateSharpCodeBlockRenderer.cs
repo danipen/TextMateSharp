@@ -35,9 +35,7 @@ public class TextMateSharpCodeBlockRenderer(
 			return;
 		}
 		
-		htmlRenderer.WriteHeader(renderer.Writer, languageId);
-		htmlRenderer.WriteLines(renderer.Writer, TokenizeLines(fenced, grammar));
-		htmlRenderer.WriteFooter(renderer.Writer);
+		htmlRenderer.Write(renderer.Writer, languageId, lines: TokenizeLines(fenced, grammar));
 	}
 
 	private static IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> TokenizeLines(
