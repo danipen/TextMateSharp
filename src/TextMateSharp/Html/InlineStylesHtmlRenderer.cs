@@ -1,16 +1,48 @@
 using System;
 using System.IO;
+using System.Text.Encodings.Web;
 using TextMateSharp.Grammars;
 using TextMateSharp.Themes;
 
 namespace TextMateSharp.Html;
 
 /// <summary>
-/// Implementation of <see cref="IHtmlTokenRenderer"/> that outputs tokens with inline styles.
+/// Implementation of <see cref="IHtmlRenderer"/> that outputs tokens with inline styles.
 /// </summary>
-public class InlineStylesTokenRenderer(Theme theme) : IHtmlTokenRenderer
+public class InlineStylesHtmlRenderer(Theme theme) : IHtmlRenderer
 {
-	private const int NoColor = -1;
+	/// <inheritdoc/>
+	public void WriteHeader(TextWriter writer, string languageId)
+	{
+		var guiColors = theme.GetGuiColorDictionary();
+		guiColors.TryGetValue("editor.background", out var backgroundColor);
+		guiColors.TryGetValue("editor.foreground", out var foregroundColor);
+		
+		// `<pre><code class="language-...">` is the markup recommended in the HTML spec:
+		// https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
+		writer.WriteLine();
+		writer.Write("<pre style=\"");
+		if (backgroundColor is not null)
+		{
+			writer.Write("background-color:");
+			writer.Write(backgroundColor);
+			writer.Write(';');
+		}
+		if (foregroundColor is not null)
+		{
+			writer.Write("color:");
+			writer.Write(foregroundColor);
+		}
+		writer.Write("\"><code class=\"language-");
+		HtmlEncoder.Default.Encode(writer, languageId);
+		writer.Write("\">");
+	}
+
+	/// <inheritdoc/>
+	public void WriteFooter(TextWriter writer)
+	{
+		writer.WriteLine("</code></pre>");
+	}
 	
 	/// <inheritdoc/>
 	public void Write(IToken token, ReadOnlyMemory<char> line, TextWriter writer)
@@ -89,6 +121,6 @@ public class InlineStylesTokenRenderer(Theme theme) : IHtmlTokenRenderer
 
 	private string ResolveColor(int color)
 	{
-		return color == NoColor ? null : theme.GetColor(color);
+		return color == ResolvedStyles.NoColor ? null : theme.GetColor(color);
 	}
 }

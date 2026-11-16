@@ -143,7 +143,7 @@ namespace TextMateSharp.Markdown.Tests
             const string markdown = "```csharp\n" + source + "\n```";
             var options = new RegistryOptions(ThemeName.DarkPlus);
             var registry = new Registry.Registry(options);
-            var tokenRenderer = new Mock<IHtmlTokenRenderer>(MockBehavior.Strict);
+            var tokenRenderer = new Mock<IHtmlRenderer>(MockBehavior.Strict);
             using var writer = new StringWriter();
             var renderer = new HtmlRenderer(writer);
             renderer.ObjectRenderers.Remove(renderer.ObjectRenderers.FindExact<CodeBlockRenderer>());

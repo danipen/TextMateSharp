@@ -11,7 +11,7 @@ using TextMateSharp.Themes;
 namespace TextMateSharp.Tests.Html
 {
     [TestFixture]
-    public class InlineStylesTokenRendererTests
+    public class InlineStylesHtmlRendererTests
     {
         [TestCase("bold", "font-weight:bold;")]
         [TestCase("italic", "font-style:italic;")]
@@ -22,7 +22,7 @@ namespace TextMateSharp.Tests.Html
         public void Write_StyledToken_WritesInlineStylesAndEscapesTokenText(
             string fontStyle, string expectedFontStyles)
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(fontStyle));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(fontStyle));
             var token = new Token(7, 12, ["source.test"]);
             using var writer = new StringWriter();
 
@@ -37,7 +37,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_TokenWithoutScopes_WritesEscapedTextWithoutSpan()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme("bold"));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme("bold"));
             var token = new Token(0, 4, []);
             using var writer = new StringWriter();
 
@@ -51,7 +51,7 @@ namespace TextMateSharp.Tests.Html
         [TestCase("none")]
         public void Write_ColorsWithoutFontStyle_DoesNotEmitFontStyles(string fontStyle)
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(fontStyle));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(fontStyle));
             var token = new Token(0, 4, ["source.test"]);
             using var writer = new StringWriter();
 
@@ -90,7 +90,7 @@ namespace TextMateSharp.Tests.Html
                     }
                 }
             };
-            var renderer = new InlineStylesTokenRenderer(Theme.CreateFromRawTheme(rawTheme, null));
+            var renderer = new InlineStylesHtmlRenderer(Theme.CreateFromRawTheme(rawTheme, null));
             var token = new Token(0, 4, ["source.test", "keyword.test"]);
             using var writer = new StringWriter();
 
@@ -104,7 +104,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_ConsecutiveTokens_DoesNotLeakStylesIntoUnstyledToken()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme("bold"));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme("bold"));
             using var writer = new StringWriter();
 
             renderer.Write(new Token(0, 1, ["source.test"]), "a&".AsMemory(), writer);
@@ -118,7 +118,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_EmptyLine_WritesNothing()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(""));
             var token = new Token(0, 1, []);
             using var writer = new StringWriter();
 
@@ -132,7 +132,7 @@ namespace TextMateSharp.Tests.Html
         [TestCase(1, 1, "")]
         public void Write_TokenBoundaries_ClampsToLineLength(int start, int end, string expected)
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(""));
             var token = new Token(start, end, new List<string>());
             using var writer = new StringWriter();
 
@@ -148,7 +148,7 @@ namespace TextMateSharp.Tests.Html
         public void Write_LineSlice_UsesRelativeTokenIndicesAndClampsToSliceLength(
             int start, int end, string expected)
         {
-            IHtmlTokenRenderer renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            IHtmlRenderer renderer = new InlineStylesHtmlRenderer(CreateTheme(""));
             var token = new Token(start, end, []);
             using var writer = new StringWriter();
 
@@ -160,7 +160,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_LineSliceToEnd_UsesRemainingString()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(""));
             var token = new Token(0, 100, []);
             using var writer = new StringWriter();
 
@@ -172,7 +172,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_EmptyLineSlice_DoesNotWriteSurroundingText()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(""));
             var token = new Token(0, 1, []);
             using var writer = new StringWriter();
 
@@ -184,7 +184,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_StyledLineSlice_WritesStylesAndEscapesOnlySlice()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme("bold"));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme("bold"));
             var token = new Token(0, 100, ["source.test"]);
             using var writer = new StringWriter();
 
@@ -198,7 +198,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_ArrayBackedSlice_UsesRelativeIndicesAndEscapesText()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(""));
             var token = new Token(1, 100, []);
             var source = "prefix <&\"> suffix".ToCharArray();
             using var writer = new StringWriter();
@@ -211,7 +211,7 @@ namespace TextMateSharp.Tests.Html
         [Test]
         public void Write_ArrayBackedLongToken_EncodesAcrossBufferBoundaries()
         {
-            var renderer = new InlineStylesTokenRenderer(CreateTheme(""));
+            var renderer = new InlineStylesHtmlRenderer(CreateTheme(""));
             var source = new string('<', 600) + "\U0001F600\uD800";
             var token = new Token(0, source.Length, []);
             using var writer = new StringWriter();

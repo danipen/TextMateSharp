@@ -15,7 +15,7 @@ public class TextMateSharpCodeBlockRenderer(
 	Registry.Registry registry,
 	RegistryOptions registryOptions,
 	CodeBlockRenderer fallbackRenderer,
-	IHtmlTokenRenderer htmlTokenRenderer
+	IHtmlRenderer htmlRenderer
 ) : HtmlObjectRenderer<CodeBlock>
 {
 	private readonly ConcurrentDictionary<string, IGrammar> _grammarByLanguage = new();
@@ -34,32 +34,7 @@ public class TextMateSharpCodeBlockRenderer(
 			return;
 		}
 		
-		var theme = registry.GetTheme();
-		var guiColors = theme.GetGuiColorDictionary();
-		// TODO(daniel15) We only need to do this when using inline styles 
-		guiColors.TryGetValue("editor.background", out var backgroundColor);
-		guiColors.TryGetValue("editor.foreground", out var foregroundColor);
-
-		renderer.EnsureLine();
-		// `<pre><code class="language-...">` is the markup recommended in the HTML spec:
-		// https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
-		// TODO(daniel15) This should be generalized and moved to TextMateSharp.Html namespace.
-		renderer.Write("<pre style=\"");
-		if (backgroundColor is not null)
-		{
-			renderer.Write("background-color:");
-			renderer.Write(backgroundColor);
-			renderer.Write(';');
-		}
-		if (foregroundColor is not null)
-		{
-			renderer.Write("color:");
-			renderer.Write(foregroundColor);
-		}
-		renderer.Write("\"><code class=\"language-");
-		renderer.WriteEscape(languageId);
-		renderer.Write("\">");
-
+		htmlRenderer.WriteHeader(renderer.Writer, languageId);
 		IStateStack state = null;
 		for (var i = 0; i < fenced.Lines.Count; i++)
 		{
@@ -71,12 +46,11 @@ public class TextMateSharpCodeBlockRenderer(
 		
 			foreach (var token in tokenized.Tokens)
 			{
-				htmlTokenRenderer.Write(token, lineText, renderer.Writer);
+				htmlRenderer.Write(token, lineText, renderer.Writer);
 			}
 			renderer.WriteLine();
 		}
-
-		renderer.WriteLine("</code></pre>");
+		htmlRenderer.WriteFooter(renderer.Writer);
 	}
 
 	private bool TryGetGrammar(string languageId, out IGrammar grammar)

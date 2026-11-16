@@ -37,7 +37,7 @@ public class TextMateSharpExtension(
 			existingRenderer = new CodeBlockRenderer();
 		}
 
-		var htmlTokenRenderer = new InlineStylesTokenRenderer(registry.GetTheme());
+		var htmlTokenRenderer = new InlineStylesHtmlRenderer(registry.GetTheme());
 		htmlRenderer.ObjectRenderers.AddIfNotAlready(
 			new TextMateSharpCodeBlockRenderer(
 				registry,
