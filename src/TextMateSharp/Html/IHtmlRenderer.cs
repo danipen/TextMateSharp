@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using TextMateSharp.Grammars;
 
@@ -17,14 +18,10 @@ public interface IHtmlRenderer
 	/// <summary>
 	/// Writes the ending tag for an HTML code block;
 	/// </summary>
-	/// <param name="writer"></param>
 	public void WriteFooter(TextWriter writer);
 	
 	/// <summary>
-	/// Writes the token to the specified writer, including any required styling markup.
+	/// Writes tokenized code lines, including styling markup.
 	/// </summary>
-	/// <param name="token">A token with indices relative to the selected line slice.</param>
-	/// <param name="line">The line slice containing the token.</param>
-	/// <param name="writer">The output writer.</param>
-	public void Write(IToken token, ReadOnlyMemory<char> line, TextWriter writer);
+	public void WriteLines(TextWriter writer, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines);
 }

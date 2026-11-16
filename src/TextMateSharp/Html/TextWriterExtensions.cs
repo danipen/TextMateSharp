@@ -9,7 +9,7 @@ namespace TextMateSharp.Html;
 /// <summary>
 /// Extension methods for <see cref="TextWriter"/>.
 /// </summary>
-internal static class TextWriterExtensions
+public static class TextWriterExtensions
 {
 	extension(TextWriter writer)
 	{

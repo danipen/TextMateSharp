@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -37,6 +38,47 @@ namespace TextMateSharp.Markdown.Tests
             Assert.AreEqual("language-" + language, (string)code.Attribute("class"));
             Assert.IsTrue(code.Elements("span").Any(), "Supported code should contain highlighted spans.");
             Assert.AreEqual(source + "\n", code.Value.Replace("\r\n", "\n"));
+        }
+
+        [Test]
+        public void ToHtml_ConsecutiveStringTokens_MergesQuotesAndContent()
+        {
+            const string source = "Console.WriteLine(\"Hello world\" + 42);";
+
+            var html = Markdig.Markdown.ToHtml("```csharp\n" + source + "\n```", _pipeline);
+            var code = XElement.Parse(html, LoadOptions.PreserveWhitespace).Element("code");
+            var literal = code.Elements("span").Single(span => span.Value.Contains("Hello world"));
+
+            Assert.AreEqual("\"Hello world\"", literal.Value);
+            Assert.AreEqual("color:#CE9178;", (string)literal.Attribute("style"));
+        }
+
+        [TestCase("var text = @\"first line\nsecond line\";", "@\"first line\nsecond line\"")]
+        [TestCase("var text = @\"first line\n\nthird line\";", "@\"first line\n\nthird line\"")]
+        [TestCase("/* first line\nsecond line */", "/* first line\nsecond line */\n")]
+        public void ToHtml_IdenticalStylesAcrossLines_UsesOneSpan(string source, string expectedSpanText)
+        {
+            var html = Markdig.Markdown.ToHtml("```csharp\n" + source + "\n```", _pipeline);
+            var code = XElement.Parse(html, LoadOptions.PreserveWhitespace).Element("code");
+            var span = code.Elements("span").Single(element => element.Value.Contains("first line"));
+
+            Assert.AreEqual(expectedSpanText, span.Value.Replace("\r\n", "\n"));
+            Assert.AreEqual(source + "\n", code.Value.Replace("\r\n", "\n"));
+        }
+
+        [Test]
+        public void ToHtml_EqualStylesSeparatedByOtherTokens_RemainSeparateSpans()
+        {
+            const string source = "var text = \"first\" + 42 + \"second\";";
+
+            var html = Markdig.Markdown.ToHtml("```csharp\n" + source + "\n```", _pipeline);
+            var code = XElement.Parse(html, LoadOptions.PreserveWhitespace).Element("code");
+            var first = code.Elements("span").Single(span => span.Value.Contains("first"));
+            var second = code.Elements("span").Single(span => span.Value.Contains("second"));
+
+            Assert.AreEqual("\"first\"", first.Value);
+            Assert.AreEqual("\"second\"", second.Value);
+            Assert.AreEqual((string)first.Attribute("style"), (string)second.Attribute("style"));
         }
 
         [Test]
@@ -119,8 +161,11 @@ namespace TextMateSharp.Markdown.Tests
             var continuation = blocks[0].Elements("span").Single(span => span.Value.Contains("still a comment"));
             var nextBlockKeyword = blocks[1].Elements("span").Single(span => span.Value == "var");
 
-            Assert.AreEqual((string)firstLine.Attribute("style"), (string)continuation.Attribute("style"),
-                "The second line should remain highlighted as a comment.");
+            Assert.AreSame(
+                firstLine,
+                continuation,
+                "Consecutive comment lines should share a single span."
+            );
             Assert.AreNotEqual((string)continuation.Attribute("style"), (string)nextBlockKeyword.Attribute("style"),
                 "An unclosed comment must not affect the next code block.");
         }
@@ -149,15 +194,29 @@ namespace TextMateSharp.Markdown.Tests
             renderer.ObjectRenderers.Remove(renderer.ObjectRenderers.FindExact<CodeBlockRenderer>());
             renderer.ObjectRenderers.Add(new TextMateSharpCodeBlockRenderer(
                 registry, options, new CodeBlockRenderer(), tokenRenderer.Object));
-            tokenRenderer.Setup(r => r.Write(
-                It.IsAny<IToken>(), It.Is<ReadOnlyMemory<char>>(text => text.Equals(markdown.AsMemory(10, source.Length))),
-                writer));
+            tokenRenderer.Setup(r => r.WriteHeader(writer, "csharp"));
+            tokenRenderer.Setup(r => r.WriteFooter(writer));
+            tokenRenderer.Setup(r => r.WriteLines(
+                writer,
+                It.IsAny<IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>())
+            )
+                .Callback<TextWriter, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>((output, lines) =>
+                {
+                    var line = lines.Single();
+                    Assert.AreEqual(markdown.AsMemory(10, source.Length), line.Line);
+                    Assert.IsNotEmpty(line.Tokens);
+                    foreach (var token in line.Tokens)
+                    {
+                        output.Write(token, line.Line);
+                    }
+                    output.WriteLine();
+                });
 
             renderer.Render(Markdig.Markdown.Parse(markdown));
 
-            tokenRenderer.Verify(r => r.Write(
-                It.IsAny<IToken>(), It.Is<ReadOnlyMemory<char>>(text => text.Equals(markdown.AsMemory(10, source.Length))),
-                writer), Times.AtLeastOnce());
+            Assert.AreEqual(source + writer.NewLine, writer.ToString());
+            tokenRenderer.Verify(r => r.WriteLines(writer,
+                It.IsAny<IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>()), Times.Once());
         }
 
         [Test]

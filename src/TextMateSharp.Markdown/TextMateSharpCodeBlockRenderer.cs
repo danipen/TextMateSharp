@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
@@ -35,6 +36,15 @@ public class TextMateSharpCodeBlockRenderer(
 		}
 		
 		htmlRenderer.WriteHeader(renderer.Writer, languageId);
+		htmlRenderer.WriteLines(renderer.Writer, TokenizeLines(fenced, grammar));
+		htmlRenderer.WriteFooter(renderer.Writer);
+	}
+
+	private static IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> TokenizeLines(
+		FencedCodeBlock fenced,
+		IGrammar grammar
+	)
+	{
 		IStateStack state = null;
 		for (var i = 0; i < fenced.Lines.Count; i++)
 		{
@@ -43,14 +53,8 @@ public class TextMateSharpCodeBlockRenderer(
 			var lineText = slice.Text.AsMemory(slice.Start, slice.Length);
 			var tokenized = grammar.TokenizeLine(lineText, state, TimeSpan.MaxValue);
 			state = tokenized.RuleStack;
-		
-			foreach (var token in tokenized.Tokens)
-			{
-				htmlRenderer.Write(token, lineText, renderer.Writer);
-			}
-			renderer.WriteLine();
+			yield return (tokenized.Tokens, lineText);
 		}
-		htmlRenderer.WriteFooter(renderer.Writer);
 	}
 
 	private bool TryGetGrammar(string languageId, out IGrammar grammar)

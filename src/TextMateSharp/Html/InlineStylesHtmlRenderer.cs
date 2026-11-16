@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
 using TextMateSharp.Grammars;
@@ -45,18 +46,51 @@ public class InlineStylesHtmlRenderer(Theme theme) : IHtmlRenderer
 	}
 	
 	/// <inheritdoc/>
-	public void Write(IToken token, ReadOnlyMemory<char> line, TextWriter writer)
+	public void WriteLines(TextWriter writer, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines)
 	{
-		var styles = ResolvedStyles.Create(token, theme);
-		var isStyled = !styles.IsEmpty;
-		if (isStyled)
+		ResolvedStyles? currentStyles = null;
+		foreach (var (tokens, line) in lines)
+		{
+			foreach (var token in tokens)
+			{
+				// Empty tokens must not split a style run (for example on blank lines).
+				if (token.StartIndex >= line.Length || token.EndIndex <= token.StartIndex)
+				{
+					continue;
+				}
+				var styles = ResolvedStyles.Create(token, theme);
+				if (currentStyles != styles)
+				{
+					if (currentStyles.HasValue)
+					{
+						WriteStyleEnd(writer, currentStyles.Value);
+					}
+					WriteStyleStart(writer, styles);
+					currentStyles = styles;
+				}
+				writer.Write(token, line);
+			}
+			writer.WriteLine();
+		}
+		if (currentStyles.HasValue)
+		{
+			WriteStyleEnd(writer, currentStyles.Value);
+		}
+	}
+
+	private void WriteStyleStart(TextWriter writer, ResolvedStyles styles)
+	{
+		if (!styles.IsEmpty)
 		{
 			writer.Write("<span style=\"");
 			WriteStyles(styles, writer);
 			writer.Write("\">");
 		}
-		writer.Write(token, line);
-		if (isStyled)
+	}
+
+	private void WriteStyleEnd(TextWriter writer, ResolvedStyles styles)
+	{
+		if (!styles.IsEmpty)
 		{
 			writer.Write("</span>");
 		}
