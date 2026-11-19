@@ -194,7 +194,7 @@ namespace TextMateSharp.Markdown.Tests
             renderer.ObjectRenderers.Remove(renderer.ObjectRenderers.FindExact<CodeBlockRenderer>());
             renderer.ObjectRenderers.Add(new TextMateSharpCodeBlockRenderer(
                 registry, options, new CodeBlockRenderer(), tokenRenderer.Object));
-            tokenRenderer.Setup(r => r.Write(
+            tokenRenderer.Setup(r => r.Render(
                 writer,
                 "csharp",
                 It.IsAny<IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>())
@@ -214,7 +214,7 @@ namespace TextMateSharp.Markdown.Tests
             renderer.Render(Markdig.Markdown.Parse(markdown));
 
             Assert.AreEqual(source + writer.NewLine, writer.ToString());
-            tokenRenderer.Verify(r => r.Write(
+            tokenRenderer.Verify(r => r.Render(
                 writer,
                 "csharp",
                 It.IsAny<IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)>>()), Times.Once()
