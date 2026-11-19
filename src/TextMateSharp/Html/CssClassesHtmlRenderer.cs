@@ -83,40 +83,45 @@ public class CssClassesHtmlRenderer : IHtmlRenderer
 		// class: `tm-string tm-string-quoted tm-string-quoted-double tm-string-quoted-double-cs`
 		
 		var length = scope.Length;
-#if !NETSTANDARD2_0
-		// Stack allocate a buffer to contain a string like "string-quoted-double"
+		
 		Span<char> buffer = stackalloc char[length];
+#if NETSTANDARD2_0
+		scope.AsSpan().CopyTo(buffer);
+#else
+		// In newer .NET, we can avoid the intermediary .AsSpan()
 		scope.CopyTo(buffer);
-		for (var i = 0; i < buffer.Length; i++)
+#endif
+
+		var isFirst = true;
+		for (var i = 0; i <= length; i++)
 		{
-			if (buffer[i] == '.')
+			// We only need to output a class at the '.' separators, or at the end.
+			var isEnd = i == length;
+			var isDot = !isEnd && buffer[i] == '.';
+			if (!isDot && !isEnd)
+			{
+				continue;	
+			}
+
+			// Replace dots with hyphens as we go
+			if (isDot)
 			{
 				buffer[i] = '-';
 			}
-		}
-#else
-		// Fall back to slower method in .NET Standard 2.0, since it doesn't support the
-		// functionality we need.
-		var buffer = scope.Replace('.', '-');
-#endif
-		
-		var first = true;
-		// For each `.` in the scope, render the contents of the buffer up until that point.
-		// Given "string.quoted.double", this will first render "tm-string", then "tm-string-quoted",
-		// then "tm-string-quoted-double".
-		for (var i = 0; i <= length; i++)
-		{
-			if (i != scope.Length && scope[i] != '.')
-				continue;
 
-			if (!first)
+			if (!isFirst)
 			{
 				writer.Write(' ');
 			}
-			first = false;
-
+			isFirst = false;
+			
 			writer.Write("tm-");
+#if NETSTANDARD2_0
+			// No ReadOnlySpan<char> overload in .NET Standard 2.0, so this is the best we can do.
+			writer.Write(buffer[..i].ToArray());		
+#else
 			writer.Write(buffer[..i]);
+#endif
 		}
 	}
 }
