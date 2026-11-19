@@ -8,9 +8,13 @@ namespace TextMateSharp.Markdown;
 
 public class TextMateSharpExtension(
 	Registry.Registry registry,
-	RegistryOptions registryOptions
+	RegistryOptions registryOptions,
+	IHtmlRenderer renderer = null
 ) : IMarkdownExtension
 {
+	private readonly IHtmlRenderer _renderer = 
+		renderer ?? new InlineStylesHtmlRenderer(registry.GetTheme());
+
 	/// <inheritdoc/>
 	public void Setup(MarkdownPipelineBuilder pipeline)
 	{
@@ -18,32 +22,31 @@ public class TextMateSharpExtension(
 	}
 
 	/// <inheritdoc/>
-	public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
+	public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer markdownRenderer)
 	{
-		if (renderer is not HtmlRenderer htmlRenderer)
+		if (markdownRenderer is not HtmlRenderer markdownHtmlRenderer)
 		{
 			return;
 		}
 		
 		// Find the existing render to use as a fallback, if any.
-		var existingRenderer = htmlRenderer.ObjectRenderers.FindExact<CodeBlockRenderer>();
-		if (existingRenderer is not null)
+		var existingCodeBlock = markdownHtmlRenderer.ObjectRenderers.FindExact<CodeBlockRenderer>();
+		if (existingCodeBlock is not null)
 		{
-			htmlRenderer.ObjectRenderers.Remove(existingRenderer);
+			markdownHtmlRenderer.ObjectRenderers.Remove(existingCodeBlock);
 		}
 		else
 		{
 			// No existing renderer, so create a new one as the fallback.
-			existingRenderer = new CodeBlockRenderer();
+			existingCodeBlock = new CodeBlockRenderer();
 		}
-
-		var htmlTokenRenderer = new InlineStylesHtmlRenderer(registry.GetTheme());
-		htmlRenderer.ObjectRenderers.AddIfNotAlready(
+		
+		markdownHtmlRenderer.ObjectRenderers.AddIfNotAlready(
 			new TextMateSharpCodeBlockRenderer(
 				registry,
 				registryOptions,
-				existingRenderer,
-				htmlTokenRenderer
+				existingCodeBlock,
+				_renderer
 			)
 		);
 	}

@@ -11,10 +11,19 @@ namespace TextMateSharp.Html;
 public interface IHtmlRenderer
 {
 	/// <summary>
-	/// Writes the specified tokenized code lines as HTML.
+	/// Renders the specified tokenized code lines as HTML, to the specified
+	/// <see cref="TextWriter"/>.
 	/// </summary>
-	public void Write(
+	public void Render(
 		TextWriter writer,
+		string languageId,
+		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
+	);
+	
+	/// <summary>
+	/// Returns the specified tokenized code lines as HTML.
+	/// </summary>
+	public string Render(
 		string languageId,
 		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
 	);

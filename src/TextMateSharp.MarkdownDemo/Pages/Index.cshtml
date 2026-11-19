@@ -38,6 +38,7 @@
     <hr />
     <h1>HTML with CSS classes</h1>
     @{
+        // Example of rendering without Markdown
         var lines = """
                    Console.WriteLine("Hello world" + 42);
                    foreach (var something in Foo) {
@@ -57,11 +58,9 @@
             state = tokenized.RuleStack;
             return (tokenized.Tokens, line.AsMemory());
         });
-        var writer = new StringWriter();
-        
-        htmlRenderer.Write(writer, "csharp", tokenizedLines);
+        var output =htmlRenderer.Render("csharp", tokenizedLines);
     }
     
-    @Html.Raw(writer.ToString())
+    @Html.Raw(output)
 </body>
 </html>

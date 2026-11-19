@@ -10,17 +10,21 @@ namespace TextMateSharp.Html;
 /// <summary>
 /// Implementation of <see cref="IHtmlRenderer"/> that outputs tokens with inline styles.
 /// </summary>
-public class InlineStylesHtmlRenderer(Theme theme) : IHtmlRenderer
+public class InlineStylesHtmlRenderer(Theme theme) : HtmlRendererBase, IHtmlRenderer
 {
 	/// <inheritdoc/>
-	public void Write(TextWriter writer, string languageId, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines)
+	public override void Render(
+		TextWriter writer,
+		string languageId,
+		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
+	)
 	{
-		WriteHeader(writer, languageId);
-		WriteLines(writer, lines);
-		WriteFooter(writer);
+		RenderHeader(writer, languageId);
+		RenderLines(writer, lines);
+		RenderFooter(writer);
 	}
 	
-	private void WriteHeader(TextWriter writer, string languageId)
+	private void RenderHeader(TextWriter writer, string languageId)
 	{
 		var guiColors = theme.GetGuiColorDictionary();
 		guiColors.TryGetValue("editor.background", out var backgroundColor);
@@ -46,12 +50,12 @@ public class InlineStylesHtmlRenderer(Theme theme) : IHtmlRenderer
 		writer.Write("\">");
 	}
 
-	private void WriteFooter(TextWriter writer)
+	private void RenderFooter(TextWriter writer)
 	{
 		writer.WriteLine("</code></pre>");
 	}
-	
-	public void WriteLines(TextWriter writer, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines)
+
+	private void RenderLines(TextWriter writer, IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines)
 	{
 		ResolvedStyles? currentStyles = null;
 		foreach (var (tokens, line) in lines)

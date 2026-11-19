@@ -27,7 +27,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(7, 12, ["source.test"]);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "before <&\"> after".AsMemory())]);
+            renderer.Render(writer, "test", [([token], "before <&\"> after".AsMemory())]);
 
             AssertCodeHtml(
                 "<span style=\"color:#123456;background-color:#ABCDEF;" +
@@ -42,7 +42,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 4, []);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "<&\">".AsMemory())]);
+            renderer.Render(writer, "test", [([token], "<&\">".AsMemory())]);
 
             AssertCodeHtml("&lt;&amp;&quot;&gt;" + writer.NewLine, writer);
         }
@@ -56,7 +56,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 4, ["source.test"]);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "text".AsMemory())]);
+            renderer.Render(writer, "test", [([token], "text".AsMemory())]);
 
             AssertCodeHtml(
                 "<span style=\"color:#123456;background-color:#ABCDEF;\">text" + writer.NewLine + "</span>",
@@ -95,7 +95,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 4, ["source.test", "keyword.test"]);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "text".AsMemory())]);
+            renderer.Render(writer, "test", [([token], "text".AsMemory())]);
 
             AssertCodeHtml(
                 "<span style=\"color:#FEDCBA;background-color:#ABCDEF;font-style:italic;\">text" + writer.NewLine + "</span>",
@@ -108,8 +108,11 @@ namespace TextMateSharp.Tests.Html
             var renderer = new InlineStylesHtmlRenderer(CreateTheme("bold"));
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test",
-                [([new Token(0, 1, ["source.test"]), new Token(1, 2, [])], "a&".AsMemory())]);
+            renderer.Render(
+                writer,
+                "test",
+                [([new Token(0, 1, ["source.test"]), new Token(1, 2, [])], "a&".AsMemory())]
+            );
 
             AssertCodeHtml(
                 "<span style=\"color:#123456;background-color:#ABCDEF;font-weight:bold;\">a</span>&amp;" + writer.NewLine,
@@ -124,7 +127,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 1, []);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], ReadOnlyMemory<char>.Empty)]);
+            renderer.Render(writer, "test", [([token], ReadOnlyMemory<char>.Empty)]);
 
             AssertCodeHtml(writer.NewLine, writer);
         }
@@ -138,7 +141,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(start, end, new List<string>());
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "abc".AsMemory())]);
+            renderer.Render(writer, "test", [([token], "abc".AsMemory())]);
 
             AssertCodeHtml(expected + writer.NewLine, writer);
         }
@@ -154,7 +157,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(start, end, []);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "prefix <&\"> suffix".AsMemory(7, 4))]);
+            renderer.Render(writer, "test", [([token], "prefix <&\"> suffix".AsMemory(7, 4))]);
 
             AssertCodeHtml(expected + writer.NewLine, writer);
         }
@@ -166,7 +169,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 100, []);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "prefix <&".AsMemory(7))]);
+            renderer.Render(writer, "test", [([token], "prefix <&".AsMemory(7))]);
 
             AssertCodeHtml("&lt;&amp;" + writer.NewLine, writer);
         }
@@ -178,7 +181,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 1, []);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "prefix suffix".AsMemory(7, 0))]);
+            renderer.Render(writer, "test", [([token], "prefix suffix".AsMemory(7, 0))]);
 
             AssertCodeHtml(writer.NewLine, writer);
         }
@@ -190,7 +193,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, 100, ["source.test"]);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], "prefix <& suffix".AsMemory(7, 2))]);
+            renderer.Render(writer, "test", [([token], "prefix <& suffix".AsMemory(7, 2))]);
 
             AssertCodeHtml(
                 "<span style=\"color:#123456;background-color:#ABCDEF;font-weight:bold;\">&lt;&amp;" + writer.NewLine + "</span>",
@@ -205,7 +208,7 @@ namespace TextMateSharp.Tests.Html
             var source = "prefix <&\"> suffix".ToCharArray();
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], source.AsMemory(7, 4))]);
+            renderer.Render(writer, "test", [([token], source.AsMemory(7, 4))]);
 
             AssertCodeHtml("&amp;&quot;&gt;" + writer.NewLine, writer);
         }
@@ -218,7 +221,7 @@ namespace TextMateSharp.Tests.Html
             var token = new Token(0, source.Length, []);
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", [([token], source.ToCharArray().AsMemory())]);
+            renderer.Render(writer, "test", [([token], source.ToCharArray().AsMemory())]);
 
             AssertCodeHtml(HtmlEncoder.Default.Encode(source) + writer.NewLine, writer);
         }
@@ -236,8 +239,8 @@ namespace TextMateSharp.Tests.Html
             using var first = new StringWriter();
             using var second = new StringWriter();
 
-            renderer.Write(first, "test", lines);
-            renderer.Write(second, "test", lines);
+            renderer.Render(first, "test", lines);
+            renderer.Render(second, "test", lines);
 
             AssertCodeHtml(
                 "<span style=\"color:#123456;background-color:#ABCDEF;font-weight:bold;\">a&lt;" +
@@ -257,7 +260,7 @@ namespace TextMateSharp.Tests.Html
             ];
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test", lines);
+            renderer.Render(writer, "test", lines);
 
             const string opening = "<span style=\"color:#123456;background-color:#ABCDEF;font-weight:bold;\">";
             AssertCodeHtml(

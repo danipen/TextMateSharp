@@ -1,5 +1,6 @@
 using Markdig;
 using TextMateSharp.Grammars;
+using TextMateSharp.Html;
 
 namespace TextMateSharp.Markdown;
 
@@ -25,10 +26,13 @@ public static class MarkdownPipelineBuilderExtensions
 		/// </summary>
 		public MarkdownPipelineBuilder UseTextMateSharp(
 			Registry.Registry registry,
-			RegistryOptions registryOptions
+			RegistryOptions registryOptions,
+			IHtmlRenderer renderer = null
 		)
 		{
-			return builder.Use(new TextMateSharpExtension(registry, registryOptions));
+			return builder.Use(
+				new TextMateSharpExtension(registry, registryOptions, renderer)
+			);
 		}
 	}
 }

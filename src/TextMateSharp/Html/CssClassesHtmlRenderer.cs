@@ -9,21 +9,21 @@ namespace TextMateSharp.Html;
 /// <summary>
 /// Implementation of <see cref="IHtmlRenderer"/> that outputs tokens with CSS class names.
 /// </summary>
-public class CssClassesHtmlRenderer : IHtmlRenderer
+public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 {
 	/// <inheritdoc/>
-	public void Write(
+	public override void Render(
 		TextWriter writer,
 		string languageId,
 		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
 	)
 	{
-		WriteHeader(writer, languageId);
-		WriteLines(writer, lines);
-		WriteFooter(writer);
+		RenderHeader(writer, languageId);
+		RenderLines(writer, lines);
+		RenderFooter(writer);
 	}
 
-	private void WriteHeader(TextWriter writer, string languageId)
+	private void RenderHeader(TextWriter writer, string languageId)
 	{
 		// `<pre><code class="language-...">` is the markup recommended in the HTML spec:
 		// https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
@@ -33,12 +33,12 @@ public class CssClassesHtmlRenderer : IHtmlRenderer
 		writer.Write("\">");
 	}
 	
-	private void WriteFooter(TextWriter writer)
+	private void RenderFooter(TextWriter writer)
 	{
 		writer.WriteLine("</code></pre>");
 	}
 
-	private void WriteLines(
+	private void RenderLines(
 		TextWriter writer,
 		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
 	)

@@ -25,7 +25,7 @@ namespace TextMateSharp.Tests.Html
             ];
             using var writer = new StringWriter();
 
-            renderer.Write(writer, "test\"&", lines);
+            renderer.Render(writer, "test\"&", lines);
 
             Assert.AreEqual(
                 writer.NewLine + "<pre><code class=\"language-test&quot;&amp;\">" +
