@@ -1,0 +1,172 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Encodings.Web;
+using TextMateSharp.Grammars;
+
+namespace TextMateSharp.Html;
+
+/// <summary>
+/// Implementation of <see cref="IHtmlRenderer"/> that outputs tokens with CSS class names.
+/// </summary>
+public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
+{
+	private readonly string[] _allowedScopes;
+
+	/// <summary>
+	/// Creates a renderer that includes all scope classes.
+	/// </summary>
+	public CssClassesHtmlRenderer() {}
+
+	/// <summary>
+	/// Creates a renderer with an optional allowlist of scope classes.
+	/// </summary>
+	/// <param name="allowedScopes">
+	/// Dot-separated scope prefixes to emit as individual CSS classes. For example,
+	/// "string.quoted" allows "tm-string-quoted", but not "tm-string" or
+	/// "tm-string-quoted-double". Null allows all classes.
+	/// </param>
+	public CssClassesHtmlRenderer(IEnumerable<string> allowedScopes)
+	{
+		_allowedScopes = allowedScopes == null ? null : new List<string>(allowedScopes).ToArray();
+	}
+
+	/// <inheritdoc/>
+	public override void Render(
+		TextWriter writer,
+		string languageId,
+		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
+	)
+	{
+		RenderHeader(writer, languageId);
+		RenderLines(writer, lines);
+		RenderFooter(writer);
+	}
+
+	private void RenderHeader(TextWriter writer, string languageId)
+	{
+		// `<pre><code class="language-...">` is the markup recommended in the HTML spec:
+		// https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-code-element
+		writer.WriteLine();
+		writer.Write("<pre><code class=\"language-");
+		HtmlEncoder.Default.Encode(writer, languageId);
+		writer.Write("\">");
+	}
+	
+	private void RenderFooter(TextWriter writer)
+	{
+		writer.WriteLine("</code></pre>");
+	}
+
+	private void RenderLines(
+		TextWriter writer,
+		IEnumerable<(IToken[] Tokens, ReadOnlyMemory<char> Line)> lines
+	)
+	{
+		foreach (var (tokens, line) in lines)
+		{
+			foreach (var token in tokens)
+			{
+				// TODO(daniel15) Merge adjacent tokens with same scopes into a single <span>,
+				// like InlineStylesHtmlRenderer does for styles.
+				writer.Write("<span class=\"");
+				WriteScopes(writer, token.Scopes);
+				writer.Write("\">");
+				writer.Write(token, line);
+				writer.Write("</span>");
+			}
+			writer.WriteLine();
+		}
+	}
+
+	private void WriteScopes(
+		TextWriter writer,
+		IEnumerable<string> scopes
+	)
+	{
+		var first = true;
+		foreach (var scope in scopes)
+		{
+			WriteScopeClasses(writer, scope, ref first);
+		}	
+	}
+
+	private void WriteScopeClasses(
+		TextWriter writer,
+		string scope,
+		ref bool isFirst
+	)
+	{
+		// Scope looks like `string.quoted.double.cs`. We want to render each segment as a CSS 
+		// class: `tm-string tm-string-quoted tm-string-quoted-double tm-string-quoted-double-cs`
+		
+		var length = scope.Length;
+		
+		Span<char> buffer = stackalloc char[length];
+#if NETSTANDARD2_0
+		scope.AsSpan().CopyTo(buffer);
+#else
+		// In newer .NET, we can avoid the intermediary .AsSpan()
+		scope.CopyTo(buffer);
+#endif
+
+		for (var i = 0; i <= length; i++)
+		{
+			// We only need to output a class at the '.' separators, or at the end.
+			var isEnd = i == length;
+			var isDot = !isEnd && buffer[i] == '.';
+			if (!isDot && !isEnd)
+			{
+				continue;	
+			}
+
+			// Replace dots with hyphens as we go
+			if (isDot)
+			{
+				buffer[i] = '-';
+			}
+
+			if (!IsAllowed(scope.AsSpan(0, i)))
+			{
+				continue;
+			}
+
+			if (!isFirst)
+			{
+				writer.Write(' ');
+			}
+			isFirst = false;
+			
+			writer.Write("tm-");
+#if NETSTANDARD2_0
+			// No Write(ReadOnlySpan<char>) overload in .NET Standard 2.0, so this is the best we
+			// can do.
+			for (var bufferChar = 0; bufferChar < i; bufferChar++)
+			{
+				writer.Write(buffer[bufferChar]);
+			}
+#else
+			writer.Write(buffer[..i]);
+#endif
+		}
+	}
+
+	/// <summary>
+	/// Determines whether we should output the specified scope.
+	/// </summary>
+	private bool IsAllowed(ReadOnlySpan<char> scope)
+	{
+		if (_allowedScopes == null)
+		{
+			return true;
+		}
+		foreach (var allowed in _allowedScopes)
+		{
+			if (scope.SequenceEqual(allowed.AsSpan()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+}

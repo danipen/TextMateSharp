@@ -175,22 +175,41 @@ namespace TextMateSharp.Grammars
 
         public string GetScopeByExtension(string extension)
         {
+            return GetScopeByLanguageCallback(language =>
+                language.Extensions?.Contains(extension, StringComparer.OrdinalIgnoreCase) ?? false
+            );
+        }
+
+        /// <summary>
+        /// Gets the scope by either file extension or alias. This is mostly for use with Markdown
+        /// code blocks, since they can use either extension (js, c#) or alias (javascript, csharp).
+        /// </summary>
+        public string GetScopeByExtensionOrAlias(string extensionOrAlias)
+        {
+            var extension = extensionOrAlias.StartsWith(".")
+                ? extensionOrAlias
+                : '.' + extensionOrAlias;
+            return GetScopeByLanguageCallback(language =>
+                language.Extensions?.Contains(extension, StringComparer.OrdinalIgnoreCase) ??
+                language.Aliases?.Contains(extensionOrAlias, StringComparer.OrdinalIgnoreCase) ??
+                false
+            );
+        }
+
+        private string GetScopeByLanguageCallback(Func<Language, bool> check)
+        {
             foreach (GrammarDefinition definition in _availableGrammars.Values)
             {
                 foreach (var language in definition.Contributes.Languages)
                 {
                     if (language.Extensions == null)
                         continue;
-
-                    foreach (var languageExtension in language.Extensions)
+                    
+                    if (check(language))
                     {
-                        if (extension.Equals(languageExtension,
-                                StringComparison.OrdinalIgnoreCase))
+                        foreach (var grammar in definition.Contributes.Grammars)
                         {
-                            foreach (var grammar in definition.Contributes.Grammars)
-                            {
-                                return grammar.ScopeName;
-                            }
+                            return grammar.ScopeName;
                         }
                     }
                 }

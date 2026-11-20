@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <IsPackable>False</IsPackable>
+        <SignAssembly>True</SignAssembly>
+        <LangVersion>14.0</LangVersion>
+        <AssemblyOriginatorKeyFile>..\TextMateSharp.snk</AssemblyOriginatorKeyFile>
+        <AssemblyName>TextMateSharp.Markdown.Tests</AssemblyName>
+        <RootNamespace>TextMateSharp.Markdown.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NUnit" Version="3.13.3" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Moq" Version="4.18.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TextMateSharp.Markdown\TextMateSharp.Markdown.csproj" />
+    </ItemGroup>
+</Project>

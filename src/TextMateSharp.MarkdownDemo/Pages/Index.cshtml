@@ -1,0 +1,66 @@
+﻿@page
+@using Markdig
+@using TextMateSharp.Grammars
+@using TextMateSharp.Html
+@using TextMateSharp.Registry
+@inject MarkdownPipeline markdownPipeline
+@{
+    var content = """
+                  # Hello world! :D
+                  This is example Markdown content.
+
+                  Here is some C# code:
+                  ```csharp
+                  Console.WriteLine("Hello world" + 42);
+                  ```
+                  
+                  Here is some JavaScript:
+                  ```javascript
+                  const result = await loadSomeData();
+                  console.log('Hello world! ' + result); 
+                  
+                  const multiLineString = `
+                    Hello
+                    world!
+                  `;
+                  ```
+                  """;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TextMateSharp Markdown Example</title>
+</head>
+<body>
+    <h1>Markdown</h1>
+    @Html.Raw(Markdown.ToHtml(content, markdownPipeline))
+    
+    <hr />
+    <h1>HTML with CSS classes</h1>
+    @{
+        // Example of rendering without Markdown
+        var lines = """
+                   Console.WriteLine("Hello world" + 42);
+                   foreach (var something in Foo) {
+                       await something.DoIt();
+                   }
+                   """.Split("\n");
+        
+        var registryOptions = new RegistryOptions(ThemeName.OneDark);
+        var registry = new Registry(registryOptions);
+        var grammar = registry.LoadGrammar(registryOptions.GetScopeByExtension(".cs"));
+        var htmlRenderer = new CssClassesHtmlRenderer();
+        
+        IStateStack? state = null;
+        var tokenizedLines = lines.Select(line =>
+        {
+            var tokenized = grammar.TokenizeLine(line, state, TimeSpan.MaxValue);
+            state = tokenized.RuleStack;
+            return (tokenized.Tokens, line.AsMemory());
+        });
+        var output =htmlRenderer.Render("csharp", tokenizedLines);
+    }
+    
+    @Html.Raw(output)
+</body>
+</html>
