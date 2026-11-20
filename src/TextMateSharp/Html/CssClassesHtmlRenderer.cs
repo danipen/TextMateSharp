@@ -139,8 +139,12 @@ public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 			
 			writer.Write("tm-");
 #if NETSTANDARD2_0
-			// No ReadOnlySpan<char> overload in .NET Standard 2.0, so this is the best we can do.
-			writer.Write(buffer[..i].ToArray());		
+			// No Write(ReadOnlySpan<char>) overload in .NET Standard 2.0, so this is the best we
+			// can do.
+			for (var bufferChar = 0; bufferChar < i; bufferChar++)
+			{
+				writer.Write(buffer[bufferChar]);
+			}
 #else
 			writer.Write(buffer[..i]);
 #endif
