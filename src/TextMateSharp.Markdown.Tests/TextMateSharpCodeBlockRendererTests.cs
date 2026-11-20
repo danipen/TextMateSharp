@@ -86,7 +86,7 @@ namespace TextMateSharp.Markdown.Tests
         {
             var options = new RegistryOptions(ThemeName.DarkPlus);
             var registry = new Registry.Registry(options);
-            var pipeline = new MarkdownPipelineBuilder().UseTextMateSharp(registry, options).Build();
+            var pipeline = new MarkdownPipelineBuilder().UseTextMateSharp(options).Build();
             var colors = registry.GetTheme().GetGuiColorDictionary();
 
             var pre = XElement.Parse(Markdig.Markdown.ToHtml("```csharp\nvar x = 1;\n```", pipeline));

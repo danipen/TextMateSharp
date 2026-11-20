@@ -47,8 +47,7 @@ namespace TextMateSharp.Markdown.Tests
         public void UseTextMateSharp_SuppliedRegistry_UsesItsTheme()
         {
             var options = new RegistryOptions(ThemeName.LightPlus);
-            var registry = new Registry.Registry(options);
-            var pipeline = new MarkdownPipelineBuilder().UseTextMateSharp(registry, options).Build();
+            var pipeline = new MarkdownPipelineBuilder().UseTextMateSharp(options).Build();
             var expectedPipeline = new MarkdownPipelineBuilder().UseTextMateSharp(ThemeName.LightPlus).Build();
 
             Assert.AreEqual(

@@ -14,22 +14,23 @@ public static class MarkdownPipelineBuilderExtensions
 		/// <summary>
 		/// Add TextMateSharp to handle code blocks.
 		/// </summary>
-		public MarkdownPipelineBuilder UseTextMateSharp(ThemeName? themeName = null)
+		public MarkdownPipelineBuilder UseTextMateSharp(ThemeName themeName)
 		{
-			var registryOptions = new RegistryOptions(themeName ?? ThemeName.DarkPlus);
-			var registry = new Registry.Registry(registryOptions);
-			return builder.UseTextMateSharp(registry, registryOptions);
+			var registryOptions = new RegistryOptions(themeName);
+			return builder.UseTextMateSharp(registryOptions);
 		}
 
 		/// <summary>
 		/// Add TextMateSharp to handle code blocks.
 		/// </summary>
 		public MarkdownPipelineBuilder UseTextMateSharp(
-			Registry.Registry registry,
-			RegistryOptions registryOptions,
+			RegistryOptions registryOptions = null,
+			Registry.Registry registry = null,
 			IHtmlRenderer renderer = null
 		)
 		{
+			registryOptions ??= new RegistryOptions(ThemeName.DarkPlus);
+			registry ??= new Registry.Registry(registryOptions);
 			return builder.Use(
 				new TextMateSharpExtension(registry, registryOptions, renderer)
 			);
