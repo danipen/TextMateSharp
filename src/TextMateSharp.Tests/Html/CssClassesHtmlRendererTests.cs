@@ -38,5 +38,51 @@ namespace TextMateSharp.Tests.Html
                 writer.ToString()
             );
         }
+        [Test]
+        public void Render_Allowlist_FiltersIndividualExpandedClassesWithoutMergingTokens()
+        {
+            var allowed = new[] { "string.quoted", "entity.name" };
+            var renderer = new CssClassesHtmlRenderer(allowed);
+            allowed[0] = "ignored";
+            (IToken[] Tokens, ReadOnlyMemory<char> Line)[] lines =
+            [
+                ([
+                    new Token(0, 1, ["source.test", "string.quoted.double", "entity.name.tag"]),
+                    new Token(1, 2, ["string.quoted.single"]),
+                    new Token(2, 3, ["string.quoted.single"]),
+                    new Token(3, 4, ["stringy.quoted", "entity.other"])
+                ], "<&ab".AsMemory())
+            ];
+            using var writer = new StringWriter();
+
+            renderer.Render(writer, "test", lines);
+
+            Assert.AreEqual(
+                writer.NewLine + "<pre><code class=\"language-test\">" +
+                "<span class=\"tm-string-quoted tm-entity-name\">&lt;</span>" +
+                "<span class=\"tm-string-quoted\">&amp;</span>" +
+                "<span class=\"tm-string-quoted\">a</span>" +
+                "<span class=\"\">b</span>" + writer.NewLine +
+                "</code></pre>" + writer.NewLine,
+                writer.ToString());
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Render_NullOrEmptyAllowlist_AllowsAllOrNoClasses(bool empty)
+        {
+            var renderer = new CssClassesHtmlRenderer(empty ? Array.Empty<string>() : null);
+            (IToken[] Tokens, ReadOnlyMemory<char> Line)[] lines =
+                [([new Token(0, 1, ["source.test"])], "a".AsMemory())];
+            using var writer = new StringWriter();
+
+            renderer.Render(writer, "test", lines);
+
+            var classes = empty ? "" : "tm-source tm-source-test";
+            Assert.AreEqual(
+                writer.NewLine + "<pre><code class=\"language-test\"><span class=\"" + classes +
+                "\">a</span>" + writer.NewLine + "</code></pre>" + writer.NewLine,
+                writer.ToString());
+        }
     }
 }

@@ -11,6 +11,26 @@ namespace TextMateSharp.Html;
 /// </summary>
 public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 {
+	private readonly string[] _allowedScopes;
+
+	/// <summary>
+	/// Creates a renderer that includes all scope classes.
+	/// </summary>
+	public CssClassesHtmlRenderer() {}
+
+	/// <summary>
+	/// Creates a renderer with an optional allowlist of scope classes.
+	/// </summary>
+	/// <param name="allowedScopes">
+	/// Dot-separated scope prefixes to emit as individual CSS classes. For example,
+	/// "string.quoted" allows "tm-string-quoted", but not "tm-string" or
+	/// "tm-string-quoted-double". Null allows all classes.
+	/// </param>
+	public CssClassesHtmlRenderer(IEnumerable<string> allowedScopes)
+	{
+		_allowedScopes = allowedScopes == null ? null : new List<string>(allowedScopes).ToArray();
+	}
+
 	/// <inheritdoc/>
 	public override void Render(
 		TextWriter writer,
@@ -47,6 +67,8 @@ public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 		{
 			foreach (var token in tokens)
 			{
+				// TODO(daniel15) Merge adjacent tokens with same scopes into a single <span>,
+				// like InlineStylesHtmlRenderer does for styles.
 				writer.Write("<span class=\"");
 				WriteScopes(writer, token.Scopes);
 				writer.Write("\">");
@@ -65,18 +87,14 @@ public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 		var first = true;
 		foreach (var scope in scopes)
 		{
-			if (!first)
-			{
-				writer.Write(' ');
-			}
-			first = false;
-			WriteScopeClasses(writer, scope);
+			WriteScopeClasses(writer, scope, ref first);
 		}	
 	}
 
 	private void WriteScopeClasses(
 		TextWriter writer,
-		string scope
+		string scope,
+		ref bool isFirst
 	)
 	{
 		// Scope looks like `string.quoted.double.cs`. We want to render each segment as a CSS 
@@ -92,7 +110,6 @@ public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 		scope.CopyTo(buffer);
 #endif
 
-		var isFirst = true;
 		for (var i = 0; i <= length; i++)
 		{
 			// We only need to output a class at the '.' separators, or at the end.
@@ -109,6 +126,11 @@ public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 				buffer[i] = '-';
 			}
 
+			if (!IsAllowed(scope.AsSpan(0, i)))
+			{
+				continue;
+			}
+
 			if (!isFirst)
 			{
 				writer.Write(' ');
@@ -123,5 +145,24 @@ public class CssClassesHtmlRenderer : HtmlRendererBase, IHtmlRenderer
 			writer.Write(buffer[..i]);
 #endif
 		}
+	}
+
+	/// <summary>
+	/// Determines whether we should output the specified scope.
+	/// </summary>
+	private bool IsAllowed(ReadOnlySpan<char> scope)
+	{
+		if (_allowedScopes == null)
+		{
+			return true;
+		}
+		foreach (var allowed in _allowedScopes)
+		{
+			if (scope.SequenceEqual(allowed.AsSpan()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
